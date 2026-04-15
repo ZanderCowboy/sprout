@@ -1,6 +1,6 @@
 import 'bootstrap.dart';
 
-/// Same as [main_development] — default for `flutter run` without `-t`.
+/// Entry point that loads [assets/config/development.json].
 Future<void> main() async {
   await bootstrap(configAssetPath: 'assets/config/development.json');
 }

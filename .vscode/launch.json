@@ -1,0 +1,55 @@
+{
+  "version": "0.2.0",
+  // Dev configs use lib/main_development.dart → assets/config/development.json
+  // Prod configs use lib/main_production.dart → assets/config/production.json
+  "configurations": [
+    {
+      "name": "Sprout · dev · debug",
+      "request": "launch",
+      "type": "dart",
+      "cwd": "${workspaceFolder}/sprout_app",
+      "program": "lib/main_development.dart",
+      "flutterMode": "debug"
+    },
+    {
+      "name": "Sprout · dev · profile",
+      "request": "launch",
+      "type": "dart",
+      "cwd": "${workspaceFolder}/sprout_app",
+      "program": "lib/main_development.dart",
+      "flutterMode": "profile"
+    },
+    {
+      "name": "Sprout · dev · release",
+      "request": "launch",
+      "type": "dart",
+      "cwd": "${workspaceFolder}/sprout_app",
+      "program": "lib/main_development.dart",
+      "flutterMode": "release"
+    },
+    {
+      "name": "Sprout · prod · debug",
+      "request": "launch",
+      "type": "dart",
+      "cwd": "${workspaceFolder}/sprout_app",
+      "program": "lib/main_production.dart",
+      "flutterMode": "debug"
+    },
+    {
+      "name": "Sprout · prod · profile",
+      "request": "launch",
+      "type": "dart",
+      "cwd": "${workspaceFolder}/sprout_app",
+      "program": "lib/main_production.dart",
+      "flutterMode": "profile"
+    },
+    {
+      "name": "Sprout · prod · release",
+      "request": "launch",
+      "type": "dart",
+      "cwd": "${workspaceFolder}/sprout_app",
+      "program": "lib/main_production.dart",
+      "flutterMode": "release"
+    }
+  ]
+}

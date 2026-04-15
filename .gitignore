@@ -6,6 +6,12 @@
 *.swp
 .buildlog/
 .history
+*.DS_Store
+
+# Secrets
+.secrets
+sprout_app/assets/config/development.json
+sprout_app/assets/config/production.json
 
 
 
