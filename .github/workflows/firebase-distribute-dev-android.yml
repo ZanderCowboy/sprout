@@ -1,0 +1,55 @@
+name: "Firebase Distribute (Dev Android APK)"
+
+on:
+  workflow_dispatch:
+    inputs:
+      git_ref:
+        description: "Branch, tag, or commit SHA to build (defaults to the current ref)."
+        required: false
+        default: ""
+      tester_groups:
+        description: "Firebase App Distribution groups (comma-separated)."
+        required: true
+        default: "dev"
+      release_notes:
+        description: "Release notes shown in Firebase App Distribution."
+        required: false
+        default: ""
+
+jobs:
+  build-and-distribute:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.git_ref != '' && inputs.git_ref || github.ref }}
+
+      - name: Setup Flutter (and pub get)
+        uses: ./.github/actions/flutter-setup
+        with:
+          working-directory: sprout_app
+
+      - name: Configure Android signing (optional)
+        if: ${{ secrets.ANDROID_SIGNING_CONFIG_BASE64 != '' }}
+        uses: ./.github/actions/android-signing-setup
+        with:
+          working-directory: sprout_app
+          signing-config-base64: ${{ secrets.ANDROID_SIGNING_CONFIG_BASE64 }}
+
+      - name: Build dev APK (Firebase internal testing)
+        working-directory: sprout_app
+        env:
+          ANDROID_APPLICATION_ID: ${{ secrets.ANDROID_APPLICATION_ID }}
+        run: flutter build apk --release -t lib/main_development.dart
+
+      - name: Upload to Firebase App Distribution
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: ${{ secrets.FIREBASE_APP_ID }}
+          serviceCredentialsFileContent: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+          groups: ${{ inputs.tester_groups }}
+          releaseNotes: ${{ inputs.release_notes }}
+          file: sprout_app/build/app/outputs/flutter-apk/app-release.apk
+

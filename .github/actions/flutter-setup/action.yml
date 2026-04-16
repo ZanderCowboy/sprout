@@ -1,0 +1,37 @@
+name: "Flutter Setup (Pub Get)"
+description: "Install Java + Flutter and run `flutter pub get` for a Flutter module."
+
+inputs:
+  working-directory:
+    description: "Directory containing the Flutter project (where pubspec.yaml lives)."
+    required: false
+    default: "sprout_app"
+  flutter-channel:
+    description: "Flutter release channel."
+    required: false
+    default: "stable"
+  java-version:
+    description: "Java version for Android builds."
+    required: false
+    default: "17"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: "temurin"
+        java-version: ${{ inputs.java-version }}
+
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        channel: ${{ inputs.flutter-channel }}
+        cache: true
+
+    - name: Flutter pub get
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: flutter pub get
+

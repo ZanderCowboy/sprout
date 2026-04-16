@@ -7,6 +7,7 @@ import 'package:sprout/core/core.dart';
 import 'package:sprout/features/sync/export.dart';
 import 'package:sprout/features/transactions/export.dart';
 import '../domain/budget_group.dart';
+import '../domain/budget_category.dart';
 import '../domain/budget_repository.dart';
 import 'budget_mapper.dart';
 
@@ -49,12 +50,21 @@ class BudgetRepositoryImpl implements BudgetRepository {
         .map(budgetGroupFromHive)
         .where((g) => g.userId == uid)
         .toList();
-    list.sort((a, b) {
-      final c = a.category.index.compareTo(b.category.index);
-      if (c != 0) return c;
-      return a.name.compareTo(b.name);
-    });
-    return list;
+
+    // Preserve the user/insertion order inside each category.
+    // We still return categories in a deterministic order.
+    final byCategory = <BudgetCategory, List<BudgetGroup>>{
+      for (final c in BudgetCategory.values) c: <BudgetGroup>[],
+    };
+    for (final g in list) {
+      byCategory[g.category]!.add(g);
+    }
+
+    final result = <BudgetGroup>[];
+    for (final c in BudgetCategory.values) {
+      result.addAll(byCategory[c]!);
+    }
+    return result;
   }
 
   @override

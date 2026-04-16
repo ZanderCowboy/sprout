@@ -1,0 +1,32 @@
+name: "CI Dev Checks"
+
+on:
+  push:
+  workflow_call:
+    inputs:
+      working-directory:
+        description: "Flutter module directory containing pubspec.yaml"
+        required: false
+        type: string
+        default: "sprout_app"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter (and pub get)
+        uses: ./.github/actions/flutter-setup
+        with:
+          working-directory: ${{ inputs.working-directory || 'sprout_app' }}
+
+      - name: Flutter analyze
+        working-directory: ${{ inputs.working-directory || 'sprout_app' }}
+        run: flutter analyze
+
+      - name: Flutter test
+        working-directory: ${{ inputs.working-directory || 'sprout_app' }}
+        run: flutter test
+

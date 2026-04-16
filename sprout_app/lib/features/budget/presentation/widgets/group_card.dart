@@ -6,12 +6,14 @@ import '../../domain/budget_group.dart';
 import '../../domain/budget_item.dart';
 import 'budget_group_icon_picker.dart';
 import 'budget_item_card.dart';
+import '../utils/budget_sorting.dart';
 
 class GroupCard extends StatefulWidget {
   const GroupCard({
     super.key,
     required this.group,
     required this.totalAmount,
+    required this.itemSort,
     required this.onUpsertGroup,
     required this.onDeleteGroup,
     required this.onUpsertItem,
@@ -25,6 +27,7 @@ class GroupCard extends StatefulWidget {
 
   final BudgetGroup group;
   final double totalAmount;
+  final BudgetSortOption itemSort;
 
   final ValueChanged<BudgetGroup> onUpsertGroup;
   final ValueChanged<String> onDeleteGroup;
@@ -84,6 +87,8 @@ class _GroupCardState extends State<GroupCard> {
   @override
   void didUpdateWidget(covariant GroupCard oldWidget) {
     super.didUpdateWidget(oldWidget);
+    // Keep the open state when a just-created draft group becomes persisted.
+    // The parent uses a stable key so this State can survive that list move.
     if (oldWidget.group.id != widget.group.id ||
         oldWidget.group.name != widget.group.name) {
       if (!_editingName) _name.text = widget.group.name;
@@ -146,6 +151,9 @@ class _GroupCardState extends State<GroupCard> {
     );
 
     if (widget.isDraft) {
+      // Draft groups are promoted into the persisted list immediately after a
+      // valid name is entered, so the card must preserve its expansion state
+      // across that transition to keep item entry feeling continuous.
       widget.onDraftChanged?.call(updated);
     }
 
@@ -172,7 +180,8 @@ class _GroupCardState extends State<GroupCard> {
   Future<void> _showAppearanceSheet() async {
     FocusScope.of(context).unfocus();
     final scheme = Theme.of(context).colorScheme;
-    final initialColor = _parseHexColor(widget.group.colorHex) ?? scheme.primary;
+    final initialColor =
+        _parseHexColor(widget.group.colorHex) ?? scheme.primary;
     var colorArgb = initialColor.toARGB32();
     var icon = _iconForGroup(widget.group);
 
@@ -190,7 +199,8 @@ class _GroupCardState extends State<GroupCard> {
                   left: 20,
                   right: 20,
                   top: 8,
-                  bottom: MediaQuery.viewInsetsOf(context).bottom +
+                  bottom:
+                      MediaQuery.viewInsetsOf(context).bottom +
                       MediaQuery.paddingOf(context).bottom +
                       20,
                 ),
@@ -201,8 +211,8 @@ class _GroupCardState extends State<GroupCard> {
                     Text(
                       'Color & icon',
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 16),
                     Text(
@@ -216,7 +226,8 @@ class _GroupCardState extends State<GroupCard> {
                       children: [
                         for (final c in AppColors.cardPalette)
                           GestureDetector(
-                            onTap: () => setModalState(() => colorArgb = c.toARGB32()),
+                            onTap: () =>
+                                setModalState(() => colorArgb = c.toARGB32()),
                             child: CircleAvatar(
                               backgroundColor: c,
                               child: colorArgb == c.toARGB32()
@@ -227,10 +238,7 @@ class _GroupCardState extends State<GroupCard> {
                       ],
                     ),
                     const SizedBox(height: 16),
-                    Text(
-                      'Icon',
-                      style: Theme.of(context).textTheme.labelLarge,
-                    ),
+                    Text('Icon', style: Theme.of(context).textTheme.labelLarge),
                     const SizedBox(height: 8),
                     BudgetGroupIconPicker(
                       selected: icon,
@@ -260,7 +268,9 @@ class _GroupCardState extends State<GroupCard> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Remove group?'),
-        content: Text('This will remove “${widget.group.name.trim().isEmpty ? 'Untitled group' : widget.group.name}”.'),
+        content: Text(
+          'This will remove “${widget.group.name.trim().isEmpty ? 'Untitled group' : widget.group.name}”.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
@@ -287,11 +297,7 @@ class _GroupCardState extends State<GroupCard> {
         }
       }
       _draftItems.add(
-        BudgetItem(
-          id: UniqueKey().toString(),
-          name: '',
-          amount: 0.0,
-        ),
+        BudgetItem(id: UniqueKey().toString(), name: '', amount: 0.0),
       );
     });
   }
@@ -323,141 +329,153 @@ class _GroupCardState extends State<GroupCard> {
     final color = _parseHexColor(widget.group.colorHex) ?? scheme.primary;
     final icon = _iconForGroup(widget.group);
 
-    final items = [...widget.group.items, ..._draftItems];
+    final itemsUnsorted = [...widget.group.items, ..._draftItems];
+    final items = sortBudgetItems(itemsUnsorted, widget.itemSort);
 
-    return Card(
-      clipBehavior: Clip.antiAlias,
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              color.withValues(alpha: 0.20),
-              scheme.surface,
-            ],
-            stops: const [0.0, 0.72],
+    return GestureDetector(
+      onLongPress: widget.isDraft ? widget.onDiscardDraft : _confirmDeleteGroup,
+      child: Card(
+        clipBehavior: Clip.antiAlias,
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [color.withValues(alpha: 0.20), scheme.surface],
+              stops: const [0.0, 0.72],
+            ),
           ),
-        ),
-        child: ExpansionTile(
-          initiallyExpanded: _expanded,
-          onExpansionChanged: (v) => setState(() => _expanded = v),
-          tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
-          shape: const Border(),
-          collapsedShape: const Border(),
-          leading: Tooltip(
-            message: 'Color & icon',
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: _showAppearanceSheet,
-                customBorder: const CircleBorder(),
-                child: Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: color,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: color.withValues(alpha: 0.35),
-                        blurRadius: 14,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
+          child: ExpansionTile(
+            initiallyExpanded: _expanded,
+            onExpansionChanged: (v) => setState(() => _expanded = v),
+            tilePadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 4,
+            ),
+            childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
+            shape: const Border(),
+            collapsedShape: const Border(),
+            leading: Tooltip(
+              message: 'Color & icon',
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: _showAppearanceSheet,
+                  customBorder: const CircleBorder(),
+                  child: Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: color,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: color.withValues(alpha: 0.35),
+                          blurRadius: 14,
+                          offset: const Offset(0, 8),
+                        ),
+                      ],
+                    ),
+                    child: Icon(icon, color: Colors.white, size: 22),
                   ),
-                  child: Icon(icon, color: Colors.white, size: 22),
                 ),
               ),
             ),
-          ),
-          title: _editingName
-              ? TextField(
-                  controller: _name,
-                  focusNode: _nameFocus,
-                  decoration: const InputDecoration(
-                    isDense: true,
-                    border: InputBorder.none,
-                    hintText: 'Group name',
+            title: _editingName
+                ? TextField(
+                    controller: _name,
+                    focusNode: _nameFocus,
+                    decoration: const InputDecoration(
+                      isDense: true,
+                      border: InputBorder.none,
+                      hintText: 'Group name',
+                    ),
+                    textCapitalization: TextCapitalization.words,
+                    autofocus: true,
+                  )
+                : InkWell(
+                    onTap: () {
+                      setState(() {
+                        _editingName = true;
+                        _expanded = true;
+                      });
+                      _nameFocus.requestFocus();
+                    },
+                    child: Text(
+                      widget.group.name.trim().isEmpty
+                          ? 'Untitled group'
+                          : widget.group.name,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
                   ),
-                  textCapitalization: TextCapitalization.words,
-                  autofocus: true,
-                )
-              : InkWell(
-                  onTap: () {
-                    setState(() {
-                      _editingName = true;
-                      _expanded = true;
-                    });
-                    _nameFocus.requestFocus();
-                  },
-                  child: Text(
-                    widget.group.name.trim().isEmpty ? 'Untitled group' : widget.group.name,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w900,
-                        ),
+            subtitle: _editingDescription
+                ? TextField(
+                    controller: _description,
+                    focusNode: _descriptionFocus,
+                    decoration: const InputDecoration(
+                      isDense: true,
+                      border: InputBorder.none,
+                      hintText: 'Description (optional)',
+                    ),
+                    textCapitalization: TextCapitalization.sentences,
+                    autofocus: true,
+                  )
+                : ((widget.group.description == null ||
+                          widget.group.description!.trim().isEmpty)
+                      ? InkWell(
+                          onTap: () {
+                            setState(() {
+                              _editingDescription = true;
+                              _expanded = true;
+                            });
+                            _descriptionFocus.requestFocus();
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 6),
+                            child: Text(
+                              'Tap to add a description',
+                              style: Theme.of(context).textTheme.bodyMedium
+                                  ?.copyWith(
+                                    color: scheme.onSurfaceVariant,
+                                    height: 1.2,
+                                  ),
+                            ),
+                          ),
+                        )
+                      : InkWell(
+                          onTap: () {
+                            setState(() {
+                              _editingDescription = true;
+                              _expanded = true;
+                            });
+                            _descriptionFocus.requestFocus();
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 6),
+                            child: Text(
+                              widget.group.description!.trim(),
+                              style: Theme.of(context).textTheme.bodyMedium
+                                  ?.copyWith(
+                                    color: scheme.onSurfaceVariant,
+                                    height: 1.2,
+                                  ),
+                            ),
+                          ),
+                        )),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  formatZarFromCents((widget.totalAmount * 100).round()),
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w900,
                   ),
                 ),
-          subtitle: _editingDescription
-              ? TextField(
-                  controller: _description,
-                  focusNode: _descriptionFocus,
-                  decoration: const InputDecoration(
-                    isDense: true,
-                    border: InputBorder.none,
-                    hintText: 'Description (optional)',
-                  ),
-                  textCapitalization: TextCapitalization.sentences,
-                  autofocus: true,
-                )
-              : ((widget.group.description == null ||
-                      widget.group.description!.trim().isEmpty)
-                  ? InkWell(
-                      onTap: () {
-                        setState(() {
-                          _editingDescription = true;
-                          _expanded = true;
-                        });
-                        _descriptionFocus.requestFocus();
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 6),
-                        child: Text(
-                          'Tap to add a description',
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: scheme.onSurfaceVariant,
-                                height: 1.2,
-                              ),
-                        ),
-                      ),
-                    )
-                  : InkWell(
-                      onTap: () {
-                        setState(() {
-                          _editingDescription = true;
-                          _expanded = true;
-                        });
-                        _descriptionFocus.requestFocus();
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 6),
-                        child: Text(
-                          widget.group.description!.trim(),
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: scheme.onSurfaceVariant,
-                                height: 1.2,
-                              ),
-                        ),
-                      ),
-                    )),
-          trailing: Row(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              IgnorePointer(
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 4),
+                const SizedBox(width: 2),
+                IgnorePointer(
                   child: Icon(
                     _expanded
                         ? Icons.keyboard_arrow_up_rounded
@@ -466,80 +484,36 @@ class _GroupCardState extends State<GroupCard> {
                     color: scheme.onSurfaceVariant,
                   ),
                 ),
-              ),
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    formatZarFromCents((widget.totalAmount * 100).round()),
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w900,
-                        ),
+              ],
+            ),
+            children: [
+              if (items.isNotEmpty)
+                ...items.map(
+                  (i) => Padding(
+                    padding: const EdgeInsets.only(top: 2),
+                    child: BudgetItemCard(
+                      key: ValueKey(i.id),
+                      item: i,
+                      isDraft: _draftItems.any((d) => d.id == i.id),
+                      onDiscardDraft: _draftItems.any((d) => d.id == i.id)
+                          ? () => _discardDraftItem(i.id)
+                          : null,
+                      onDraftChanged: _draftItems.any((d) => d.id == i.id)
+                          ? _upsertDraftItem
+                          : null,
+                      onUpsert: (updated) =>
+                          widget.onUpsertItem(widget.group.id, updated),
+                      onDelete: () =>
+                          widget.onDeleteItem(widget.group.id, i.id),
+                    ),
                   ),
-                  const SizedBox(height: 2),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      _TinyIconAction(
-                        tooltip: 'Edit',
-                        icon: Icons.edit_rounded,
-                        onTap: () {
-                          setState(() {
-                            _editingName = true;
-                            _expanded = true;
-                          });
-                          _nameFocus.requestFocus();
-                        },
-                      ),
-                      _TinyIconAction(
-                        tooltip: 'Delete',
-                        icon: Icons.delete_outline_rounded,
-                        onTap: widget.isDraft
-                            ? widget.onDiscardDraft
-                            : _confirmDeleteGroup,
-                      ),
-                    ],
-                  ),
-                ],
+                ),
+              Padding(
+                padding: const EdgeInsets.only(top: 6),
+                child: _AddItemCard(onTap: _addDraftItem),
               ),
             ],
           ),
-          children: [
-            if (items.isEmpty)
-              Padding(
-                padding: const EdgeInsets.only(top: 8),
-                child: Text(
-                  'No items yet.',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: scheme.onSurfaceVariant,
-                      ),
-                ),
-              )
-            else
-              ...items.map(
-                (i) => Padding(
-                  padding: const EdgeInsets.only(top: 6),
-                  child: BudgetItemCard(
-                    item: i,
-                    isDraft: _draftItems.any((d) => d.id == i.id),
-                    onDiscardDraft: _draftItems.any((d) => d.id == i.id)
-                        ? () => _discardDraftItem(i.id)
-                        : null,
-                    onDraftChanged: _draftItems.any((d) => d.id == i.id)
-                        ? _upsertDraftItem
-                        : null,
-                    onUpsert: (updated) => widget.onUpsertItem(widget.group.id, updated),
-                    onDelete: () => widget.onDeleteItem(widget.group.id, i.id),
-                  ),
-                ),
-              ),
-            Padding(
-              padding: const EdgeInsets.only(top: 12),
-              child: _AddItemCard(onTap: _addDraftItem),
-            ),
-          ],
         ),
       ),
     );
@@ -561,16 +535,16 @@ class _AddItemCard extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+          padding: const EdgeInsets.fromLTRB(14, 8, 14, 8),
           child: Row(
             children: [
               Icon(Icons.add_rounded, color: scheme.primary, size: 18),
               const SizedBox(width: 10),
               Text(
                 'Add item',
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      fontWeight: FontWeight.w800,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w800),
               ),
             ],
           ),
@@ -580,41 +554,10 @@ class _AddItemCard extends StatelessWidget {
   }
 }
 
-class _TinyIconAction extends StatelessWidget {
-  const _TinyIconAction({
-    required this.tooltip,
-    required this.icon,
-    required this.onTap,
-  });
-
-  final String tooltip;
-  final IconData icon;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Tooltip(
-      message: tooltip,
-      child: SizedBox.square(
-        dimension: 30,
-        child: InkResponse(
-          onTap: onTap,
-          radius: 18,
-          child: Icon(icon, size: 18, color: scheme.onSurfaceVariant),
-        ),
-      ),
-    );
-  }
-}
-
 IconData _iconForGroup(BudgetGroup group) {
   final cp = group.iconCodePoint;
   if (cp == null) return Icons.category_rounded;
-  return IconData(
-    cp,
-    fontFamily: group.iconFontFamily ?? 'MaterialIcons',
-  );
+  return IconData(cp, fontFamily: group.iconFontFamily ?? 'MaterialIcons');
 }
 
 Color? _parseHexColor(String hex) {
@@ -627,4 +570,3 @@ Color? _parseHexColor(String hex) {
   if (v == null) return null;
   return Color(v);
 }
-

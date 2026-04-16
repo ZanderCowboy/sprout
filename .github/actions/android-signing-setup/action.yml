@@ -1,0 +1,57 @@
+name: "Android Signing Setup"
+description: "Decode Android signing config (base64 JSON) and generate key.properties + keystore. Also exports decoded values to GITHUB_ENV."
+
+inputs:
+  working-directory:
+    description: "Flutter module directory containing android/"
+    required: false
+    default: "sprout_app"
+  signing-config-base64:
+    description: "Base64-encoded JSON containing KEYSTORE_BASE64, KEY_ALIAS, KEY_PASSWORD, STORE_PASSWORD."
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Decode signing config and write key.properties
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      env:
+        SIGNING_CONFIG_BASE64: ${{ inputs.signing-config-base64 }}
+      run: |
+        set -euo pipefail
+
+        # Decode JSON payload
+        SIGNING_JSON="$(echo "${SIGNING_CONFIG_BASE64}" | base64 --decode)"
+
+        # Extract fields (KEYSTORE_BASE64 is itself base64)
+        KEYSTORE_BASE64="$(echo "${SIGNING_JSON}" | jq -r '.KEYSTORE_BASE64')"
+        KEY_ALIAS="$(echo "${SIGNING_JSON}" | jq -r '.KEY_ALIAS')"
+        KEY_PASSWORD="$(echo "${SIGNING_JSON}" | jq -r '.KEY_PASSWORD')"
+        STORE_PASSWORD="$(echo "${SIGNING_JSON}" | jq -r '.STORE_PASSWORD')"
+
+        if [[ -z "${KEYSTORE_BASE64}" || "${KEYSTORE_BASE64}" == "null" || -z "${KEY_ALIAS}" || "${KEY_ALIAS}" == "null" || -z "${KEY_PASSWORD}" || "${KEY_PASSWORD}" == "null" || -z "${STORE_PASSWORD}" || "${STORE_PASSWORD}" == "null" ]]; then
+          echo "Android signing config JSON is missing one of: KEYSTORE_BASE64, KEY_ALIAS, KEY_PASSWORD, STORE_PASSWORD"
+          exit 1
+        fi
+
+        # Write keystore and Android key.properties expected by Gradle.
+        echo "${KEYSTORE_BASE64}" | base64 --decode > android/release-key.p12
+
+        cat > android/key.properties <<EOF
+        storePassword=${STORE_PASSWORD}
+        keyPassword=${KEY_PASSWORD}
+        keyAlias=${KEY_ALIAS}
+        storeFile=release-key.p12
+        EOF
+
+        # Export decoded values for any future steps/workflows.
+        {
+          echo "KEY_ALIAS=${KEY_ALIAS}"
+          echo "KEY_PASSWORD=${KEY_PASSWORD}"
+          echo "STORE_PASSWORD=${STORE_PASSWORD}"
+          echo "ANDROID_KEY_ALIAS=${KEY_ALIAS}"
+          echo "ANDROID_KEY_PASSWORD=${KEY_PASSWORD}"
+          echo "ANDROID_STORE_PASSWORD=${STORE_PASSWORD}"
+        } >> "$GITHUB_ENV"
+

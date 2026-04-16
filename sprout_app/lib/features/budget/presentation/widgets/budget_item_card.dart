@@ -35,12 +35,15 @@ class _BudgetItemCardState extends State<BudgetItemCard> {
 
   bool _editingName = false;
   bool _editingAmount = false;
+  bool _handingOffToAmount = false;
 
   @override
   void initState() {
     super.initState();
     _name = TextEditingController(text: widget.item.name);
-    _amount = TextEditingController(text: _amountTextForField(widget.item.amount));
+    _amount = TextEditingController(
+      text: _amountTextForField(widget.item.amount),
+    );
     _nameFocus = FocusNode()..addListener(_onNameFocus);
     _amountFocus = FocusNode()..addListener(_onAmountFocus);
 
@@ -56,7 +59,8 @@ class _BudgetItemCardState extends State<BudgetItemCard> {
   @override
   void didUpdateWidget(covariant BudgetItemCard oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.item.id != widget.item.id || oldWidget.item.name != widget.item.name) {
+    if (oldWidget.item.id != widget.item.id ||
+        oldWidget.item.name != widget.item.name) {
       if (!_editingName) {
         _name.text = widget.item.name;
       } else if (oldWidget.item.name.trim().isEmpty &&
@@ -74,6 +78,7 @@ class _BudgetItemCardState extends State<BudgetItemCard> {
 
   void _onNameFocus() {
     if (!_nameFocus.hasFocus && _editingName) {
+      if (_handingOffToAmount) return;
       setState(() => _editingName = false);
       _commit();
     }
@@ -99,8 +104,38 @@ class _BudgetItemCardState extends State<BudgetItemCard> {
     return _formatAmount(v);
   }
 
-  String get _amountHint =>
-      formatZarFromCents(0).replaceAll('R', '').trim();
+  String get _amountHint => formatZarFromCents(0).replaceAll('R', '').trim();
+
+  void _requestAmountFocus([int attemptsRemaining = 3]) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      FocusScope.of(context).requestFocus(_amountFocus);
+      if (_amountFocus.hasFocus || attemptsRemaining <= 1) {
+        _handingOffToAmount = false;
+        return;
+      }
+      _requestAmountFocus(attemptsRemaining - 1);
+    });
+  }
+
+  void _focusAmountField() {
+    _handingOffToAmount = true;
+    setState(() {
+      _editingName = false;
+      _editingAmount = true;
+      _amount.text = _amount.text.isEmpty
+          ? _amountTextForField(widget.item.amount)
+          : _amount.text;
+    });
+    _requestAmountFocus();
+  }
+
+  void _completeNameEditing() {
+    if (_name.text.trim().isNotEmpty) {
+      _commit();
+    }
+    _focusAmountField();
+  }
 
   void _commit() {
     final name = _name.text.trim();
@@ -112,9 +147,9 @@ class _BudgetItemCardState extends State<BudgetItemCard> {
       final cleaned = rawAmount.replaceAll(',', '');
       final p = double.tryParse(cleaned);
       if (p == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Enter a valid amount.')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Enter a valid amount.')));
         return;
       }
       amount = p;
@@ -189,7 +224,7 @@ class _BudgetItemCardState extends State<BudgetItemCard> {
       child: InkWell(
         onLongPress: widget.isDraft ? widget.onDiscardDraft : _confirmDelete,
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+          padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
           child: Row(
             children: [
               Expanded(
@@ -205,21 +240,7 @@ class _BudgetItemCardState extends State<BudgetItemCard> {
                         textCapitalization: TextCapitalization.words,
                         textInputAction: TextInputAction.next,
                         autofocus: true,
-                        onSubmitted: (_) {
-                          if (_name.text.trim().isNotEmpty) {
-                            _commit();
-                          }
-                          setState(() {
-                            _editingName = false;
-                            _editingAmount = true;
-                            _amount.text =
-                                _amountTextForField(widget.item.amount);
-                          });
-                          WidgetsBinding.instance.addPostFrameCallback((_) {
-                            if (!mounted) return;
-                            _amountFocus.requestFocus();
-                          });
-                        },
+                        onEditingComplete: _completeNameEditing,
                       )
                     : InkWell(
                         onTap: () {
@@ -230,10 +251,13 @@ class _BudgetItemCardState extends State<BudgetItemCard> {
                           widget.item.name.trim().isEmpty
                               ? BudgetItem.defaultDraftName
                               : widget.item.name,
-                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          style: Theme.of(context).textTheme.bodyLarge
+                              ?.copyWith(
                                 fontWeight: FontWeight.w800,
                                 color: widget.item.name.trim().isEmpty
-                                    ? scheme.onSurfaceVariant.withValues(alpha: 0.55)
+                                    ? scheme.onSurfaceVariant.withValues(
+                                        alpha: 0.55,
+                                      )
                                     : null,
                               ),
                         ),
@@ -250,14 +274,17 @@ class _BudgetItemCardState extends State<BudgetItemCard> {
                           isDense: true,
                           border: InputBorder.none,
                           hintText: _amountHint,
-                          hintStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                color: scheme.onSurfaceVariant.withValues(alpha: 0.45),
+                          hintStyle: Theme.of(context).textTheme.bodyLarge
+                              ?.copyWith(
+                                color: scheme.onSurfaceVariant.withValues(
+                                  alpha: 0.45,
+                                ),
                               ),
                         ),
                         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                              fontWeight: FontWeight.w900,
-                              color: scheme.onSurfaceVariant,
-                            ),
+                          fontWeight: FontWeight.w900,
+                          color: scheme.onSurfaceVariant,
+                        ),
                         textAlign: TextAlign.end,
                         keyboardType: const TextInputType.numberWithOptions(
                           decimal: true,
@@ -270,20 +297,24 @@ class _BudgetItemCardState extends State<BudgetItemCard> {
                       onTap: () {
                         setState(() {
                           _editingAmount = true;
-                          _amount.text = _amountTextForField(widget.item.amount);
+                          _amount.text = _amountTextForField(
+                            widget.item.amount,
+                          );
                         });
                         _amountFocus.requestFocus();
                       },
                       child: Text(
                         widget.item.amount == 0.0
                             ? _amountHint
-                            : formatZarFromCents((widget.item.amount * 100).round()),
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                              fontWeight: FontWeight.w900,
-                              color: scheme.onSurfaceVariant.withValues(
-                                alpha: widget.item.amount == 0.0 ? 0.45 : 1.0,
+                            : formatZarFromCents(
+                                (widget.item.amount * 100).round(),
                               ),
-                            ),
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          fontWeight: FontWeight.w900,
+                          color: scheme.onSurfaceVariant.withValues(
+                            alpha: widget.item.amount == 0.0 ? 0.45 : 1.0,
+                          ),
+                        ),
                       ),
                     ),
             ],
@@ -293,4 +324,3 @@ class _BudgetItemCardState extends State<BudgetItemCard> {
     );
   }
 }
-

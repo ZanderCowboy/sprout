@@ -14,7 +14,7 @@ class AddGroupCard extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
           child: Row(
             children: [
               Container(
@@ -27,18 +27,15 @@ class AddGroupCard extends StatelessWidget {
                     color: scheme.outlineVariant.withValues(alpha: 0.35),
                   ),
                 ),
-                child: Icon(
-                  Icons.add_rounded,
-                  color: scheme.primary,
-                ),
+                child: Icon(Icons.add_rounded, color: scheme.primary),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
                   'Tap + to add a group',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w800,
-                      ),
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
               ),
             ],
@@ -48,4 +45,3 @@ class AddGroupCard extends StatelessWidget {
     );
   }
 }
-

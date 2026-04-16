@@ -3,8 +3,11 @@ import 'package:intl/intl.dart';
 /// [amountCents] minor units (ZAR cents).
 String formatZarFromCents(int amountCents) {
   final major = amountCents / 100;
-  return NumberFormat.currency(locale: 'en_ZA', symbol: 'R', decimalDigits: 2)
-      .format(major);
+  return NumberFormat.currency(
+    locale: 'en_US',
+    symbol: 'R',
+    decimalDigits: 2,
+  ).format(major);
 }
 
 /// Parses user input like "1234.56" or "1 234,56" to cents; null if invalid.

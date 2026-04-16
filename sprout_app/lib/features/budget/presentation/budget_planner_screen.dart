@@ -9,29 +9,63 @@ import '../application/budget_service.dart';
 import '../domain/budget_category.dart';
 import '../domain/budget_group.dart';
 import 'budget_bloc.dart';
+import 'utils/budget_sorting.dart';
 import 'widgets/add_group_card.dart';
 import 'widgets/group_card.dart';
 
-class BudgetPlannerScreen extends StatelessWidget {
+class BudgetPlannerScreen extends StatefulWidget {
   const BudgetPlannerScreen({super.key});
+
+  @override
+  State<BudgetPlannerScreen> createState() => _BudgetPlannerScreenState();
+}
+
+class _BudgetPlannerScreenState extends State<BudgetPlannerScreen> {
+  BudgetSortOption _groupSort = BudgetSortOption.asIs;
+  BudgetSortOption _itemSort = BudgetSortOption.asIs;
+
+  Future<void> _openSortModal() async {
+    final initialGroupSort = _groupSort;
+    final initialItemSort = _itemSort;
+
+    final selected = await showModalBottomSheet<({
+      BudgetSortOption groupSort,
+      BudgetSortOption itemSort,
+    })>(
+      context: context,
+      showDragHandle: true,
+      isScrollControlled: true,
+      builder: (context) => _BudgetSortModal(
+        initialGroupSort: initialGroupSort,
+        initialItemSort: initialItemSort,
+      ),
+    );
+
+    if (!mounted || selected == null) return;
+    setState(() {
+      _groupSort = selected.groupSort;
+      _itemSort = selected.itemSort;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) =>
-          BudgetBloc(budgetService: sl<BudgetService>())..add(const BudgetSubscriptionRequested()),
+          BudgetBloc(budgetService: sl<BudgetService>())
+            ..add(const BudgetSubscriptionRequested()),
       child: DefaultTabController(
         length: 3,
         child: Scaffold(
           appBar: AppBar(
             title: const Text('Master Budget'),
-            bottom: const TabBar(
-              tabs: [
-                Tab(text: 'Income'),
-                Tab(text: 'Essentials'),
-                Tab(text: 'Lifestyle'),
-              ],
-            ),
+            actions: [
+              IconButton(
+                onPressed: _openSortModal,
+                tooltip: 'Sort budget',
+                icon: const Icon(Icons.sort_rounded),
+              ),
+            ],
           ),
           body: BlocBuilder<BudgetBloc, BudgetState>(
             builder: (context, state) {
@@ -45,9 +79,10 @@ class BudgetPlannerScreen extends StatelessWidget {
                 child: Column(
                   children: [
                     Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+                      padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
                       child: _BudgetSummaryHeader(state: state),
                     ),
+                    const _BudgetTabHeader(),
                     Expanded(
                       child: TabBarView(
                         children: [
@@ -55,16 +90,22 @@ class BudgetPlannerScreen extends StatelessWidget {
                             category: BudgetCategory.income,
                             groups: state.groups,
                             totals: state.groupTotals,
+                            groupSort: _groupSort,
+                            itemSort: _itemSort,
                           ),
                           _BudgetCategoryTab(
                             category: BudgetCategory.essentials,
                             groups: state.groups,
                             totals: state.groupTotals,
+                            groupSort: _groupSort,
+                            itemSort: _itemSort,
                           ),
                           _BudgetCategoryTab(
                             category: BudgetCategory.lifestyle,
                             groups: state.groups,
                             totals: state.groupTotals,
+                            groupSort: _groupSort,
+                            itemSort: _itemSort,
                           ),
                         ],
                       ),
@@ -74,6 +115,103 @@ class BudgetPlannerScreen extends StatelessWidget {
               );
             },
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _BudgetSortModal extends StatefulWidget {
+  const _BudgetSortModal({
+    required this.initialGroupSort,
+    required this.initialItemSort,
+  });
+
+  final BudgetSortOption initialGroupSort;
+  final BudgetSortOption initialItemSort;
+
+  @override
+  State<_BudgetSortModal> createState() => _BudgetSortModalState();
+}
+
+class _BudgetSortModalState extends State<_BudgetSortModal> {
+  late BudgetSortOption _groupSort;
+  late BudgetSortOption _itemSort;
+
+  @override
+  void initState() {
+    super.initState();
+    _groupSort = widget.initialGroupSort;
+    _itemSort = widget.initialItemSort;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Center(
+              child: Container(
+                width: 64,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant
+                      .withValues(alpha: 0.35),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Sort budget',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w900,
+                  ),
+            ),
+            const SizedBox(height: 16),
+            DropdownButtonFormField<BudgetSortOption>(
+              value: _groupSort,
+              decoration: const InputDecoration(labelText: 'Groups'),
+              items: [
+                for (final opt in BudgetSortOption.values)
+                  DropdownMenuItem(
+                    value: opt,
+                    child: Text(budgetSortOptionLabel(opt)),
+                  ),
+              ],
+              onChanged: (v) {
+                if (v == null) return;
+                setState(() => _groupSort = v);
+              },
+            ),
+            const SizedBox(height: 14),
+            DropdownButtonFormField<BudgetSortOption>(
+              value: _itemSort,
+              decoration: const InputDecoration(labelText: 'Items'),
+              items: [
+                for (final opt in BudgetSortOption.values)
+                  DropdownMenuItem(
+                    value: opt,
+                    child: Text(budgetSortOptionLabel(opt)),
+                  ),
+              ],
+              onChanged: (v) {
+                if (v == null) return;
+                setState(() => _itemSort = v);
+              },
+            ),
+            const SizedBox(height: 18),
+            FilledButton(
+              onPressed: () => Navigator.of(context).pop(
+                (groupSort: _groupSort, itemSort: _itemSort),
+              ),
+              child: const Text('Done'),
+            ),
+          ],
         ),
       ),
     );
@@ -101,10 +239,11 @@ class _BudgetSummaryHeaderState extends State<_BudgetSummaryHeader> {
     final valueColor = isNegative ? scheme.error : scheme.primary;
 
     return Card(
+      margin: EdgeInsets.zero,
       elevation: 0,
       color: scheme.surfaceContainerHighest,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+        padding: EdgeInsets.fromLTRB(16, 14, 16, _showBreakdown ? 14 : 12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -114,22 +253,20 @@ class _BudgetSummaryHeaderState extends State<_BudgetSummaryHeader> {
                 onTap: () => setState(() => _showBreakdown = !_showBreakdown),
                 borderRadius: BorderRadius.circular(8),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  padding: const EdgeInsets.symmetric(vertical: 2),
                   child: Row(
                     children: [
                       Icon(
                         Icons.account_tree_rounded,
-                        size: 18,
+                        size: 16,
                         color: scheme.primary,
                       ),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           'Theoretical disposable income',
-                          style:
-                              Theme.of(context).textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.w800,
-                                  ),
+                          style: Theme.of(context).textTheme.titleSmall
+                              ?.copyWith(fontWeight: FontWeight.w800),
                         ),
                       ),
                       Icon(
@@ -137,53 +274,57 @@ class _BudgetSummaryHeaderState extends State<_BudgetSummaryHeader> {
                             ? Icons.expand_less_rounded
                             : Icons.expand_more_rounded,
                         color: scheme.onSurfaceVariant,
-                        size: 22,
+                        size: 20,
                       ),
                     ],
                   ),
                 ),
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
             Text(
               formatZarFromCents(disposableCents),
-              style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                    fontWeight: FontWeight.w900,
-                    color: valueColor,
-                  ),
+              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                fontWeight: FontWeight.w900,
+                color: valueColor,
+              ),
             ),
             if (!_showBreakdown) ...[
-              const SizedBox(height: 6),
+              const SizedBox(height: 4),
               Text(
                 'Tap above for breakdown',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: scheme.onSurfaceVariant,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
               ),
             ],
             if (_showBreakdown) ...[
-              const SizedBox(height: 10),
+              const SizedBox(height: 8),
               Wrap(
                 spacing: 10,
                 runSpacing: 8,
                 children: [
                   _MiniTotalPill(
                     label: 'Income',
-                    value: formatZarFromCents((state.totalIncome * 100).round()),
+                    value: formatZarFromCents(
+                      (state.totalIncome * 100).round(),
+                    ),
                     icon: Icons.trending_up_rounded,
                     color: scheme.primary,
                   ),
                   _MiniTotalPill(
                     label: 'Essentials',
                     value: formatZarFromCents(
-                        (state.totalEssentials * 100).round()),
+                      (state.totalEssentials * 100).round(),
+                    ),
                     icon: Icons.home_rounded,
                     color: scheme.tertiary,
                   ),
                   _MiniTotalPill(
                     label: 'Lifestyle',
                     value: formatZarFromCents(
-                        (state.totalLifestyle * 100).round()),
+                      (state.totalLifestyle * 100).round(),
+                    ),
                     icon: Icons.local_cafe_rounded,
                     color: scheme.secondary,
                   ),
@@ -192,6 +333,33 @@ class _BudgetSummaryHeaderState extends State<_BudgetSummaryHeader> {
             ],
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _BudgetTabHeader extends StatelessWidget {
+  const _BudgetTabHeader();
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Material(
+      color: scheme.surfaceContainerHighest.withValues(alpha: 0.55),
+      child: TabBar(
+        dividerColor: Colors.transparent,
+        indicatorSize: TabBarIndicatorSize.tab,
+        labelStyle: Theme.of(
+          context,
+        ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
+        unselectedLabelStyle: Theme.of(
+          context,
+        ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+        tabs: const [
+          Tab(height: 42, text: 'Income'),
+          Tab(height: 42, text: 'Essentials'),
+          Tab(height: 42, text: 'Lifestyle'),
+        ],
       ),
     );
   }
@@ -218,7 +386,9 @@ class _MiniTotalPill extends StatelessWidget {
       decoration: BoxDecoration(
         color: scheme.surface,
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.35)),
+        border: Border.all(
+          color: scheme.outlineVariant.withValues(alpha: 0.35),
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -228,15 +398,15 @@ class _MiniTotalPill extends StatelessWidget {
           Text(
             '$label: ',
             style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: scheme.onSurfaceVariant,
-                ),
+              fontWeight: FontWeight.w700,
+              color: scheme.onSurfaceVariant,
+            ),
           ),
           Text(
             value,
-            style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                  fontWeight: FontWeight.w900,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w900),
           ),
         ],
       ),
@@ -249,11 +419,15 @@ class _BudgetCategoryTab extends StatelessWidget {
     required this.category,
     required this.groups,
     required this.totals,
+    required this.groupSort,
+    required this.itemSort,
   });
 
   final BudgetCategory category;
   final List<BudgetGroup> groups;
   final Map<String, double> totals;
+  final BudgetSortOption groupSort;
+  final BudgetSortOption itemSort;
 
   @override
   Widget build(BuildContext context) {
@@ -261,6 +435,8 @@ class _BudgetCategoryTab extends StatelessWidget {
       category: category,
       groups: groups,
       totals: totals,
+      groupSort: groupSort,
+      itemSort: itemSort,
     );
   }
 }
@@ -270,11 +446,15 @@ class _BudgetCategoryTabBody extends StatefulWidget {
     required this.category,
     required this.groups,
     required this.totals,
+    required this.groupSort,
+    required this.itemSort,
   });
 
   final BudgetCategory category;
   final List<BudgetGroup> groups;
   final Map<String, double> totals;
+  final BudgetSortOption groupSort;
+  final BudgetSortOption itemSort;
 
   @override
   State<_BudgetCategoryTabBody> createState() => _BudgetCategoryTabBodyState();
@@ -325,40 +505,45 @@ class _BudgetCategoryTabBodyState extends State<_BudgetCategoryTabBody> {
 
   @override
   Widget build(BuildContext context) {
-    final separator = const SizedBox(height: 6);
+    final separator = const SizedBox(height: 2);
     final all = [..._existing, ..._drafts];
+    final allSorted = sortBudgetGroups(all, widget.groupSort);
+    final bottomInset = MediaQuery.paddingOf(context).bottom;
 
     return ListView.separated(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 28),
-      itemCount: all.length + 1,
+      padding: EdgeInsets.fromLTRB(16, 6, 16, bottomInset + 18),
+      itemCount: allSorted.length + 1,
       separatorBuilder: (context, index) => separator,
       itemBuilder: (context, i) {
-        if (i == all.length) {
+        if (i == allSorted.length) {
           return AddGroupCard(onTap: _addDraft);
         }
 
-        final g = all[i];
+        final g = allSorted[i];
         final isDraft = _draftGroups.any((d) => d.id == g.id);
         final total = widget.totals[g.id] ?? 0.0;
 
         return GroupCard(
+          key: ValueKey(g.id),
           group: g,
           totalAmount: total,
+          itemSort: widget.itemSort,
           initiallyExpanded: isDraft,
           isDraft: isDraft,
           onDiscardDraft: isDraft ? () => _removeDraft(g.id) : null,
           onDraftChanged: isDraft ? _upsertDraft : null,
           allGroupsForNameValidation: widget.groups,
-          onUpsertGroup: (updated) =>
-              context.read<BudgetBloc>().add(BudgetGroupUpsertRequested(updated)),
+          onUpsertGroup: (updated) => context.read<BudgetBloc>().add(
+            BudgetGroupUpsertRequested(updated),
+          ),
           onDeleteGroup: (groupId) =>
               context.read<BudgetBloc>().add(BudgetGroupDeleted(groupId)),
-          onUpsertItem: (groupId, item) => context
-              .read<BudgetBloc>()
-              .add(BudgetItemUpsertRequested(groupId: groupId, item: item)),
-          onDeleteItem: (groupId, itemId) => context
-              .read<BudgetBloc>()
-              .add(BudgetItemDeleted(groupId: groupId, itemId: itemId)),
+          onUpsertItem: (groupId, item) => context.read<BudgetBloc>().add(
+            BudgetItemUpsertRequested(groupId: groupId, item: item),
+          ),
+          onDeleteItem: (groupId, itemId) => context.read<BudgetBloc>().add(
+            BudgetItemDeleted(groupId: groupId, itemId: itemId),
+          ),
         );
       },
     );
