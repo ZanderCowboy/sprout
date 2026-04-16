@@ -10,7 +10,13 @@
 			"titleBar.activeBackground": "#68301E",
 			"titleBar.activeForeground": "#FDF9F8",
 			"titleBar.inactiveBackground": "#4A2215",
-			"titleBar.inactiveForeground": "#FDF9F8"
+			"titleBar.inactiveForeground": "#FDF9F8",
+			"statusBar.background": "#823C25",
+			"statusBar.foreground": "#FEFBFA",
+			"statusBar.debuggingBackground": "#823C25",
+			"statusBar.debuggingForeground": "#FEFBFA",
+			"statusBar.noFolderBackground": "#823C25",
+			"statusBar.noFolderForeground": "#FEFBFA"
 		},
 		"java.configuration.updateBuildConfiguration": "interactive"
 	}
