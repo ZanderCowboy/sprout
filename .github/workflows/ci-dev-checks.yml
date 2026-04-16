@@ -29,4 +29,3 @@ jobs:
       - name: Flutter test
         working-directory: ${{ inputs.working-directory || 'sprout_app' }}
         run: flutter test
-

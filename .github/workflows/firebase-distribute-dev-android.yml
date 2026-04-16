@@ -19,7 +19,8 @@ on:
 jobs:
   build-and-distribute:
     runs-on: ubuntu-latest
-
+    env:
+      ANDROID_SIGNING_CONFIG_BASE64: ${{ secrets.ANDROID_SIGNING_CONFIG_BASE64 }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -32,11 +33,11 @@ jobs:
           working-directory: sprout_app
 
       - name: Configure Android signing (optional)
-        if: ${{ secrets.ANDROID_SIGNING_CONFIG_BASE64 != '' }}
+        if: ${{ env.ANDROID_SIGNING_CONFIG_BASE64 != '' }}
         uses: ./.github/actions/android-signing-setup
         with:
           working-directory: sprout_app
-          signing-config-base64: ${{ secrets.ANDROID_SIGNING_CONFIG_BASE64 }}
+          signing-config-base64: ${{ env.ANDROID_SIGNING_CONFIG_BASE64 }}
 
       - name: Build dev APK (Firebase internal testing)
         working-directory: sprout_app
@@ -52,4 +53,3 @@ jobs:
           groups: ${{ inputs.tester_groups }}
           releaseNotes: ${{ inputs.release_notes }}
           file: sprout_app/build/app/outputs/flutter-apk/app-release.apk
-
