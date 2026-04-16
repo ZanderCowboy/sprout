@@ -4,12 +4,11 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:sprout/core/core.dart';
-import 'package:sprout/features/sync/sync.dart';
-import 'package:sprout/features/transactions/transactions.dart';
+import 'package:sprout/features/sync/export.dart';
+import 'package:sprout/features/transactions/export.dart';
 import '../domain/goal.dart';
 import '../domain/goals_repository.dart';
 import 'goal_mapper.dart';
-import 'local/goal_hive_model.dart';
 
 class GoalsRepositoryImpl implements GoalsRepository {
   GoalsRepositoryImpl({

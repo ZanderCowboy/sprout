@@ -3,9 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:sprout/core/core.dart';
 import 'package:sprout/core/di/service_locator.dart';
-import 'package:sprout/features/accounts/accounts.dart';
-import 'package:sprout/features/goals/goals.dart';
-import 'package:sprout/features/transactions/transactions.dart';
+import 'package:sprout/features/accounts/export.dart';
+import 'package:sprout/features/goals/export.dart';
+import 'package:sprout/features/transactions/export.dart';
+
+import 'bloc/recurring_payments_bloc.dart';
+import 'utils/transaction_frequency_label.dart';
 
 class RecurringPaymentsPage extends StatelessWidget {
   const RecurringPaymentsPage({super.key});
@@ -13,17 +16,17 @@ class RecurringPaymentsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => _RecurringPaymentsBloc(
+      create: (_) => RecurringPaymentsBloc(
         transactionsService: sl<TransactionsService>(),
         goalsService: sl<GoalsService>(),
         accountsService: sl<AccountsService>(),
-      )..add(const _RecurringPaymentsSubscriptionRequested()),
-      child: BlocBuilder<_RecurringPaymentsBloc, _RecurringPaymentsState>(
+      )..add(const RecurringPaymentsSubscriptionRequested()),
+      child: BlocBuilder<RecurringPaymentsBloc, RecurringPaymentsState>(
         builder: (context, state) {
           return Scaffold(
             appBar: AppBar(title: const Text('Recurring payments')),
             body: switch (state) {
-              _RecurringPaymentsReady s => _RecurringPaymentsBody(state: s),
+              RecurringPaymentsReady s => _RecurringPaymentsBody(state: s),
               _ => const Center(child: CircularProgressIndicator()),
             },
           );
@@ -36,7 +39,7 @@ class RecurringPaymentsPage extends StatelessWidget {
 class _RecurringPaymentsBody extends StatelessWidget {
   const _RecurringPaymentsBody({required this.state});
 
-  final _RecurringPaymentsReady state;
+  final RecurringPaymentsReady state;
 
   @override
   Widget build(BuildContext context) {
@@ -64,8 +67,9 @@ class _RecurringPaymentsBody extends StatelessWidget {
           leading: const Icon(Icons.autorenew_rounded),
           title: Text(formatZarFromCents(item.amountCents)),
           subtitle: Text(
-            '$goalName · $accountName · ${_labelForFrequency(item.frequency)}'
-            '${item.nextScheduledDate != null ? ' · next ${formatDateTime(item.nextScheduledDate!)}' : ''}',
+            '$goalName · $accountName · ${transactionFrequencyLabel(item.frequency)}'
+            '${item.recurringEnabled && item.nextScheduledDate != null ? ' · next ${formatDateTime(item.nextScheduledDate!)}' : ''}'
+            '${!item.recurringEnabled ? ' · disabled' : ''}',
           ),
           trailing: IconButton(
             tooltip: 'Edit',
@@ -76,16 +80,6 @@ class _RecurringPaymentsBody extends StatelessWidget {
         );
       },
     );
-  }
-
-  String _labelForFrequency(TransactionFrequency f) {
-    return switch (f) {
-      TransactionFrequency.daily => 'Daily',
-      TransactionFrequency.weekly => 'Weekly',
-      TransactionFrequency.monthly => 'Monthly',
-      TransactionFrequency.yearly => 'Yearly',
-      TransactionFrequency.none => 'None',
-    };
   }
 
   Future<void> _openEdit(BuildContext context, Transaction tx) async {
@@ -108,7 +102,7 @@ class _EditRecurringSheet extends StatefulWidget {
 }
 
 class _EditRecurringSheetState extends State<_EditRecurringSheet> {
-  late bool _isRecurring;
+  late bool _enabled;
   late TransactionFrequency _frequency;
   String? _error;
   bool _saving = false;
@@ -116,7 +110,7 @@ class _EditRecurringSheetState extends State<_EditRecurringSheet> {
   @override
   void initState() {
     super.initState();
-    _isRecurring = widget.transaction.isRecurring;
+    _enabled = widget.transaction.recurringEnabled;
     _frequency = widget.transaction.frequency == TransactionFrequency.none
         ? TransactionFrequency.monthly
         : widget.transaction.frequency;
@@ -130,8 +124,8 @@ class _EditRecurringSheetState extends State<_EditRecurringSheet> {
     try {
       await sl<TransactionsService>().updateRecurringDeposit(
         transactionId: widget.transaction.id,
-        isRecurring: _isRecurring,
-        frequency: _isRecurring ? _frequency : TransactionFrequency.none,
+        isRecurring: _enabled,
+        frequency: _enabled ? _frequency : TransactionFrequency.none,
       );
       if (mounted) Navigator.of(context).pop();
     } on Object catch (e) {
@@ -142,24 +136,59 @@ class _EditRecurringSheetState extends State<_EditRecurringSheet> {
   }
 
   Future<void> _cancelRecurring() async {
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Cancel recurring payment?'),
+        content: const Text(
+          'This will remove the recurring payment. Existing transactions '
+          'already in your history will remain.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text(AppStrings.cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text(AppStrings.delete),
+          ),
+        ],
+      ),
+    );
+    if (ok != true) return;
+
     setState(() {
-      _isRecurring = false;
-      _frequency = TransactionFrequency.none;
+      _saving = true;
+      _error = null;
     });
-    await _save();
+    try {
+      await sl<TransactionsService>().deleteTransaction(widget.transaction.id);
+      if (mounted) Navigator.of(context).pop();
+    } on Object catch (e) {
+      setState(() => _error = '$e');
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final bottom = MediaQuery.viewInsetsOf(context).bottom;
+    final mq = MediaQuery.of(context);
+    final bottomPadding = mq.viewInsets.bottom + mq.padding.bottom;
     return Padding(
-      padding: EdgeInsets.only(left: 20, right: 20, top: 20, bottom: bottom + 20),
+      padding: EdgeInsets.only(
+        left: 20,
+        right: 20,
+        top: 20,
+        bottom: bottomPadding + 20,
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            'Recurring deposit',
+            _enabled ? 'Recurring deposit' : 'Recurring deposit (Disabled)',
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
@@ -167,11 +196,14 @@ class _EditRecurringSheetState extends State<_EditRecurringSheet> {
           const SizedBox(height: 12),
           SwitchListTile.adaptive(
             contentPadding: EdgeInsets.zero,
-            value: _isRecurring,
-            onChanged: _saving ? null : (v) => setState(() => _isRecurring = v),
-            title: const Text('Enabled'),
+            value: _enabled,
+            onChanged: _saving ? null : (v) => setState(() => _enabled = v),
+            title: Text(_enabled ? 'Enabled' : 'Disabled'),
+            subtitle: _enabled
+                ? null
+                : const Text('This recurring deposit won’t be applied.'),
           ),
-          if (_isRecurring) ...[
+          if (_enabled) ...[
             const SizedBox(height: 8),
             DropdownButtonFormField<TransactionFrequency>(
               value: _frequency, // ignore: deprecated_member_use
@@ -215,7 +247,7 @@ class _EditRecurringSheetState extends State<_EditRecurringSheet> {
               Expanded(
                 child: OutlinedButton(
                   onPressed: _saving ? null : _cancelRecurring,
-                  child: const Text('Cancel recurring'),
+                  child: const Text('Cancel (remove)'),
                 ),
               ),
               const SizedBox(width: 12),
@@ -232,124 +264,3 @@ class _EditRecurringSheetState extends State<_EditRecurringSheet> {
     );
   }
 }
-
-sealed class _RecurringPaymentsEvent {
-  const _RecurringPaymentsEvent();
-}
-
-final class _RecurringPaymentsSubscriptionRequested
-    extends _RecurringPaymentsEvent {
-  const _RecurringPaymentsSubscriptionRequested();
-}
-
-sealed class _RecurringPaymentsState {
-  const _RecurringPaymentsState();
-}
-
-final class _RecurringPaymentsInitial extends _RecurringPaymentsState {
-  const _RecurringPaymentsInitial();
-}
-
-final class _RecurringPaymentsReady extends _RecurringPaymentsState {
-  const _RecurringPaymentsReady({
-    required this.items,
-    required this.goalsById,
-    required this.accountsById,
-  });
-
-  final List<Transaction> items;
-  final Map<String, Goal> goalsById;
-  final Map<String, Account> accountsById;
-}
-
-class _RecurringPaymentsBloc
-    extends Bloc<_RecurringPaymentsEvent, _RecurringPaymentsState> {
-  _RecurringPaymentsBloc({
-    required TransactionsService transactionsService,
-    required GoalsService goalsService,
-    required AccountsService accountsService,
-  })  : _transactionsService = transactionsService,
-        _goalsService = goalsService,
-        _accountsService = accountsService,
-        super(const _RecurringPaymentsInitial()) {
-    on<_RecurringPaymentsSubscriptionRequested>(_onSubscribe);
-  }
-
-  final TransactionsService _transactionsService;
-  final GoalsService _goalsService;
-  final AccountsService _accountsService;
-
-  Future<void> _onSubscribe(
-    _RecurringPaymentsSubscriptionRequested event,
-    Emitter<_RecurringPaymentsState> emit,
-  ) {
-    return emit.forEach<_RecurringPaymentsReady>(
-      _watchReady(),
-      onData: (ready) => ready,
-    );
-  }
-
-  Stream<_RecurringPaymentsReady> _watchReady() {
-    return Stream<_RecurringPaymentsReady>.multi((controller) {
-      List<Transaction>? txs;
-      List<Goal>? goals;
-      List<Account>? accounts;
-
-      void tryEmit() {
-        if (txs == null || goals == null || accounts == null) return;
-
-        final items = txs!
-            .where(
-              (t) =>
-                  t.isRecurring &&
-                  t.frequency != TransactionFrequency.none &&
-                  t.kind == TransactionKind.deposit,
-            )
-            .toList()
-          ..sort((a, b) {
-            final ad = a.nextScheduledDate ?? DateTime(9999);
-            final bd = b.nextScheduledDate ?? DateTime(9999);
-            return ad.compareTo(bd);
-          });
-
-        controller.add(
-          _RecurringPaymentsReady(
-            items: items,
-            goalsById: {for (final g in goals!) g.id: g},
-            accountsById: {for (final a in accounts!) a.id: a},
-          ),
-        );
-      }
-
-      final txSub = _transactionsService.watchTransactions().listen(
-        (t) {
-          txs = t;
-          tryEmit();
-        },
-        onError: controller.addError,
-      );
-      final goalsSub = _goalsService.watchGoals().listen(
-        (g) {
-          goals = g;
-          tryEmit();
-        },
-        onError: controller.addError,
-      );
-      final accountsSub = _accountsService.watchAccounts().listen(
-        (a) {
-          accounts = a;
-          tryEmit();
-        },
-        onError: controller.addError,
-      );
-
-      controller.onCancel = () {
-        txSub.cancel();
-        goalsSub.cancel();
-        accountsSub.cancel();
-      };
-    });
-  }
-}
-
-

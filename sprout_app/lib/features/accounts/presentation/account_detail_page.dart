@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 
 import 'package:sprout/core/core.dart';
 import 'package:sprout/core/di/service_locator.dart';
-import 'package:sprout/features/goals/goals.dart';
+import 'package:sprout/features/goals/export.dart';
 import 'package:sprout/features/shell/shell.dart';
-import 'package:sprout/features/transactions/transactions.dart';
+import 'package:sprout/features/transactions/export.dart';
+import 'package:sprout/features/transactions/presentation/utils/transaction_display.dart';
 import '../application/accounts_service.dart';
 import '../domain/account.dart';
 import 'account_form_sheet.dart';
@@ -103,8 +104,73 @@ class _AccountDetailPageState extends State<AccountDetailPage> {
     if (mounted) await _load();
   }
 
+  Future<void> _clearScheduled() async {
+    final now = DateTime.now();
+    final scheduledIds = _tx
+        .where((t) => TransactionDisplay.isPendingByDate(t, now))
+        .map((t) => t.id)
+        .toList(growable: false);
+    if (scheduledIds.isEmpty) return;
+
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Clear scheduled transactions?'),
+        content: Text(
+          'This will remove ${scheduledIds.length} future-dated '
+          'transaction${scheduledIds.length == 1 ? '' : 's'} from this account.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text(AppStrings.cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text(AppStrings.delete),
+          ),
+        ],
+      ),
+    );
+    if (ok != true || !mounted) return;
+
+    for (final id in scheduledIds) {
+      await _txService.deleteTransaction(id);
+    }
+    if (mounted) await _load();
+  }
+
   @override
   Widget build(BuildContext context) {
+    final now = DateTime.now();
+
+    int computeAccountDepositTotalCents(Iterable<Transaction> txs) {
+      var totalDeposits = 0;
+      for (final t in txs) {
+        switch (t.kind) {
+          case TransactionKind.deposit:
+            // Account value should include deposits whether they’re unallocated
+            // or assigned directly to a goal.
+            totalDeposits += t.amountCents;
+            break;
+          case TransactionKind.allocation:
+            // Allocation is a movement of funds *within* the same account
+            // (unallocated -> goal), so it should not change the account total.
+            break;
+        }
+      }
+      return totalDeposits > 0 ? totalDeposits : 0;
+    }
+
+    final scheduledTxs =
+        _tx.where((t) => TransactionDisplay.isPendingByDate(t, now));
+    final historyTxs =
+        _tx.where((t) => !TransactionDisplay.isPendingByDate(t, now));
+
+    final currentTotalCents = computeAccountDepositTotalCents(historyTxs);
+    final scheduledTotalCents = computeAccountDepositTotalCents(scheduledTxs);
+    final grandTotalCents = currentTotalCents + scheduledTotalCents;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(_account.name),
@@ -131,6 +197,54 @@ class _AccountDetailPageState extends State<AccountDetailPage> {
                     caption: AppStrings.addDepositCaptionAccount,
                     onPressed: _openDeposit,
                   ),
+                  const SizedBox(height: 12),
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  'Account value',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleMedium
+                                      ?.copyWith(
+                                        fontWeight: FontWeight.w800,
+                                      ),
+                                ),
+                              ),
+                              if (scheduledTotalCents > 0)
+                                TextButton.icon(
+                                  onPressed: _clearScheduled,
+                                  icon: const Icon(Icons.delete_outline_rounded),
+                                  label: const Text('Clear scheduled'),
+                                ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          _ValueRow(
+                            label: 'Current',
+                            value: formatZarFromCents(currentTotalCents),
+                          ),
+                          const SizedBox(height: 6),
+                          _ValueRow(
+                            label: 'Scheduled',
+                            value: formatZarFromCents(scheduledTotalCents),
+                          ),
+                          const Divider(height: 18),
+                          _ValueRow(
+                            label: 'Total',
+                            value: formatZarFromCents(grandTotalCents),
+                            isEmphasis: true,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                   const SizedBox(height: 8),
                   Text(
                     AppStrings.transactions,
@@ -149,26 +263,75 @@ class _AccountDetailPageState extends State<AccountDetailPage> {
                       final goalName = t.goalId == null || t.goalId!.isEmpty
                           ? 'Unallocated'
                           : (_goals[t.goalId!]?.name ?? 'Unknown goal');
+                      final kindLabel = switch (t.kind) {
+                        TransactionKind.deposit => 'Deposit',
+                        TransactionKind.allocation => 'Allocation',
+                      };
+                      final style = mapTransactionToListStyle(t: t, now: now);
                       return Card(
                         margin: const EdgeInsets.only(bottom: 8),
-                        child: ListTile(
-                          title: Text(formatZarFromCents(t.amountCents)),
-                          subtitle: Text(
-                            '$goalName · ${formatDateTime(t.occurredAt)}',
+                        child: Opacity(
+                          opacity: style.opacity,
+                          child: ListTile(
+                            leading: style.leadingIcon == null
+                                ? null
+                                : Icon(style.leadingIcon),
+                            title: Text(formatZarFromCents(t.amountCents)),
+                            subtitle: Text(
+                              [
+                                kindLabel,
+                                goalName,
+                                formatDateTime(t.occurredAt),
+                                if (style.statusText != null) style.statusText!,
+                              ].join(' · '),
+                            ),
+                            trailing: t.pendingSync
+                                ? Icon(
+                                    Icons.sync_rounded,
+                                    size: 20,
+                                    color: Theme.of(context).colorScheme.primary,
+                                  )
+                                : null,
                           ),
-                          trailing: t.pendingSync
-                              ? Icon(
-                                  Icons.sync_rounded,
-                                  size: 20,
-                                  color: Theme.of(context).colorScheme.primary,
-                                )
-                              : null,
                         ),
                       );
                     }),
                 ],
               ),
             ),
+    );
+  }
+}
+
+class _ValueRow extends StatelessWidget {
+  const _ValueRow({
+    required this.label,
+    required this.value,
+    this.isEmphasis = false,
+  });
+
+  final String label;
+  final String value;
+  final bool isEmphasis;
+
+  @override
+  Widget build(BuildContext context) {
+    final style = Theme.of(context).textTheme.bodyMedium;
+    final valueStyle = (isEmphasis ? Theme.of(context).textTheme.titleMedium : style)
+        ?.copyWith(fontWeight: isEmphasis ? FontWeight.w900 : FontWeight.w700);
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            label,
+            style: style?.copyWith(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        Text(value, style: valueStyle),
+      ],
     );
   }
 }

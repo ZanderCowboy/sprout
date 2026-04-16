@@ -11,6 +11,7 @@ class TransactionHiveModel {
     this.note,
     required this.pendingSync,
     this.isRecurring = false,
+    this.recurringEnabled = false,
     this.frequencyIndex = 0,
     this.nextScheduledAtMillis,
   });
@@ -32,6 +33,7 @@ class TransactionHiveModel {
   final String? note;
   final bool pendingSync;
   final bool isRecurring;
+  final bool recurringEnabled;
   final int frequencyIndex;
   final int? nextScheduledAtMillis;
 }

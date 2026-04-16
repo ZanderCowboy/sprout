@@ -4,15 +4,15 @@ import 'package:intl/intl.dart';
 
 import 'package:sprout/core/core.dart';
 import 'package:sprout/core/di/service_locator.dart';
-import 'package:sprout/features/accounts/accounts.dart';
+import 'package:sprout/features/accounts/export.dart';
 import 'package:sprout/features/shell/shell.dart';
-import 'package:sprout/features/transactions/transactions.dart';
+import 'package:sprout/features/transactions/export.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../application/goals_service.dart';
 import '../domain/goal.dart';
 import '../domain/goal_progress.dart';
 import 'goal_detail_bloc.dart';
-import 'goal_growth_chart_mapper.dart';
+import 'utils/goal_growth_chart.dart';
 import 'goal_form_sheet.dart';
 
 class GoalDetailPage extends StatefulWidget {
@@ -88,6 +88,46 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
     if (mounted) {}
   }
 
+  Future<void> _clearScheduledForGoal(
+    GoalDetailReady state, {
+    required String goalId,
+  }) async {
+    final now = DateTime.now();
+    final scheduledIds = state.transactions
+        .where((t) => t.goalId == goalId)
+        .where((t) => TransactionDisplay.isPendingByDate(t, now))
+        .map((t) => t.id)
+        .toList(growable: false);
+    if (scheduledIds.isEmpty) return;
+
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Clear scheduled transactions?'),
+        content: Text(
+          'This will remove ${scheduledIds.length} future-dated '
+          'transaction${scheduledIds.length == 1 ? '' : 's'} from this goal.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text(AppStrings.cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text(AppStrings.delete),
+          ),
+        ],
+      ),
+    );
+    if (ok != true || !mounted) return;
+
+    final tx = sl<TransactionsService>();
+    for (final id in scheduledIds) {
+      await tx.deleteTransaction(id);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -120,17 +160,20 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                 ),
               ],
             ),
-            body: state is! GoalDetailReady
-                ? const Center(child: CircularProgressIndicator())
-                : RefreshIndicator(
-                    onRefresh: () async {
-                      await sl<GoalsService>().pullRemote();
-                      await sl<TransactionsService>().pullRemote();
-                    },
-                    child: ListView(
-                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
-                      children: [
-                        LinearProgressIndicator(
+            body: () {
+              if (state is! GoalDetailReady) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              final ready = state;
+              return RefreshIndicator(
+                onRefresh: () async {
+                  await sl<GoalsService>().pullRemote();
+                  await sl<TransactionsService>().pullRemote();
+                },
+                child: ListView(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+                  children: [
+                    LinearProgressIndicator(
                           value: (progress.percentComplete / 100)
                               .clamp(0.0, 1.0),
                           minHeight: 10,
@@ -171,50 +214,125 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                           goalColor: Color(g.color),
                           goalCreatedAt: g.createdAt,
                           goalTargetCents: g.targetAmountCents,
-                          points: state.graphPoints,
-                          prediction: state.prediction,
+                          points: ready.graphPoints,
+                          prediction: ready.prediction,
                         ),
                         const SizedBox(height: 18),
-                        Text(
-                          AppStrings.transactions,
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleMedium
-                              ?.copyWith(fontWeight: FontWeight.bold),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                AppStrings.transactions,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleMedium
+                                    ?.copyWith(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            if (ready.transactions.any(
+                                  (t) => TransactionDisplay.isPendingByDate(
+                                    t,
+                                    DateTime.now(),
+                                  ),
+                                ))
+                              TextButton.icon(
+                                onPressed: () => _clearScheduledForGoal(
+                                  ready,
+                                  goalId: g.id,
+                                ),
+                                icon: const Icon(Icons.delete_outline_rounded),
+                                label: const Text('Clear scheduled'),
+                              ),
+                          ],
                         ),
                         const SizedBox(height: 12),
-                        if (state.transactions.isEmpty)
+                        if (ready.transactions.isEmpty)
                           Text(
                             'No deposits toward this goal yet.',
                             style: Theme.of(context).textTheme.bodyMedium,
                           )
                         else
-                          ...state.transactions.map((t) {
-                            final accName =
-                                state.accountsById[t.accountId]?.name ??
-                                    'Unknown account';
-                            return Card(
-                              margin: const EdgeInsets.only(bottom: 8),
-                              child: ListTile(
-                                title: Text(formatZarFromCents(t.amountCents)),
-                                subtitle: Text(
-                                  '$accName · ${formatDateTime(t.occurredAt)}',
+                          ...(() {
+                            final now = DateTime.now();
+                            final scheduled = <Transaction>[];
+                            final history = <Transaction>[];
+                            for (final t in ready.transactions) {
+                              if (TransactionDisplay.isPendingByDate(t, now)) {
+                                scheduled.add(t);
+                              } else {
+                                history.add(t);
+                              }
+                            }
+                            scheduled.sort((a, b) => a.occurredAt.compareTo(b.occurredAt));
+                            history.sort((a, b) => b.occurredAt.compareTo(a.occurredAt));
+
+                            List<Widget> section({
+                              required String title,
+                              required List<Transaction> items,
+                            }) {
+                              if (items.isEmpty) return const [];
+                              return [
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 6, top: 4),
+                                  child: Text(
+                                    title,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleSmall
+                                        ?.copyWith(fontWeight: FontWeight.w800),
+                                  ),
                                 ),
-                                trailing: t.pendingSync
-                                    ? Icon(
-                                        Icons.sync_rounded,
-                                        size: 20,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primary,
-                                      )
-                                    : null,
-                              ),
-                            );
-                          }),
+                                ...items.map((t) {
+                                  final accName =
+                                      ready.accountsById[t.accountId]?.name ??
+                                          'Unknown account';
+                                  final style = mapTransactionToListStyle(
+                                    t: t,
+                                    now: now,
+                                  );
+                                  return Card(
+                                    margin: const EdgeInsets.only(bottom: 8),
+                                    child: Opacity(
+                                      opacity: style.opacity,
+                                      child: ListTile(
+                                        leading: style.leadingIcon == null
+                                            ? null
+                                            : Icon(style.leadingIcon),
+                                        title:
+                                            Text(formatZarFromCents(t.amountCents)),
+                                        subtitle: Text(
+                                          [
+                                            accName,
+                                            formatDateTime(t.occurredAt),
+                                            if (style.statusText != null)
+                                              style.statusText!,
+                                          ].join(' · '),
+                                        ),
+                                        trailing: t.pendingSync
+                                            ? Icon(
+                                                Icons.sync_rounded,
+                                                size: 20,
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .primary,
+                                              )
+                                            : null,
+                                      ),
+                                    ),
+                                  );
+                                }),
+                              ];
+                            }
+
+                            return [
+                              ...section(title: 'Scheduled', items: scheduled),
+                              ...section(title: 'History', items: history),
+                            ];
+                          })(),
                       ],
                     ),
-                  ),
+                  );
+            }(),
           );
         },
       ),

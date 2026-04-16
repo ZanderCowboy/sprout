@@ -17,6 +17,7 @@ Transaction transactionFromHive(TransactionHiveModel m) => Transaction(
       note: m.note,
       pendingSync: m.pendingSync,
       isRecurring: m.isRecurring,
+      recurringEnabled: m.recurringEnabled,
       frequency: TransactionFrequency.values[m.frequencyIndex],
       nextScheduledDate: m.nextScheduledAtMillis == null
           ? null
@@ -35,11 +36,13 @@ TransactionHiveModel transactionToHive(Transaction t) => TransactionHiveModel(
       note: t.note,
       pendingSync: t.pendingSync,
       isRecurring: t.isRecurring,
+      recurringEnabled: t.recurringEnabled,
       frequencyIndex: t.frequency.index,
       nextScheduledAtMillis: t.nextScheduledDate?.millisecondsSinceEpoch,
     );
 
 Transaction transactionFromSupabaseRow(Map<String, dynamic> row) {
+  final isRecurring = (row['is_recurring'] as bool?) ?? false;
   return Transaction(
     id: row['id'] as String,
     userId: row['user_id'] as String,
@@ -50,7 +53,10 @@ Transaction transactionFromSupabaseRow(Map<String, dynamic> row) {
     amountCents: (row['amount_cents'] as num).toInt(),
     occurredAt: DateTime.parse(row['occurred_at'] as String),
     note: row['note'] as String?,
-    isRecurring: (row['is_recurring'] as bool?) ?? false,
+    isRecurring: isRecurring,
+    // Guard: older Supabase schema doesn't include 'recurring_enabled'.
+    // When absent, default to "enabled if recurring".
+    recurringEnabled: (row['recurring_enabled'] as bool?) ?? isRecurring,
     frequency: TransactionFrequencyCodec.fromWireName(row['frequency'] as String?),
     nextScheduledDate: row['next_scheduled_date'] == null
         ? null

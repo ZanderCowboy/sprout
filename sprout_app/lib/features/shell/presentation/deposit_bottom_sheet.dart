@@ -3,9 +3,10 @@ import 'package:uuid/uuid.dart';
 
 import 'package:sprout/core/core.dart';
 import 'package:sprout/core/di/service_locator.dart';
-import 'package:sprout/features/accounts/accounts.dart';
-import 'package:sprout/features/goals/goals.dart';
-import 'package:sprout/features/transactions/transactions.dart';
+import 'package:sprout/features/accounts/export.dart';
+import 'package:sprout/features/goals/export.dart';
+import 'package:sprout/features/transactions/export.dart';
+import 'package:sprout/features/transactions/presentation/utils/transaction_display.dart';
 
 enum DepositBottomSheetMode {
   /// Current behavior: deposit and immediately assign to a single goal.
@@ -91,6 +92,7 @@ class _DepositBottomSheetState extends State<DepositBottomSheet> {
   String? _accountId;
   String? _goalId;
   final _amount = TextEditingController();
+  DateTime _selectedDate = DateTime.now();
   late DepositBottomSheetMode _mode;
   final List<_AllocationRow> _allocations = [];
   bool _isRecurring = false;
@@ -103,6 +105,7 @@ class _DepositBottomSheetState extends State<DepositBottomSheet> {
   void initState() {
     super.initState();
     _mode = widget.initialMode;
+    _selectedDate = DateTime.now();
     _load();
   }
 
@@ -156,9 +159,11 @@ class _DepositBottomSheetState extends State<DepositBottomSheet> {
     final accountId = _accountId;
     if (accountId == null) return;
     final txs = await sl<TransactionsService>().getForAccount(accountId);
+    final now = DateTime.now();
     var depositedUnallocated = 0;
     var allocated = 0;
     for (final t in txs) {
+      if (TransactionDisplay.isPendingByDate(t, now)) continue;
       switch (t.kind) {
         case TransactionKind.deposit:
           final gid = t.goalId;
@@ -188,6 +193,7 @@ class _DepositBottomSheetState extends State<DepositBottomSheet> {
     setState(() => _error = null);
     final tx = sl<TransactionsService>();
     final accountId = _accountId!;
+    final occurredAt = _selectedDate;
 
     if (_mode == DepositBottomSheetMode.fullDepositToGoal) {
       if (cents == null || cents <= 0) {
@@ -203,6 +209,7 @@ class _DepositBottomSheetState extends State<DepositBottomSheet> {
         goalId: _goalId!,
         groupId: null,
         amountCents: cents,
+        occurredAt: occurredAt,
         isRecurring: _isRecurring,
         frequency: _isRecurring ? _frequency : TransactionFrequency.none,
       );
@@ -241,6 +248,7 @@ class _DepositBottomSheetState extends State<DepositBottomSheet> {
           goalId: goalId,
           groupId: groupId,
           amountCents: aCents,
+          occurredAt: occurredAt,
         );
       }
       if (mounted) Navigator.of(context).pop();
@@ -257,6 +265,7 @@ class _DepositBottomSheetState extends State<DepositBottomSheet> {
       accountId: accountId,
       groupId: groupId,
       amountCents: cents,
+      occurredAt: occurredAt,
       isRecurring: _isRecurring,
       frequency: _isRecurring ? _frequency : TransactionFrequency.none,
     );
@@ -281,6 +290,7 @@ class _DepositBottomSheetState extends State<DepositBottomSheet> {
         goalId: goalId,
         groupId: groupId,
         amountCents: aCents,
+        occurredAt: occurredAt,
       );
     }
     if (mounted) Navigator.of(context).pop();
@@ -288,7 +298,8 @@ class _DepositBottomSheetState extends State<DepositBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final bottom = MediaQuery.viewInsetsOf(context).bottom;
+    final mq = MediaQuery.of(context);
+    final bottomPadding = mq.viewInsets.bottom + mq.padding.bottom;
     if (_loading) {
       return const Padding(
         padding: EdgeInsets.all(32),
@@ -308,8 +319,14 @@ class _DepositBottomSheetState extends State<DepositBottomSheet> {
     final quickGoal = widget.forceQuickGoalDepositUi;
     final isQuickUi = quickAccount || quickGoal;
     final canDepositToGoal = _goals.isNotEmpty;
+    final dateLabel = formatDateTime(_selectedDate);
     return Padding(
-      padding: EdgeInsets.only(left: 20, right: 20, top: 20, bottom: bottom + 20),
+      padding: EdgeInsets.only(
+        left: 20,
+        right: 20,
+        top: 20,
+        bottom: bottomPadding + 20,
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -441,6 +458,20 @@ class _DepositBottomSheetState extends State<DepositBottomSheet> {
           if (widget.showRecurringToggle &&
               _mode != DepositBottomSheetMode.allocateExistingUnallocated) ...[
             const SizedBox(height: 12),
+            OutlinedButton.icon(
+              onPressed: () async {
+                final picked = await showDatePicker(
+                  context: context,
+                  initialDate: _selectedDate,
+                  firstDate: DateTime(2000),
+                  lastDate: DateTime(DateTime.now().year + 10),
+                );
+                if (picked == null) return;
+                setState(() => _selectedDate = picked);
+              },
+              icon: const Icon(Icons.calendar_today_outlined),
+              label: Text('Date · $dateLabel'),
+            ),
             SwitchListTile.adaptive(
               contentPadding: EdgeInsets.zero,
               value: _isRecurring,

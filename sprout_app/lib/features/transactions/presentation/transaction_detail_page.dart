@@ -3,10 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:sprout/core/core.dart';
 import 'package:sprout/core/di/service_locator.dart';
-import 'package:sprout/features/accounts/accounts.dart';
-import 'package:sprout/features/goals/goals.dart';
+import 'package:sprout/features/accounts/export.dart';
+import 'package:sprout/features/goals/export.dart';
 import 'package:sprout/features/transactions/presentation/recurring_payments_page.dart';
-import 'package:sprout/features/transactions/transactions.dart';
+import 'package:sprout/features/transactions/export.dart';
+import 'bloc/transaction_detail_bloc.dart';
+import 'utils/transaction_frequency_label.dart';
 
 class TransactionDetailPage extends StatelessWidget {
   const TransactionDetailPage({super.key, required this.transactionId});
@@ -16,19 +18,19 @@ class TransactionDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => _TransactionDetailBloc(
+      create: (_) => TransactionDetailBloc(
         transactionId: transactionId,
         transactionsService: sl<TransactionsService>(),
         goalsService: sl<GoalsService>(),
         accountsService: sl<AccountsService>(),
-      )..add(const _TransactionDetailSubscriptionRequested()),
-      child: BlocBuilder<_TransactionDetailBloc, _TransactionDetailState>(
+      )..add(const TransactionDetailSubscriptionRequested()),
+      child: BlocBuilder<TransactionDetailBloc, TransactionDetailState>(
         builder: (context, state) {
           return Scaffold(
             appBar: AppBar(title: const Text('Transaction')),
             body: switch (state) {
-              _TransactionDetailReady s => _TransactionDetailBody(state: s),
-              _TransactionDetailMissing _ => const Center(
+              TransactionDetailReady s => _TransactionDetailBody(state: s),
+              TransactionDetailMissing _ => const Center(
                   child: Text('Transaction not found.'),
                 ),
               _ => const Center(child: CircularProgressIndicator()),
@@ -43,7 +45,7 @@ class TransactionDetailPage extends StatelessWidget {
 class _TransactionDetailBody extends StatefulWidget {
   const _TransactionDetailBody({required this.state});
 
-  final _TransactionDetailReady state;
+  final TransactionDetailReady state;
 
   @override
   State<_TransactionDetailBody> createState() => _TransactionDetailBodyState();
@@ -144,7 +146,7 @@ class _TransactionDetailBodyState extends State<_TransactionDetailBody> {
               _kv(
                 'Recurring',
                 t.isRecurring && t.frequency != TransactionFrequency.none
-                    ? 'Yes (${_labelForFrequency(t.frequency)})'
+                    ? 'Yes (${transactionFrequencyLabel(t.frequency)})'
                     : 'No',
               ),
               if (t.nextScheduledDate != null)
@@ -262,16 +264,6 @@ class _TransactionDetailBodyState extends State<_TransactionDetailBody> {
       ),
     );
   }
-
-  String _labelForFrequency(TransactionFrequency f) {
-    return switch (f) {
-      TransactionFrequency.daily => 'Daily',
-      TransactionFrequency.weekly => 'Weekly',
-      TransactionFrequency.monthly => 'Monthly',
-      TransactionFrequency.yearly => 'Yearly',
-      TransactionFrequency.none => 'None',
-    };
-  }
 }
 
 class _InfoCard extends StatelessWidget {
@@ -369,131 +361,3 @@ class _AllocationRowView extends StatelessWidget {
     );
   }
 }
-
-sealed class _TransactionDetailEvent {
-  const _TransactionDetailEvent();
-}
-
-final class _TransactionDetailSubscriptionRequested extends _TransactionDetailEvent {
-  const _TransactionDetailSubscriptionRequested();
-}
-
-sealed class _TransactionDetailState {
-  const _TransactionDetailState();
-}
-
-final class _TransactionDetailInitial extends _TransactionDetailState {
-  const _TransactionDetailInitial();
-}
-
-final class _TransactionDetailMissing extends _TransactionDetailState {
-  const _TransactionDetailMissing();
-}
-
-final class _TransactionDetailReady extends _TransactionDetailState {
-  const _TransactionDetailReady({
-    required this.transaction,
-    required this.groupTransactions,
-    required this.goalsById,
-    required this.accountsById,
-  });
-
-  final Transaction transaction;
-  final List<Transaction>? groupTransactions;
-  final Map<String, Goal> goalsById;
-  final Map<String, Account> accountsById;
-}
-
-class _TransactionDetailBloc
-    extends Bloc<_TransactionDetailEvent, _TransactionDetailState> {
-  _TransactionDetailBloc({
-    required String transactionId,
-    required TransactionsService transactionsService,
-    required GoalsService goalsService,
-    required AccountsService accountsService,
-  })  : _transactionId = transactionId,
-        _transactionsService = transactionsService,
-        _goalsService = goalsService,
-        _accountsService = accountsService,
-        super(const _TransactionDetailInitial()) {
-    on<_TransactionDetailSubscriptionRequested>(_onSubscribe);
-  }
-
-  final String _transactionId;
-  final TransactionsService _transactionsService;
-  final GoalsService _goalsService;
-  final AccountsService _accountsService;
-
-  Future<void> _onSubscribe(
-    _TransactionDetailSubscriptionRequested event,
-    Emitter<_TransactionDetailState> emit,
-  ) {
-    return emit.forEach<_TransactionDetailState>(
-      _watch(),
-      onData: (s) => s,
-    );
-  }
-
-  Stream<_TransactionDetailState> _watch() {
-    return Stream<_TransactionDetailState>.multi((controller) {
-      List<Transaction>? txs;
-      List<Goal>? goals;
-      List<Account>? accounts;
-
-      void tryEmit() {
-        if (txs == null || goals == null || accounts == null) return;
-        final t = txs!.where((x) => x.id == _transactionId).toList();
-        if (t.isEmpty) {
-          controller.add(const _TransactionDetailMissing());
-          return;
-        }
-        final tx = t.first;
-        final gid = tx.groupId;
-        List<Transaction>? group;
-        if (gid != null) {
-          group = txs!
-              .where((x) => x.groupId == gid)
-              .toList()
-            ..sort((a, b) => a.occurredAt.compareTo(b.occurredAt));
-        }
-        controller.add(
-          _TransactionDetailReady(
-            transaction: tx,
-            groupTransactions: group,
-            goalsById: {for (final g in goals!) g.id: g},
-            accountsById: {for (final a in accounts!) a.id: a},
-          ),
-        );
-      }
-
-      final txSub = _transactionsService.watchTransactions().listen(
-        (t) {
-          txs = t;
-          tryEmit();
-        },
-        onError: controller.addError,
-      );
-      final goalsSub = _goalsService.watchGoals().listen(
-        (g) {
-          goals = g;
-          tryEmit();
-        },
-        onError: controller.addError,
-      );
-      final accountsSub = _accountsService.watchAccounts().listen(
-        (a) {
-          accounts = a;
-          tryEmit();
-        },
-        onError: controller.addError,
-      );
-
-      controller.onCancel = () {
-        txSub.cancel();
-        goalsSub.cancel();
-        accountsSub.cancel();
-      };
-    });
-  }
-}
-

@@ -4,7 +4,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:sprout/core/di/service_locator.dart';
-import 'package:sprout/features/sync/sync.dart';
+import 'package:sprout/features/sync/export.dart';
 
 class ConnectivityCubit extends Cubit<bool> {
   ConnectivityCubit() : super(true) {

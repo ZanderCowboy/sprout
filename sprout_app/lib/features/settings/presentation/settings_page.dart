@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:sprout/core/core.dart';
 import 'package:sprout/features/transactions/presentation/recurring_payments_page.dart';
 import 'package:sprout/features/transactions/presentation/transactions_page.dart';
+import 'package:sprout/features/budget/presentation/budget_planner_screen.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -36,6 +37,20 @@ class SettingsPage extends StatelessWidget {
               Navigator.of(context).push(
                 MaterialPageRoute<void>(
                   builder: (_) => const RecurringPaymentsPage(),
+                ),
+              );
+            },
+          ),
+          const Divider(height: 1),
+          ListTile(
+            leading: const Icon(Icons.account_tree_rounded),
+            title: const Text('Master Budget'),
+            subtitle: const Text('Plan income and expenses (static template)'),
+            trailing: const Icon(Icons.chevron_right_rounded),
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => const BudgetPlannerScreen(),
                 ),
               );
             },

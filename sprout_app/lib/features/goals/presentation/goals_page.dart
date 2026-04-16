@@ -4,16 +4,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sprout/core/core.dart';
 import 'package:sprout/features/settings/presentation/settings_page.dart';
 import 'package:sprout/features/shell/shell.dart';
-import '../domain/goal_progress.dart';
+import 'package:sprout/ui/export.dart';
 import 'goal_detail_page.dart';
 import 'goals_bloc.dart';
+import 'enums/goals_sort.dart';
+import 'utils/goals_sorting.dart';
 import 'widgets/unallocated_funds_card.dart';
-
-enum GoalsSort {
-  remainingLowToHigh,
-  progressHighToLow,
-  nameAToZ,
-}
 
 class GoalsPage extends StatefulWidget {
   const GoalsPage({super.key});
@@ -24,55 +20,6 @@ class GoalsPage extends StatefulWidget {
 
 class _GoalsPageState extends State<GoalsPage> {
   GoalsSort _sort = GoalsSort.remainingLowToHigh;
-
-  String _sortLabel(GoalsSort s) {
-    return switch (s) {
-      GoalsSort.remainingLowToHigh => 'Remaining (low → high)',
-      GoalsSort.progressHighToLow => 'Progress (high → low)',
-      GoalsSort.nameAToZ => 'Name (A → Z)',
-    };
-  }
-
-  List<GoalProgress> _sorted(List<GoalProgress> input) {
-    final list = [...input];
-
-    // Always push completed goals to the bottom by default (>= 100%),
-    // regardless of the selected sort.
-    list.sort((a, b) {
-      final aDone = a.percentComplete >= 100;
-      final bDone = b.percentComplete >= 100;
-      if (aDone != bDone) return aDone ? 1 : -1;
-
-      int byName() {
-        return a.goal.name.trim().toLowerCase().compareTo(
-              b.goal.name.trim().toLowerCase(),
-            );
-      }
-
-      int byRemaining() => a.remainingCents.compareTo(b.remainingCents);
-      int byProgressDesc() => b.percentComplete.compareTo(a.percentComplete);
-
-      // Primary comparator chosen by user; secondary tie-breakers ensure we
-      // still get a deterministic visible re-order even when many values match.
-      final primary = switch (_sort) {
-        GoalsSort.remainingLowToHigh => byRemaining(),
-        GoalsSort.progressHighToLow => byProgressDesc(),
-        GoalsSort.nameAToZ => byName(),
-      };
-      if (primary != 0) return primary;
-
-      final secondary = switch (_sort) {
-        GoalsSort.remainingLowToHigh => byName(),
-        GoalsSort.progressHighToLow => byRemaining(),
-        GoalsSort.nameAToZ => byRemaining(),
-      };
-      if (secondary != 0) return secondary;
-
-      return a.goal.id.compareTo(b.goal.id);
-    });
-
-    return list;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -128,7 +75,7 @@ class _GoalsPageState extends State<GoalsPage> {
         final overallPercent = totalTargetCents <= 0
             ? 0
             : (totalSavedCents * 100) ~/ totalTargetCents;
-        final sorted = _sorted(state.progressList);
+        final sorted = sortGoals(state.progressList, _sort);
         final firstCompletedIndex =
             sorted.indexWhere((p) => p.percentComplete >= 100);
         final hasCompleted = firstCompletedIndex != -1;
@@ -155,7 +102,7 @@ class _GoalsPageState extends State<GoalsPage> {
                               .map(
                                 (s) => PopupMenuItem<GoalsSort>(
                                   value: s,
-                                  child: Text(_sortLabel(s)),
+                                  child: Text(goalsSortLabel(s)),
                                 ),
                               )
                               .toList();

@@ -2,9 +2,10 @@ import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:sprout/core/config/app_config.dart';
-import 'package:sprout/features/accounts/accounts.dart';
-import 'package:sprout/features/goals/goals.dart';
-import 'package:sprout/features/transactions/transactions.dart';
+import 'package:sprout/features/accounts/export.dart';
+import 'package:sprout/features/budget/export.dart';
+import 'package:sprout/features/goals/export.dart';
+import 'package:sprout/features/transactions/export.dart';
 import '../data/pending_sync_queue.dart';
 import '../domain/pending_sync_operation.dart';
 
@@ -90,6 +91,23 @@ class SyncService {
           case PendingSyncOperationType.deleteGoal:
             final id = decodeIdPayload(item.payloadJson);
             await client.from(SupabaseTables.goals).delete().eq('id', id);
+            break;
+          case PendingSyncOperationType.deleteTransaction:
+            final id = decodeIdPayload(item.payloadJson);
+            await client.from(SupabaseTables.transactions).delete().eq('id', id);
+            break;
+          case PendingSyncOperationType.upsertBudgetGroup:
+            final bg = decodeBudgetGroupPayload(item.payloadJson);
+            final row = budgetGroupToSupabaseRow(bg);
+            row['user_id'] = authUid;
+            await client.from(SupabaseTables.budgetGroups).upsert(
+                  row,
+                  onConflict: 'id',
+                );
+            break;
+          case PendingSyncOperationType.deleteBudgetGroup:
+            final id = decodeIdPayload(item.payloadJson);
+            await client.from(SupabaseTables.budgetGroups).delete().eq('id', id);
             break;
         }
         await _queue.remove(item.queueId);

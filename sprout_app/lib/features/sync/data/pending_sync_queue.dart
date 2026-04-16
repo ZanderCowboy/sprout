@@ -1,7 +1,7 @@
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:uuid/uuid.dart';
 
-import 'package:sprout/features/transactions/transactions.dart';
+import 'package:sprout/features/transactions/export.dart';
 import '../domain/pending_sync_operation.dart';
 
 class PendingSyncQueue {

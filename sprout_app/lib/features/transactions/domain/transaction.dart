@@ -40,6 +40,7 @@ class Transaction extends Equatable {
     this.note,
     required this.pendingSync,
     this.isRecurring = false,
+    this.recurringEnabled = false,
     this.frequency = TransactionFrequency.none,
     this.nextScheduledDate,
   });
@@ -55,6 +56,7 @@ class Transaction extends Equatable {
   final String? note;
   final bool pendingSync;
   final bool isRecurring;
+  final bool recurringEnabled;
   final TransactionFrequency frequency;
   final DateTime? nextScheduledDate;
 
@@ -71,6 +73,7 @@ class Transaction extends Equatable {
         note,
         pendingSync,
         isRecurring,
+        recurringEnabled,
         frequency,
         nextScheduledDate,
       ];

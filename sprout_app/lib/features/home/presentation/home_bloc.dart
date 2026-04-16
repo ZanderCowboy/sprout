@@ -2,8 +2,8 @@ import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:sprout/features/accounts/accounts.dart';
-import 'package:sprout/features/transactions/transactions.dart';
+import 'package:sprout/features/accounts/export.dart';
+import 'package:sprout/features/transactions/export.dart';
 
 sealed class HomeEvent extends Equatable {
   const HomeEvent();
@@ -30,14 +30,24 @@ final class HomeReady extends HomeState {
     required this.accounts,
     required this.portfolio,
     required this.recentTransactions,
+    this.accountCurrentTotalsById = const <String, int>{},
+    this.accountScheduledTotalsById = const <String, int>{},
   });
 
   final List<Account> accounts;
   final PortfolioSummary portfolio;
   final List<Transaction> recentTransactions;
+  final Map<String, int> accountCurrentTotalsById;
+  final Map<String, int> accountScheduledTotalsById;
 
   @override
-  List<Object?> get props => [accounts, portfolio, recentTransactions];
+  List<Object?> get props => [
+        accounts,
+        portfolio,
+        recentTransactions,
+        accountCurrentTotalsById,
+        accountScheduledTotalsById,
+      ];
 }
 
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
@@ -71,6 +81,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       List<Account>? accounts;
       PortfolioSummary? portfolio;
       List<Transaction>? recent;
+      Map<String, int> currentTotals = const <String, int>{};
+      Map<String, int> scheduledTotals = const <String, int>{};
 
       void tryEmit() {
         if (accounts != null && portfolio != null && recent != null) {
@@ -79,6 +91,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
               accounts: accounts!,
               portfolio: portfolio!,
               recentTransactions: recent!,
+              accountCurrentTotalsById: currentTotals,
+              accountScheduledTotalsById: scheduledTotals,
             ),
           );
         }
@@ -101,9 +115,24 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       );
       final recentSub = _transactionsService.watchTransactions().listen(
         (all) {
-          final sorted = all.toList()
+          final now = DateTime.now();
+
+          final recentCandidates = all
+              .where((t) => !TransactionDisplay.isPendingByDate(t, now))
+              .toList()
             ..sort((a, b) => b.occurredAt.compareTo(a.occurredAt));
-          recent = sorted.take(5).toList(growable: false);
+          recent = recentCandidates.take(5).toList(growable: false);
+
+          final current = <String, int>{};
+          final scheduled = <String, int>{};
+          for (final t in all) {
+            if (t.kind != TransactionKind.deposit) continue;
+            final isScheduled = TransactionDisplay.isPendingByDate(t, now);
+            final target = isScheduled ? scheduled : current;
+            target[t.accountId] = (target[t.accountId] ?? 0) + t.amountCents;
+          }
+          currentTotals = current;
+          scheduledTotals = scheduled;
           tryEmit();
         },
         onError: controller.addError,

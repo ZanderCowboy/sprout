@@ -103,5 +103,8 @@ class TransactionsService {
         frequency: frequency,
       );
 
+  Future<void> deleteTransaction(String transactionId) =>
+      _repository.deleteTransaction(transactionId);
+
   Future<void> pullRemote() => _repository.pullRemote();
 }

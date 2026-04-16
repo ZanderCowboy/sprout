@@ -3,6 +3,7 @@ import 'package:uuid/uuid.dart';
 
 import 'package:sprout/core/core.dart';
 import 'package:sprout/core/di/service_locator.dart';
+import 'package:sprout/ui/export.dart';
 import '../application/accounts_service.dart';
 import '../domain/account.dart';
 
@@ -105,59 +106,16 @@ class _AccountFormSheetState extends State<AccountFormSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final bottom = MediaQuery.viewInsetsOf(context).bottom;
-    return Padding(
-      padding: EdgeInsets.only(left: 20, right: 20, top: 20, bottom: bottom + 20),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(
-            widget.initial == null ? AppStrings.newAccount : AppStrings.edit,
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-          ),
-          const SizedBox(height: 16),
-          TextField(
-            controller: _name,
-            decoration: InputDecoration(
-              labelText: AppStrings.accountName,
-              errorText: _nameError,
-            ),
-            textCapitalization: TextCapitalization.words,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'Color',
-            style: Theme.of(context).textTheme.labelLarge,
-          ),
-          const SizedBox(height: 8),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              for (var i = 0; i < AppColors.cardPalette.length; i++)
-                GestureDetector(
-                  onTap: () => setState(
-                    () => _colorArgb = AppColors.cardPalette[i].toARGB32(),
-                  ),
-                  child: CircleAvatar(
-                    backgroundColor: AppColors.cardPalette[i],
-                    child: _colorArgb == AppColors.cardPalette[i].toARGB32()
-                        ? const Icon(Icons.check, color: Colors.white)
-                        : null,
-                  ),
-                ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          FilledButton(
-            onPressed: _canSave ? _save : null,
-            child: const Text(AppStrings.save),
-          ),
-        ],
-      ),
+    return NameColorFormSheet(
+      title: widget.initial == null ? AppStrings.newAccount : AppStrings.edit,
+      nameLabel: AppStrings.accountName,
+      nameController: _name,
+      nameErrorText: _nameError,
+      colorArgb: _colorArgb,
+      onColorSelected: (argb) => setState(() => _colorArgb = argb),
+      primaryActionLabel: AppStrings.save,
+      onPrimaryAction: _save,
+      primaryActionEnabled: _canSave,
     );
   }
 }

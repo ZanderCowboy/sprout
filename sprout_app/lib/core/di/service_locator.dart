@@ -6,10 +6,11 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:sprout/core/config/app_config.dart';
 import 'package:sprout/core/user/user_context.dart';
-import 'package:sprout/features/accounts/accounts.dart';
-import 'package:sprout/features/goals/goals.dart';
-import 'package:sprout/features/sync/sync.dart';
-import 'package:sprout/features/transactions/transactions.dart';
+import 'package:sprout/features/accounts/export.dart';
+import 'package:sprout/features/budget/export.dart';
+import 'package:sprout/features/goals/export.dart';
+import 'package:sprout/features/sync/export.dart';
+import 'package:sprout/features/transactions/export.dart';
 
 final sl = GetIt.instance;
 
@@ -18,6 +19,7 @@ Future<void> configureDependencies({
   required Box<dynamic> settingsBox,
   required Box<AccountHiveModel> accountsBox,
   required Box<GoalHiveModel> goalsBox,
+  required Box<BudgetGroupHiveModel> budgetGroupsBox,
   required Box<TransactionHiveModel> transactionsBox,
   required Box<PendingSyncHiveModel> pendingSyncBox,
   SupabaseClient? supabaseClient,
@@ -26,6 +28,7 @@ Future<void> configureDependencies({
 
   sl.registerSingleton<Box<AccountHiveModel>>(accountsBox);
   sl.registerSingleton<Box<GoalHiveModel>>(goalsBox);
+  sl.registerSingleton<Box<BudgetGroupHiveModel>>(budgetGroupsBox);
   sl.registerSingleton<Box<TransactionHiveModel>>(transactionsBox);
   sl.registerSingleton<Box<PendingSyncHiveModel>>(pendingSyncBox);
 
@@ -61,6 +64,16 @@ Future<void> configureDependencies({
     ),
   );
 
+  sl.registerLazySingleton<BudgetRepository>(
+    () => BudgetRepositoryImpl(
+      box: sl(),
+      userContext: sl(),
+      appConfig: sl(),
+      supabase: supabaseClient,
+      pendingSyncQueue: pendingForRepos,
+    ),
+  );
+
   sl.registerLazySingleton<TransactionsRepository>(
     () => TransactionsRepositoryImpl(
       box: sl(),
@@ -76,6 +89,9 @@ Future<void> configureDependencies({
   );
   sl.registerLazySingleton<GoalsService>(
     () => GoalsService(sl()),
+  );
+  sl.registerLazySingleton<BudgetService>(
+    () => BudgetService(sl()),
   );
   sl.registerLazySingleton<TransactionsService>(
     () => TransactionsService(sl()),

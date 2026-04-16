@@ -4,8 +4,8 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:sprout/core/core.dart';
-import 'package:sprout/features/sync/sync.dart';
-import 'package:sprout/features/transactions/transactions.dart';
+import 'package:sprout/features/sync/export.dart';
+import 'package:sprout/features/transactions/export.dart';
 import '../domain/account.dart';
 import '../domain/accounts_repository.dart';
 import 'account_mapper.dart';

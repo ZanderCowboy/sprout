@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/constants/app_strings.dart';
+import 'package:sprout/core/core.dart';
+import 'package:sprout/ui/export.dart';
 import '../../home/presentation/home_bloc.dart';
-import '../../shell/presentation/widgets/colored_entity_card.dart';
 import 'account_detail_page.dart';
 
 class AccountsPage extends StatelessWidget {
@@ -67,9 +68,18 @@ class AccountsPage extends StatelessWidget {
                       const SizedBox(height: 10),
                   itemBuilder: (context, i) {
                     final a = state.accounts[i];
+                    final currentCents =
+                        state.accountCurrentTotalsById[a.id] ?? 0;
+                    final scheduledCents =
+                        state.accountScheduledTotalsById[a.id] ?? 0;
+                    final subtitleLines = <String>[
+                      'Current: ${formatZarFromCents(currentCents)}',
+                      if (scheduledCents > 0)
+                        'Scheduled: ${formatZarFromCents(scheduledCents)}',
+                    ];
                     return ColoredEntityCard(
                       title: a.name,
-                      subtitle: 'Tap for transactions',
+                      subtitle: subtitleLines.join('\n'),
                       color: Color(a.color),
                       onTap: () {
                         Navigator.of(context).push(

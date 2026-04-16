@@ -9,5 +9,6 @@ export 'domain/portfolio_summary.dart';
 export 'domain/transaction.dart';
 export 'domain/transaction_frequency.dart';
 export 'domain/transactions_repository.dart';
+export 'presentation/utils/transaction_display.dart';
 export 'presentation/transaction_detail_page.dart';
 export 'presentation/transactions_page.dart';

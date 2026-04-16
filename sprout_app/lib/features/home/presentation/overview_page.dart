@@ -7,7 +7,7 @@ import '../../../core/utils/date_format.dart';
 import '../../../core/utils/money_format.dart';
 import '../../accounts/presentation/account_form_sheet.dart';
 import '../../goals/presentation/goals_bloc.dart';
-import '../../goals/presentation/goal_form_sheet.dart';
+import '../../goals/presentation/create_goal_screen.dart';
 import '../../shell/presentation/shell_page.dart';
 import '../../shell/presentation/deposit_bottom_sheet.dart';
 import '../../transactions/domain/transaction.dart';
@@ -30,7 +30,7 @@ class OverviewPage extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
-      builder: (_) => GoalFormSheet(defaultColor: AppColors.cardColorAt(1)),
+      builder: (_) => CreateGoalScreen(defaultColor: AppColors.cardColorAt(1)),
     );
   }
 

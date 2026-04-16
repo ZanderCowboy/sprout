@@ -4,4 +4,8 @@ enum PendingSyncOperationType {
   deleteAccount,
   upsertGoal,
   deleteGoal,
+  // Appended to preserve existing index values.
+  deleteTransaction,
+  upsertBudgetGroup,
+  deleteBudgetGroup,
 }

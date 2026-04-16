@@ -1,17 +1,20 @@
 import 'package:hive/hive.dart';
 
-import 'package:sprout/features/accounts/accounts.dart';
-import 'package:sprout/features/goals/goals.dart';
-import 'package:sprout/features/transactions/transactions.dart';
+import 'package:sprout/features/accounts/export.dart';
+import 'package:sprout/features/budget/export.dart';
+import 'package:sprout/features/goals/export.dart';
+import 'package:sprout/features/transactions/export.dart';
 
 const int _typeAccount = 0;
 const int _typeGoal = 1;
 const int _typeTransaction = 2;
 const int _typePendingSync = 3;
+const int _typeBudgetGroup = 4;
 
 void registerHiveAdapters() {
   Hive
     ..registerAdapter(AccountHiveAdapter())
+    ..registerAdapter(BudgetGroupHiveAdapter())
     ..registerAdapter(GoalHiveAdapter())
     ..registerAdapter(TransactionHiveAdapter())
     ..registerAdapter(PendingSyncHiveAdapter());
@@ -89,6 +92,7 @@ class TransactionHiveAdapter extends TypeAdapter<TransactionHiveModel> {
     int frequencyIndex = 0;
     int? nextScheduledAtMillis;
     int kindIndex = 0;
+    bool recurringEnabled = false;
 
     return TransactionHiveModel(
       id: reader.readString(),
@@ -134,6 +138,16 @@ class TransactionHiveAdapter extends TypeAdapter<TransactionHiveModel> {
         }
         return kindIndex;
       })(),
+      recurringEnabled: (() {
+        // Appended field; older rows won't have it.
+        recurringEnabled = isRecurring;
+        try {
+          recurringEnabled = reader.readBool();
+        } on Object {
+          // ignore: no-op
+        }
+        return recurringEnabled;
+      })(),
     );
   }
 
@@ -166,7 +180,9 @@ class TransactionHiveAdapter extends TypeAdapter<TransactionHiveModel> {
     } else {
       writer.writeBool(false);
     }
-    writer.writeInt(obj.kindIndex);
+    writer
+      ..writeInt(obj.kindIndex)
+      ..writeBool(obj.recurringEnabled);
   }
 }
 
@@ -189,5 +205,73 @@ class PendingSyncHiveAdapter extends TypeAdapter<PendingSyncHiveModel> {
       ..writeString(obj.queueId)
       ..writeInt(obj.operationTypeIndex)
       ..writeString(obj.payloadJson);
+  }
+}
+
+class BudgetGroupHiveAdapter extends TypeAdapter<BudgetGroupHiveModel> {
+  @override
+  int get typeId => _typeBudgetGroup;
+
+  @override
+  BudgetGroupHiveModel read(BinaryReader reader) {
+    // IMPORTANT: Read order must exactly match write order.
+    final id = reader.readString();
+    final userId = reader.readString();
+    final name = reader.readString();
+    final description = reader.readBool() ? reader.readString() : null;
+    final colorHex = reader.readString();
+    final iconCodePoint = reader.readBool() ? reader.readInt() : null;
+    final iconFontFamily = reader.readBool() ? reader.readString() : null;
+    return BudgetGroupHiveModel(
+      id: id,
+      userId: userId,
+      name: name,
+      description: description,
+      colorHex: colorHex,
+      iconCodePoint: iconCodePoint,
+      iconFontFamily: iconFontFamily,
+      categoryIndex: reader.readInt(),
+      itemsJson: reader.readString(),
+      createdAtMillis: reader.readInt(),
+      updatedAtMillis: reader.readInt(),
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, BudgetGroupHiveModel obj) {
+    writer
+      ..writeString(obj.id)
+      ..writeString(obj.userId)
+      ..writeString(obj.name);
+    final d = obj.description;
+    if (d != null) {
+      writer
+        ..writeBool(true)
+        ..writeString(d);
+    } else {
+      writer.writeBool(false);
+    }
+    writer.writeString(obj.colorHex);
+    final cp = obj.iconCodePoint;
+    if (cp != null) {
+      writer
+        ..writeBool(true)
+        ..writeInt(cp);
+    } else {
+      writer.writeBool(false);
+    }
+    final ff = obj.iconFontFamily;
+    if (ff != null) {
+      writer
+        ..writeBool(true)
+        ..writeString(ff);
+    } else {
+      writer.writeBool(false);
+    }
+    writer
+      ..writeInt(obj.categoryIndex)
+      ..writeString(obj.itemsJson)
+      ..writeInt(obj.createdAtMillis)
+      ..writeInt(obj.updatedAtMillis);
   }
 }

@@ -3,6 +3,7 @@ import 'package:uuid/uuid.dart';
 
 import 'package:sprout/core/core.dart';
 import 'package:sprout/core/di/service_locator.dart';
+import 'package:sprout/ui/export.dart';
 import '../application/goals_service.dart';
 import '../domain/goal.dart';
 
@@ -130,71 +131,30 @@ class _GoalFormSheetState extends State<GoalFormSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final bottom = MediaQuery.viewInsetsOf(context).bottom;
-    return Padding(
-      padding: EdgeInsets.only(left: 20, right: 20, top: 20, bottom: bottom + 20),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(
-            widget.initial == null ? AppStrings.newGoal : AppStrings.edit,
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+    return NameColorFormSheet(
+      title: widget.initial == null ? AppStrings.newGoal : AppStrings.edit,
+      nameLabel: AppStrings.goalName,
+      nameController: _name,
+      nameErrorText: _nameError,
+      colorArgb: _colorArgb,
+      onColorSelected: (argb) => setState(() => _colorArgb = argb),
+      primaryActionLabel: AppStrings.save,
+      onPrimaryAction: _save,
+      primaryActionEnabled: _canSave,
+      body: [
+        const SizedBox(height: 12),
+        TextField(
+          controller: _target,
+          decoration: InputDecoration(
+            labelText: AppStrings.targetAmount,
+            errorText: _targetError,
           ),
-          const SizedBox(height: 16),
-          TextField(
-            controller: _name,
-            decoration: InputDecoration(
-              labelText: AppStrings.goalName,
-              errorText: _nameError,
-            ),
-            textCapitalization: TextCapitalization.words,
+          keyboardType: const TextInputType.numberWithOptions(
+            decimal: true,
+            signed: true,
           ),
-          const SizedBox(height: 12),
-          TextField(
-            controller: _target,
-            decoration: InputDecoration(
-              labelText: AppStrings.targetAmount,
-              errorText: _targetError,
-            ),
-            keyboardType: const TextInputType.numberWithOptions(
-              decimal: true,
-              signed: true,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'Color',
-            style: Theme.of(context).textTheme.labelLarge,
-          ),
-          const SizedBox(height: 8),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              for (var i = 0; i < AppColors.cardPalette.length; i++)
-                GestureDetector(
-                  onTap: () => setState(
-                    () => _colorArgb = AppColors.cardPalette[i].toARGB32(),
-                  ),
-                  child: CircleAvatar(
-                    backgroundColor: AppColors.cardPalette[i],
-                    child: _colorArgb == AppColors.cardPalette[i].toARGB32()
-                        ? const Icon(Icons.check, color: Colors.white)
-                        : null,
-                  ),
-                ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          FilledButton(
-            onPressed: _canSave ? _save : null,
-            child: const Text(AppStrings.save),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

@@ -8,10 +8,11 @@ import 'package:sprout/core/di/service_locator.dart';
 import 'package:sprout/core/storage/hive_adapters.dart';
 import 'package:sprout/core/storage/migrate_hive_user_id_to_auth.dart';
 import 'package:sprout/core/user/user_context.dart';
-import 'package:sprout/features/accounts/accounts.dart';
-import 'package:sprout/features/goals/goals.dart';
-import 'package:sprout/features/sync/sync.dart';
-import 'package:sprout/features/transactions/transactions.dart';
+import 'package:sprout/features/accounts/export.dart';
+import 'package:sprout/features/budget/export.dart';
+import 'package:sprout/features/goals/export.dart';
+import 'package:sprout/features/sync/export.dart';
+import 'package:sprout/features/transactions/export.dart';
 
 enum StartupStep {
   hiveInit,
@@ -56,6 +57,7 @@ Future<void> initializeApp({
   final settingsBox = await Hive.openBox<dynamic>(HiveBoxes.settings);
   final accountsBox = await Hive.openBox<AccountHiveModel>(HiveBoxes.accounts);
   final goalsBox = await Hive.openBox<GoalHiveModel>(HiveBoxes.goals);
+  final budgetGroupsBox = await _openBudgetGroupsBox();
   final transactionsBox =
       await Hive.openBox<TransactionHiveModel>(HiveBoxes.transactions);
   final pendingSyncBox =
@@ -129,6 +131,7 @@ Future<void> initializeApp({
     settingsBox: settingsBox,
     accountsBox: accountsBox,
     goalsBox: goalsBox,
+    budgetGroupsBox: budgetGroupsBox,
     transactionsBox: transactionsBox,
     pendingSyncBox: pendingSyncBox,
     supabaseClient: supabaseClient,
@@ -146,6 +149,7 @@ Future<void> initializeApp({
       authUserId: authUserId,
       accounts: sl(),
       goals: sl(),
+      budgetGroups: sl(),
       transactions: sl(),
     );
     reporter.update(StartupStep.migrateUserIds, StartupStepStatus.done);
@@ -165,6 +169,20 @@ Future<void> initializeApp({
     reporter.update(StartupStep.pullRemote, StartupStepStatus.done);
   } else {
     reporter.update(StartupStep.pullRemote, StartupStepStatus.skipped);
+  }
+}
+
+Future<Box<BudgetGroupHiveModel>> _openBudgetGroupsBox() async {
+  try {
+    return await Hive.openBox<BudgetGroupHiveModel>(HiveBoxes.budgetGroups);
+  } on RangeError catch (e) {
+    if (kDebugMode) {
+      debugPrint(
+        'Budget groups box corrupted ($e). Deleting and recreating Hive box.',
+      );
+    }
+    await Hive.deleteBoxFromDisk(HiveBoxes.budgetGroups);
+    return await Hive.openBox<BudgetGroupHiveModel>(HiveBoxes.budgetGroups);
   }
 }
 

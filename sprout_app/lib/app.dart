@@ -3,9 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:sprout/core/core.dart';
 import 'package:sprout/core/di/service_locator.dart';
-import 'package:sprout/features/connectivity/connectivity.dart';
-import 'package:sprout/features/goals/goals.dart';
-import 'package:sprout/features/home/home.dart';
+import 'package:sprout/features/connectivity/export.dart';
+import 'package:sprout/features/goals/export.dart';
+import 'package:sprout/features/home/export.dart';
 import 'package:sprout/features/shell/shell.dart';
 
 class SproutApp extends StatelessWidget {

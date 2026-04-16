@@ -31,6 +31,8 @@ abstract class TransactionsRepository {
     required TransactionFrequency frequency,
   });
 
+  Future<void> deleteTransaction(String transactionId);
+
   /// Called after a successful remote insert (e.g. from [SyncService]).
   Future<void> markTransactionSynced(String id);
 

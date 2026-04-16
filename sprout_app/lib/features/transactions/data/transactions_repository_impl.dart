@@ -5,7 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 
 import 'package:sprout/core/core.dart';
-import 'package:sprout/features/sync/sync.dart';
+import 'package:sprout/features/sync/export.dart';
 import '../domain/portfolio_summary.dart';
 import '../domain/transaction.dart';
 import '../domain/transaction_frequency.dart';
@@ -44,9 +44,12 @@ class TransactionsRepositoryImpl implements TransactionsRepository {
     if (_box.isEmpty) {
       return const PortfolioSummary(totalCents: 0, lastActivityAt: null);
     }
+    final now = DateTime.now();
     var total = 0;
     DateTime? last;
     for (final t in _box.values) {
+      final dt = DateTime.fromMillisecondsSinceEpoch(t.occurredAtMillis);
+      if (dt.isAfter(now)) continue; // pending by date
       final kind = TransactionKind.values[(t.kindIndex >= 0 &&
               t.kindIndex < TransactionKind.values.length)
           ? t.kindIndex
@@ -54,7 +57,6 @@ class TransactionsRepositoryImpl implements TransactionsRepository {
       if (kind == TransactionKind.deposit) {
         total += t.amountCents;
       }
-      final dt = DateTime.fromMillisecondsSinceEpoch(t.occurredAtMillis);
       if (last == null || dt.isAfter(last)) last = dt;
     }
     return PortfolioSummary(totalCents: total, lastActivityAt: last);
@@ -133,6 +135,7 @@ class TransactionsRepositoryImpl implements TransactionsRepository {
       note: note,
       pendingSync: pending,
       isRecurring: normalizedIsRecurring,
+      recurringEnabled: normalizedIsRecurring,
       frequency: normalizedIsRecurring ? frequency : TransactionFrequency.none,
       nextScheduledDate: next,
     );
@@ -168,6 +171,7 @@ class TransactionsRepositoryImpl implements TransactionsRepository {
       note: normalizedNote.isEmpty ? null : normalizedNote,
       pendingSync: _appConfig.isSupabaseConfigured ? true : existing.pendingSync,
       isRecurring: existing.isRecurring,
+      recurringEnabled: existing.recurringEnabled,
       frequencyIndex: existing.frequencyIndex,
       nextScheduledAtMillis: existing.nextScheduledAtMillis,
     );
@@ -194,12 +198,51 @@ class TransactionsRepositoryImpl implements TransactionsRepository {
     final existing = _box.get(transactionId);
     if (existing == null) return;
 
-    final normalizedIsRecurring =
-        isRecurring && frequency != TransactionFrequency.none;
+    final enabled = isRecurring && frequency != TransactionFrequency.none;
+    final template = existing.isRecurring || enabled;
+    final currentFrequency = TransactionFrequency.values[existing.frequencyIndex];
+    final effectiveFrequency = enabled
+        ? frequency
+        : (currentFrequency == TransactionFrequency.none
+            ? TransactionFrequency.monthly
+            : currentFrequency);
     final now = DateTime.now();
-    final next = normalizedIsRecurring
-        ? _computeNextScheduledDate(now, frequency)
-        : null;
+    final previousNext = existing.nextScheduledAtMillis == null
+        ? null
+        : DateTime.fromMillisecondsSinceEpoch(existing.nextScheduledAtMillis!);
+
+    DateTime computeNextAfter({
+      required DateTime anchor,
+      required TransactionFrequency frequency,
+      required DateTime after,
+    }) {
+      var next = anchor;
+      var guard = 0;
+      while (!next.isAfter(after) && guard < 5000) {
+        next = _computeNextScheduledDate(next, frequency);
+        guard++;
+      }
+      return next;
+    }
+
+    final next = enabled
+        ? (() {
+            // If we're re-enabling and already have a future next date with the
+            // same frequency, keep it (preserves e.g. "27th of each month").
+            if (previousNext != null &&
+                previousNext.isAfter(now) &&
+                currentFrequency == effectiveFrequency) {
+              return previousNext;
+            }
+            final anchor =
+                previousNext ?? DateTime.fromMillisecondsSinceEpoch(existing.occurredAtMillis);
+            return computeNextAfter(
+              anchor: anchor,
+              frequency: effectiveFrequency,
+              after: now,
+            );
+          })()
+        : previousNext;
 
     final updatedHive = TransactionHiveModel(
       id: existing.id,
@@ -212,8 +255,9 @@ class TransactionsRepositoryImpl implements TransactionsRepository {
       occurredAtMillis: existing.occurredAtMillis,
       note: existing.note,
       pendingSync: _appConfig.isSupabaseConfigured ? true : existing.pendingSync,
-      isRecurring: normalizedIsRecurring,
-      frequencyIndex: normalizedIsRecurring ? frequency.index : 0,
+      isRecurring: template,
+      recurringEnabled: enabled,
+      frequencyIndex: template ? effectiveFrequency.index : 0,
       nextScheduledAtMillis: next?.millisecondsSinceEpoch,
     );
 
@@ -226,6 +270,23 @@ class TransactionsRepositoryImpl implements TransactionsRepository {
       await q.enqueue(
         PendingSyncOperationType.insertTransaction,
         encodeTransactionPayload(tx),
+      );
+    }
+  }
+
+  @override
+  Future<void> deleteTransaction(String transactionId) async {
+    final existing = _box.get(transactionId);
+    if (existing == null) return;
+
+    await _box.delete(transactionId);
+    _notify();
+
+    final q = _pendingSyncQueue;
+    if (_appConfig.isSupabaseConfigured && q != null) {
+      await q.enqueue(
+        PendingSyncOperationType.deleteTransaction,
+        encodeIdPayload(transactionId),
       );
     }
   }
@@ -248,6 +309,7 @@ class TransactionsRepositoryImpl implements TransactionsRepository {
         note: hive.note,
         pendingSync: false,
         isRecurring: hive.isRecurring,
+        recurringEnabled: hive.recurringEnabled,
         frequencyIndex: hive.frequencyIndex,
         nextScheduledAtMillis: hive.nextScheduledAtMillis,
       ),

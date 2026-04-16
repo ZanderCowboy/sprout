@@ -2,13 +2,13 @@ import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:sprout/features/accounts/accounts.dart';
-import 'package:sprout/features/transactions/transactions.dart';
+import 'package:sprout/features/accounts/export.dart';
+import 'package:sprout/features/transactions/export.dart';
 
 import '../application/goals_service.dart';
 import '../domain/goal.dart';
 import '../domain/goal_progress.dart';
-import 'goal_growth_chart_mapper.dart';
+import 'utils/goal_growth_chart.dart';
 
 sealed class GoalDetailEvent extends Equatable {
   const GoalDetailEvent();
@@ -93,6 +93,7 @@ class GoalDetailBloc extends Bloc<GoalDetailEvent, GoalDetailState> {
       void tryEmit() {
         if (goals == null || txs == null || accounts == null) return;
 
+        final now = DateTime.now();
         final goal = goals!.cast<Goal?>().firstWhere(
               (g) => g?.id == goalId,
               orElse: () => null,
@@ -104,7 +105,9 @@ class GoalDetailBloc extends Bloc<GoalDetailEvent, GoalDetailState> {
         for (final t in txs!) {
           if (t.goalId != goalId) continue;
           forGoal.add(t);
-          saved += t.amountCents;
+          if (!t.occurredAt.isAfter(now)) {
+            saved += t.amountCents;
+          }
         }
         forGoal.sort((a, b) => b.occurredAt.compareTo(a.occurredAt));
 

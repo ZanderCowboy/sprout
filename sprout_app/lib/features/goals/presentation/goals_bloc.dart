@@ -5,8 +5,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../application/goals_service.dart';
 import '../domain/goal.dart';
 import '../domain/goal_progress.dart';
-import 'package:sprout/features/transactions/transactions.dart';
-import 'package:sprout/features/accounts/accounts.dart';
+import 'package:sprout/features/transactions/export.dart';
+import 'package:sprout/features/accounts/export.dart';
 
 sealed class GoalsEvent extends Equatable {
   const GoalsEvent();
@@ -77,10 +77,12 @@ class GoalsBloc extends Bloc<GoalsEvent, GoalsState> {
       var transactions = <Transaction>[];
 
       void emitProgress() {
+        final now = DateTime.now();
         final allocationSavedByGoalId = <String, int>{};
         final depositUnallocatedByAccountId = <String, int>{};
         final allocationByAccountId = <String, int>{};
         for (final t in transactions) {
+          if (t.occurredAt.isAfter(now)) continue; // pending by date
           switch (t.kind) {
             case TransactionKind.deposit:
               final gid = t.goalId;
