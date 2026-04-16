@@ -22,6 +22,11 @@ jobs:
         with:
           working-directory: ${{ inputs.working-directory || 'sprout_app' }}
 
+      - name: Ensure config assets exist (CI)
+        uses: ./.github/actions/ensure-config-assets
+        with:
+          working-directory: ${{ inputs.working-directory || 'sprout_app' }}
+
       - name: Flutter analyze
         working-directory: ${{ inputs.working-directory || 'sprout_app' }}
         run: flutter analyze

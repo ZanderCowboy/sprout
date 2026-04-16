@@ -23,6 +23,10 @@ Create the following repository secrets:
 Signing (used to produce installable APKs in CI):
 - `ANDROID_SIGNING_CONFIG_BASE64`: base64-encoded JSON blob containing the keystore and credentials
 
+App config assets (used by Flutter at startup):
+- `APP_CONFIG_DEV_BASE64`: base64-encoded contents of `sprout_app/assets/config/development.json`
+- `APP_CONFIG_PROD_BASE64`: base64-encoded contents of `sprout_app/assets/config/production.json`
+
 Optional:
 - `ANDROID_APPLICATION_ID`: overrides the Gradle `applicationId`/`namespace` at build time
 
@@ -59,6 +63,17 @@ PY
 
 The workflow decodes this secret, recreates `android/release-key.jks`, and writes `android/key.properties` automatically.
 
+## App config asset secrets format
+Encode each JSON file directly as base64 and store as repository secrets:
+
+```bash
+base64 -i sprout_app/assets/config/development.json | tr -d '\n'
+base64 -i sprout_app/assets/config/production.json | tr -d '\n'
+```
+
+Use the first output for `APP_CONFIG_DEV_BASE64` and the second for `APP_CONFIG_PROD_BASE64`.
+If either secret is omitted, the workflow falls back to placeholder config files so the asset bundle still builds.
+
 ## Manual workflow inputs
 Go to **Actions** -> **Firebase Distribute (Dev Android APK)** -> **Run workflow**:
 - `git_ref` (optional): branch/tag/commit SHA to build (default: current ref)
@@ -70,4 +85,3 @@ The workflow uploads:
 `sprout_app/build/app/outputs/flutter-apk/app-release.apk`
 
 If your Flutter/Gradle output path differs, update the workflow’s `file:` field accordingly.
-

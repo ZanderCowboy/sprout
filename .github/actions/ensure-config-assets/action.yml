@@ -1,0 +1,48 @@
+name: "Ensure Flutter Config Assets"
+description: "Create placeholder Flutter config asset JSON files when they are missing."
+
+inputs:
+  working-directory:
+    description: "Directory containing the Flutter project (where assets/ lives)."
+    required: false
+    default: "sprout_app"
+  development-config-path:
+    description: "Path to development config asset relative to working-directory."
+    required: false
+    default: "assets/config/development.json"
+  production-config-path:
+    description: "Path to production config asset relative to working-directory."
+    required: false
+    default: "assets/config/production.json"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Ensure config assets
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      env:
+        DEVELOPMENT_CONFIG_PATH: ${{ inputs.development-config-path }}
+        PRODUCTION_CONFIG_PATH: ${{ inputs.production-config-path }}
+      run: |
+        set -euo pipefail
+
+        ensure_config_file() {
+          local target="$1"
+          mkdir -p "$(dirname "${target}")"
+
+          if [[ ! -f "${target}" ]]; then
+            cat > "${target}" <<'JSON'
+        {
+          "supabaseUrl": "",
+          "supabaseAnonKey": ""
+        }
+        JSON
+            echo "Created placeholder config: ${target}"
+          else
+            echo "Config already exists: ${target}"
+          fi
+        }
+
+        ensure_config_file "${DEVELOPMENT_CONFIG_PATH}"
+        ensure_config_file "${PRODUCTION_CONFIG_PATH}"
