@@ -6,10 +6,10 @@ inputs:
     description: "Directory containing the Flutter project (where pubspec.yaml lives)."
     required: false
     default: "sprout_app"
-  flutter-channel:
-    description: "Flutter release channel."
+  flutter-version:
+    description: "Flutter SDK version."
     required: false
-    default: "stable"
+    default: "3.38.10"
   java-version:
     description: "Java version for Android builds."
     required: false
@@ -27,11 +27,10 @@ runs:
     - name: Setup Flutter
       uses: subosito/flutter-action@v2
       with:
-        channel: ${{ inputs.flutter-channel }}
+        flutter-version: ${{ inputs.flutter-version }}
         cache: true
 
     - name: Flutter pub get
       shell: bash
       working-directory: ${{ inputs.working-directory }}
       run: flutter pub get
-
