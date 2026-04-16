@@ -8,10 +8,7 @@ import 'package:sprout/features/startup/startup_error_page.dart';
 import 'package:sprout/features/startup/startup_page.dart';
 
 class SproutBootstrapApp extends StatefulWidget {
-  const SproutBootstrapApp({
-    super.key,
-    required this.configAssetPath,
-  });
+  const SproutBootstrapApp({super.key, required this.configAssetPath});
 
   final String configAssetPath;
 
@@ -19,14 +16,9 @@ class SproutBootstrapApp extends StatefulWidget {
   State<SproutBootstrapApp> createState() => _SproutBootstrapAppState();
 }
 
-class _SproutBootstrapAppState extends State<SproutBootstrapApp>
-    implements StartupProgressReporter {
-  final Map<StartupStep, StartupStepStatus> _steps = {
-    for (final s in StartupStep.values) s: StartupStepStatus.pending,
-  };
-  final Map<StartupStep, String?> _details = {
-    for (final s in StartupStep.values) s: null,
-  };
+class _SproutBootstrapAppState extends State<SproutBootstrapApp> implements StartupProgressReporter {
+  final Map<StartupStep, StartupStepStatus> _steps = {for (final s in StartupStep.values) s: StartupStepStatus.pending};
+  final Map<StartupStep, String?> _details = {for (final s in StartupStep.values) s: null};
 
   bool _ready = false;
   Object? _error;
@@ -39,10 +31,7 @@ class _SproutBootstrapAppState extends State<SproutBootstrapApp>
     _runInit(allowSupabase: true, strictConfig: true);
   }
 
-  Future<void> _runInit({
-    required bool allowSupabase,
-    required bool strictConfig,
-  }) async {
+  Future<void> _runInit({required bool allowSupabase, required bool strictConfig}) async {
     if (_running) return;
     setState(() {
       _running = true;
@@ -77,6 +66,7 @@ class _SproutBootstrapAppState extends State<SproutBootstrapApp>
         _stackTrace = st;
       });
     } finally {
+      // ignore: control_flow_in_finally
       if (!mounted) return;
       setState(() {
         _running = false;
@@ -85,11 +75,7 @@ class _SproutBootstrapAppState extends State<SproutBootstrapApp>
   }
 
   @override
-  void update(
-    StartupStep step,
-    StartupStepStatus status, {
-    String? detail,
-  }) {
+  void update(StartupStep step, StartupStepStatus status, {String? detail}) {
     if (!mounted) return;
     setState(() {
       _steps[step] = status;
@@ -121,19 +107,10 @@ class _SproutBootstrapAppState extends State<SproutBootstrapApp>
               stackTrace: stack,
               steps: _steps,
               details: _details,
-              onRetry: _running
-                  ? null
-                  : () => _runInit(allowSupabase: true, strictConfig: true),
-              onContinueLocalOnly: _running
-                  ? null
-                  : () => _runInit(allowSupabase: false, strictConfig: false),
+              onRetry: _running ? null : () => _runInit(allowSupabase: true, strictConfig: true),
+              onContinueLocalOnly: _running ? null : () => _runInit(allowSupabase: false, strictConfig: false),
             )
-          : StartupPage(
-              configAssetPath: widget.configAssetPath,
-              steps: _steps,
-              details: _details,
-            ),
+          : StartupPage(configAssetPath: widget.configAssetPath, steps: _steps, details: _details),
     );
   }
 }
-

@@ -13,15 +13,15 @@ import 'deposit_bottom_sheet.dart';
 class ShellPage extends StatefulWidget {
   const ShellPage({super.key});
 
-  static _ShellPageState? maybeOf(BuildContext context) {
-    return context.findAncestorStateOfType<_ShellPageState>();
+  static ShellPageState? maybeOf(BuildContext context) {
+    return context.findAncestorStateOfType<ShellPageState>();
   }
 
   @override
-  State<ShellPage> createState() => _ShellPageState();
+  State<ShellPage> createState() => ShellPageState();
 }
 
-class _ShellPageState extends State<ShellPage> {
+class ShellPageState extends State<ShellPage> {
   int _pageIndex = 0;
 
   void setTabIndex(int index) {
@@ -48,9 +48,7 @@ class _ShellPageState extends State<ShellPage> {
                     context: context,
                     isScrollControlled: true,
                     showDragHandle: true,
-                    builder: (_) => AccountFormSheet(
-                      defaultColor: AppColors.cardColorAt(0),
-                    ),
+                    builder: (_) => AccountFormSheet(defaultColor: AppColors.cardColorAt(0)),
                   );
                 },
               ),
@@ -63,8 +61,7 @@ class _ShellPageState extends State<ShellPage> {
                     context: context,
                     isScrollControlled: true,
                     showDragHandle: true,
-                    builder: (_) =>
-                        CreateGoalScreen(defaultColor: AppColors.cardColorAt(1)),
+                    builder: (_) => CreateGoalScreen(defaultColor: AppColors.cardColorAt(1)),
                   );
                 },
               ),
@@ -101,10 +98,7 @@ class _ShellPageState extends State<ShellPage> {
                   child: SafeArea(
                     bottom: false,
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
-                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       child: Row(
                         children: [
                           Icon(
@@ -117,11 +111,9 @@ class _ShellPageState extends State<ShellPage> {
                             child: Text(
                               AppStrings.offline,
                               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onErrorContainer,
-                                    fontWeight: FontWeight.w600,
-                                  ),
+                                color: Theme.of(context).colorScheme.onErrorContainer,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
                         ],
@@ -134,12 +126,7 @@ class _ShellPageState extends State<ShellPage> {
                   bottom: false,
                   child: IndexedStack(
                     index: _pageIndex,
-                    children: const [
-                      OverviewPage(),
-                      AccountsPage(),
-                      GoalsPage(),
-                      SettingsPage(),
-                    ],
+                    children: const [OverviewPage(), AccountsPage(), GoalsPage(), SettingsPage()],
                   ),
                 ),
               ),
@@ -239,11 +226,7 @@ class _ShellTabItem extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               label,
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
-                color: color,
-              ),
+              style: TextStyle(fontSize: 12, fontWeight: selected ? FontWeight.w600 : FontWeight.w500, color: color),
             ),
           ],
         ),

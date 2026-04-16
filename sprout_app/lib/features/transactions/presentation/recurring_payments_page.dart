@@ -44,24 +44,16 @@ class _RecurringPaymentsBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (state.items.isEmpty) {
-      return Center(
-        child: Text(
-          'No recurring deposits yet.',
-          style: Theme.of(context).textTheme.bodyMedium,
-        ),
-      );
+      return Center(child: Text('No recurring deposits yet.', style: Theme.of(context).textTheme.bodyMedium));
     }
 
     return ListView.separated(
       itemCount: state.items.length,
-      separatorBuilder: (_, __) => const Divider(height: 1),
+      separatorBuilder: (_, _) => const Divider(height: 1),
       itemBuilder: (context, i) {
         final item = state.items[i];
-        final goalName = item.goalId == null
-            ? 'Unallocated'
-            : (state.goalsById[item.goalId!]?.name ?? 'Unknown goal');
-        final accountName =
-            state.accountsById[item.accountId]?.name ?? 'Unknown account';
+        final goalName = item.goalId == null ? 'Unallocated' : (state.goalsById[item.goalId!]?.name ?? 'Unknown goal');
+        final accountName = state.accountsById[item.accountId]?.name ?? 'Unknown account';
 
         return ListTile(
           leading: const Icon(Icons.autorenew_rounded),
@@ -145,14 +137,8 @@ class _EditRecurringSheetState extends State<_EditRecurringSheet> {
           'already in your history will remain.',
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: const Text(AppStrings.cancel),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: const Text(AppStrings.delete),
-          ),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text(AppStrings.cancel)),
+          FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text(AppStrings.delete)),
         ],
       ),
     );
@@ -177,21 +163,14 @@ class _EditRecurringSheetState extends State<_EditRecurringSheet> {
     final mq = MediaQuery.of(context);
     final bottomPadding = mq.viewInsets.bottom + mq.padding.bottom;
     return Padding(
-      padding: EdgeInsets.only(
-        left: 20,
-        right: 20,
-        top: 20,
-        bottom: bottomPadding + 20,
-      ),
+      padding: EdgeInsets.only(left: 20, right: 20, top: 20, bottom: bottomPadding + 20),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
             _enabled ? 'Recurring deposit' : 'Recurring deposit (Disabled)',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 12),
           SwitchListTile.adaptive(
@@ -199,9 +178,7 @@ class _EditRecurringSheetState extends State<_EditRecurringSheet> {
             value: _enabled,
             onChanged: _saving ? null : (v) => setState(() => _enabled = v),
             title: Text(_enabled ? 'Enabled' : 'Disabled'),
-            subtitle: _enabled
-                ? null
-                : const Text('This recurring deposit won’t be applied.'),
+            subtitle: _enabled ? null : const Text('This recurring deposit won’t be applied.'),
           ),
           if (_enabled) ...[
             const SizedBox(height: 8),
@@ -209,22 +186,10 @@ class _EditRecurringSheetState extends State<_EditRecurringSheet> {
               value: _frequency, // ignore: deprecated_member_use
               decoration: const InputDecoration(labelText: 'Frequency'),
               items: const [
-                DropdownMenuItem(
-                  value: TransactionFrequency.daily,
-                  child: Text('Daily'),
-                ),
-                DropdownMenuItem(
-                  value: TransactionFrequency.weekly,
-                  child: Text('Weekly'),
-                ),
-                DropdownMenuItem(
-                  value: TransactionFrequency.monthly,
-                  child: Text('Monthly'),
-                ),
-                DropdownMenuItem(
-                  value: TransactionFrequency.yearly,
-                  child: Text('Yearly'),
-                ),
+                DropdownMenuItem(value: TransactionFrequency.daily, child: Text('Daily')),
+                DropdownMenuItem(value: TransactionFrequency.weekly, child: Text('Weekly')),
+                DropdownMenuItem(value: TransactionFrequency.monthly, child: Text('Monthly')),
+                DropdownMenuItem(value: TransactionFrequency.yearly, child: Text('Yearly')),
               ],
               onChanged: _saving
                   ? null
@@ -236,10 +201,7 @@ class _EditRecurringSheetState extends State<_EditRecurringSheet> {
           ],
           if (_error != null) ...[
             const SizedBox(height: 8),
-            Text(
-              _error!,
-              style: TextStyle(color: Theme.of(context).colorScheme.error),
-            ),
+            Text(_error!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
           ],
           const SizedBox(height: 16),
           Row(
@@ -252,10 +214,7 @@ class _EditRecurringSheetState extends State<_EditRecurringSheet> {
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: FilledButton(
-                  onPressed: _saving ? null : _save,
-                  child: const Text(AppStrings.save),
-                ),
+                child: FilledButton(onPressed: _saving ? null : _save, child: const Text(AppStrings.save)),
               ),
             ],
           ),

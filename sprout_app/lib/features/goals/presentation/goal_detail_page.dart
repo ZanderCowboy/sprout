@@ -34,10 +34,7 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
     final goal = await showModalBottomSheet<Goal>(
       context: context,
       isScrollControlled: true,
-      builder: (_) => GoalFormSheet(
-        initial: widget.progress.goal,
-        defaultColor: Color(widget.progress.goal.color),
-      ),
+      builder: (_) => GoalFormSheet(initial: widget.progress.goal, defaultColor: Color(widget.progress.goal.color)),
     );
     if (goal != null && mounted) {}
   }
@@ -47,18 +44,10 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text(AppStrings.delete),
-        content: const Text(
-          'Remove this goal? Past deposits stay in your history.',
-        ),
+        content: const Text('Remove this goal? Past deposits stay in your history.'),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: const Text(AppStrings.cancel),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: const Text(AppStrings.delete),
-          ),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text(AppStrings.cancel)),
+          FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text(AppStrings.delete)),
         ],
       ),
     );
@@ -88,10 +77,7 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
     if (mounted) {}
   }
 
-  Future<void> _clearScheduledForGoal(
-    GoalDetailReady state, {
-    required String goalId,
-  }) async {
+  Future<void> _clearScheduledForGoal(GoalDetailReady state, {required String goalId}) async {
     final now = DateTime.now();
     final scheduledIds = state.transactions
         .where((t) => t.goalId == goalId)
@@ -109,14 +95,8 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
           'transaction${scheduledIds.length == 1 ? '' : 's'} from this goal.',
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: const Text(AppStrings.cancel),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: const Text(AppStrings.delete),
-          ),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text(AppStrings.cancel)),
+          FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text(AppStrings.delete)),
         ],
       ),
     );
@@ -135,9 +115,7 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
         goalsService: sl<GoalsService>(),
         transactionsService: sl<TransactionsService>(),
         accountsService: sl<AccountsService>(),
-      )..add(
-          GoalDetailSubscriptionRequested(goalId: widget.progress.goal.id),
-        ),
+      )..add(GoalDetailSubscriptionRequested(goalId: widget.progress.goal.id)),
       child: BlocBuilder<GoalDetailBloc, GoalDetailState>(
         builder: (context, state) {
           final progress = switch (state) {
@@ -150,14 +128,8 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
             appBar: AppBar(
               title: Text(g.name),
               actions: [
-                IconButton(
-                  icon: const Icon(Icons.edit_rounded),
-                  onPressed: _edit,
-                ),
-                IconButton(
-                  icon: const Icon(Icons.delete_outline_rounded),
-                  onPressed: _delete,
-                ),
+                IconButton(icon: const Icon(Icons.edit_rounded), onPressed: _edit),
+                IconButton(icon: const Icon(Icons.delete_outline_rounded), onPressed: _delete),
               ],
             ),
             body: () {
@@ -174,164 +146,130 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                   padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
                   children: [
                     LinearProgressIndicator(
-                          value: (progress.percentComplete / 100)
-                              .clamp(0.0, 1.0),
-                          minHeight: 10,
-                          borderRadius: BorderRadius.circular(8),
-                          color: Color(g.color),
-                        ),
-                        const SizedBox(height: 12),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                '${AppStrings.progress}: ${progress.percentComplete}%',
-                                style: Theme.of(context).textTheme.bodyMedium,
-                              ),
-                            ),
-                            Text(
-                              'Saved: ${formatZarFromCents(progress.savedCents)} / '
-                              '${formatZarFromCents(g.targetAmountCents)}',
-                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          '${AppStrings.remaining}: ${formatZarFromCents(progress.remainingCents)}',
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
-                        const SizedBox(height: 22),
-                        DetailDepositCallout(
-                          accentColor: Color(g.color),
-                          caption: AppStrings.addDepositCaptionGoal,
-                          onPressed: _openDeposit,
-                        ),
-                        const SizedBox(height: 16),
-                        _GoalGrowthChart(
-                          goalColor: Color(g.color),
-                          goalCreatedAt: g.createdAt,
-                          goalTargetCents: g.targetAmountCents,
-                          points: ready.graphPoints,
-                          prediction: ready.prediction,
-                        ),
-                        const SizedBox(height: 18),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                AppStrings.transactions,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleMedium
-                                    ?.copyWith(fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                            if (ready.transactions.any(
-                                  (t) => TransactionDisplay.isPendingByDate(
-                                    t,
-                                    DateTime.now(),
-                                  ),
-                                ))
-                              TextButton.icon(
-                                onPressed: () => _clearScheduledForGoal(
-                                  ready,
-                                  goalId: g.id,
-                                ),
-                                icon: const Icon(Icons.delete_outline_rounded),
-                                label: const Text('Clear scheduled'),
-                              ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        if (ready.transactions.isEmpty)
-                          Text(
-                            'No deposits toward this goal yet.',
+                      value: (progress.percentComplete / 100).clamp(0.0, 1.0),
+                      minHeight: 10,
+                      borderRadius: BorderRadius.circular(8),
+                      color: Color(g.color),
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            '${AppStrings.progress}: ${progress.percentComplete}%',
                             style: Theme.of(context).textTheme.bodyMedium,
-                          )
-                        else
-                          ...(() {
-                            final now = DateTime.now();
-                            final scheduled = <Transaction>[];
-                            final history = <Transaction>[];
-                            for (final t in ready.transactions) {
-                              if (TransactionDisplay.isPendingByDate(t, now)) {
-                                scheduled.add(t);
-                              } else {
-                                history.add(t);
-                              }
-                            }
-                            scheduled.sort((a, b) => a.occurredAt.compareTo(b.occurredAt));
-                            history.sort((a, b) => b.occurredAt.compareTo(a.occurredAt));
-
-                            List<Widget> section({
-                              required String title,
-                              required List<Transaction> items,
-                            }) {
-                              if (items.isEmpty) return const [];
-                              return [
-                                Padding(
-                                  padding: const EdgeInsets.only(bottom: 6, top: 4),
-                                  child: Text(
-                                    title,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleSmall
-                                        ?.copyWith(fontWeight: FontWeight.w800),
-                                  ),
-                                ),
-                                ...items.map((t) {
-                                  final accName =
-                                      ready.accountsById[t.accountId]?.name ??
-                                          'Unknown account';
-                                  final style = mapTransactionToListStyle(
-                                    t: t,
-                                    now: now,
-                                  );
-                                  return Card(
-                                    margin: const EdgeInsets.only(bottom: 8),
-                                    child: Opacity(
-                                      opacity: style.opacity,
-                                      child: ListTile(
-                                        leading: style.leadingIcon == null
-                                            ? null
-                                            : Icon(style.leadingIcon),
-                                        title:
-                                            Text(formatZarFromCents(t.amountCents)),
-                                        subtitle: Text(
-                                          [
-                                            accName,
-                                            formatDateTime(t.occurredAt),
-                                            if (style.statusText != null)
-                                              style.statusText!,
-                                          ].join(' · '),
-                                        ),
-                                        trailing: t.pendingSync
-                                            ? Icon(
-                                                Icons.sync_rounded,
-                                                size: 20,
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .primary,
-                                              )
-                                            : null,
-                                      ),
-                                    ),
-                                  );
-                                }),
-                              ];
-                            }
-
-                            return [
-                              ...section(title: 'Scheduled', items: scheduled),
-                              ...section(title: 'History', items: history),
-                            ];
-                          })(),
+                          ),
+                        ),
+                        Text(
+                          'Saved: ${formatZarFromCents(progress.savedCents)} / '
+                          '${formatZarFromCents(g.targetAmountCents)}',
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700),
+                        ),
                       ],
                     ),
-                  );
+                    const SizedBox(height: 6),
+                    Text(
+                      '${AppStrings.remaining}: ${formatZarFromCents(progress.remainingCents)}',
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                    const SizedBox(height: 22),
+                    DetailDepositCallout(
+                      accentColor: Color(g.color),
+                      caption: AppStrings.addDepositCaptionGoal,
+                      onPressed: _openDeposit,
+                    ),
+                    const SizedBox(height: 16),
+                    _GoalGrowthChart(
+                      goalColor: Color(g.color),
+                      goalCreatedAt: g.createdAt,
+                      goalTargetCents: g.targetAmountCents,
+                      points: ready.graphPoints,
+                      prediction: ready.prediction,
+                    ),
+                    const SizedBox(height: 18),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            AppStrings.transactions,
+                            style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        if (ready.transactions.any((t) => TransactionDisplay.isPendingByDate(t, DateTime.now())))
+                          TextButton.icon(
+                            onPressed: () => _clearScheduledForGoal(ready, goalId: g.id),
+                            icon: const Icon(Icons.delete_outline_rounded),
+                            label: const Text('Clear scheduled'),
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    if (ready.transactions.isEmpty)
+                      Text('No deposits toward this goal yet.', style: Theme.of(context).textTheme.bodyMedium)
+                    else
+                      ...(() {
+                        final now = DateTime.now();
+                        final scheduled = <Transaction>[];
+                        final history = <Transaction>[];
+                        for (final t in ready.transactions) {
+                          if (TransactionDisplay.isPendingByDate(t, now)) {
+                            scheduled.add(t);
+                          } else {
+                            history.add(t);
+                          }
+                        }
+                        scheduled.sort((a, b) => a.occurredAt.compareTo(b.occurredAt));
+                        history.sort((a, b) => b.occurredAt.compareTo(a.occurredAt));
+
+                        List<Widget> section({required String title, required List<Transaction> items}) {
+                          if (items.isEmpty) return const [];
+                          return [
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 6, top: 4),
+                              child: Text(
+                                title,
+                                style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
+                              ),
+                            ),
+                            ...items.map((t) {
+                              final accName = ready.accountsById[t.accountId]?.name ?? 'Unknown account';
+                              final style = mapTransactionToListStyle(t: t, now: now);
+                              return Card(
+                                margin: const EdgeInsets.only(bottom: 8),
+                                child: Opacity(
+                                  opacity: style.opacity,
+                                  child: ListTile(
+                                    leading: style.leadingIcon == null ? null : Icon(style.leadingIcon),
+                                    title: Text(formatZarFromCents(t.amountCents)),
+                                    subtitle: Text(
+                                      [
+                                        accName,
+                                        formatDateTime(t.occurredAt),
+                                        if (style.statusText != null) style.statusText!,
+                                      ].join(' · '),
+                                    ),
+                                    trailing: t.pendingSync
+                                        ? Icon(
+                                            Icons.sync_rounded,
+                                            size: 20,
+                                            color: Theme.of(context).colorScheme.primary,
+                                          )
+                                        : null,
+                                  ),
+                                ),
+                              );
+                            }),
+                          ];
+                        }
+
+                        return [
+                          ...section(title: 'Scheduled', items: scheduled),
+                          ...section(title: 'History', items: history),
+                        ];
+                      })(),
+                  ],
+                ),
+              );
             }(),
           );
         },
@@ -369,17 +307,14 @@ class _GoalGrowthChart extends StatelessWidget {
     final maxY = points.isEmpty
         ? goalTargetCents.toDouble()
         : (points.last.cumulativeCents > goalTargetCents
-            ? points.last.cumulativeCents.toDouble()
-            : goalTargetCents.toDouble());
+              ? points.last.cumulativeCents.toDouble()
+              : goalTargetCents.toDouble());
     final targetY = goalTargetCents.toDouble();
 
     final gradient = LinearGradient(
       begin: Alignment.topCenter,
       end: Alignment.bottomCenter,
-      colors: [
-        goalColor.withOpacity(0.35),
-        goalColor.withOpacity(0.00),
-      ],
+      colors: [goalColor.withValues(alpha: 0.35), goalColor.withValues(alpha: 0.00)],
     );
 
     return Card(
@@ -398,21 +333,16 @@ class _GoalGrowthChart extends StatelessWidget {
                 horizontalLines: [
                   HorizontalLine(
                     y: targetY,
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurfaceVariant
-                        .withOpacity(0.55),
+                    color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.55),
                     strokeWidth: 2,
                     dashArray: const [6, 6],
                     label: HorizontalLineLabel(
                       show: true,
                       alignment: Alignment.topLeft,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            fontWeight: FontWeight.w700,
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSurfaceVariant,
-                          ),
+                        fontWeight: FontWeight.w700,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
                       labelResolver: (_) => 'Goal: ${formatZarFromCents(goalTargetCents)}',
                     ),
                   ),
@@ -420,20 +350,11 @@ class _GoalGrowthChart extends StatelessWidget {
               ),
               borderData: FlBorderData(
                 show: true,
-                border: Border.all(
-                  color: Theme.of(context)
-                      .colorScheme
-                      .onSurfaceVariant
-                      .withOpacity(0.35),
-                ),
+                border: Border.all(color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.35)),
               ),
               titlesData: FlTitlesData(
-                topTitles: const AxisTitles(
-                  sideTitles: SideTitles(showTitles: false),
-                ),
-                rightTitles: const AxisTitles(
-                  sideTitles: SideTitles(showTitles: false),
-                ),
+                topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                 leftTitles: AxisTitles(
                   sideTitles: SideTitles(
                     showTitles: true,
@@ -444,10 +365,7 @@ class _GoalGrowthChart extends StatelessWidget {
                       if (value.abs() < eps) {
                         return Padding(
                           padding: const EdgeInsets.only(right: 6),
-                          child: Text(
-                            '0',
-                            style: Theme.of(context).textTheme.bodySmall,
-                          ),
+                          child: Text('0', style: Theme.of(context).textTheme.bodySmall),
                         );
                       }
                       if ((value - target).abs() < eps) {
@@ -455,9 +373,7 @@ class _GoalGrowthChart extends StatelessWidget {
                           padding: const EdgeInsets.only(right: 6),
                           child: Text(
                             formatZarFromCents(goalTargetCents),
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  fontWeight: FontWeight.w700,
-                                ),
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w700),
                           ),
                         );
                       }
@@ -474,15 +390,11 @@ class _GoalGrowthChart extends StatelessWidget {
                       const Duration(days: 365).inMilliseconds.toDouble(),
                     ),
                     getTitlesWidget: (value, meta) {
-                      final dt =
-                          DateTime.fromMillisecondsSinceEpoch(value.toInt());
+                      final dt = DateTime.fromMillisecondsSinceEpoch(value.toInt());
                       final fmt = DateFormat('MMM yy');
                       return Padding(
                         padding: const EdgeInsets.only(top: 8),
-                        child: Text(
-                          fmt.format(dt),
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
+                        child: Text(fmt.format(dt), style: Theme.of(context).textTheme.bodySmall),
                       );
                     },
                   ),
@@ -491,23 +403,20 @@ class _GoalGrowthChart extends StatelessWidget {
               lineTouchData: LineTouchData(
                 handleBuiltInTouches: true,
                 touchTooltipData: LineTouchTooltipData(
-                  getTooltipColor: (touchedSpot) =>
-                      Theme.of(context).colorScheme.surfaceContainerHighest,
+                  getTooltipColor: (touchedSpot) => Theme.of(context).colorScheme.surfaceContainerHighest,
                   getTooltipItems: (touchedSpots) {
                     return touchedSpots.map((barSpot) {
                       final idx = barSpot.spotIndex;
-                      final p = (idx >= 0 && idx < points.length)
-                          ? points[idx]
-                          : null;
+                      final p = (idx >= 0 && idx < points.length) ? points[idx] : null;
                       if (p == null) return null;
                       final date = formatDateTime(p.occurredAt);
                       final amount = formatZarFromCents(p.depositCents);
                       return LineTooltipItem(
                         '$date\n$amount',
                         Theme.of(context).textTheme.bodySmall!.copyWith(
-                              color: Theme.of(context).colorScheme.onSurface,
-                              fontWeight: FontWeight.w600,
-                            ),
+                          color: Theme.of(context).colorScheme.onSurface,
+                          fontWeight: FontWeight.w600,
+                        ),
                       );
                     }).toList();
                   },
@@ -537,7 +446,7 @@ class _GoalGrowthChart extends StatelessWidget {
                   LineChartBarData(
                     spots: prediction!.predictionLineSpots,
                     isCurved: false,
-                    color: goalColor.withOpacity(0.65),
+                    color: goalColor.withValues(alpha: 0.65),
                     barWidth: 2,
                     dashArray: const [6, 6],
                     dotData: const FlDotData(show: false),

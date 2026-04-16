@@ -43,13 +43,8 @@ class _AddGroupSheetState extends State<AddGroupSheet> {
     _description.addListener(_onFieldChanged);
 
     _category = i?.category ?? BudgetCategory.income;
-    _colorArgb =
-        _parseHexColor(i?.colorHex)?.toARGB32() ?? AppColors.cardColorAt(0).toARGB32();
-    _icon = _iconFromStored(
-          codePoint: i?.iconCodePoint,
-          fontFamily: i?.iconFontFamily,
-        ) ??
-        Icons.category_rounded;
+    _colorArgb = _parseHexColor(i?.colorHex)?.toARGB32() ?? AppColors.cardColorAt(0).toARGB32();
+    _icon = _iconFromStored(codePoint: i?.iconCodePoint, fontFamily: i?.iconFontFamily) ?? Icons.category_rounded;
 
     _loadExisting();
   }
@@ -71,11 +66,7 @@ class _AddGroupSheetState extends State<AddGroupSheet> {
     final name = _name.text.trim();
     if (name.isEmpty) return null;
     final key = name.toLowerCase();
-    final taken = _existing.any(
-      (g) =>
-          g.id != widget.initial?.id &&
-          g.name.trim().toLowerCase() == key,
-    );
+    final taken = _existing.any((g) => g.id != widget.initial?.id && g.name.trim().toLowerCase() == key);
     if (taken) return 'You already have a group with this name.';
     return null;
   }
@@ -128,64 +119,40 @@ class _AddGroupSheetState extends State<AddGroupSheet> {
 
     return SafeArea(
       child: SingleChildScrollView(
-        padding: EdgeInsets.only(
-          left: 20,
-          right: 20,
-          top: 20,
-          bottom: bottomPadding + 20,
-        ),
+        padding: EdgeInsets.only(left: 20, right: 20, top: 20, bottom: bottomPadding + 20),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
               widget.initial == null ? 'New budget group' : 'Edit group',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
             TextField(
               controller: _name,
-              decoration: InputDecoration(
-                labelText: 'Group name',
-                errorText: _nameError,
-              ),
+              decoration: InputDecoration(labelText: 'Group name', errorText: _nameError),
               textCapitalization: TextCapitalization.words,
             ),
             const SizedBox(height: 12),
             TextField(
               controller: _description,
-              decoration: const InputDecoration(
-                labelText: 'Description (optional)',
-              ),
+              decoration: const InputDecoration(labelText: 'Description (optional)'),
               textCapitalization: TextCapitalization.sentences,
             ),
             const SizedBox(height: 16),
             DropdownButtonFormField<BudgetCategory>(
-              value: _category,
+              initialValue: _category,
               decoration: const InputDecoration(labelText: 'Category'),
               items: const [
-                DropdownMenuItem(
-                  value: BudgetCategory.income,
-                  child: Text('Income'),
-                ),
-                DropdownMenuItem(
-                  value: BudgetCategory.essentials,
-                  child: Text('Essentials'),
-                ),
-                DropdownMenuItem(
-                  value: BudgetCategory.lifestyle,
-                  child: Text('Lifestyle'),
-                ),
+                DropdownMenuItem(value: BudgetCategory.income, child: Text('Income')),
+                DropdownMenuItem(value: BudgetCategory.essentials, child: Text('Essentials')),
+                DropdownMenuItem(value: BudgetCategory.lifestyle, child: Text('Lifestyle')),
               ],
               onChanged: (v) => setState(() => _category = v ?? _category),
             ),
             const SizedBox(height: 16),
-            Text(
-              'Color',
-              style: Theme.of(context).textTheme.labelLarge,
-            ),
+            Text('Color', style: Theme.of(context).textTheme.labelLarge),
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
@@ -196,18 +163,13 @@ class _AddGroupSheetState extends State<AddGroupSheet> {
                     onTap: () => setState(() => _colorArgb = c.toARGB32()),
                     child: CircleAvatar(
                       backgroundColor: c,
-                      child: _colorArgb == c.toARGB32()
-                          ? const Icon(Icons.check, color: Colors.white)
-                          : null,
+                      child: _colorArgb == c.toARGB32() ? const Icon(Icons.check, color: Colors.white) : null,
                     ),
                   ),
               ],
             ),
             const SizedBox(height: 16),
-            Text(
-              'Icon',
-              style: Theme.of(context).textTheme.labelLarge,
-            ),
+            Text('Icon', style: Theme.of(context).textTheme.labelLarge),
             const SizedBox(height: 8),
             BudgetGroupIconPicker(
               selected: _icon,
@@ -215,10 +177,7 @@ class _AddGroupSheetState extends State<AddGroupSheet> {
               accent: Color(_colorArgb),
             ),
             const SizedBox(height: 24),
-            FilledButton(
-              onPressed: _canSave ? _save : null,
-              child: const Text(AppStrings.save),
-            ),
+            FilledButton(onPressed: _canSave ? _save : null, child: const Text(AppStrings.save)),
           ],
         ),
       ),
@@ -242,4 +201,3 @@ IconData? _iconFromStored({required int? codePoint, required String? fontFamily}
   if (codePoint == null) return null;
   return IconData(codePoint, fontFamily: fontFamily ?? 'MaterialIcons');
 }
-
