@@ -36,7 +36,7 @@ runs:
         fi
 
         # Write keystore and Android key.properties expected by Gradle.
-        echo "${KEYSTORE_BASE64}" | base64 --decode > android/release-key.p12
+        echo "${KEYSTORE_BASE64}" | base64 --decode > android/app/release-key.p12
 
         cat > android/key.properties <<EOF
         storePassword=${STORE_PASSWORD}
