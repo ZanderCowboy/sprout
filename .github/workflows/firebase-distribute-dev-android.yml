@@ -63,7 +63,7 @@ jobs:
         working-directory: sprout_app
         env:
           ANDROID_APPLICATION_ID: ${{ secrets.ANDROID_APPLICATION_ID }}
-        run: flutter build apk --release -t lib/main_development.dart
+        run: flutter build apk --release --no-tree-shake-icons -t lib/main_development.dart
 
       - name: Upload to Firebase App Distribution
         uses: wzieba/Firebase-Distribution-Github-Action@v1

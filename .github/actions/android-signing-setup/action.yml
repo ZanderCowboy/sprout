@@ -45,6 +45,11 @@ runs:
         storeFile=release-key.p12
         EOF
 
+        # Mask sensitive values so they never appear in logs.
+        echo "::add-mask::${KEY_ALIAS}"
+        echo "::add-mask::${KEY_PASSWORD}"
+        echo "::add-mask::${STORE_PASSWORD}"
+
         # Export decoded values for any future steps/workflows.
         {
           echo "KEY_ALIAS=${KEY_ALIAS}"
@@ -54,4 +59,3 @@ runs:
           echo "ANDROID_KEY_PASSWORD=${KEY_PASSWORD}"
           echo "ANDROID_STORE_PASSWORD=${STORE_PASSWORD}"
         } >> "$GITHUB_ENV"
-
