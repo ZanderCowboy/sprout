@@ -1,0 +1,30 @@
+---
+description: Human never edits code — all implementation must be done by the AI agent
+alwaysApply: true
+---
+
+# AI-only development
+
+The human does **not** write or edit project code. Every code change, fix, refactor, test, and config edit must be performed by the agent.
+
+## Agent owns
+
+- Source, tests, assets, CI, Cursor rules/skills/commands
+- Running tooling (`melos`, `flutter`, `dart`, `build_runner`, lints, tests)
+- Commits and PRs when the human asks
+- Investigating failures and applying fixes
+
+## Human owns (non-code only)
+
+- Product decisions and approvals
+- Manual device / UI verification
+- Secrets, store/dashboard logins, and 2FA the agent cannot access
+- Saying what to build next
+
+## Hard rules
+
+- Never ask the human to edit files, paste patches, or "run this change yourself".
+- Never leave unfinished implementation with "you can add X later" — implement it or ask a product question.
+- If blocked on a human-only action, say exactly what they must do (one short step), then continue everything else yourself.
+- Prefer doing the work over explaining how the human would do it.
+- After changes, verify with the project's usual checks when reasonable; report what you ran and what still needs human device testing.
