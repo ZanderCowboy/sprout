@@ -1,4 +1,4 @@
-name: "Firebase Distribute (Dev Android APK)"
+name: "Firebase Distribute (Dev Android)"
 
 on:
   workflow_dispatch:
@@ -53,14 +53,15 @@ jobs:
             echo "Wrote assets/config/development.json from APP_CONFIG_DEV_BASE64"
           fi
 
-      - name: Write google-services.json (dev)
+      - name: Write google-services.json (development)
         working-directory: sprout_app
         env:
           GOOGLE_SERVICES_DEV_BASE64: ${{ env.GOOGLE_SERVICES_DEV_BASE64 }}
         run: |
           set -euo pipefail
-          echo "${GOOGLE_SERVICES_DEV_BASE64}" | base64 --decode > android/app/google-services.json
-          echo "Wrote android/app/google-services.json"
+          mkdir -p android/app/src/development
+          echo "${GOOGLE_SERVICES_DEV_BASE64}" | base64 --decode > android/app/src/development/google-services.json
+          echo "Wrote android/app/src/development/google-services.json"
 
       - name: Configure Android signing (optional)
         if: ${{ env.ANDROID_SIGNING_CONFIG_BASE64 != '' }}
@@ -69,11 +70,9 @@ jobs:
           working-directory: sprout_app
           signing-config-base64: ${{ env.ANDROID_SIGNING_CONFIG_BASE64 }}
 
-      - name: Build dev APK (Firebase internal testing)
+      - name: Build development APK (Firebase internal testing)
         working-directory: sprout_app
-        env:
-          ANDROID_APPLICATION_ID: ${{ secrets.ANDROID_APPLICATION_ID }}
-        run: flutter build apk --release --no-tree-shake-icons -t lib/main_development.dart
+        run: flutter build apk --release --flavor development -t lib/main_development.dart --no-tree-shake-icons
 
       - name: Upload to Firebase App Distribution
         uses: wzieba/Firebase-Distribution-Github-Action@v1
@@ -82,4 +81,4 @@ jobs:
           serviceCredentialsFileContent: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
           groups: ${{ inputs.tester_groups }}
           releaseNotes: ${{ inputs.release_notes }}
-          file: sprout_app/build/app/outputs/flutter-apk/app-release.apk
+          file: sprout_app/build/app/outputs/flutter-apk/app-development-release.apk

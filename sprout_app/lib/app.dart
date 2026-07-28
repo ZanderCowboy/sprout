@@ -7,6 +7,7 @@ import 'package:sprout/features/connectivity/export.dart';
 import 'package:sprout/features/goals/export.dart';
 import 'package:sprout/features/home/export.dart';
 import 'package:sprout/features/shell/shell.dart';
+import 'package:sprout/ui/export.dart';
 
 class SproutApp extends StatelessWidget {
   const SproutApp({super.key});
@@ -36,6 +37,10 @@ class SproutApp extends StatelessWidget {
         themeMode: ThemeMode.dark,
         home: const ShellPage(),
         debugShowCheckedModeBanner: false,
+        builder: (context, child) => EnvironmentBanner(
+          environment: sl<AppConfig>().environment,
+          child: child ?? const SizedBox.shrink(),
+        ),
       ),
     );
   }

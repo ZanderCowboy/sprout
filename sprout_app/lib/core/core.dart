@@ -1,4 +1,5 @@
 export 'config/app_config.dart';
+export 'config/app_environment.dart';
 export 'constants/constants.dart';
 export 'error/error.dart';
 export 'routing/app_tab.dart';

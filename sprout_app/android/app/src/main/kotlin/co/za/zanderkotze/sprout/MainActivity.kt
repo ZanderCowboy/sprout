@@ -1,4 +1,4 @@
-package co.za.zanderkotze.sprout.dev
+package co.za.zanderkotze.sprout
 
 import io.flutter.embedding.android.FlutterActivity
 

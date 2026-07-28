@@ -1,0 +1,118 @@
+name: "Play Publish (Prod Android)"
+
+on:
+  workflow_dispatch:
+    inputs:
+      git_ref:
+        description: "Branch, tag, or commit SHA to build (defaults to the current ref)."
+        required: false
+        default: ""
+      track:
+        description: "Play Console track (internal, alpha, beta, or production)."
+        required: true
+        default: "internal"
+        type: choice
+        options:
+          - internal
+          - alpha
+          - beta
+          - production
+      release_status:
+        description: "Release status on the selected track."
+        required: true
+        default: "completed"
+        type: choice
+        options:
+          - completed
+          - draft
+          - halted
+          - inProgress
+      release_notes:
+        description: "Release notes for Play Console (en-US)."
+        required: false
+        default: ""
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    env:
+      ANDROID_SIGNING_CONFIG_BASE64: ${{ secrets.ANDROID_SIGNING_CONFIG_BASE64 }}
+      APP_CONFIG_PROD_BASE64: ${{ secrets.APP_CONFIG_PROD_BASE64 }}
+      GOOGLE_SERVICES_PROD_BASE64: ${{ secrets.GOOGLE_SERVICES_PROD_BASE64 }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.git_ref != '' && inputs.git_ref || github.ref }}
+
+      - name: Setup Flutter (and pub get)
+        uses: ./.github/actions/flutter-setup
+        with:
+          working-directory: sprout_app
+
+      - name: Ensure config assets exist (fallback)
+        uses: ./.github/actions/ensure-config-assets
+        with:
+          working-directory: sprout_app
+
+      - name: Configure app config assets from secrets
+        working-directory: sprout_app
+        env:
+          APP_CONFIG_PROD_BASE64: ${{ env.APP_CONFIG_PROD_BASE64 }}
+        run: |
+          set -euo pipefail
+
+          mkdir -p assets/config
+
+          if [[ -n "${APP_CONFIG_PROD_BASE64}" ]]; then
+            echo "${APP_CONFIG_PROD_BASE64}" | base64 --decode > assets/config/production.json
+            echo "Wrote assets/config/production.json from APP_CONFIG_PROD_BASE64"
+          fi
+
+      - name: Write google-services.json (production)
+        working-directory: sprout_app
+        env:
+          GOOGLE_SERVICES_PROD_BASE64: ${{ env.GOOGLE_SERVICES_PROD_BASE64 }}
+        run: |
+          set -euo pipefail
+          mkdir -p android/app/src/production
+          echo "${GOOGLE_SERVICES_PROD_BASE64}" | base64 --decode > android/app/src/production/google-services.json
+          echo "Wrote android/app/src/production/google-services.json"
+
+      - name: Require Android signing secret
+        if: ${{ env.ANDROID_SIGNING_CONFIG_BASE64 == '' }}
+        run: |
+          echo "ANDROID_SIGNING_CONFIG_BASE64 is required for Play Store uploads."
+          exit 1
+
+      - name: Configure Android signing
+        uses: ./.github/actions/android-signing-setup
+        with:
+          working-directory: sprout_app
+          signing-config-base64: ${{ env.ANDROID_SIGNING_CONFIG_BASE64 }}
+
+      - name: Build production AAB
+        working-directory: sprout_app
+        run: flutter build appbundle --release --flavor production -t lib/main_production.dart --no-tree-shake-icons
+
+      - name: Prepare Play release notes
+        env:
+          RELEASE_NOTES: ${{ inputs.release_notes }}
+        run: |
+          set -euo pipefail
+          mkdir -p whatsnew
+          if [[ -z "${RELEASE_NOTES}" ]]; then
+            echo "Production release" > whatsnew/whatsnew-en-US
+          else
+            printf '%s\n' "${RELEASE_NOTES}" > whatsnew/whatsnew-en-US
+          fi
+
+      - name: Upload AAB to Google Play
+        uses: r0adkll/upload-google-play@v1.1.3
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
+          packageName: co.za.zanderkotze.sprout
+          releaseFiles: sprout_app/build/app/outputs/bundle/productionRelease/app-production-release.aab
+          track: ${{ inputs.track }}
+          status: ${{ inputs.release_status }}
+          whatsNewDirectory: whatsnew

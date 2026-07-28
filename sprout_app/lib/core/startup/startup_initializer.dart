@@ -3,6 +3,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:sprout/core/config/app_config.dart';
+import 'package:sprout/core/config/app_environment.dart';
 import 'package:sprout/core/constants/hive_boxes.dart';
 import 'package:sprout/core/di/service_locator.dart';
 import 'package:sprout/core/storage/hive_adapters.dart';
@@ -41,6 +42,7 @@ bool _supabaseInitialized = false;
 
 Future<void> initializeApp({
   required String configAssetPath,
+  required AppEnvironment environment,
   required StartupProgressReporter reporter,
   required bool allowSupabase,
   required bool strictConfig,
@@ -70,10 +72,16 @@ Future<void> initializeApp({
   StackTrace? configStackTrace;
 
   if (strictConfig) {
-    config = await AppConfig.load(configAssetPath: configAssetPath);
+    config = await AppConfig.load(
+      configAssetPath: configAssetPath,
+      environment: environment,
+    );
     config.assertValidSupabaseIfConfigured();
   } else {
-    final loaded = await AppConfig.tryLoad(configAssetPath: configAssetPath);
+    final loaded = await AppConfig.tryLoad(
+      configAssetPath: configAssetPath,
+      environment: environment,
+    );
     config = loaded.config;
     configError = loaded.error;
     configStackTrace = loaded.stackTrace;

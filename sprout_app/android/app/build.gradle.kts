@@ -16,11 +16,9 @@ dependencies {
     implementation("com.google.firebase:firebase-crashlytics")
 }
 
-val androidApplicationId: String =
-    (project.findProperty("androidApplicationId") as? String)
-        ?: System.getenv("ANDROID_APPLICATION_ID")
-        ?: "co.za.zanderkotze.sprout.dev"
-
+// Must stay in sync with MainActivity's Kotlin package and google-services.json.
+// Flutter tooling regex-parses a quoted namespace/applicationId from this file
+// (variables like `namespace = someVar` break `flutter run`).
 val keystoreProperties = Properties().apply {
     val propertiesFile = rootProject.file("key.properties")
     if (propertiesFile.exists()) {
@@ -37,7 +35,7 @@ val hasReleaseSigning: Boolean =
         keystoreProperties.getProperty("keyPassword") != null
 
 android {
-    namespace = androidApplicationId
+    namespace = "co.za.zanderkotze.sprout"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -62,13 +60,28 @@ android {
     }
 
     defaultConfig {
-        applicationId = androidApplicationId
+        // Quoted so Flutter tooling can parse applicationId from this file.
+        // Flavors append `.dev` for development; production keeps this base id.
+        applicationId = "co.za.zanderkotze.sprout"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+    }
+
+    flavorDimensions += "environment"
+    productFlavors {
+        create("development") {
+            dimension = "environment"
+            applicationIdSuffix = ".dev"
+            resValue("string", "app_name", "[DEV] Sprout")
+        }
+        create("production") {
+            dimension = "environment"
+            resValue("string", "app_name", "Sprout")
+        }
     }
 
     buildTypes {

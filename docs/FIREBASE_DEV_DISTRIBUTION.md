@@ -2,35 +2,37 @@
 
 This repo uses GitHub Actions for:
 - `CI Dev Checks` on every push: `flutter analyze` + `flutter test`
-- `Firebase Distribute (Dev Android APK)` on manual trigger: builds a **dev APK** and uploads it to Firebase App Distribution
+- `Firebase Distribute (Dev Android APK)` on manual trigger: builds a **development** APK and uploads it to Firebase App Distribution
 
-## Android package name (important)
-The Android `applicationId` is configured in `sprout_app/android/app/build.gradle.kts` and defaults to `com.example.sprout`.
+Production Play uploads are documented separately in [PLAY_PUBLISH_PROD_ANDROID.md](PLAY_PUBLISH_PROD_ANDROID.md).
 
-To override it (without code changes), set a secret named `ANDROID_APPLICATION_ID` in GitHub. The build will read it at runtime.
+## Android flavors
 
-## Firebase App Distribution prereqs
-1. In Firebase, open your project and register the Android app using the final `applicationId`.
-2. Copy the Firebase App Distribution Android `appId` (format: `1:...:android:...`).
-3. Create your Distribution groups (for example: `dev`).
-4. Create a service account key with the **Firebase App Distribution Admin** role.
+| Flavor | applicationId | Entry point | Launcher name |
+|--------|---------------|-------------|---------------|
+| `development` | `co.za.zanderkotze.sprout.dev` | `lib/main_development.dart` | [DEV] Sprout |
+| `production` | `co.za.zanderkotze.sprout` | `lib/main_production.dart` | Sprout |
 
-## GitHub Secrets required
-Create the following repository secrets:
-- `FIREBASE_APP_ID`: Firebase App Distribution Android appId
+Both can be installed on the same device. Only **development** uses Firebase App Distribution.
+
+## Firebase App Distribution prereqs (development)
+
+1. In the **development** Firebase project, register the Android app with package `co.za.zanderkotze.sprout.dev`.
+2. Download `google-services.json` and place it at `sprout_app/android/app/src/development/google-services.json` (gitignored).
+3. Copy the Firebase App Distribution Android `appId` (format: `1:...:android:...`).
+4. Create your Distribution groups (for example: `default`).
+5. Create a service account key with the **Firebase App Distribution Admin** role.
+
+## GitHub Secrets required (dev distribute)
+
+- `FIREBASE_APP_ID`: Firebase App Distribution Android appId (dev app)
 - `FIREBASE_SERVICE_ACCOUNT_JSON`: the full private key JSON content (raw JSON string)
-
-Signing (used to produce installable APKs in CI):
-- `ANDROID_SIGNING_CONFIG_BASE64`: base64-encoded JSON blob containing the keystore and credentials
-
-App config assets (used by Flutter at startup):
-- `APP_CONFIG_DEV_BASE64`: base64-encoded contents of `sprout_app/assets/config/development.json`
-- `APP_CONFIG_PROD_BASE64`: base64-encoded contents of `sprout_app/assets/config/production.json`
-
-Optional:
-- `ANDROID_APPLICATION_ID`: overrides the Gradle `applicationId`/`namespace` at build time
+- `GOOGLE_SERVICES_DEV_BASE64`: base64-encoded `src/development/google-services.json`
+- `APP_CONFIG_DEV_BASE64`: base64-encoded `sprout_app/assets/config/development.json`
+- `ANDROID_SIGNING_CONFIG_BASE64`: base64-encoded JSON blob containing the keystore and credentials (optional for local testing; recommended for installable CI APKs)
 
 ## Android signing secret format
+
 Encode a JSON object like this as base64, then store the result in `ANDROID_SIGNING_CONFIG_BASE64`:
 
 ```json
@@ -63,25 +65,31 @@ PY
 
 The workflow decodes this secret, recreates `android/release-key.jks`, and writes `android/key.properties` automatically.
 
-## App config asset secrets format
-Encode each JSON file directly as base64 and store as repository secrets:
+## App config / google-services secret format
 
 ```bash
 base64 -i sprout_app/assets/config/development.json | tr -d '\n'
-base64 -i sprout_app/assets/config/production.json | tr -d '\n'
+base64 -i sprout_app/android/app/src/development/google-services.json | tr -d '\n'
 ```
 
-Use the first output for `APP_CONFIG_DEV_BASE64` and the second for `APP_CONFIG_PROD_BASE64`.
-If either secret is omitted, the workflow falls back to placeholder config files so the asset bundle still builds.
+If `APP_CONFIG_DEV_BASE64` is omitted, the workflow falls back to a placeholder config so the asset bundle still builds.
 
 ## Manual workflow inputs
-Go to **Actions** -> **Firebase Distribute (Dev Android APK)** -> **Run workflow**:
+
+Go to **Actions** → **Firebase Distribute (Dev Android APK)** → **Run workflow**:
+
 - `git_ref` (optional): branch/tag/commit SHA to build (default: current ref)
 - `tester_groups`: comma-separated Firebase App Distribution groups
 - `release_notes` (optional): release notes shown to testers
 
 ## Artifact path used
-The workflow uploads:
-`sprout_app/build/app/outputs/flutter-apk/app-release.apk`
 
-If your Flutter/Gradle output path differs, update the workflow’s `file:` field accordingly.
+The workflow uploads:
+
+`sprout_app/build/app/outputs/flutter-apk/app-development-release.apk`
+
+Build command:
+
+```bash
+flutter build apk --release --flavor development -t lib/main_development.dart --no-tree-shake-icons
+```

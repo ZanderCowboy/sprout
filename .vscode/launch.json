@@ -9,6 +9,7 @@
       "type": "dart",
       "cwd": "${workspaceFolder}/sprout_app",
       "program": "lib/main_development.dart",
+      "args": ["--flavor", "development"],
       "flutterMode": "debug"
     },
     {
@@ -17,6 +18,7 @@
       "type": "dart",
       "cwd": "${workspaceFolder}/sprout_app",
       "program": "lib/main_development.dart",
+      "args": ["--flavor", "development"],
       "flutterMode": "profile"
     },
     {
@@ -25,6 +27,7 @@
       "type": "dart",
       "cwd": "${workspaceFolder}/sprout_app",
       "program": "lib/main_development.dart",
+      "args": ["--flavor", "development"],
       "flutterMode": "release"
     },
     {
@@ -33,6 +36,7 @@
       "type": "dart",
       "cwd": "${workspaceFolder}/sprout_app",
       "program": "lib/main_production.dart",
+      "args": ["--flavor", "production"],
       "flutterMode": "debug"
     },
     {
@@ -41,6 +45,7 @@
       "type": "dart",
       "cwd": "${workspaceFolder}/sprout_app",
       "program": "lib/main_production.dart",
+      "args": ["--flavor", "production"],
       "flutterMode": "profile"
     },
     {
@@ -49,6 +54,7 @@
       "type": "dart",
       "cwd": "${workspaceFolder}/sprout_app",
       "program": "lib/main_production.dart",
+      "args": ["--flavor", "production"],
       "flutterMode": "release"
     }
   ]

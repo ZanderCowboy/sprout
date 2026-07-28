@@ -2,15 +2,22 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:sprout/app.dart';
+import 'package:sprout/core/config/app_environment.dart';
 import 'package:sprout/core/constants/app_strings.dart';
 import 'package:sprout/core/startup/startup_initializer.dart';
 import 'package:sprout/features/startup/startup_error_page.dart';
 import 'package:sprout/features/startup/startup_page.dart';
+import 'package:sprout/ui/export.dart';
 
 class SproutBootstrapApp extends StatefulWidget {
-  const SproutBootstrapApp({super.key, required this.configAssetPath});
+  const SproutBootstrapApp({
+    super.key,
+    required this.configAssetPath,
+    required this.environment,
+  });
 
   final String configAssetPath;
+  final AppEnvironment environment;
 
   @override
   State<SproutBootstrapApp> createState() => _SproutBootstrapAppState();
@@ -47,6 +54,7 @@ class _SproutBootstrapAppState extends State<SproutBootstrapApp> implements Star
     try {
       await initializeApp(
         configAssetPath: widget.configAssetPath,
+        environment: widget.environment,
         reporter: this,
         allowSupabase: allowSupabase,
         strictConfig: strictConfig,
@@ -100,6 +108,10 @@ class _SproutBootstrapAppState extends State<SproutBootstrapApp> implements Star
       debugShowCheckedModeBanner: false,
       themeMode: ThemeMode.dark,
       theme: ThemeData.dark(),
+      builder: (context, child) => EnvironmentBanner(
+        environment: widget.environment,
+        child: child ?? const SizedBox.shrink(),
+      ),
       home: isError
           ? StartupErrorPage(
               configAssetPath: widget.configAssetPath,

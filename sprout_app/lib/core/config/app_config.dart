@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/services.dart';
 
+import 'package:sprout/core/config/app_environment.dart';
+
 class AppConfigLoadResult {
   const AppConfigLoadResult({
     required this.config,
@@ -16,10 +18,12 @@ class AppConfigLoadResult {
 
 class AppConfig {
   const AppConfig({
+    required this.environment,
     required this.supabaseUrl,
     required this.supabaseAnonKey,
   });
 
+  final AppEnvironment environment;
   final String supabaseUrl;
   final String supabaseAnonKey;
 
@@ -55,13 +59,20 @@ class AppConfig {
   ///
   /// Non-empty compile-time `SUPABASE_URL` / `SUPABASE_ANON_KEY` override JSON
   /// values (e.g. CI).
-  static Future<AppConfig> load({required String configAssetPath}) async {
+  static Future<AppConfig> load({
+    required String configAssetPath,
+    required AppEnvironment environment,
+  }) async {
     const envUrl = String.fromEnvironment('SUPABASE_URL');
     const envKey = String.fromEnvironment('SUPABASE_ANON_KEY');
 
-    final fromFile = await _loadConfigJson(configAssetPath);
+    final fromFile = await _loadConfigJson(
+      configAssetPath,
+      environment: environment,
+    );
 
     return AppConfig(
+      environment: environment,
       supabaseUrl: envUrl.isNotEmpty ? envUrl : fromFile.supabaseUrl,
       supabaseAnonKey: envKey.isNotEmpty ? envKey : fromFile.supabaseAnonKey,
     );
@@ -73,19 +84,25 @@ class AppConfig {
   /// - Still honors compile-time overrides (`SUPABASE_URL` / `SUPABASE_ANON_KEY`).
   static Future<AppConfigLoadResult> tryLoad({
     required String configAssetPath,
+    required AppEnvironment environment,
   }) async {
     const envUrl = String.fromEnvironment('SUPABASE_URL');
     const envKey = String.fromEnvironment('SUPABASE_ANON_KEY');
 
     try {
-      final fromFile = await _loadConfigJson(configAssetPath);
+      final fromFile = await _loadConfigJson(
+        configAssetPath,
+        environment: environment,
+      );
       final cfg = AppConfig(
+        environment: environment,
         supabaseUrl: envUrl.isNotEmpty ? envUrl : fromFile.supabaseUrl,
         supabaseAnonKey: envKey.isNotEmpty ? envKey : fromFile.supabaseAnonKey,
       );
       return AppConfigLoadResult(config: cfg, error: null, stackTrace: null);
     } on Object catch (e, st) {
       final cfg = AppConfig(
+        environment: environment,
         supabaseUrl: envUrl,
         supabaseAnonKey: envKey,
       );
@@ -93,7 +110,10 @@ class AppConfig {
     }
   }
 
-  static Future<AppConfig> _loadConfigJson(String assetPath) async {
+  static Future<AppConfig> _loadConfigJson(
+    String assetPath, {
+    required AppEnvironment environment,
+  }) async {
     late final String raw;
     try {
       raw = await rootBundle.loadString(assetPath);
@@ -125,6 +145,7 @@ class AppConfig {
     }
 
     return AppConfig(
+      environment: environment,
       supabaseUrl: (map['supabaseUrl'] as String?)?.trim() ?? '',
       supabaseAnonKey: (map['supabaseAnonKey'] as String?)?.trim() ?? '',
     );

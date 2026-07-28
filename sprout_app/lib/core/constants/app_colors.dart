@@ -8,6 +8,8 @@ abstract final class AppColors {
   static const Color accentSky = Color(0xFF38BDF8);
   static const Color accentViolet = Color(0xFFA78BFA);
   static const Color surfaceDeep = Color(0xFF0F172A);
+  static const Color environmentDev = Color(0xFFF59E0B);
+  static const Color environmentProd = accentCoral;
   static const List<Color> cardPalette = [
     Color(0xFF14B8A6),
     Color(0xFF6366F1),
