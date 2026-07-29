@@ -1,11 +1,14 @@
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:sprout/core/config/app_config.dart';
 import 'package:sprout/core/config/app_environment.dart';
 import 'package:sprout/core/constants/hive_boxes.dart';
 import 'package:sprout/core/di/service_locator.dart';
+import 'package:sprout/core/flags/remote_config_service.dart';
+import 'package:sprout/core/flags/remote_feature_flag.dart';
 import 'package:sprout/core/storage/hive_adapters.dart';
 import 'package:sprout/core/storage/migrate_hive_user_id_to_auth.dart';
 import 'package:sprout/core/user/user_context.dart';
@@ -22,6 +25,7 @@ enum StartupStep {
   initSupabase,
   configureDI,
   resolveUser,
+  configurePurchases,
   migrateUserIds,
   flushPending,
   pullRemote,
@@ -39,6 +43,9 @@ abstract class StartupProgressReporter {
 
 bool _hiveInitialized = false;
 bool _supabaseInitialized = false;
+bool _purchasesConfigured = false;
+final RemoteConfigService _remoteConfigService = RemoteConfigService();
+
 
 Future<void> initializeApp({
   required String configAssetPath,
@@ -147,8 +154,14 @@ Future<void> initializeApp({
   reporter.update(StartupStep.configureDI, StartupStepStatus.done);
 
   reporter.update(StartupStep.resolveUser, StartupStepStatus.running);
-  await sl<UserContext>().resolveUserId();
+  final userId = await sl<UserContext>().resolveUserId();
   reporter.update(StartupStep.resolveUser, StartupStepStatus.done);
+
+  await _configurePurchases(
+    config: config,
+    userId: userId,
+    reporter: reporter,
+  );
 
   reporter.update(StartupStep.migrateUserIds, StartupStepStatus.running);
   final authUserId = supabaseClient?.auth.currentUser?.id;
@@ -178,6 +191,59 @@ Future<void> initializeApp({
   } else {
     reporter.update(StartupStep.pullRemote, StartupStepStatus.skipped);
   }
+}
+
+Future<void> _configurePurchases({
+  required AppConfig config,
+  required String userId,
+  required StartupProgressReporter reporter,
+}) async {
+  if (!config.isRevenueCatConfigured) {
+    reporter.update(StartupStep.configurePurchases, StartupStepStatus.skipped);
+    return;
+  }
+
+  final enabled = await _isRevenueCatRemoteEnabled(config);
+  if (!enabled) {
+    reporter.update(
+      StartupStep.configurePurchases,
+      StartupStepStatus.skipped,
+      detail: 'remote flag off',
+    );
+    return;
+  }
+
+  reporter.update(StartupStep.configurePurchases, StartupStepStatus.running);
+  try {
+    if (!_purchasesConfigured) {
+      await Purchases.setLogLevel(
+        config.environment == AppEnvironment.development || kDebugMode
+            ? LogLevel.debug
+            : LogLevel.info,
+      );
+      final purchasesConfig = PurchasesConfiguration(
+        config.revenueCatAndroidApiKey,
+      )..appUserID = userId;
+      await Purchases.configure(purchasesConfig);
+      _purchasesConfigured = true;
+    }
+    reporter.update(StartupStep.configurePurchases, StartupStepStatus.done);
+  } on Object catch (e) {
+    if (kDebugMode) {
+      debugPrint('RevenueCat configure failed: $e');
+    }
+    reporter.update(
+      StartupStep.configurePurchases,
+      StartupStepStatus.failed,
+      detail: '$e',
+    );
+  }
+}
+
+Future<bool> _isRevenueCatRemoteEnabled(AppConfig config) async {
+  await _remoteConfigService.setup(config);
+  await _remoteConfigService.fetchFlags();
+  return _remoteConfigService.isEnabled(RemoteFeatureFlag.revenueCatEnabled);
 }
 
 Future<Box<BudgetGroupHiveModel>> _openBudgetGroupsBox() async {

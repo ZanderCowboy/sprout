@@ -49,13 +49,28 @@ Both JSON files are gitignored but must exist locally (they are listed in `pubsp
 ```json
 {
   "supabaseUrl": "",
-  "supabaseAnonKey": ""
+  "supabaseAnonKey": "",
+  "androidApplicationId": "co.za.zanderkotze.sprout.dev",
+  "revenueCatAndroidApiKey": "",
+  "firebase": {
+    "apiKey": "",
+    "appId": "",
+    "messagingSenderId": "",
+    "projectId": "",
+    "storageBucket": ""
+  }
 }
 ```
 
+Use `co.za.zanderkotze.sprout` for production. `androidApplicationId` documents the Play package for that flavor; RevenueCat still uses `revenueCatAndroidApiKey` (`test_…` / `goog_…`), not the package name.
+
+Copy `apiKey` / `appId` / etc. from the flavor’s `google-services.json` into the gitignored `firebase` object (do **not** commit those values in Dart sources).
+
 Empty URL/key → **local-only** mode (Hive, no sync). Fill them for Supabase sync — use the **development** Supabase project in `development.json` and the **production** project in `production.json`.
 
-Optional overrides: `--dart-define=SUPABASE_URL=...` and `--dart-define=SUPABASE_ANON_KEY=...`.
+Empty `revenueCatAndroidApiKey` → RevenueCat is skipped at startup. On **development**, a Firebase Remote Config kill switch (`revenuecat_enabled`, default off) must also be `true` before `Purchases.configure` runs — see [RevenueCat foundation](docs/REVENUECAT.md). Production always skips configure for now.
+
+Optional overrides: `--dart-define=SUPABASE_URL=...`, `--dart-define=SUPABASE_ANON_KEY=...`, and `--dart-define=REVENUECAT_ANDROID_API_KEY=...`.
 
 ### Firebase (`google-services.json`)
 
@@ -80,4 +95,5 @@ flutter test
 
 - [Firebase Dev Distribution (Android)](docs/FIREBASE_DEV_DISTRIBUTION.md) — CI APK builds and GitHub secrets
 - [Play Store publish (Android)](docs/PLAY_PUBLISH_PROD_ANDROID.md) — dispatch-only production AAB upload
+- [RevenueCat foundation](docs/REVENUECAT.md) — SDK configure, identity, Test Store catalog
 - [Supabase setup](supabase/README.md)

@@ -138,6 +138,7 @@ String _labelFor(StartupStep step) {
     StartupStep.initSupabase => 'Connecting to Supabase',
     StartupStep.configureDI => 'Configuring services',
     StartupStep.resolveUser => 'Resolving user',
+    StartupStep.configurePurchases => 'Configuring purchases',
     StartupStep.migrateUserIds => 'Migrating user data',
     StartupStep.flushPending => 'Flushing pending sync',
     StartupStep.pullRemote => 'Pulling remote data',
