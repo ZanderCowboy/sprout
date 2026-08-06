@@ -22,6 +22,7 @@ enum StartupStep {
   hiveInit,
   openBoxes,
   loadConfig,
+  initRemoteConfig,
   initSupabase,
   configureDI,
   resolveUser,
@@ -39,13 +40,15 @@ abstract class StartupProgressReporter {
     StartupStepStatus status, {
     String? detail,
   });
+
+  /// Called after Remote Config activates (or defaults are applied).
+  void onShowStartupChecks(bool enabled);
 }
 
 bool _hiveInitialized = false;
 bool _supabaseInitialized = false;
 bool _purchasesConfigured = false;
 final RemoteConfigService _remoteConfigService = RemoteConfigService();
-
 
 Future<void> initializeApp({
   required String configAssetPath,
@@ -109,6 +112,23 @@ Future<void> initializeApp({
       configStackTrace ?? StackTrace.current,
     );
   }
+
+  reporter.update(StartupStep.initRemoteConfig, StartupStepStatus.running);
+  await _remoteConfigService.setup(config);
+  await _remoteConfigService.fetchFlags();
+  final showStartupChecks = _remoteConfigService.isEnabled(
+    RemoteFeatureFlag.showStartupChecks,
+  );
+  reporter.onShowStartupChecks(showStartupChecks);
+  reporter.update(
+    StartupStep.initRemoteConfig,
+    _remoteConfigService.isReady
+        ? StartupStepStatus.done
+        : StartupStepStatus.skipped,
+    detail: showStartupChecks
+        ? 'show_startup_checks=true'
+        : 'show_startup_checks=false',
+  );
 
   SupabaseClient? supabaseClient;
   if (allowSupabase && config.isSupabaseConfigured) {
@@ -203,7 +223,9 @@ Future<void> _configurePurchases({
     return;
   }
 
-  final enabled = await _isRevenueCatRemoteEnabled(config);
+  final enabled = _remoteConfigService.isEnabled(
+    RemoteFeatureFlag.revenueCatEnabled,
+  );
   if (!enabled) {
     reporter.update(
       StartupStep.configurePurchases,
@@ -240,12 +262,6 @@ Future<void> _configurePurchases({
   }
 }
 
-Future<bool> _isRevenueCatRemoteEnabled(AppConfig config) async {
-  await _remoteConfigService.setup(config);
-  await _remoteConfigService.fetchFlags();
-  return _remoteConfigService.isEnabled(RemoteFeatureFlag.revenueCatEnabled);
-}
-
 Future<Box<BudgetGroupHiveModel>> _openBudgetGroupsBox() async {
   try {
     return await Hive.openBox<BudgetGroupHiveModel>(HiveBoxes.budgetGroups);
@@ -259,4 +275,3 @@ Future<Box<BudgetGroupHiveModel>> _openBudgetGroupsBox() async {
     return await Hive.openBox<BudgetGroupHiveModel>(HiveBoxes.budgetGroups);
   }
 }
-

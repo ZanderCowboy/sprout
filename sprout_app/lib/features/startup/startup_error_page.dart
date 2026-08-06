@@ -213,6 +213,7 @@ String _labelFor(StartupStep step) {
     StartupStep.hiveInit => 'Initializing local storage',
     StartupStep.openBoxes => 'Opening boxes',
     StartupStep.loadConfig => 'Loading config',
+    StartupStep.initRemoteConfig => 'Loading feature flags',
     StartupStep.initSupabase => 'Connecting to Supabase',
     StartupStep.configureDI => 'Configuring services',
     StartupStep.resolveUser => 'Resolving user',

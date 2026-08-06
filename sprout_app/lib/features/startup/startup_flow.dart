@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:sprout/app.dart';
 import 'package:sprout/core/config/app_environment.dart';
 import 'package:sprout/core/constants/app_strings.dart';
+import 'package:sprout/core/flags/remote_feature_flag.dart';
 import 'package:sprout/core/startup/startup_initializer.dart';
 import 'package:sprout/features/startup/startup_error_page.dart';
 import 'package:sprout/features/startup/startup_page.dart';
+import 'package:sprout/features/startup/startup_splash_page.dart';
 import 'package:sprout/ui/export.dart';
 
 class SproutBootstrapApp extends StatefulWidget {
@@ -23,14 +25,21 @@ class SproutBootstrapApp extends StatefulWidget {
   State<SproutBootstrapApp> createState() => _SproutBootstrapAppState();
 }
 
-class _SproutBootstrapAppState extends State<SproutBootstrapApp> implements StartupProgressReporter {
-  final Map<StartupStep, StartupStepStatus> _steps = {for (final s in StartupStep.values) s: StartupStepStatus.pending};
-  final Map<StartupStep, String?> _details = {for (final s in StartupStep.values) s: null};
+class _SproutBootstrapAppState extends State<SproutBootstrapApp>
+    implements StartupProgressReporter {
+  final Map<StartupStep, StartupStepStatus> _steps = {
+    for (final s in StartupStep.values) s: StartupStepStatus.pending,
+  };
+  final Map<StartupStep, String?> _details = {
+    for (final s in StartupStep.values) s: null,
+  };
 
   bool _ready = false;
   Object? _error;
   StackTrace? _stackTrace;
   bool _running = false;
+  bool _showStartupChecks =
+      RemoteFeatureFlag.showStartupChecks.defaultValue;
 
   @override
   void initState() {
@@ -38,13 +47,17 @@ class _SproutBootstrapAppState extends State<SproutBootstrapApp> implements Star
     _runInit(allowSupabase: true, strictConfig: true);
   }
 
-  Future<void> _runInit({required bool allowSupabase, required bool strictConfig}) async {
+  Future<void> _runInit({
+    required bool allowSupabase,
+    required bool strictConfig,
+  }) async {
     if (_running) return;
     setState(() {
       _running = true;
       _ready = false;
       _error = null;
       _stackTrace = null;
+      _showStartupChecks = RemoteFeatureFlag.showStartupChecks.defaultValue;
       for (final s in StartupStep.values) {
         _steps[s] = StartupStepStatus.pending;
         _details[s] = null;
@@ -94,6 +107,14 @@ class _SproutBootstrapAppState extends State<SproutBootstrapApp> implements Star
   }
 
   @override
+  void onShowStartupChecks(bool enabled) {
+    if (!mounted) return;
+    setState(() {
+      _showStartupChecks = enabled;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     if (_ready) {
       return const SproutApp();
@@ -119,10 +140,20 @@ class _SproutBootstrapAppState extends State<SproutBootstrapApp> implements Star
               stackTrace: stack,
               steps: _steps,
               details: _details,
-              onRetry: _running ? null : () => _runInit(allowSupabase: true, strictConfig: true),
-              onContinueLocalOnly: _running ? null : () => _runInit(allowSupabase: false, strictConfig: false),
+              onRetry: _running
+                  ? null
+                  : () => _runInit(allowSupabase: true, strictConfig: true),
+              onContinueLocalOnly: _running
+                  ? null
+                  : () => _runInit(allowSupabase: false, strictConfig: false),
             )
-          : StartupPage(configAssetPath: widget.configAssetPath, steps: _steps, details: _details),
+          : _showStartupChecks
+              ? StartupPage(
+                  configAssetPath: widget.configAssetPath,
+                  steps: _steps,
+                  details: _details,
+                )
+              : const StartupSplashPage(),
     );
   }
 }
