@@ -10,9 +10,10 @@
 
 # Secrets and Config
 .secrets
-sprout_app/assets/config/development.json
-sprout_app/assets/config/production.json
-config/
+/config/
+sprout_app/assets/config/*.json
+sprout_app/assets/config/*.md
+sprout_app/config/
 google-services.json
 **/firebase_options*.dart
 
