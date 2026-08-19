@@ -24,6 +24,7 @@ final class AuthViewGuest extends AuthViewState {
     required this.supabaseConfigured,
     required this.googleAvailable,
     this.email = '',
+    this.displayName = '',
     this.otpSent = false,
     this.busy = false,
     this.errorMessage,
@@ -33,6 +34,7 @@ final class AuthViewGuest extends AuthViewState {
   final bool supabaseConfigured;
   final bool googleAvailable;
   final String email;
+  final String displayName;
   final bool otpSent;
   final bool busy;
   final String? errorMessage;
@@ -42,6 +44,7 @@ final class AuthViewGuest extends AuthViewState {
     bool? supabaseConfigured,
     bool? googleAvailable,
     String? email,
+    String? displayName,
     bool? otpSent,
     bool? busy,
     String? errorMessage,
@@ -53,6 +56,7 @@ final class AuthViewGuest extends AuthViewState {
       supabaseConfigured: supabaseConfigured ?? this.supabaseConfigured,
       googleAvailable: googleAvailable ?? this.googleAvailable,
       email: email ?? this.email,
+      displayName: displayName ?? this.displayName,
       otpSent: otpSent ?? this.otpSent,
       busy: busy ?? this.busy,
       errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
@@ -65,6 +69,7 @@ final class AuthViewGuest extends AuthViewState {
     supabaseConfigured,
     googleAvailable,
     email,
+    displayName,
     otpSent,
     busy,
     errorMessage,
@@ -121,6 +126,18 @@ class AuthCubit extends Cubit<AuthViewState> {
     emit(current.copyWith(email: email, clearError: true, clearInfo: true));
   }
 
+  void displayNameChanged(String displayName) {
+    final current = state;
+    if (current is! AuthViewGuest || current.busy) return;
+    emit(
+      current.copyWith(
+        displayName: displayName,
+        clearError: true,
+        clearInfo: true,
+      ),
+    );
+  }
+
   Future<void> sendOtp() async {
     final current = state;
     if (current is! AuthViewGuest || current.busy) return;
@@ -166,7 +183,11 @@ class AuthCubit extends Cubit<AuthViewState> {
 
     emit(current.copyWith(busy: true, clearError: true, clearInfo: true));
     try {
-      await _authService.verifyEmailOtp(email: current.email, token: token);
+      await _authService.verifyEmailOtp(
+        email: current.email,
+        token: token,
+        displayName: current.displayName,
+      );
       if (isClosed) return;
       _emitFromCurrent();
     } on AppException catch (e) {
@@ -255,12 +276,14 @@ class AuthCubit extends Cubit<AuthViewState> {
     }
     final previous = state;
     final email = previous is AuthViewGuest ? previous.email : '';
+    final displayName = previous is AuthViewGuest ? previous.displayName : '';
     final otpSent = previous is AuthViewGuest ? previous.otpSent : false;
     emit(
       AuthViewGuest(
         supabaseConfigured: _appConfig.isSupabaseConfigured,
         googleAvailable: _googleAvailable,
         email: email,
+        displayName: displayName,
         otpSent: otpSent,
       ),
     );

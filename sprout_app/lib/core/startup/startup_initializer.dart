@@ -154,6 +154,7 @@ Future<void> initializeApp({
     transactionsBox: transactionsBox,
     pendingSyncBox: pendingSyncBox,
     supabaseClient: supabaseClient,
+    remoteConfigService: _remoteConfigService,
   );
   reporter.update(StartupStep.configureDI, StartupStepStatus.done);
 

@@ -114,6 +114,28 @@ void main() {
     expect(pullCalls, 1);
   });
 
+  test('verifyEmailOtp with display name updates metadata', () async {
+    final user = await authService.verifyEmailOtp(
+      email: 'guest@example.com',
+      token: '123456',
+      displayName: 'Ada',
+    );
+
+    expect(user.displayName, 'Ada');
+    expect(fakeAuth.updateDisplayNameCalls, 1);
+    expect(fakeAuth.lastDisplayName, 'Ada');
+  });
+
+  test('verifyEmailOtp skips blank display name', () async {
+    await authService.verifyEmailOtp(
+      email: 'guest@example.com',
+      token: '123456',
+      displayName: '  ',
+    );
+
+    expect(fakeAuth.updateDisplayNameCalls, 0);
+  });
+
   test('same uid re-login only flush+pull', () async {
     await userContext.setActiveUserId('verified-uid');
     await userContext.markVerifiedUserId('verified-uid');

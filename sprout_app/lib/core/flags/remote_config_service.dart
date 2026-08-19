@@ -6,6 +6,12 @@ import 'package:sprout/core/config/app_config.dart';
 import 'package:sprout/core/config/app_environment.dart';
 import 'package:sprout/core/flags/remote_feature_flag.dart';
 
+/// Firebase Remote Config string parameter names.
+abstract final class RemoteConfigKeys {
+  /// Markdown Terms of Service. Empty default falls back to the bundled asset.
+  static const termsOfService = 'terms_of_service';
+}
+
 /// Owns Firebase + Remote Config setup, separate from reading flag values.
 class RemoteConfigService {
   bool _firebaseReady = false;
@@ -47,7 +53,9 @@ class RemoteConfigService {
         ),
       );
       await remoteConfig.setDefaults({
-        for (final flag in RemoteFeatureFlag.values) flag.key: flag.defaultValue,
+        for (final flag in RemoteFeatureFlag.values)
+          flag.key: flag.defaultValue,
+        RemoteConfigKeys.termsOfService: '',
       });
       _remoteConfigReady = true;
     } on Object catch (e) {
@@ -84,6 +92,24 @@ class RemoteConfigService {
         debugPrint('RemoteConfigService.isEnabled(${flag.key}) failed: $e');
       }
       return flag.defaultValue;
+    }
+  }
+
+  /// Reads an activated string parameter.
+  ///
+  /// Returns `null` when setup was skipped, fetch never ran, or the value is
+  /// empty so callers can fall back to a bundled asset.
+  String? getString(String key) {
+    if (!_remoteConfigReady) return null;
+    try {
+      final value = FirebaseRemoteConfig.instance.getString(key);
+      if (value.isEmpty) return null;
+      return value;
+    } on Object catch (e) {
+      if (kDebugMode) {
+        debugPrint('RemoteConfigService.getString($key) failed: $e');
+      }
+      return null;
     }
   }
 }

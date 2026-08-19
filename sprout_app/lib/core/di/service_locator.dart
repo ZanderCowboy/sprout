@@ -6,6 +6,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:sprout/core/config/app_config.dart';
+import 'package:sprout/core/flags/remote_config_service.dart';
 import 'package:sprout/core/user/user_context.dart';
 import 'package:sprout/features/accounts/export.dart';
 import 'package:sprout/features/auth/export.dart';
@@ -27,8 +28,15 @@ Future<void> configureDependencies({
   required Box<TransactionHiveModel> transactionsBox,
   required Box<PendingSyncHiveModel> pendingSyncBox,
   SupabaseClient? supabaseClient,
+  RemoteConfigService? remoteConfigService,
 }) async {
   sl.registerSingleton<AppConfig>(appConfig);
+  sl.registerSingleton<RemoteConfigService>(
+    remoteConfigService ?? RemoteConfigService(),
+  );
+  sl.registerLazySingleton<TermsOfServiceService>(
+    () => TermsOfServiceService(remoteConfig: sl()),
+  );
 
   sl.registerSingleton<Box<AccountHiveModel>>(accountsBox);
   sl.registerSingleton<Box<GoalHiveModel>>(goalsBox);
@@ -39,10 +47,7 @@ Future<void> configureDependencies({
   final pendingQueue = PendingSyncQueue(pendingSyncBox);
   sl.registerSingleton<PendingSyncQueue>(pendingQueue);
 
-  final userContext = UserContext(
-    settingsBox,
-    supabaseClient: supabaseClient,
-  );
+  final userContext = UserContext(settingsBox, supabaseClient: supabaseClient);
   sl.registerSingleton<UserContext>(userContext);
 
   GoogleSignIn? googleSignIn;
@@ -85,8 +90,7 @@ Future<void> configureDependencies({
 
   bool canSync() => sl<AuthService>().canSync;
 
-  final pendingForRepos =
-      appConfig.isSupabaseConfigured ? pendingQueue : null;
+  final pendingForRepos = appConfig.isSupabaseConfigured ? pendingQueue : null;
 
   sl.registerLazySingleton<AccountsRepository>(
     () => AccountsRepositoryImpl(
@@ -132,15 +136,9 @@ Future<void> configureDependencies({
     ),
   );
 
-  sl.registerLazySingleton<AccountsService>(
-    () => AccountsService(sl()),
-  );
-  sl.registerLazySingleton<GoalsService>(
-    () => GoalsService(sl()),
-  );
-  sl.registerLazySingleton<BudgetService>(
-    () => BudgetService(sl()),
-  );
+  sl.registerLazySingleton<AccountsService>(() => AccountsService(sl()));
+  sl.registerLazySingleton<GoalsService>(() => GoalsService(sl()));
+  sl.registerLazySingleton<BudgetService>(() => BudgetService(sl()));
   sl.registerLazySingleton<TransactionsService>(
     () => TransactionsService(sl()),
   );

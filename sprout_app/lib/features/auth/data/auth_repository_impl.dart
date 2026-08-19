@@ -1,6 +1,7 @@
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' hide AuthUser;
 
+import 'package:sprout/core/constants/app_strings.dart';
 import 'package:sprout/core/error/error.dart';
 import '../domain/auth_repository.dart';
 import '../domain/auth_user.dart';
@@ -143,6 +144,32 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  Future<AuthUser> updateDisplayName(String displayName) async {
+    final trimmed = displayName.trim();
+    if (trimmed.isEmpty) {
+      throw const ValidationAppException(AppStrings.nameRequired);
+    }
+    try {
+      final response = await _client.auth.updateUser(
+        UserAttributes(data: {'display_name': trimmed}),
+      );
+      final user = _mapUser(response.user ?? _client.auth.currentUser);
+      if (user == null || !user.isVerified) {
+        throw const AuthAppException('Could not update display name.');
+      }
+      return user;
+    } on AuthException catch (e) {
+      throw AuthAppException(e.message);
+    } on AuthAppException {
+      rethrow;
+    } on ValidationAppException {
+      rethrow;
+    } on Object catch (e) {
+      throw AuthAppException(e.toString());
+    }
+  }
+
+  @override
   Future<void> signOut() async {
     try {
       await _googleSignIn?.signOut();
@@ -165,6 +192,7 @@ class AuthRepositoryImpl implements AuthRepository {
     return AuthUser(
       id: user.id,
       email: user.email,
+      displayName: displayNameFromMetadata(user.userMetadata),
       isAnonymous: user.isAnonymous,
     );
   }

@@ -43,4 +43,8 @@ abstract final class AppStrings {
   static const String nameRequired = 'Please enter a name.';
   static const String invalidAmount = 'Enter a valid amount.';
   static const String amountCannotBeNegative = 'Amount cannot be negative.';
+  static const String displayNameOptional = 'Display name (optional)';
+  static const String termsOfService = 'Terms of Service';
+  static const String byContinuingYouAgree = 'By continuing you agree to the';
+  static const String termsLoadFailed = 'Could not load Terms of Service.';
 }

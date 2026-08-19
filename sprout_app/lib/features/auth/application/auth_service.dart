@@ -57,11 +57,13 @@ class AuthService {
   Future<AuthUser> verifyEmailOtp({
     required String email,
     required String token,
+    String? displayName,
   }) async {
-    final user = await _authRepository.verifyEmailOtp(
-      email: email,
-      token: token,
-    );
+    var user = await _authRepository.verifyEmailOtp(email: email, token: token);
+    final trimmedName = displayName?.trim() ?? '';
+    if (trimmedName.isNotEmpty) {
+      user = await _authRepository.updateDisplayName(trimmedName);
+    }
     await bindAfterVerifiedSignIn(user);
     return user;
   }

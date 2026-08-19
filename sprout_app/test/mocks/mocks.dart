@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:sprout/core/flags/remote_config_service.dart';
 import 'package:sprout/features/auth/domain/auth_repository.dart';
 import 'package:sprout/features/auth/domain/auth_user.dart';
 
@@ -12,13 +13,16 @@ class FakeAuthRepository implements AuthRepository {
   int sendOtpCalls = 0;
   int verifyOtpCalls = 0;
   int googleCalls = 0;
+  int updateDisplayNameCalls = 0;
   int signOutCalls = 0;
 
   String? lastEmail;
   String? lastToken;
+  String? lastDisplayName;
   Object? sendOtpError;
   Object? verifyOtpError;
   Object? googleError;
+  Object? updateDisplayNameError;
   Object? signOutError;
 
   void setUser(AuthUser? user) {
@@ -63,7 +67,28 @@ class FakeAuthRepository implements AuthRepository {
     const user = AuthUser(
       id: 'google-uid',
       email: 'user@gmail.com',
+      displayName: 'Google User',
       isAnonymous: false,
+    );
+    setUser(user);
+    return user;
+  }
+
+  @override
+  Future<AuthUser> updateDisplayName(String displayName) async {
+    updateDisplayNameCalls++;
+    lastDisplayName = displayName;
+    final error = updateDisplayNameError;
+    if (error != null) throw error;
+    final current = _currentUser;
+    if (current == null) {
+      throw StateError('No signed-in user to update.');
+    }
+    final user = AuthUser(
+      id: current.id,
+      email: current.email,
+      displayName: displayName,
+      isAnonymous: current.isAnonymous,
     );
     setUser(user);
     return user;
@@ -79,5 +104,22 @@ class FakeAuthRepository implements AuthRepository {
 
   Future<void> dispose() async {
     await _controller.close();
+  }
+}
+
+class FakeRemoteConfigService extends RemoteConfigService {
+  FakeRemoteConfigService({Map<String, String> strings = const {}})
+    : _strings = Map.of(strings);
+
+  final Map<String, String> _strings;
+
+  @override
+  bool get isReady => true;
+
+  @override
+  String? getString(String key) {
+    final value = _strings[key];
+    if (value == null || value.trim().isEmpty) return null;
+    return value;
   }
 }

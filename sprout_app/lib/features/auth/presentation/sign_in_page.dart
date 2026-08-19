@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:sprout/core/constants/app_strings.dart';
 import 'package:sprout/features/auth/presentation/bloc/auth_cubit.dart';
+import 'package:sprout/features/auth/presentation/terms_page.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({super.key, this.onBackToIntro});
@@ -15,20 +17,29 @@ class SignInPage extends StatefulWidget {
 
 class _SignInPageState extends State<SignInPage> {
   late final TextEditingController _emailController;
+  late final TextEditingController _displayNameController;
   late final TextEditingController _otpController;
 
   @override
   void initState() {
     super.initState();
     _emailController = TextEditingController();
+    _displayNameController = TextEditingController();
     _otpController = TextEditingController();
   }
 
   @override
   void dispose() {
     _emailController.dispose();
+    _displayNameController.dispose();
     _otpController.dispose();
     super.dispose();
+  }
+
+  void _openTerms() {
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute<void>(builder: (_) => const TermsPage()));
   }
 
   @override
@@ -42,13 +53,21 @@ class _SignInPageState extends State<SignInPage> {
       ),
       body: BlocConsumer<AuthCubit, AuthViewState>(
         listener: (context, state) {
-          if (state is AuthViewGuest &&
-              _emailController.text != state.email &&
-              !state.busy) {
-            _emailController.value = TextEditingValue(
-              text: state.email,
-              selection: TextSelection.collapsed(offset: state.email.length),
-            );
+          if (state is AuthViewGuest && !state.busy) {
+            if (_emailController.text != state.email) {
+              _emailController.value = TextEditingValue(
+                text: state.email,
+                selection: TextSelection.collapsed(offset: state.email.length),
+              );
+            }
+            if (_displayNameController.text != state.displayName) {
+              _displayNameController.value = TextEditingValue(
+                text: state.displayName,
+                selection: TextSelection.collapsed(
+                  offset: state.displayName.length,
+                ),
+              );
+            }
           }
           if (state is AuthViewSignedIn) {
             _otpController.clear();
@@ -105,6 +124,18 @@ class _SignInPageState extends State<SignInPage> {
                     if (otpSent) ...[
                       const SizedBox(height: 16),
                       TextField(
+                        controller: _displayNameController,
+                        enabled: !busy,
+                        textCapitalization: TextCapitalization.words,
+                        autofillHints: const [AutofillHints.name],
+                        decoration: const InputDecoration(
+                          labelText: AppStrings.displayNameOptional,
+                          border: OutlineInputBorder(),
+                        ),
+                        onChanged: context.read<AuthCubit>().displayNameChanged,
+                      ),
+                      const SizedBox(height: 12),
+                      TextField(
                         controller: _otpController,
                         enabled: !busy,
                         keyboardType: TextInputType.number,
@@ -149,6 +180,35 @@ class _SignInPageState extends State<SignInPage> {
                         label: const Text('Continue with Google'),
                       ),
                     ],
+                    const SizedBox(height: 24),
+                    Text.rich(
+                      TextSpan(
+                        style: Theme.of(context).textTheme.bodySmall,
+                        children: [
+                          const TextSpan(
+                            text: '${AppStrings.byContinuingYouAgree} ',
+                          ),
+                          WidgetSpan(
+                            alignment: PlaceholderAlignment.baseline,
+                            baseline: TextBaseline.alphabetic,
+                            child: GestureDetector(
+                              onTap: _openTerms,
+                              child: Text(
+                                AppStrings.termsOfService,
+                                style: Theme.of(context).textTheme.bodySmall
+                                    ?.copyWith(
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.primary,
+                                      decoration: TextDecoration.underline,
+                                    ),
+                              ),
+                            ),
+                          ),
+                          const TextSpan(text: '.'),
+                        ],
+                      ),
+                    ),
                   ],
                   if (busy) ...[
                     const SizedBox(height: 24),

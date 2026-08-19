@@ -121,7 +121,44 @@ void main() {
     final signedIn = cubit.state as AuthViewSignedIn;
     expect(signedIn.user.email, 'user@example.com');
     expect(fakeAuth.verifyOtpCalls, 1);
+    expect(fakeAuth.updateDisplayNameCalls, 0);
   });
+
+  test('verifyOtp with display name updates metadata', () async {
+    cubit.emailChanged('user@example.com');
+    cubit.displayNameChanged('Ada');
+    await cubit.sendOtp();
+    await cubit.verifyOtp('123456');
+
+    expect(cubit.state, isA<AuthViewSignedIn>());
+    final signedIn = cubit.state as AuthViewSignedIn;
+    expect(signedIn.user.displayName, 'Ada');
+    expect(fakeAuth.updateDisplayNameCalls, 1);
+    expect(fakeAuth.lastDisplayName, 'Ada');
+  });
+
+  test('verifyOtp skips display name when empty', () async {
+    cubit.emailChanged('user@example.com');
+    cubit.displayNameChanged('   ');
+    await cubit.sendOtp();
+    await cubit.verifyOtp('123456');
+
+    expect(fakeAuth.updateDisplayNameCalls, 0);
+    expect((cubit.state as AuthViewSignedIn).user.displayName, isNull);
+  });
+
+  test(
+    'Google sign-in uses profile name and does not require a name field',
+    () async {
+      await cubit.signInWithGoogle();
+
+      expect(cubit.state, isA<AuthViewSignedIn>());
+      final signedIn = cubit.state as AuthViewSignedIn;
+      expect(signedIn.user.displayName, 'Google User');
+      expect(fakeAuth.updateDisplayNameCalls, 0);
+      expect(fakeAuth.googleCalls, 1);
+    },
+  );
 
   test('sendOtp surfaces AuthFailure message', () async {
     fakeAuth.sendOtpError = const AuthAppException('Rate limited');

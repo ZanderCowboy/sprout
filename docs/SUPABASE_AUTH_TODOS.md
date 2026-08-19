@@ -32,6 +32,7 @@ Tick here as you go. Each open item jumps to the step below.
 - [ ] [Sign-out keeps local data](#3-device-test-google-main-goal-for-tonight)
 - [x] [Re-login with Google works](#3-device-test-google-main-goal-for-tonight)
 - [x] [Optional cleanup](#5-optional-cleanup-dev-only): delete old anonymous users / orphaned rows
+- [ ] [Paste Terms into Firebase Remote Config](#7-terms-of-service-firebase-remote-config-dev)
 
 
 
@@ -172,6 +173,24 @@ Walkthrough if you ever need to redo it (or set up **prod**): [RESEND_SMTP_SUPAB
 
 - [ ] Authentication → Users: delete old anonymous users
 - [ ] Wipe orphaned rows in `accounts` / `goals` / `transactions` / `budget_groups` if junk from earlier tests
+
+---
+
+
+
+### 7. Terms of Service (Firebase Remote Config, dev)
+
+The app shows Terms **in-app** (not a website). Markdown is loaded from Firebase Remote Config string `terms_of_service`. Until that parameter exists (or the device is offline / RC setup is skipped), it uses the bundled placeholder in `sprout_app/assets/legal/terms.md`.
+
+**Where:** [Firebase → sprout-app-development → Remote Config](https://console.firebase.google.com/project/sprout-app-development/config)
+
+1. Add parameter **`terms_of_service`** (type **String**).
+2. Paste the real Terms markdown.
+3. Publish the changes.
+
+Prod keeps the bundled file until prod Firebase Remote Config is turned on.
+
+- [ ] Dev Remote Config: `terms_of_service` string published
 
 ---
 
@@ -447,6 +466,8 @@ If `APP_CONFIG_DEV_BASE64` is missing, CI still builds with a **placeholder** co
 3. Sign-out: session only; return to sign-in. Local cache stays for that uid until a different account signs in.
 4. Startup failure: **Retry only** — no Continue local-only.
 5. Providers: email OTP + Google on Android. No Apple / iOS yet.
+6. Email OTP: optional **display name** (saved to `user_metadata.display_name`). Google: use the Google profile name already in metadata; do not ask again.
+7. Sign-in agrees to **in-app Terms** (tappable link on the sign-in screen). Markdown comes from Firebase Remote Config `terms_of_service`, with bundled [`sprout_app/assets/legal/terms.md`](../sprout_app/assets/legal/terms.md) as fallback.
 
 Config shape: [supabase/README.md](../supabase/README.md).
 

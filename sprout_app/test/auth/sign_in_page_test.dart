@@ -1,18 +1,24 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 import 'package:sprout/core/config/app_config.dart';
 import 'package:sprout/core/config/app_environment.dart';
+import 'package:sprout/core/constants/app_strings.dart';
+import 'package:sprout/core/di/service_locator.dart';
 import 'package:sprout/core/storage/hive_adapters.dart';
 import 'package:sprout/core/theme/app_theme.dart';
 import 'package:sprout/core/user/user_context.dart';
 import 'package:sprout/features/accounts/export.dart';
 import 'package:sprout/features/auth/application/auth_service.dart';
+import 'package:sprout/features/auth/application/terms_of_service_service.dart';
 import 'package:sprout/features/auth/presentation/bloc/auth_cubit.dart';
 import 'package:sprout/features/auth/presentation/sign_in_page.dart';
+import 'package:sprout/features/auth/presentation/terms_page.dart';
 import 'package:sprout/features/budget/export.dart';
 import 'package:sprout/features/goals/export.dart';
 import 'package:sprout/features/sync/export.dart';
@@ -104,6 +110,8 @@ void main() {
 
     expect(find.text('Send code'), findsOneWidget);
     expect(find.text('Continue with Google'), findsOneWidget);
+    expect(find.text(AppStrings.termsOfService), findsOneWidget);
+    expect(find.text(AppStrings.displayNameOptional), findsNothing);
   });
 
   testWidgets('back button calls onBackToIntro', (tester) async {
@@ -121,4 +129,67 @@ void main() {
     await tester.tap(find.byType(BackButton));
     expect(back, isTrue);
   });
+
+  testWidgets('optional display name appears after sending email OTP', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: buildAppTheme(),
+        home: BlocProvider.value(value: cubit, child: const SignInPage()),
+      ),
+    );
+
+    expect(find.text(AppStrings.displayNameOptional), findsNothing);
+
+    await tester.enterText(find.byType(TextField).first, 'user@example.com');
+    await tester.tap(find.text('Send code'));
+    await tester.pump();
+
+    expect(find.text(AppStrings.displayNameOptional), findsOneWidget);
+    expect(find.text('Continue with Google'), findsOneWidget);
+  });
+
+  testWidgets('Terms hyperlink opens TermsPage', (tester) async {
+    sl.registerSingleton<TermsOfServiceService>(
+      TermsOfServiceService(
+        remoteConfig: FakeRemoteConfigService(),
+        assetBundle: _FakeAssetBundle({
+          TermsOfServiceService.bundledAssetPath:
+              '# Bundled Terms\n\nLocal placeholder.',
+        }),
+      ),
+    );
+    addTearDown(() async {
+      await sl.reset(dispose: false);
+    });
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: buildAppTheme(),
+        home: BlocProvider.value(value: cubit, child: const SignInPage()),
+      ),
+    );
+
+    await tester.tap(find.text(AppStrings.termsOfService));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(TermsPage), findsOneWidget);
+    expect(find.textContaining('Local placeholder.'), findsOneWidget);
+  });
+}
+
+class _FakeAssetBundle extends CachingAssetBundle {
+  _FakeAssetBundle(this._strings);
+
+  final Map<String, String> _strings;
+
+  @override
+  Future<ByteData> load(String key) async {
+    final value = _strings[key];
+    if (value == null) {
+      throw FlutterError('Unable to load asset: $key');
+    }
+    return ByteData.sublistView(Uint8List.fromList(utf8.encode(value)));
+  }
 }
