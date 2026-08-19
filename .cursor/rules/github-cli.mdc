@@ -1,0 +1,14 @@
+---
+description: GitHub CLI, PRs, issues, and gh api for this personal repo (ZanderCowboy)
+alwaysApply: false
+---
+
+# GitHub CLI
+
+Before any `gh` command:
+
+```bash
+export GH_CONFIG_DIR="$HOME/.config/gh-zandercowboy"
+```
+
+Use personal account **ZanderCowboy**, never work **Zander-K**. Do not run `gh auth switch`. Details: `docs/GITHUB_CLI_PERSONAL.md`.

@@ -1,0 +1,18 @@
+---
+description: Dart/Flutter conventions for Sprout (GetIt, blocs, strings, money, package imports)
+globs: sprout_app/**/*.dart
+alwaysApply: false
+---
+
+# Flutter conventions
+
+Package name is `sprout`. App root is `sprout_app/`.
+
+- Cross-feature and core imports: `package:sprout/...`. Same-feature files may use relative imports.
+- Register new repositories/services in `sprout_app/lib/core/di/service_locator.dart` (`sl`).
+- Blocs/cubits: `sealed` events/states + `Equatable`. Prefer `flutter_bloc` already used in the feature.
+- User-visible copy: `AppStrings`. Do not hard-code new UI strings.
+- Validation errors: throw `ValidationAppException` with an `AppStrings` message.
+- Money: integer **cents**. Format for display with existing `core/utils` helpers.
+- Theme: `buildAppTheme()`; app is dark (`ThemeMode.dark`). Reuse `lib/ui` widgets before inventing new cards/sheets.
+- Hive adapters are hand-written — see the hive-storage rule. No `build_runner` unless Melos is added first.

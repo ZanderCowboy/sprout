@@ -24,7 +24,7 @@ The human is product owner / tester only. The agent is the sole coder.
 |-----|-----------|
 | Desired behavior / acceptance criteria | "Can you update this file?" |
 | Preference between product options | "Paste this diff" |
-| Secrets / dashboard clicks only they can do | "Run build_runner" (run it yourself via melos) |
+| Secrets / dashboard clicks only they can do | "Run flutter test" (run `cd sprout_app && flutter test` yourself) |
 | Confirm destructive ops (force push, prod publish) | "Add the missing import" |
 
 ## Blocking
@@ -45,3 +45,4 @@ If blocked:
 
 - Always-on policy: `.cursor/rules/ai-only-development.mdc`
 - Repo overview: `AGENTS.md`
+- Project knowledge: `.cursor/references/`

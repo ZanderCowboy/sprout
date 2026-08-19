@@ -10,7 +10,7 @@ The human does **not** write or edit project code. Every code change, fix, refac
 ## Agent owns
 
 - Source, tests, assets, CI, Cursor rules/skills/commands
-- Running tooling (`melos`, `flutter`, `dart`, `build_runner`, lints, tests)
+- Running tooling (`flutter analyze` / `flutter test`, and Melos/`build_runner` only if those exist)
 - Commits and PRs when the human asks
 - Investigating failures and applying fixes
 

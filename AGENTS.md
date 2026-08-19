@@ -11,7 +11,11 @@ Never instruct the human to edit source files or apply patches. If something req
 
 ## Project notes
 
-- Flutter app lives under `sprout_app/`.
-- Use Melos for `build_runner` and monorepo scripts.
-- Feature architecture: see `.cursor/rules/clean-architecture.md`.
-- Prefer existing `mocks.dart` when writing tests that need mocks.
+- Flutter app lives under `sprout_app/` (package `sprout`).
+- Agent knowledge: [`.cursor/references/`](.cursor/references/README.md) (architecture, tooling, testing, sync, secrets).
+- Feature architecture: `.cursor/rules/clean-architecture.mdc`.
+- Prefer existing `sprout_app/test/mocks/mocks.dart` (hand-written fakes, not mockito).
+- No Melos/`build_runner` today — Hive adapters are checked in at `hive_adapters.dart`. If codegen is added later, run it via Melos.
+- GitHub CLI must use personal account `ZanderCowboy`, not work `Zander-K`. Before any `gh` command: `export GH_CONFIG_DIR=$HOME/.config/gh-zandercowboy`.
+- After Dart changes: `cd sprout_app && flutter analyze && flutter test`.
+- RevenueCat: plugin MCP + `docs/REVENUECAT.md`. Supabase: MCP + `supabase/README.md`.

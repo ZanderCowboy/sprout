@@ -1,0 +1,15 @@
+---
+description: Supabase schema, RLS, two projects (dev/prod), and Flutter sync/auth integration
+globs: supabase/**,sprout_app/lib/features/sync/**/*.dart,sprout_app/lib/features/auth/**/*.dart
+alwaysApply: false
+---
+
+# Supabase
+
+Two projects (dev + prod). Apply the **same** files in `supabase/migrations/` to both. Human docs: `supabase/README.md`.
+
+- Use the Supabase MCP for dashboard/schema work when available; never put service-role keys in the app.
+- Flutter uses the anon/publishable key only. Sync is gated on verified (non-anonymous) auth — `.cursor/references/offline-sync.md`.
+- New tables/columns: SQL migration + remote DTO + mapper + repository pull/enqueue path.
+- Guests stay local until email OTP or Google. Do not enable anonymous auth for the verified-sync path.
+- Flavor JSON is gitignored — `.cursor/references/secrets.md`.

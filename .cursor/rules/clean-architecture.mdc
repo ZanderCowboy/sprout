@@ -1,0 +1,43 @@
+---
+description: Clean-arch boundaries for Sprout features (barrels, layers, mapping, UI-only pages)
+globs: sprout_app/lib/features/**/*.dart
+alwaysApply: false
+---
+
+# Clean-arch boundaries (features)
+
+Applies to feature work under `sprout_app/lib/features/**`. Details: `.cursor/references/architecture.md`.
+
+## Barrel exports
+
+- Feature barrel files must be named `export.dart`.
+- Import from `package:sprout/features/<feature>/export.dart` (not `.../<feature>.dart`).
+
+## UI-only pages
+
+- Files under `sprout_app/lib/features/**/presentation/**_page.dart` (and `*_screen.dart`) must be UI-only.
+- Do not define `enum`s, top-level helper functions, or sorting/business logic in pages.
+- Extract non-UI code to `presentation/utils/**` or a bloc/service.
+
+## Reusable UI
+
+- If the same UI pattern appears in 2+ features, extract a shared widget under `sprout_app/lib/ui/**`.
+- Feature UI may depend on `lib/ui/**`. Shared UI must not import feature code.
+- Shared UI stays dumb: inputs + callbacks; no `sl<>`, repositories, or feature services.
+- Keep async work (save/delete/fetch) in the feature bloc/service; pass a callback/result into the widget.
+
+## Enums location
+
+- UI-specific enums: `presentation/enums/**`.
+- Domain-wide enums: `domain/enums/**` (or next to the entity if there is a single enum).
+
+## Models and mapping
+
+- Frontend entities: `domain/**`.
+- Hive/Supabase DTOs: `data/local/models/**` and `data/remote/models/**`.
+- Mapping: `data/mappers/**` (or a feature `data/*_mapper.dart` barrel).
+
+## Dependency direction
+
+- `presentation/**` may depend on `domain/**` and `application/**`.
+- `presentation/**` must not import `data/local/**`, `data/remote/**`, or `data/**/models/**`.

@@ -1,0 +1,14 @@
+---
+description: Hand-written Hive models and TypeAdapters — stable typeIds, backward-compatible reads
+globs: sprout_app/lib/core/storage/hive_adapters.dart,sprout_app/lib/**/local/**/*.dart,sprout_app/lib/**/*hive*
+alwaysApply: false
+---
+
+# Hive storage
+
+Adapters are **checked in** at `sprout_app/lib/core/storage/hive_adapters.dart`. Do not generate them.
+
+- Never reuse or reshuffle `typeId`s (`0` account … `4` budget group). New models get the next unused id and a `HiveBoxes` name.
+- `read` order must match `write` order. New fields are **appended**; old rows must still deserialize (see `TransactionHiveAdapter`).
+- Map Hive DTOs in `data/mappers/**`, not in presentation.
+- More: `.cursor/references/offline-sync.md`.
