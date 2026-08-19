@@ -33,6 +33,7 @@ Tick here as you go. Each open item jumps to the step below.
 - [x] [Re-login with Google works](#3-device-test-google-main-goal-for-tonight)
 - [x] [Optional cleanup](#5-optional-cleanup-dev-only): delete old anonymous users / orphaned rows
 - [ ] [Paste Terms into Firebase Remote Config](#7-terms-of-service-firebase-remote-config-dev)
+- [ ] [Apply delete-account migration](#8-delete-account-rpc-dev) on the **dev** Supabase project
 
 
 
@@ -142,8 +143,10 @@ Email OTP already works. Google does not use SMTP or email templates.
 2. Fresh install: intro → **Sign in** → **Continue with Google**. Later launches skip intro and land on sign-in.
 3. Pick a Google account → should end signed in (overview, not the sign-in form).
 4. Create a local account/goal while signed in → data should sync to Supabase (check Table Editor).
-5. Settings → **Account** → Sign out → back on sign-in, not an empty overview.
-6. Sign in with Google again → same user, cloud data still there.
+5. Settings → **Account** tile shows name/email (not “Sign in…”). Account page: avatar, name, email, sign out, Terms, delete.
+6. Settings → **Account** → Sign out → back on sign-in, not an empty overview.
+7. Sign in with Google again → same user, cloud data still there.
+8. Delete account → confirm (copy mentions Premium / Play billing if subscribed) → back on sign-in; that Google/email has no old cloud data. Needs [step 8](#8-delete-account-rpc-dev) applied.
 
 - [x] Google sign-in works on device (dev)
 - [ ] Sign-out keeps local data
@@ -180,17 +183,34 @@ Walkthrough if you ever need to redo it (or set up **prod**): [RESEND_SMTP_SUPAB
 
 ### 7. Terms of Service (Firebase Remote Config, dev)
 
-The app shows Terms **in-app** (not a website). Markdown is loaded from Firebase Remote Config string `terms_of_service`. Until that parameter exists (or the device is offline / RC setup is skipped), it uses the bundled placeholder in `sprout_app/assets/legal/terms.md`.
+The app shows Terms **in-app** (not a website). Markdown is loaded from Firebase Remote Config string `terms_of_service`. Until that parameter exists (or the device is offline / RC setup is skipped), it uses the current Terms draft bundled in [`sprout_app/assets/legal/terms.md`](../sprout_app/assets/legal/terms.md). Paste **that same markdown** into RC so fetched clients stay in sync with the bundle.
 
 **Where:** [Firebase → sprout-app-development → Remote Config](https://console.firebase.google.com/project/sprout-app-development/config)
 
 1. Add parameter **`terms_of_service`** (type **String**).
-2. Paste the real Terms markdown.
+2. Paste the markdown from `sprout_app/assets/legal/terms.md`.
 3. Publish the changes.
 
 Prod keeps the bundled file until prod Firebase Remote Config is turned on.
 
 - [ ] Dev Remote Config: `terms_of_service` string published
+
+---
+
+
+
+### 8. Delete-account RPC (dev)
+
+Flutter already calls `supabase.rpc('delete_own_account')` from Account → **Delete account**. The SQL is in [`supabase/migrations/20260819120000_delete_own_account.sql`](../supabase/migrations/20260819120000_delete_own_account.sql).
+
+**Human action required:** apply that migration on the **dev** Supabase project (SQL editor, or `supabase db push` if the CLI is linked). Until it is applied, in-app delete will fail at the RPC.
+
+The function is `private.delete_own_account()` (`SECURITY DEFINER`, deletes `auth.users` where `id = auth.uid()`) plus a thin `public.delete_own_account()` invoker wrapper for the client. Existing tables already `references auth.users (id) on delete cascade`.
+
+Apply the same file on **prod** later, when you do the prod auth pass. Deletion does **not** cancel Play billing / RevenueCat entitlements; the confirm sheet tells the user to manage Premium separately.
+
+- [ ] Dev: run `20260819120000_delete_own_account.sql`
+- [ ] Prod (later): same migration
 
 ---
 
@@ -468,6 +488,7 @@ If `APP_CONFIG_DEV_BASE64` is missing, CI still builds with a **placeholder** co
 5. Providers: email OTP + Google on Android. No Apple / iOS yet.
 6. Email OTP: optional **display name** (saved to `user_metadata.display_name`). Google: use the Google profile name already in metadata; do not ask again.
 7. Sign-in agrees to **in-app Terms** (tappable link on the sign-in screen). Markdown comes from Firebase Remote Config `terms_of_service`, with bundled [`sprout_app/assets/legal/terms.md`](../sprout_app/assets/legal/terms.md) as fallback.
+8. **Delete account** (in-app, Play requirement) calls `public.delete_own_account()` which deletes `auth.users` for `auth.uid()`. Cloud rows cascade. Local Hive entity boxes and pending sync are cleared; `intro_completed` stays. RevenueCat `logOut` runs if Purchases is configured. Sign-out then returns to the sign-in gate. **Premium / Play billing is separate** — deletion does not cancel or refund a subscription.
 
 Config shape: [supabase/README.md](../supabase/README.md).
 

@@ -4,16 +4,16 @@ overview: Settings Account tile shows signed-in identity. Account page becomes d
 todos:
   - id: settings-tile
     content: Settings Account tile shows avatar/name/email not Sign in text
-    status: pending
+    status: completed
   - id: account-page
     content: Rebuild AccountPage as details UI (avatar, editable display name, email, sign out, Terms, delete)
-    status: pending
+    status: completed
   - id: account-delete
     content: Confirm flow; private SQL delete_own_account; clear Hive + RevenueCat logOut; return to sign-in
-    status: pending
+    status: completed
   - id: tests-docs
     content: Tests + docs; note human action to apply migration on dev Supabase
-    status: pending
+    status: completed
 isProject: false
 ---
 

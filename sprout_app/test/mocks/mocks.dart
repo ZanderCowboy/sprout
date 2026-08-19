@@ -14,6 +14,7 @@ class FakeAuthRepository implements AuthRepository {
   int verifyOtpCalls = 0;
   int googleCalls = 0;
   int updateDisplayNameCalls = 0;
+  int deleteOwnAccountCalls = 0;
   int signOutCalls = 0;
 
   String? lastEmail;
@@ -23,6 +24,7 @@ class FakeAuthRepository implements AuthRepository {
   Object? verifyOtpError;
   Object? googleError;
   Object? updateDisplayNameError;
+  Object? deleteOwnAccountError;
   Object? signOutError;
 
   void setUser(AuthUser? user) {
@@ -69,6 +71,7 @@ class FakeAuthRepository implements AuthRepository {
       email: 'user@gmail.com',
       displayName: 'Google User',
       isAnonymous: false,
+      signedInWithGoogle: true,
     );
     setUser(user);
     return user;
@@ -89,9 +92,17 @@ class FakeAuthRepository implements AuthRepository {
       email: current.email,
       displayName: displayName,
       isAnonymous: current.isAnonymous,
+      signedInWithGoogle: current.signedInWithGoogle,
     );
     setUser(user);
     return user;
+  }
+
+  @override
+  Future<void> deleteOwnAccount() async {
+    deleteOwnAccountCalls++;
+    final error = deleteOwnAccountError;
+    if (error != null) throw error;
   }
 
   @override

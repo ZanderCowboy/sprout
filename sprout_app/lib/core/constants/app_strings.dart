@@ -44,6 +44,23 @@ abstract final class AppStrings {
   static const String invalidAmount = 'Enter a valid amount.';
   static const String amountCannotBeNegative = 'Amount cannot be negative.';
   static const String displayNameOptional = 'Display name (optional)';
+  static const String displayName = 'Display name';
+  static const String editDisplayName = 'Edit display name';
+  static const String account = 'Account';
+  static const String signedInWithGoogle = 'Signed in with Google';
+  static const String signedInWithEmail = 'Signed in with email';
+  static const String signOut = 'Sign out';
+  static const String signOutKeepsLocalData =
+      'Signing out keeps your local data on this device. '
+      'Cloud sync pauses until you sign in again.';
+  static const String deleteAccount = 'Delete account';
+  static const String deleteAccountConfirmTitle = 'Delete your account?';
+  static const String deleteAccountWarning =
+      'This permanently removes your savings data from this device and the '
+      'cloud. You cannot undo this.';
+  static const String deleteAccountPremiumNote =
+      'If you subscribe to Premium, deletion does not cancel or refund Play '
+      'billing. Manage or cancel Premium separately.';
   static const String termsOfService = 'Terms of Service';
   static const String byContinuingYouAgree = 'By continuing you agree to the';
   static const String termsLoadFailed = 'Could not load Terms of Service.';

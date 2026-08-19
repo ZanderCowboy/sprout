@@ -21,6 +21,7 @@ class AuthService {
     required PendingSyncQueue pendingSyncQueue,
     required Future<void> Function() flushPending,
     required Future<void> Function() pullRemote,
+    Future<void> Function()? logOutPurchases,
   }) : _authRepository = authRepository,
        _userContext = userContext,
        _accountsBox = accountsBox,
@@ -29,7 +30,8 @@ class AuthService {
        _transactionsBox = transactionsBox,
        _pendingSyncQueue = pendingSyncQueue,
        _flushPending = flushPending,
-       _pullRemote = pullRemote;
+       _pullRemote = pullRemote,
+       _logOutPurchases = logOutPurchases;
 
   final AuthRepository _authRepository;
   final UserContext _userContext;
@@ -40,6 +42,7 @@ class AuthService {
   final PendingSyncQueue _pendingSyncQueue;
   final Future<void> Function() _flushPending;
   final Future<void> Function() _pullRemote;
+  final Future<void> Function()? _logOutPurchases;
 
   AuthUser? get currentUser => _authRepository.currentUser;
 
@@ -74,8 +77,28 @@ class AuthService {
     return user;
   }
 
+  Future<AuthUser> updateDisplayName(String displayName) =>
+      _authRepository.updateDisplayName(displayName);
+
   /// Clears the Supabase session and keeps local Hive data / active_user_id.
   Future<void> signOut() => _authRepository.signOut();
+
+  /// Deletes the auth user remotely, wipes local entity Hive, then signs out.
+  ///
+  /// Keeps `intro_completed` in settings. Does not cancel Play billing.
+  Future<void> deleteAccount() async {
+    await _authRepository.deleteOwnAccount();
+    await _clearLocalEntityData();
+    final logOutPurchases = _logOutPurchases;
+    if (logOutPurchases != null) {
+      try {
+        await logOutPurchases();
+      } on Object {
+        // Best-effort RevenueCat logout; the auth user is already gone.
+      }
+    }
+    await _authRepository.signOut();
+  }
 
   /// Same-uid re-login keeps the cache and flushes pending, then pulls.
   /// Any other bind discards leftover local Hive and pulls cloud only.

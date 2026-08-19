@@ -180,4 +180,31 @@ void main() {
     await cubit.signOut();
     expect(cubit.state, isA<AuthViewGuest>());
   });
+
+  test('updateDisplayName saves metadata', () async {
+    fakeAuth.setUser(
+      const AuthUser(id: 'u1', email: 'a@b.com', isAnonymous: false),
+    );
+    await Future<void>.delayed(Duration.zero);
+    expect(cubit.state, isA<AuthViewSignedIn>());
+
+    await cubit.updateDisplayName('Ada');
+    expect(cubit.state, isA<AuthViewSignedIn>());
+    final signedIn = cubit.state as AuthViewSignedIn;
+    expect(signedIn.user.displayName, 'Ada');
+    expect(fakeAuth.updateDisplayNameCalls, 1);
+    expect(fakeAuth.lastDisplayName, 'Ada');
+  });
+
+  test('deleteAccount clears session after RPC', () async {
+    fakeAuth.setUser(
+      const AuthUser(id: 'u1', email: 'a@b.com', isAnonymous: false),
+    );
+    await Future<void>.delayed(Duration.zero);
+
+    await cubit.deleteAccount();
+    expect(cubit.state, isA<AuthViewGuest>());
+    expect(fakeAuth.deleteOwnAccountCalls, 1);
+    expect(fakeAuth.signOutCalls, 1);
+  });
 }

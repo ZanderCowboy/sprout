@@ -12,6 +12,7 @@ import 'package:sprout/features/accounts/export.dart';
 import 'package:sprout/features/auth/export.dart';
 import 'package:sprout/features/budget/export.dart';
 import 'package:sprout/features/goals/export.dart';
+import 'package:sprout/features/purchases/presentation/premium_paywall_helper.dart';
 import 'package:sprout/features/sync/export.dart';
 import 'package:sprout/features/transactions/export.dart';
 
@@ -85,6 +86,7 @@ Future<void> configureDependencies({
         await sl<BudgetRepository>().pullRemote();
         await sl<TransactionsRepository>().pullRemote();
       },
+      logOutPurchases: PremiumPaywall.logOutIfConfigured,
     ),
   );
 

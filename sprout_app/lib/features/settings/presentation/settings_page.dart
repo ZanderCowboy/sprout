@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:sprout/core/core.dart';
 import 'package:sprout/features/auth/export.dart';
@@ -27,24 +28,33 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Future<void> _loadPremiumStatus() async {
-    final ready = await PremiumPaywall.isPurchasesReady();
-    if (!mounted) return;
-    if (!ready) {
+    try {
+      final ready = await PremiumPaywall.isPurchasesReady();
+      if (!mounted) return;
+      if (!ready) {
+        setState(() {
+          _purchasesReady = false;
+          _loadingPremiumStatus = false;
+          _hasPremium = false;
+        });
+        return;
+      }
+
+      final hasPremium = await PremiumPaywall.hasPremium();
+      if (!mounted) return;
+      setState(() {
+        _purchasesReady = true;
+        _loadingPremiumStatus = false;
+        _hasPremium = hasPremium;
+      });
+    } on Object {
+      if (!mounted) return;
       setState(() {
         _purchasesReady = false;
         _loadingPremiumStatus = false;
         _hasPremium = false;
       });
-      return;
     }
-
-    final hasPremium = await PremiumPaywall.hasPremium();
-    if (!mounted) return;
-    setState(() {
-      _purchasesReady = true;
-      _loadingPremiumStatus = false;
-      _hasPremium = hasPremium;
-    });
   }
 
   Future<void> _presentPaywall() async {
@@ -78,28 +88,37 @@ class _SettingsPageState extends State<SettingsPage> {
     }
   }
 
+  void _openAccount() {
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute<void>(builder: (_) => const AccountPage()));
+  }
+
   @override
   Widget build(BuildContext context) {
     final premiumSubtitle = _loadingPremiumStatus
         ? 'Checking subscription...'
         : _hasPremium
-            ? 'Premium active'
-            : 'Unlock premium with Monthly or Annual';
+        ? 'Premium active'
+        : 'Unlock premium with Monthly or Annual';
 
     return Scaffold(
       appBar: AppBar(title: const Text('Settings')),
       body: ListView(
         children: [
-          ListTile(
-            leading: const Icon(Icons.manage_accounts_rounded),
-            title: const Text('Account'),
-            subtitle: const Text('Sign in with email or Google'),
-            trailing: const Icon(Icons.chevron_right_rounded),
-            onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                  builder: (_) => const AccountPage(),
+          BlocBuilder<AuthCubit, AuthViewState>(
+            builder: (context, state) {
+              final user = state is AuthViewSignedIn ? state.user : null;
+              return ListTile(
+                leading: user == null
+                    ? const Icon(Icons.manage_accounts_rounded)
+                    : CircleAvatar(child: Text(accountAvatarInitial(user))),
+                title: Text(
+                  user == null ? AppStrings.account : accountTileTitle(user),
                 ),
+                subtitle: user == null ? null : Text(accountTileSubtitle(user)),
+                trailing: const Icon(Icons.chevron_right_rounded),
+                onTap: _openAccount,
               );
             },
           ),
@@ -169,4 +188,3 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 }
-

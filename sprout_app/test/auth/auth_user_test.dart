@@ -33,4 +33,47 @@ void main() {
       expect(displayNameFromMetadata({'display_name': '  Ada  '}), 'Ada');
     });
   });
+
+  group('signedInWithGoogleFromAuth', () {
+    test('is true when google is an identity provider', () {
+      expect(
+        signedInWithGoogleFromAuth(
+          identityProviders: const ['email', 'google'],
+        ),
+        isTrue,
+      );
+    });
+
+    test('is true when app_metadata provider is google', () {
+      expect(
+        signedInWithGoogleFromAuth(appMetadata: const {'provider': 'google'}),
+        isTrue,
+      );
+    });
+
+    test('is true when app_metadata providers list includes google', () {
+      expect(
+        signedInWithGoogleFromAuth(
+          appMetadata: const {
+            'providers': ['email', 'google'],
+          },
+        ),
+        isTrue,
+      );
+    });
+
+    test('is false for email-only metadata', () {
+      expect(
+        signedInWithGoogleFromAuth(
+          identityProviders: const ['email'],
+          appMetadata: const {
+            'provider': 'email',
+            'providers': ['email'],
+          },
+        ),
+        isFalse,
+      );
+      expect(signedInWithGoogleFromAuth(), isFalse);
+    });
+  });
 }

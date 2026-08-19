@@ -170,6 +170,19 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  Future<void> deleteOwnAccount() async {
+    try {
+      await _client.rpc('delete_own_account');
+    } on AuthException catch (e) {
+      throw AuthAppException(e.message);
+    } on AuthAppException {
+      rethrow;
+    } on Object catch (e) {
+      throw AuthAppException(e.toString());
+    }
+  }
+
+  @override
   Future<void> signOut() async {
     try {
       await _googleSignIn?.signOut();
@@ -194,6 +207,11 @@ class AuthRepositoryImpl implements AuthRepository {
       email: user.email,
       displayName: displayNameFromMetadata(user.userMetadata),
       isAnonymous: user.isAnonymous,
+      signedInWithGoogle: signedInWithGoogleFromAuth(
+        identityProviders:
+            user.identities?.map((identity) => identity.provider) ?? const [],
+        appMetadata: user.appMetadata,
+      ),
     );
   }
 }

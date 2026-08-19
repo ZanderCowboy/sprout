@@ -13,14 +13,18 @@ abstract final class PremiumPaywall {
     return await Purchases.isConfigured;
   }
 
+  /// Best-effort RevenueCat logout after in-app account deletion.
+  static Future<void> logOutIfConfigured() async {
+    if (!await Purchases.isConfigured) return;
+    await Purchases.logOut();
+  }
+
   /// Returns whether the user has the premium entitlement active.
   static Future<bool> hasPremium() async {
     if (!await Purchases.isConfigured) return false;
 
     final customerInfo = await Purchases.getCustomerInfo();
-    return customerInfo.entitlements.active.containsKey(
-      kPremiumEntitlementId,
-    );
+    return customerInfo.entitlements.active.containsKey(kPremiumEntitlementId);
   }
 
   /// Presents the RevenueCat dashboard paywall (attached to the `premium`
@@ -37,4 +41,3 @@ abstract final class PremiumPaywall {
     );
   }
 }
-

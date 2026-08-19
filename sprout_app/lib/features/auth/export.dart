@@ -8,3 +8,4 @@ export 'presentation/bloc/auth_cubit.dart';
 export 'presentation/intro_page.dart';
 export 'presentation/sign_in_page.dart';
 export 'presentation/terms_page.dart';
+export 'presentation/utils/account_identity_labels.dart';

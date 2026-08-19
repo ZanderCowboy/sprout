@@ -15,21 +15,47 @@ String? displayNameFromMetadata(Map<String, dynamic>? metadata) {
   return null;
 }
 
+/// True when Google is listed on identities or in `app_metadata`.
+bool signedInWithGoogleFromAuth({
+  Iterable<String> identityProviders = const [],
+  Map<String, dynamic>? appMetadata,
+}) {
+  for (final provider in identityProviders) {
+    if (provider == 'google') return true;
+  }
+  final metadata = appMetadata;
+  if (metadata == null) return false;
+  if (metadata['provider'] == 'google') return true;
+  final providers = metadata['providers'];
+  if (providers is List) {
+    return providers.any((entry) => entry == 'google');
+  }
+  return false;
+}
+
 class AuthUser extends Equatable {
   const AuthUser({
     required this.id,
     required this.isAnonymous,
     this.email,
     this.displayName,
+    this.signedInWithGoogle = false,
   });
 
   final String id;
   final String? email;
   final String? displayName;
   final bool isAnonymous;
+  final bool signedInWithGoogle;
 
   bool get isVerified => !isAnonymous;
 
   @override
-  List<Object?> get props => [id, email, displayName, isAnonymous];
+  List<Object?> get props => [
+    id,
+    email,
+    displayName,
+    isAnonymous,
+    signedInWithGoogle,
+  ];
 }

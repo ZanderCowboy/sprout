@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
+import 'package:sprout/core/error/error.dart';
 import 'package:sprout/core/storage/hive_adapters.dart';
 import 'package:sprout/core/user/user_context.dart';
 import 'package:sprout/features/accounts/export.dart';
@@ -221,5 +222,94 @@ void main() {
     expect(fakeAuth.currentUser, isNull);
     expect(accountsBox.get('a1')!.userId, 'verified-uid');
     expect(userContext.cachedUserId, 'verified-uid');
+  });
+
+  test(
+    'deleteAccount RPCs then clears Hive and session, keeps intro',
+    () async {
+      await userContext.setActiveUserId('verified-uid');
+      await userContext.markVerifiedUserId('verified-uid');
+      await userContext.markIntroCompleted();
+      fakeAuth.setUser(
+        const AuthUser(
+          id: 'verified-uid',
+          email: 'a@b.com',
+          isAnonymous: false,
+        ),
+      );
+      final now = DateTime.now().millisecondsSinceEpoch;
+      await accountsBox.put(
+        'a1',
+        AccountHiveModel(
+          id: 'a1',
+          userId: 'verified-uid',
+          name: 'Cash',
+          color: 1,
+          createdAtMillis: now,
+          updatedAtMillis: now,
+        ),
+      );
+      await PendingSyncQueue(
+        pendingBox,
+      ).enqueue(PendingSyncOperationType.upsertAccount, '{}');
+
+      var purchasesLogOutCalls = 0;
+      authService = AuthService(
+        authRepository: fakeAuth,
+        userContext: userContext,
+        accountsBox: accountsBox,
+        goalsBox: goalsBox,
+        budgetGroupsBox: budgetGroupsBox,
+        transactionsBox: transactionsBox,
+        pendingSyncQueue: PendingSyncQueue(pendingBox),
+        flushPending: () async {
+          flushCalls++;
+        },
+        pullRemote: () async {
+          pullCalls++;
+        },
+        logOutPurchases: () async {
+          purchasesLogOutCalls++;
+        },
+      );
+
+      await authService.deleteAccount();
+
+      expect(fakeAuth.deleteOwnAccountCalls, 1);
+      expect(fakeAuth.signOutCalls, 1);
+      expect(fakeAuth.currentUser, isNull);
+      expect(accountsBox.isEmpty, isTrue);
+      expect(pendingBox.isEmpty, isTrue);
+      expect(userContext.introCompleted, isTrue);
+      expect(purchasesLogOutCalls, 1);
+    },
+  );
+
+  test('deleteAccount does not clear Hive when RPC fails', () async {
+    await userContext.setActiveUserId('verified-uid');
+    fakeAuth.setUser(
+      const AuthUser(id: 'verified-uid', email: 'a@b.com', isAnonymous: false),
+    );
+    final now = DateTime.now().millisecondsSinceEpoch;
+    await accountsBox.put(
+      'a1',
+      AccountHiveModel(
+        id: 'a1',
+        userId: 'verified-uid',
+        name: 'Cash',
+        color: 1,
+        createdAtMillis: now,
+        updatedAtMillis: now,
+      ),
+    );
+    fakeAuth.deleteOwnAccountError = const AuthAppException('Nope');
+
+    await expectLater(
+      authService.deleteAccount(),
+      throwsA(isA<AuthAppException>()),
+    );
+
+    expect(fakeAuth.signOutCalls, 0);
+    expect(accountsBox.get('a1')!.userId, 'verified-uid');
   });
 }

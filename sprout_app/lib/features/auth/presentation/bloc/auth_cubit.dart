@@ -242,6 +242,24 @@ class AuthCubit extends Cubit<AuthViewState> {
     }
   }
 
+  Future<void> updateDisplayName(String displayName) async {
+    final current = state;
+    if (current is! AuthViewSignedIn || current.busy) return;
+
+    emit(current.copyWith(busy: true, clearError: true));
+    try {
+      final user = await _authService.updateDisplayName(displayName);
+      if (isClosed) return;
+      emit(AuthViewSignedIn(user: user));
+    } on AppException catch (e) {
+      if (isClosed) return;
+      emit(current.copyWith(busy: false, errorMessage: e.toFailure().message));
+    } on Object catch (e) {
+      if (isClosed) return;
+      emit(current.copyWith(busy: false, errorMessage: e.toString()));
+    }
+  }
+
   Future<void> signOut() async {
     final current = state;
     if (current is! AuthViewSignedIn || current.busy) return;
@@ -249,6 +267,24 @@ class AuthCubit extends Cubit<AuthViewState> {
     emit(current.copyWith(busy: true, clearError: true));
     try {
       await _authService.signOut();
+      if (isClosed) return;
+      _emitFromCurrent();
+    } on AppException catch (e) {
+      if (isClosed) return;
+      emit(current.copyWith(busy: false, errorMessage: e.toFailure().message));
+    } on Object catch (e) {
+      if (isClosed) return;
+      emit(current.copyWith(busy: false, errorMessage: e.toString()));
+    }
+  }
+
+  Future<void> deleteAccount() async {
+    final current = state;
+    if (current is! AuthViewSignedIn || current.busy) return;
+
+    emit(current.copyWith(busy: true, clearError: true));
+    try {
+      await _authService.deleteAccount();
       if (isClosed) return;
       _emitFromCurrent();
     } on AppException catch (e) {
