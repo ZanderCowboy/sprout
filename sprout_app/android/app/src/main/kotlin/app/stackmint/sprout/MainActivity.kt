@@ -1,4 +1,4 @@
-package co.za.zanderkotze.sprout
+package app.stackmint.sprout
 
 import io.flutter.embedding.android.FlutterFragmentActivity
 

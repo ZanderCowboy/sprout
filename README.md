@@ -32,8 +32,8 @@ Or use the VS Code / Cursor launch configs in [`.vscode/launch.json`](.vscode/la
 
 | Launch | Flavor | Entry point | Config asset | Android applicationId |
 |--------|--------|-------------|--------------|------------------------|
-| **Sprout · dev · …** | `development` | `lib/main_development.dart` | `assets/config/development.json` | `co.za.zanderkotze.sprout.dev` |
-| **Sprout · prod · …** | `production` | `lib/main_production.dart` | `assets/config/production.json` | `co.za.zanderkotze.sprout` |
+| **Sprout · dev · …** | `development` | `lib/main_development.dart` | `assets/config/development.json` | `app.stackmint.sprout.dev` |
+| **Sprout · prod · …** | `production` | `lib/main_production.dart` | `assets/config/production.json` | `app.stackmint.sprout` |
 
 Both flavors can be installed on the same device. Production uses launcher name **Sprout**; development uses **[DEV] Sprout**.
 
@@ -50,7 +50,7 @@ Both JSON files are gitignored but must exist locally (they are listed in `pubsp
 {
   "supabaseUrl": "",
   "supabaseAnonKey": "",
-  "androidApplicationId": "co.za.zanderkotze.sprout.dev",
+  "androidApplicationId": "app.stackmint.sprout.dev",
   "revenueCatAndroidApiKey": "",
   "firebase": {
     "apiKey": "",
@@ -62,7 +62,7 @@ Both JSON files are gitignored but must exist locally (they are listed in `pubsp
 }
 ```
 
-Use `co.za.zanderkotze.sprout` for production. `androidApplicationId` documents the Play package for that flavor; RevenueCat still uses `revenueCatAndroidApiKey` (`test_…` / `goog_…`), not the package name.
+Use `app.stackmint.sprout` for production. `androidApplicationId` documents the Play package for that flavor; RevenueCat still uses `revenueCatAndroidApiKey` (`test_…` / `goog_…`), not the package name.
 
 Copy `apiKey` / `appId` / etc. from the flavor’s `google-services.json` into the gitignored `firebase` object (do **not** commit those values in Dart sources).
 
@@ -76,8 +76,8 @@ Optional overrides: `--dart-define=SUPABASE_URL=...`, `--dart-define=SUPABASE_AN
 
 Place flavor-specific files (gitignored):
 
-- `sprout_app/android/app/src/development/google-services.json` — package `co.za.zanderkotze.sprout.dev`
-- `sprout_app/android/app/src/production/google-services.json` — package `co.za.zanderkotze.sprout`
+- `sprout_app/android/app/src/development/google-services.json` — package `app.stackmint.sprout.dev`
+- `sprout_app/android/app/src/production/google-services.json` — package `app.stackmint.sprout`
 
 ## Supabase (optional)
 

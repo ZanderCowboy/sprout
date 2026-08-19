@@ -35,7 +35,7 @@ val hasReleaseSigning: Boolean =
         keystoreProperties.getProperty("keyPassword") != null
 
 android {
-    namespace = "co.za.zanderkotze.sprout"
+    namespace = "app.stackmint.sprout"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -62,10 +62,11 @@ android {
     defaultConfig {
         // Quoted so Flutter tooling can parse applicationId from this file.
         // Flavors append `.dev` for development; production keeps this base id.
-        applicationId = "co.za.zanderkotze.sprout"
+        applicationId = "app.stackmint.sprout"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
+        // purchases_ui_flutter requires Android 24+.
+        minSdk = maxOf(flutter.minSdkVersion, 24)
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName

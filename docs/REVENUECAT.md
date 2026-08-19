@@ -29,7 +29,7 @@ In `sprout_app/assets/config/development.json` and `production.json` (gitignored
 {
   "supabaseUrl": "",
   "supabaseAnonKey": "",
-  "androidApplicationId": "co.za.zanderkotze.sprout.dev",
+  "androidApplicationId": "app.stackmint.sprout.dev",
   "revenueCatAndroidApiKey": "",
   "firebase": {
     "apiKey": "",
@@ -43,8 +43,8 @@ In `sprout_app/assets/config/development.json` and `production.json` (gitignored
 
 | Flavor | `androidApplicationId` |
 |--------|------------------------|
-| development | `co.za.zanderkotze.sprout.dev` |
-| production | `co.za.zanderkotze.sprout` |
+| development | `app.stackmint.sprout.dev` |
+| production | `app.stackmint.sprout` |
 
 Fill `firebase` from the matching `google-services.json` (`mobilesdk_app_id` → `appId`, `current_key` → `apiKey`, etc.). Those files and the JSON assets are gitignored — do not hardcode them in committed Dart (e.g. no `firebase_options_*.dart` in git).
 
@@ -109,6 +109,6 @@ In-app defaults also set `revenuecat_enabled: false` before fetch, so an unpubli
 ## Later (not done yet)
 
 - Production Remote Config + Play `goog_…` keys (replace Test Store for release builds).
-- Create **Play Store** apps in RevenueCat for `co.za.zanderkotze.sprout` and `co.za.zanderkotze.sprout.dev`, attach Play Console products + service-account credentials.
+- Create **Play Store** apps in RevenueCat for `app.stackmint.sprout` and `app.stackmint.sprout.dev`, attach Play Console products + service-account credentials.
 - Entitlement gating for premium features (unlocking specific app behavior).
 - iOS (`appl_…` key) when the `ios/` platform is added.

@@ -9,7 +9,7 @@ Development builds use Firebase App Distribution instead — see [FIREBASE_DEV_D
 | Item | Value |
 |------|-------|
 | Flavor | `production` |
-| applicationId | `co.za.zanderkotze.sprout` |
+| applicationId | `app.stackmint.sprout` |
 | Entry point | `lib/main_production.dart` |
 | Config asset | `assets/config/production.json` |
 | Firebase config | `android/app/src/production/google-services.json` |
@@ -28,7 +28,7 @@ Development builds use Firebase App Distribution instead — see [FIREBASE_DEV_D
 ### Firebase (production)
 
 1. Create a **production** Firebase project (or a separate Android app).
-2. Register Android package `co.za.zanderkotze.sprout`.
+2. Register Android package `app.stackmint.sprout`.
 3. Enable Analytics / Crashlytics to match the Gradle plugins.
 4. Download `google-services.json` → `sprout_app/android/app/src/production/google-services.json`.
 5. Encode for CI: `base64 -i …/src/production/google-services.json | tr -d '\n'` → `GOOGLE_SERVICES_PROD_BASE64`.
@@ -36,7 +36,7 @@ Development builds use Firebase App Distribution instead — see [FIREBASE_DEV_D
 
 ### Google Play Console
 
-1. Create a Play Console app with package `co.za.zanderkotze.sprout`.
+1. Create a Play Console app with package `app.stackmint.sprout`.
 2. Complete listing / content basics as required by Play.
 3. Enable Play App Signing; register your **upload** keystore (same key material as `ANDROID_SIGNING_CONFIG_BASE64`).
 4. Upload at least one AAB manually (or finish first-draft requirements) so API uploads are allowed.

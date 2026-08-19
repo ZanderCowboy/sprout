@@ -40,7 +40,7 @@ void main() {
       supabaseUrl: supabase ? 'https://example.supabase.co' : '',
       supabaseAnonKey: supabase ? 'sb_publishable_test_key_1234567890' : '',
       googleWebClientId: googleWebClientId,
-      androidApplicationId: 'co.za.zanderkotze.sprout.dev',
+      androidApplicationId: 'app.stackmint.sprout.dev',
       revenueCatAndroidApiKey: '',
       firebaseApiKey: '',
       firebaseAppId: '',

@@ -10,14 +10,14 @@ Production Play uploads are documented separately in [PLAY_PUBLISH_PROD_ANDROID.
 
 | Flavor | applicationId | Entry point | Launcher name |
 |--------|---------------|-------------|---------------|
-| `development` | `co.za.zanderkotze.sprout.dev` | `lib/main_development.dart` | [DEV] Sprout |
-| `production` | `co.za.zanderkotze.sprout` | `lib/main_production.dart` | Sprout |
+| `development` | `app.stackmint.sprout.dev` | `lib/main_development.dart` | [DEV] Sprout |
+| `production` | `app.stackmint.sprout` | `lib/main_production.dart` | Sprout |
 
 Both can be installed on the same device. Only **development** uses Firebase App Distribution.
 
 ## Firebase App Distribution prereqs (development)
 
-1. In the **development** Firebase project, register the Android app with package `co.za.zanderkotze.sprout.dev`.
+1. In the **development** Firebase project, register the Android app with package `app.stackmint.sprout.dev`.
 2. Download `google-services.json` and place it at `sprout_app/android/app/src/development/google-services.json` (gitignored).
 3. Copy the Firebase App Distribution Android `appId` (format: `1:...:android:...`).
 4. Create your Distribution groups (for example: `default`).
