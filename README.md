@@ -81,7 +81,7 @@ Place flavor-specific files (gitignored):
 
 ## Supabase (optional)
 
-See [`supabase/README.md`](supabase/README.md): create **two** projects (dev + prod), run the same migrations on each, enable Anonymous auth if desired, then put URL + anon/publishable key in the matching config JSON above.
+See [`supabase/README.md`](supabase/README.md): create **two** projects (dev + prod), run the same migrations on each, then put URL + anon/publishable key in the matching config JSON above. Auth provider checklist (OTP, Google, local-only until sign-in): [`docs/SUPABASE_AUTH_TODOS.md`](docs/SUPABASE_AUTH_TODOS.md).
 
 ## Checks
 
@@ -93,7 +93,10 @@ flutter test
 
 ## More docs
 
+- [GitHub CLI (personal account)](docs/GITHUB_CLI_PERSONAL.md) — `gh` as `ZanderCowboy` in this workspace only
 - [Firebase Dev Distribution (Android)](docs/FIREBASE_DEV_DISTRIBUTION.md) — CI APK builds and GitHub secrets
 - [Play Store publish (Android)](docs/PLAY_PUBLISH_PROD_ANDROID.md) — dispatch-only production AAB upload
 - [RevenueCat foundation](docs/REVENUECAT.md) — SDK configure, identity, Test Store catalog
 - [Supabase setup](supabase/README.md)
+- [Supabase auth TODOs](docs/SUPABASE_AUTH_TODOS.md) — OTP + Google (Android); local-only until sign-in
+- [Resend SMTP for Supabase](docs/RESEND_SMTP_SUPABASE.md) — Custom SMTP + GoDaddy DNS for email OTP

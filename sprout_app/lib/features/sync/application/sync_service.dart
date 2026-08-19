@@ -17,20 +17,34 @@ class SyncService {
     required AppConfig config,
     required SupabaseClient? supabase,
     required TransactionsRepository transactionsRepository,
+    required bool Function() canSync,
     this.onAfterFlush,
   })  : _queue = queue,
         _config = config,
         _supabase = supabase,
-        _transactionsRepository = transactionsRepository;
+        _transactionsRepository = transactionsRepository,
+        _canSync = canSync;
 
   final PendingSyncQueue _queue;
   final AppConfig _config;
   final SupabaseClient? _supabase;
   final TransactionsRepository _transactionsRepository;
+  final bool Function() _canSync;
   final SyncFlushCallback? onAfterFlush;
 
   Future<void> flushPending() async {
     if (!_config.isSupabaseConfigured) return;
+    if (!_canSync()) {
+      if (kDebugMode) {
+        debugPrint(
+          'SyncService: verified Supabase session required; '
+          'remote writes skipped until sign-in.',
+        );
+      }
+      onAfterFlush?.call();
+      return;
+    }
+
     final client = _supabase;
     if (client == null) return;
 
@@ -38,8 +52,7 @@ class SyncService {
     if (authUid == null || authUid.isEmpty) {
       if (kDebugMode) {
         debugPrint(
-          'SyncService: no Supabase auth session; remote writes skipped. '
-          'Dashboard → Authentication → Providers → enable Anonymous.',
+          'SyncService: no Supabase auth session; remote writes skipped.',
         );
       }
       onAfterFlush?.call();

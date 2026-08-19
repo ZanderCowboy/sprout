@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:sprout/core/core.dart';
+import 'package:sprout/features/auth/export.dart';
 import 'package:sprout/features/purchases/presentation/premium_paywall_helper.dart';
 import 'package:purchases_ui_flutter/purchases_ui_flutter.dart';
 import 'package:sprout/features/transactions/presentation/recurring_payments_page.dart';
@@ -89,6 +90,20 @@ class _SettingsPageState extends State<SettingsPage> {
       appBar: AppBar(title: const Text('Settings')),
       body: ListView(
         children: [
+          ListTile(
+            leading: const Icon(Icons.manage_accounts_rounded),
+            title: const Text('Account'),
+            subtitle: const Text('Sign in with email or Google'),
+            trailing: const Icon(Icons.chevron_right_rounded),
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => const AccountPage(),
+                ),
+              );
+            },
+          ),
+          const Divider(height: 1),
           if (_purchasesReady)
             Column(
               children: [

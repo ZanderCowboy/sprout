@@ -3,6 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 
 const String _kUserIdKey = 'active_user_id';
+const String _kLastVerifiedUserIdKey = 'last_verified_user_id';
 
 class UserContext {
   UserContext(
@@ -14,10 +15,16 @@ class UserContext {
   final SupabaseClient? _supabase;
   static const _uuid = Uuid();
 
+  /// Prefers a verified (non-anonymous) Supabase uid; otherwise local Hive id.
   Future<String> resolveUserId() async {
-    final authId = _supabase?.auth.currentUser?.id;
-    if (authId != null && authId.isNotEmpty) {
+    final authUser = _supabase?.auth.currentUser;
+    final authId = authUser?.id;
+    if (authUser != null &&
+        !authUser.isAnonymous &&
+        authId != null &&
+        authId.isNotEmpty) {
       await _settingsBox.put(_kUserIdKey, authId);
+      await _settingsBox.put(_kLastVerifiedUserIdKey, authId);
       return authId;
     }
     final existing = _settingsBox.get(_kUserIdKey) as String?;
@@ -28,4 +35,15 @@ class UserContext {
   }
 
   String? get cachedUserId => _settingsBox.get(_kUserIdKey) as String?;
+
+  String? get lastVerifiedUserId =>
+      _settingsBox.get(_kLastVerifiedUserIdKey) as String?;
+
+  Future<void> setActiveUserId(String userId) async {
+    await _settingsBox.put(_kUserIdKey, userId);
+  }
+
+  Future<void> markVerifiedUserId(String userId) async {
+    await _settingsBox.put(_kLastVerifiedUserIdKey, userId);
+  }
 }

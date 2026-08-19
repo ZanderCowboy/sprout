@@ -4,6 +4,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:sprout/core/di/service_locator.dart';
+import 'package:sprout/features/auth/export.dart';
 import 'package:sprout/features/sync/export.dart';
 
 class ConnectivityCubit extends Cubit<bool> {
@@ -17,7 +18,7 @@ class ConnectivityCubit extends Cubit<bool> {
   void _onResults(List<ConnectivityResult> results) {
     final online = _isOnline(results);
     emit(online);
-    if (online) {
+    if (online && sl.isRegistered<AuthService>() && sl<AuthService>().canSync) {
       unawaited(sl<SyncService>().flushPending());
     }
   }

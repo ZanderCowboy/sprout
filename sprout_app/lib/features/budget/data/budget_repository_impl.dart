@@ -16,20 +16,26 @@ class BudgetRepositoryImpl implements BudgetRepository {
     required Box<BudgetGroupHiveModel> box,
     required UserContext userContext,
     required AppConfig appConfig,
+    required bool Function() canSync,
     SupabaseClient? supabase,
     PendingSyncQueue? pendingSyncQueue,
   })  : _box = box,
         _userContext = userContext,
         _appConfig = appConfig,
+        _canSync = canSync,
         _supabase = supabase,
         _pendingSyncQueue = pendingSyncQueue;
 
   final Box<BudgetGroupHiveModel> _box;
   final UserContext _userContext;
   final AppConfig _appConfig;
+  final bool Function() _canSync;
   final SupabaseClient? _supabase;
   final PendingSyncQueue? _pendingSyncQueue;
   final _updates = StreamController<void>.broadcast();
+
+  bool get _shouldEnqueue =>
+      _appConfig.isSupabaseConfigured && _pendingSyncQueue != null && _canSync();
 
   void _notify() {
     if (!_updates.isClosed) _updates.add(null);
@@ -72,7 +78,7 @@ class BudgetRepositoryImpl implements BudgetRepository {
     await _box.put(group.id, budgetGroupToHive(group));
     _notify();
     final q = _pendingSyncQueue;
-    if (_appConfig.isSupabaseConfigured && q != null) {
+    if (_shouldEnqueue && q != null) {
       await q.enqueue(
         PendingSyncOperationType.upsertBudgetGroup,
         encodeBudgetGroupPayload(group),
@@ -85,7 +91,7 @@ class BudgetRepositoryImpl implements BudgetRepository {
     await _box.delete(id);
     _notify();
     final q = _pendingSyncQueue;
-    if (_appConfig.isSupabaseConfigured && q != null) {
+    if (_shouldEnqueue && q != null) {
       await q.enqueue(
         PendingSyncOperationType.deleteBudgetGroup,
         encodeIdPayload(id),
@@ -95,7 +101,7 @@ class BudgetRepositoryImpl implements BudgetRepository {
 
   @override
   Future<void> pullRemote() async {
-    if (!_appConfig.isSupabaseConfigured) return;
+    if (!_appConfig.isSupabaseConfigured || !_canSync()) return;
     final client = _supabase;
     if (client == null) return;
     if ((_pendingSyncQueue?.length ?? 0) > 0) return;

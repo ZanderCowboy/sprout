@@ -16,17 +16,20 @@ class AccountsRepositoryImpl implements AccountsRepository {
     required Box<AccountHiveModel> box,
     required UserContext userContext,
     required AppConfig appConfig,
+    required bool Function() canSync,
     SupabaseClient? supabase,
     PendingSyncQueue? pendingSyncQueue,
   })  : _box = box,
         _userContext = userContext,
         _appConfig = appConfig,
+        _canSync = canSync,
         _supabase = supabase,
         _pendingSyncQueue = pendingSyncQueue;
 
   final Box<AccountHiveModel> _box;
   final UserContext _userContext;
   final AppConfig _appConfig;
+  final bool Function() _canSync;
   final SupabaseClient? _supabase;
   final PendingSyncQueue? _pendingSyncQueue;
   final _updates = StreamController<void>.broadcast();
@@ -35,9 +38,12 @@ class AccountsRepositoryImpl implements AccountsRepository {
     if (!_updates.isClosed) _updates.add(null);
   }
 
+  bool get _shouldEnqueue =>
+      _appConfig.isSupabaseConfigured && _pendingSyncQueue != null && _canSync();
+
   Future<void> _enqueueUpsert(Account a) async {
     final q = _pendingSyncQueue;
-    if (_appConfig.isSupabaseConfigured && q != null) {
+    if (_shouldEnqueue && q != null) {
       await q.enqueue(
         PendingSyncOperationType.upsertAccount,
         encodeAccountPayload(a),
@@ -76,7 +82,7 @@ class AccountsRepositoryImpl implements AccountsRepository {
     await _box.delete(id);
     _notify();
     final q = _pendingSyncQueue;
-    if (_appConfig.isSupabaseConfigured && q != null) {
+    if (_shouldEnqueue && q != null) {
       await q.enqueue(
         PendingSyncOperationType.deleteAccount,
         encodeIdPayload(id),
@@ -86,7 +92,7 @@ class AccountsRepositoryImpl implements AccountsRepository {
 
   @override
   Future<void> pullRemote() async {
-    if (!_appConfig.isSupabaseConfigured) return;
+    if (!_appConfig.isSupabaseConfigured || !_canSync()) return;
     final client = _supabase;
     if (client == null) return;
     if ((_pendingSyncQueue?.length ?? 0) > 0) return;

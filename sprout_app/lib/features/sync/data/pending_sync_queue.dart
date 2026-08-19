@@ -35,5 +35,7 @@ class PendingSyncQueue {
 
   Future<void> remove(String queueId) => _box.delete(queueId);
 
+  Future<void> clear() => _box.clear();
+
   int get length => _box.length;
 }

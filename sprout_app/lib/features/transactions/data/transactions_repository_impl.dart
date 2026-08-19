@@ -20,21 +20,27 @@ class TransactionsRepositoryImpl implements TransactionsRepository {
     required Box<TransactionHiveModel> box,
     required UserContext userContext,
     required AppConfig appConfig,
+    required bool Function() canSync,
     SupabaseClient? supabase,
     PendingSyncQueue? pendingSyncQueue,
   })  : _box = box,
         _userContext = userContext,
         _appConfig = appConfig,
+        _canSync = canSync,
         _supabase = supabase,
         _pendingSyncQueue = pendingSyncQueue;
 
   final Box<TransactionHiveModel> _box;
   final UserContext _userContext;
   final AppConfig _appConfig;
+  final bool Function() _canSync;
   final SupabaseClient? _supabase;
   final PendingSyncQueue? _pendingSyncQueue;
   final _updates = StreamController<void>.broadcast();
   static const _uuid = Uuid();
+
+  bool get _shouldEnqueue =>
+      _appConfig.isSupabaseConfigured && _pendingSyncQueue != null && _canSync();
 
   void _notify() {
     if (!_updates.isClosed) _updates.add(null);
@@ -142,7 +148,7 @@ class TransactionsRepositoryImpl implements TransactionsRepository {
     await _box.put(id, transactionToHive(tx));
     _notify();
     final q = _pendingSyncQueue;
-    if (_appConfig.isSupabaseConfigured && q != null) {
+    if (_shouldEnqueue && q != null) {
       await q.enqueue(
         PendingSyncOperationType.insertTransaction,
         encodeTransactionPayload(tx),
@@ -180,7 +186,7 @@ class TransactionsRepositoryImpl implements TransactionsRepository {
     _notify();
 
     final q = _pendingSyncQueue;
-    if (_appConfig.isSupabaseConfigured && q != null) {
+    if (_shouldEnqueue && q != null) {
       final tx = transactionFromHive(updatedHive);
       await q.enqueue(
         PendingSyncOperationType.insertTransaction,
@@ -265,7 +271,7 @@ class TransactionsRepositoryImpl implements TransactionsRepository {
     _notify();
 
     final q = _pendingSyncQueue;
-    if (_appConfig.isSupabaseConfigured && q != null) {
+    if (_shouldEnqueue && q != null) {
       final tx = transactionFromHive(updatedHive);
       await q.enqueue(
         PendingSyncOperationType.insertTransaction,
@@ -283,7 +289,7 @@ class TransactionsRepositoryImpl implements TransactionsRepository {
     _notify();
 
     final q = _pendingSyncQueue;
-    if (_appConfig.isSupabaseConfigured && q != null) {
+    if (_shouldEnqueue && q != null) {
       await q.enqueue(
         PendingSyncOperationType.deleteTransaction,
         encodeIdPayload(transactionId),
@@ -319,7 +325,7 @@ class TransactionsRepositoryImpl implements TransactionsRepository {
 
   @override
   Future<void> pullRemote() async {
-    if (!_appConfig.isSupabaseConfigured) return;
+    if (!_appConfig.isSupabaseConfigured || !_canSync()) return;
     final client = _supabase;
     if (client == null) return;
     if ((_pendingSyncQueue?.length ?? 0) > 0) return;

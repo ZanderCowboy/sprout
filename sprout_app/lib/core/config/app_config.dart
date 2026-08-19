@@ -22,6 +22,7 @@ class AppConfig {
     required this.environment,
     required this.supabaseUrl,
     required this.supabaseAnonKey,
+    required this.googleWebClientId,
     required this.androidApplicationId,
     required this.revenueCatAndroidApiKey,
     required this.firebaseApiKey,
@@ -34,6 +35,9 @@ class AppConfig {
   final AppEnvironment environment;
   final String supabaseUrl;
   final String supabaseAnonKey;
+
+  /// OAuth Web client ID used as `serverClientId` for Google Sign-In → Supabase.
+  final String googleWebClientId;
 
   /// Play / Android applicationId this config is meant for (flavor reference).
   /// Not used by RevenueCat configure — the SDK key is [revenueCatAndroidApiKey].
@@ -49,6 +53,8 @@ class AppConfig {
 
   bool get isSupabaseConfigured =>
       supabaseUrl.isNotEmpty && supabaseAnonKey.isNotEmpty;
+
+  bool get isGoogleSignInConfigured => googleWebClientId.isNotEmpty;
 
   bool get isRevenueCatConfigured => revenueCatAndroidApiKey.isNotEmpty;
 
@@ -153,6 +159,7 @@ class AppConfig {
         environment: environment,
         supabaseUrl: envUrl,
         supabaseAnonKey: envKey,
+        googleWebClientId: '',
         androidApplicationId: '',
         revenueCatAndroidApiKey: envRcKey,
         firebaseApiKey: '',
@@ -174,6 +181,7 @@ class AppConfig {
       environment: environment,
       supabaseUrl: envUrl.isNotEmpty ? envUrl : supabaseUrl,
       supabaseAnonKey: envKey.isNotEmpty ? envKey : supabaseAnonKey,
+      googleWebClientId: googleWebClientId,
       androidApplicationId: androidApplicationId,
       revenueCatAndroidApiKey: envRcKey.isNotEmpty
           ? envRcKey
@@ -198,9 +206,9 @@ class AppConfig {
         StateError(
           'Sprout config asset is missing or unreadable: "$assetPath". '
           'Create sprout_app/$assetPath with JSON keys supabaseUrl, '
-          'supabaseAnonKey, androidApplicationId, revenueCatAndroidApiKey, '
-          'and optional firebase { apiKey, appId, messagingSenderId, '
-          'projectId, storageBucket } '
+          'supabaseAnonKey, googleWebClientId, androidApplicationId, '
+          'revenueCatAndroidApiKey, and optional firebase { apiKey, appId, '
+          'messagingSenderId, projectId, storageBucket } '
           '(see supabase/README.md and docs/REVENUECAT.md).',
         ),
         st,
@@ -231,6 +239,7 @@ class AppConfig {
       environment: environment,
       supabaseUrl: (map['supabaseUrl'] as String?)?.trim() ?? '',
       supabaseAnonKey: (map['supabaseAnonKey'] as String?)?.trim() ?? '',
+      googleWebClientId: (map['googleWebClientId'] as String?)?.trim() ?? '',
       androidApplicationId:
           (map['androidApplicationId'] as String?)?.trim() ?? '',
       revenueCatAndroidApiKey:

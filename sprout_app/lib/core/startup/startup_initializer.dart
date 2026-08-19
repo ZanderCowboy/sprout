@@ -13,6 +13,7 @@ import 'package:sprout/core/storage/hive_adapters.dart';
 import 'package:sprout/core/storage/migrate_hive_user_id_to_auth.dart';
 import 'package:sprout/core/user/user_context.dart';
 import 'package:sprout/features/accounts/export.dart';
+import 'package:sprout/features/auth/export.dart';
 import 'package:sprout/features/budget/export.dart';
 import 'package:sprout/features/goals/export.dart';
 import 'package:sprout/features/sync/export.dart';
@@ -141,19 +142,6 @@ Future<void> initializeApp({
       _supabaseInitialized = true;
     }
     supabaseClient = Supabase.instance.client;
-    try {
-      final session = supabaseClient.auth.currentSession;
-      if (session == null) {
-        await supabaseClient.auth.signInAnonymously();
-      }
-    } on Object catch (e) {
-      if (kDebugMode) {
-        debugPrint(
-          'Supabase anonymous sign-in failed: $e. '
-          'Enable Anonymous under Authentication → Providers, then restart.',
-        );
-      }
-    }
     reporter.update(StartupStep.initSupabase, StartupStepStatus.done);
   } else {
     reporter.update(StartupStep.initSupabase, StartupStepStatus.skipped);
@@ -183,11 +171,14 @@ Future<void> initializeApp({
     reporter: reporter,
   );
 
+  final authService = sl<AuthService>();
+  final canSync = authService.canSync;
+
   reporter.update(StartupStep.migrateUserIds, StartupStepStatus.running);
-  final authUserId = supabaseClient?.auth.currentUser?.id;
-  if (authUserId != null && authUserId.isNotEmpty) {
+  final verifiedUser = authService.currentUser;
+  if (canSync && verifiedUser != null) {
     await migrateHiveUserIdsToAuthUser(
-      authUserId: authUserId,
+      authUserId: verifiedUser.id,
       accounts: sl(),
       goals: sl(),
       budgetGroups: sl(),
@@ -198,17 +189,19 @@ Future<void> initializeApp({
     reporter.update(StartupStep.migrateUserIds, StartupStepStatus.skipped);
   }
 
-  reporter.update(StartupStep.flushPending, StartupStepStatus.running);
-  await sl<SyncService>().flushPending();
-  reporter.update(StartupStep.flushPending, StartupStepStatus.done);
+  if (canSync) {
+    reporter.update(StartupStep.flushPending, StartupStepStatus.running);
+    await sl<SyncService>().flushPending();
+    reporter.update(StartupStep.flushPending, StartupStepStatus.done);
 
-  if (allowSupabase && config.isSupabaseConfigured) {
     reporter.update(StartupStep.pullRemote, StartupStepStatus.running);
     await sl<AccountsRepository>().pullRemote();
     await sl<GoalsRepository>().pullRemote();
+    await sl<BudgetRepository>().pullRemote();
     await sl<TransactionsRepository>().pullRemote();
     reporter.update(StartupStep.pullRemote, StartupStepStatus.done);
   } else {
+    reporter.update(StartupStep.flushPending, StartupStepStatus.skipped);
     reporter.update(StartupStep.pullRemote, StartupStepStatus.skipped);
   }
 }
