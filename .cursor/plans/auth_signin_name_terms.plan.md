@@ -4,16 +4,16 @@ overview: Optional display name on email OTP, Google profile name, in-app Terms 
 todos:
   - id: display-name
     content: Optional display name on email OTP; AuthUser.displayName from user_metadata; Google uses profile name
-    status: pending
+    status: completed
   - id: terms-rc
     content: Bundled terms.md + Firebase RC string terms_of_service; extend RemoteConfigService string getter; TermsPage with flutter_markdown
-    status: pending
+    status: completed
   - id: sign-in-terms-link
     content: Terms hyperlink on SignInPage
-    status: pending
+    status: completed
   - id: tests-docs
     content: Tests + docs; note human action to paste terms into dev Firebase RC
-    status: pending
+    status: completed
 isProject: false
 ---
 
