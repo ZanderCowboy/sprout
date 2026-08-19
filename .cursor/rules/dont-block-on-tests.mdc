@@ -14,6 +14,7 @@ Failing, hanging, or flaky tests must **not** delay finishing the requested work
 - The human decides whether to fix tests, skip them, or ignore them. Do not keep retrying until asked.
 - Never let `flutter test` / analyze loops eat the rest of the task. Kill hung test runs and move on.
 - Still write reasonable tests when the plan asks for them. Leaving a known-bad test hanging the suite is worse than omitting that case and reporting it.
+- Do **not** add widget tests (`testWidgets`) when unsure. They are slow and often hang (plugins, indefinite `CircularProgressIndicator`, `pumpAndSettle`). Cover the logic in service/cubit tests instead.
 
 ## Report
 

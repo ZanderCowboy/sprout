@@ -11,4 +11,5 @@ Details: `.cursor/references/testing.md`.
 - Prefer fakes in `sprout_app/test/mocks/mocks.dart`. Do not add mockito or codegen.
 - Follow `test/auth/auth_cubit_test.dart` for Hive `setUpAll` / unique box names.
 - Construct `AppConfig` in memory; do not load flavor JSON from assets.
+- **Default to service/cubit tests.** Skip `testWidgets` unless the human asked and the case is a small, plugin-free widget (no Purchases, Hive-in-`initState`, `pumpAndSettle` on loaders). If unsure, omit the widget test.
 - After adding tests: `cd sprout_app && flutter test`. If a test fails or hangs, stop and report it; do not block the rest of the work (`.cursor/rules/dont-block-on-tests.mdc`).

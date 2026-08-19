@@ -22,6 +22,6 @@ Read `.cursor/references/architecture.md` first. Follow existing features (`goal
 7. **Presentation** — UI-only page; logic in bloc/cubit; helpers in `presentation/utils/`.
 8. **DI** — register in `configureDependencies` (`service_locator.dart`). Provide blocs where `SproutApp` / the feature route already does.
 9. **Shared UI** — reuse `lib/ui` if the widget pattern exists in 2+ features.
-10. **Tests** — fake in `test/mocks/mocks.dart` if needed; add service/bloc tests. Then follow the `sprout-verify` skill.
+10. **Tests** — fake in `test/mocks/mocks.dart` if needed; add service/bloc tests. Skip widget tests unless the human asked and the case is plugin-free. Then follow the `sprout-verify` skill.
 
 Do not import `data/**/models` from presentation. Do not ask the human to create files.
