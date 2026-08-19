@@ -147,7 +147,10 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text(AppStrings.privacyPolicy));
+    final privacy = find.text(AppStrings.privacyPolicy);
+    await tester.ensureVisible(privacy);
+    await tester.pumpAndSettle();
+    await tester.tap(privacy);
     await tester.pumpAndSettle();
 
     expect(find.byType(PrivacyPage), findsOneWidget);

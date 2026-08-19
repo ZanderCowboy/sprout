@@ -151,7 +151,7 @@ class AuthRepositoryImpl implements AuthRepository {
     }
     try {
       final response = await _client.auth.updateUser(
-        UserAttributes(data: {'display_name': trimmed}),
+        UserAttributes(data: {'display_name': trimmed, 'full_name': trimmed}),
       );
       final user = _mapUser(response.user ?? _client.auth.currentUser);
       if (user == null || !user.isVerified) {
@@ -175,10 +175,12 @@ class AuthRepositoryImpl implements AuthRepository {
       await _client.rpc('delete_own_account');
     } on AuthException catch (e) {
       throw AuthAppException(e.message);
+    } on PostgrestException {
+      throw const AuthAppException(AppStrings.deleteAccountFailed);
     } on AuthAppException {
       rethrow;
-    } on Object catch (e) {
-      throw AuthAppException(e.toString());
+    } on Object {
+      throw const AuthAppException(AppStrings.deleteAccountFailed);
     }
   }
 

@@ -116,7 +116,12 @@ void main() {
     expect(find.text('Continue with Google'), findsOneWidget);
     expect(find.text(AppStrings.termsOfService), findsOneWidget);
     expect(find.text(AppStrings.privacyPolicy), findsOneWidget);
-    expect(find.text(AppStrings.displayNameOptional), findsNothing);
+    expect(find.text(AppStrings.displayNameOptional), findsOneWidget);
+    expect(
+      find.text(AppStrings.displayNameExistingAccountHint),
+      findsOneWidget,
+    );
+    expect(find.byIcon(Icons.eco_rounded), findsOneWidget);
   });
 
   testWidgets('back button calls onBackToIntro', (tester) async {
@@ -135,7 +140,7 @@ void main() {
     expect(back, isTrue);
   });
 
-  testWidgets('optional display name appears after sending email OTP', (
+  testWidgets('verification code appears after sending email OTP', (
     tester,
   ) async {
     await tester.pumpWidget(
@@ -145,14 +150,15 @@ void main() {
       ),
     );
 
-    expect(find.text(AppStrings.displayNameOptional), findsNothing);
+    expect(find.text(AppStrings.displayNameOptional), findsOneWidget);
+    expect(find.text('Verification code'), findsNothing);
 
-    await tester.enterText(find.byType(TextField).first, 'user@example.com');
+    await tester.enterText(find.byType(TextField).at(1), 'user@example.com');
     await tester.tap(find.text('Send code'));
     await tester.pump();
 
     expect(find.text(AppStrings.displayNameOptional), findsOneWidget);
-    expect(find.text('Continue with Google'), findsOneWidget);
+    expect(find.text('Verification code'), findsOneWidget);
   });
 
   testWidgets('Terms hyperlink opens TermsPage', (tester) async {

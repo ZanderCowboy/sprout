@@ -204,16 +204,18 @@ Prod keeps the bundled files until prod Firebase Remote Config is turned on.
 
 ### 8. Delete-account RPC (dev)
 
-Flutter already calls `supabase.rpc('delete_own_account')` from Account → **Delete account**. The SQL is in [`supabase/migrations/20260819120000_delete_own_account.sql`](../supabase/migrations/20260819120000_delete_own_account.sql).
+Flutter already calls `supabase.rpc('delete_own_account')` from Account → **Delete account**.
 
-**Human action required:** apply that migration on the **dev** Supabase project (SQL editor, or `supabase db push` if the CLI is linked). Until it is applied, in-app delete will fail at the RPC.
+SQL:
 
-The function is `private.delete_own_account()` (`SECURITY DEFINER`, deletes `auth.users` where `id = auth.uid()`) plus a thin `public.delete_own_account()` invoker wrapper for the client. Existing tables already `references auth.users (id) on delete cascade`.
+- [`supabase/migrations/20260819120000_delete_own_account.sql`](../supabase/migrations/20260819120000_delete_own_account.sql) — `private.delete_own_account()` (`SECURITY DEFINER`, deletes `auth.users` where `id = auth.uid()`) plus `public.delete_own_account()`.
+- [`supabase/migrations/20260819220000_delete_own_account_definer.sql`](../supabase/migrations/20260819220000_delete_own_account_definer.sql) — public wrapper must be **SECURITY DEFINER**. The original invoker wrapper fails with `42501 permission denied for schema private` because `authenticated` has no `USAGE` on schema `private`. Do not grant schema usage; keep private closed.
 
-Apply the same file on **prod** later, when you do the prod auth pass. Deletion does **not** cancel Play billing / RevenueCat entitlements; the confirm sheet tells the user to manage Premium separately.
+Existing tables already `references auth.users (id) on delete cascade`. Deletion does **not** cancel Play billing / RevenueCat entitlements; the confirm sheet tells the user to manage Premium separately.
 
-- [ ] Dev: run `20260819120000_delete_own_account.sql`
-- [ ] Prod (later): same migration
+- [x] Dev: `20260819120000_delete_own_account.sql` (already applied)
+- [x] Dev: `20260819220000_delete_own_account_definer.sql` (applied via MCP)
+- [ ] Prod (later): both delete-account migrations
 
 ---
 

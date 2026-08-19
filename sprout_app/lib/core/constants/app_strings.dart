@@ -44,9 +44,15 @@ abstract final class AppStrings {
   static const String invalidAmount = 'Enter a valid amount.';
   static const String amountCannotBeNegative = 'Amount cannot be negative.';
   static const String displayNameOptional = 'Display name (optional)';
+  static const String displayNameExistingAccountHint =
+      'Leave blank if you already have an account.';
   static const String displayName = 'Display name';
   static const String editDisplayName = 'Edit display name';
   static const String account = 'Account';
+  static const String accountSectionProfile = 'Profile';
+  static const String accountSectionSession = 'Session';
+  static const String accountSectionLegal = 'Legal';
+  static const String accountSectionDanger = 'Danger zone';
   static const String signedInWithGoogle = 'Signed in with Google';
   static const String signedInWithEmail = 'Signed in with email';
   static const String signOut = 'Sign out';
@@ -61,6 +67,8 @@ abstract final class AppStrings {
   static const String deleteAccountPremiumNote =
       'If you subscribe to Premium, deletion does not cancel or refund Play '
       'billing. Manage or cancel Premium separately.';
+  static const String deleteAccountFailed =
+      'Could not delete your account. Try again.';
   static const String termsOfService = 'Terms of Service';
   static const String privacyPolicy = 'Privacy Policy';
   static const String byContinuingYouAgree = 'By continuing you agree to the';

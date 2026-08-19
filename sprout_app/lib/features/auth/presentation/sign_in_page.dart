@@ -92,8 +92,18 @@ class _SignInPageState extends State<SignInPage> {
               ListView(
                 padding: const EdgeInsets.all(16),
                 children: [
+                  const SizedBox(height: 8),
+                  const Center(
+                    // TODO: replace with the Sprout app icon asset.
+                    child: CircleAvatar(
+                      radius: 40,
+                      child: Icon(Icons.eco_rounded, size: 40),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
                   Text(
                     'Sign in to sync your savings across devices.',
+                    textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.bodyLarge,
                   ),
                   const SizedBox(height: 8),
@@ -106,6 +116,19 @@ class _SignInPageState extends State<SignInPage> {
                     ),
                   if (supabaseConfigured) ...[
                     const SizedBox(height: 16),
+                    TextField(
+                      controller: _displayNameController,
+                      enabled: !busy,
+                      textCapitalization: TextCapitalization.words,
+                      autofillHints: const [AutofillHints.name],
+                      decoration: const InputDecoration(
+                        labelText: AppStrings.displayNameOptional,
+                        helperText: AppStrings.displayNameExistingAccountHint,
+                        border: OutlineInputBorder(),
+                      ),
+                      onChanged: context.read<AuthCubit>().displayNameChanged,
+                    ),
+                    const SizedBox(height: 12),
                     TextField(
                       controller: _emailController,
                       enabled: !busy,
@@ -126,18 +149,6 @@ class _SignInPageState extends State<SignInPage> {
                     ),
                     if (otpSent) ...[
                       const SizedBox(height: 16),
-                      TextField(
-                        controller: _displayNameController,
-                        enabled: !busy,
-                        textCapitalization: TextCapitalization.words,
-                        autofillHints: const [AutofillHints.name],
-                        decoration: const InputDecoration(
-                          labelText: AppStrings.displayNameOptional,
-                          border: OutlineInputBorder(),
-                        ),
-                        onChanged: context.read<AuthCubit>().displayNameChanged,
-                      ),
-                      const SizedBox(height: 12),
                       TextField(
                         controller: _otpController,
                         enabled: !busy,

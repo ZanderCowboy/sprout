@@ -117,71 +117,134 @@ class AccountPage extends StatelessWidget {
                   ),
                   if (errorMessage != null) ...[
                     const SizedBox(height: 16),
-                    Text(
-                      errorMessage,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.error,
-                      ),
-                    ),
+                    _AccountErrorBanner(message: errorMessage),
                   ],
                   const SizedBox(height: 24),
-                  ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    leading: const Icon(Icons.edit_rounded),
-                    title: const Text(AppStrings.editDisplayName),
-                    enabled: !busy,
-                    onTap: busy ? null : () => _editDisplayName(context, user),
-                  ),
-                  ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    leading: const Icon(Icons.logout_rounded),
-                    title: const Text(AppStrings.signOut),
-                    enabled: !busy,
-                    onTap: busy
-                        ? null
-                        : () => context.read<AuthCubit>().signOut(),
-                  ),
-                  Text(
-                    AppStrings.signOutKeepsLocalData,
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                  ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    leading: const Icon(Icons.article_outlined),
-                    title: const Text(AppStrings.termsOfService),
-                    trailing: const Icon(Icons.chevron_right_rounded),
-                    enabled: !busy,
-                    onTap: busy ? null : () => _openTerms(context),
-                  ),
-                  ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    leading: const Icon(Icons.privacy_tip_outlined),
-                    title: const Text(AppStrings.privacyPolicy),
-                    trailing: const Icon(Icons.chevron_right_rounded),
-                    enabled: !busy,
-                    onTap: busy ? null : () => _openPrivacy(context),
-                  ),
-                  const SizedBox(height: 24),
-                  ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    leading: Icon(
-                      Icons.delete_forever_rounded,
-                      color: Theme.of(context).colorScheme.error,
-                    ),
-                    title: Text(
-                      AppStrings.deleteAccount,
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.error,
+                  _AccountSectionCard(
+                    title: AppStrings.accountSectionProfile,
+                    children: [
+                      ListTile(
+                        leading: const Icon(Icons.edit_rounded),
+                        title: const Text(AppStrings.editDisplayName),
+                        enabled: !busy,
+                        onTap: busy
+                            ? null
+                            : () => _editDisplayName(context, user),
                       ),
-                    ),
-                    enabled: !busy,
-                    onTap: busy ? null : () => _confirmDelete(context),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  _AccountSectionCard(
+                    title: AppStrings.accountSectionSession,
+                    children: [
+                      ListTile(
+                        leading: const Icon(Icons.logout_rounded),
+                        title: const Text(AppStrings.signOut),
+                        subtitle: const Text(AppStrings.signOutKeepsLocalData),
+                        enabled: !busy,
+                        onTap: busy
+                            ? null
+                            : () => context.read<AuthCubit>().signOut(),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  _AccountSectionCard(
+                    title: AppStrings.accountSectionLegal,
+                    children: [
+                      ListTile(
+                        leading: const Icon(Icons.article_outlined),
+                        title: const Text(AppStrings.termsOfService),
+                        trailing: const Icon(Icons.chevron_right_rounded),
+                        enabled: !busy,
+                        onTap: busy ? null : () => _openTerms(context),
+                      ),
+                      ListTile(
+                        leading: const Icon(Icons.privacy_tip_outlined),
+                        title: const Text(AppStrings.privacyPolicy),
+                        trailing: const Icon(Icons.chevron_right_rounded),
+                        enabled: !busy,
+                        onTap: busy ? null : () => _openPrivacy(context),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  _AccountSectionCard(
+                    title: AppStrings.accountSectionDanger,
+                    children: [
+                      ListTile(
+                        leading: Icon(
+                          Icons.delete_forever_rounded,
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                        title: Text(
+                          AppStrings.deleteAccount,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.error,
+                          ),
+                        ),
+                        enabled: !busy,
+                        onTap: busy ? null : () => _confirmDelete(context),
+                      ),
+                    ],
                   ),
                 ],
               ),
           };
         },
+      ),
+    );
+  }
+}
+
+class _AccountSectionCard extends StatelessWidget {
+  const _AccountSectionCard({required this.title, required this.children});
+
+  final String title;
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 4),
+            child: Text(
+              title,
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
+            ),
+          ),
+          ...children,
+        ],
+      ),
+    );
+  }
+}
+
+class _AccountErrorBanner extends StatelessWidget {
+  const _AccountErrorBanner({required this.message});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Material(
+      color: scheme.errorContainer,
+      borderRadius: BorderRadius.circular(12),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Text(
+          message,
+          textAlign: TextAlign.center,
+          style: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.copyWith(color: scheme.onErrorContainer),
+        ),
       ),
     );
   }
