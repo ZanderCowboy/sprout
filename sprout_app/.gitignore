@@ -12,6 +12,10 @@
 .swiftpm/
 migrate_working_dir/
 
+!sprout_app/lib/core/config/app_environment.dart
+.cursor/agent-store/notes.md
+.idea/caches/
+
 # IntelliJ related
 *.iml
 *.ipr

@@ -1,0 +1,20 @@
+{
+    "terminal.integrated.env.osx": {
+        "GH_CONFIG_DIR": "${env:HOME}/.config/gh-zandercowboy"
+    },
+    "workbench.colorCustomizations": {
+        "activityBar.background": "#4A2215",
+        "titleBar.activeBackground": "#68301E",
+        "titleBar.inactiveBackground": "#4A2215",
+        "statusBar.background": "#823C25",
+        "statusBar.debuggingBackground": "#823C25",
+        "statusBar.noFolderBackground": "#823C25",
+        "activityBar.foreground": "#FFFFFF",
+        "activityBar.inactiveForeground": "#FFFFFF",
+        "titleBar.activeForeground": "#FFFFFF",
+        "titleBar.inactiveForeground": "#FFFFFF",
+        "statusBar.foreground": "#FFFFFF",
+        "statusBar.debuggingForeground": "#FFFFFF",
+        "statusBar.noFolderForeground": "#FFFFFF"
+    }
+}
