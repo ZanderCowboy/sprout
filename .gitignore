@@ -8,6 +8,10 @@
 .history
 *.DS_Store
 
+# IDE caches and agent scratch
+.idea/caches/
+.cursor/agent-store/
+
 # Secrets and Config
 .secrets
 /config/
