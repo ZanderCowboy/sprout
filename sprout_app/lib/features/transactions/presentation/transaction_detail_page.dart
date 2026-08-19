@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:sprout/core/core.dart';
 import 'package:sprout/core/di/service_locator.dart';
 import 'package:sprout/features/accounts/export.dart';
 import 'package:sprout/features/goals/export.dart';
-import 'package:sprout/features/transactions/presentation/recurring_payments_page.dart';
 import 'package:sprout/features/transactions/export.dart';
 import 'bloc/transaction_detail_bloc.dart';
 import 'utils/transaction_frequency_label.dart';
@@ -164,11 +164,7 @@ class _TransactionDetailBodyState extends State<_TransactionDetailBody> {
               alignment: Alignment.centerLeft,
               child: FilledButton.icon(
                 onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute<void>(
-                      builder: (_) => const RecurringPaymentsPage(),
-                    ),
-                  );
+                  context.push(AppRoute.recurring.path);
                 },
                 icon: const Icon(Icons.autorenew_rounded),
                 label: const Text('Manage recurring payments'),

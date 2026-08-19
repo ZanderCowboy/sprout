@@ -10,15 +10,14 @@ import 'package:sprout/features/transactions/export.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../application/goals_service.dart';
 import '../domain/goal.dart';
-import '../domain/goal_progress.dart';
 import 'goal_detail_bloc.dart';
 import 'utils/goal_growth_chart.dart';
 import 'goal_form_sheet.dart';
 
 class GoalDetailPage extends StatefulWidget {
-  const GoalDetailPage({super.key, required this.progress});
+  const GoalDetailPage({super.key, required this.goalId});
 
-  final GoalProgress progress;
+  final String goalId;
 
   @override
   State<GoalDetailPage> createState() => _GoalDetailPageState();
@@ -30,13 +29,13 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
     super.initState();
   }
 
-  Future<void> _edit() async {
-    final goal = await showModalBottomSheet<Goal>(
+  Future<void> _edit(Goal goal) async {
+    final updated = await showModalBottomSheet<Goal>(
       context: context,
       isScrollControlled: true,
-      builder: (_) => GoalFormSheet(initial: widget.progress.goal, defaultColor: Color(widget.progress.goal.color)),
+      builder: (_) => GoalFormSheet(initial: goal, defaultColor: Color(goal.color)),
     );
-    if (goal != null && mounted) {}
+    if (updated != null && mounted) {}
   }
 
   Future<void> _delete() async {
@@ -52,7 +51,7 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
       ),
     );
     if (ok == true && mounted) {
-      await sl<GoalsService>().removeGoal(widget.progress.goal.id);
+      await sl<GoalsService>().removeGoal(widget.goalId);
       if (mounted) Navigator.of(context).pop();
     }
   }
@@ -63,7 +62,7 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
       isScrollControlled: true,
       showDragHandle: true,
       builder: (_) => DepositBottomSheet(
-        initialGoalId: widget.progress.goal.id,
+        initialGoalId: widget.goalId,
         initialMode: DepositBottomSheetMode.fullDepositToGoal,
         lockGoalSelection: true,
         forceQuickGoalDepositUi: true,
@@ -115,29 +114,37 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
         goalsService: sl<GoalsService>(),
         transactionsService: sl<TransactionsService>(),
         accountsService: sl<AccountsService>(),
-      )..add(GoalDetailSubscriptionRequested(goalId: widget.progress.goal.id)),
+      )..add(GoalDetailSubscriptionRequested(goalId: widget.goalId)),
       child: BlocBuilder<GoalDetailBloc, GoalDetailState>(
         builder: (context, state) {
-          final progress = switch (state) {
-            GoalDetailReady s => s.progress,
-            _ => widget.progress,
-          };
+          if (state is! GoalDetailReady) {
+            return Scaffold(
+              appBar: AppBar(
+                actions: [
+                  IconButton(
+                    icon: const Icon(Icons.delete_outline_rounded),
+                    onPressed: _delete,
+                  ),
+                ],
+              ),
+              body: const Center(child: CircularProgressIndicator()),
+            );
+          }
+          final progress = state.progress;
           final g = progress.goal;
 
           return Scaffold(
             appBar: AppBar(
               title: Text(g.name),
               actions: [
-                IconButton(icon: const Icon(Icons.edit_rounded), onPressed: _edit),
+                IconButton(
+                  icon: const Icon(Icons.edit_rounded),
+                  onPressed: () => _edit(g),
+                ),
                 IconButton(icon: const Icon(Icons.delete_outline_rounded), onPressed: _delete),
               ],
             ),
-            body: () {
-              if (state is! GoalDetailReady) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              final ready = state;
-              return RefreshIndicator(
+            body: RefreshIndicator(
                 onRefresh: () async {
                   await sl<GoalsService>().pullRemote();
                   await sl<TransactionsService>().pullRemote();
@@ -183,8 +190,8 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                       goalColor: Color(g.color),
                       goalCreatedAt: g.createdAt,
                       goalTargetCents: g.targetAmountCents,
-                      points: ready.graphPoints,
-                      prediction: ready.prediction,
+                      points: state.graphPoints,
+                      prediction: state.prediction,
                     ),
                     const SizedBox(height: 18),
                     Row(
@@ -195,23 +202,23 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                             style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                           ),
                         ),
-                        if (ready.transactions.any((t) => TransactionDisplay.isPendingByDate(t, DateTime.now())))
+                        if (state.transactions.any((t) => TransactionDisplay.isPendingByDate(t, DateTime.now())))
                           TextButton.icon(
-                            onPressed: () => _clearScheduledForGoal(ready, goalId: g.id),
+                            onPressed: () => _clearScheduledForGoal(state, goalId: g.id),
                             icon: const Icon(Icons.delete_outline_rounded),
                             label: const Text('Clear scheduled'),
                           ),
                       ],
                     ),
                     const SizedBox(height: 12),
-                    if (ready.transactions.isEmpty)
+                    if (state.transactions.isEmpty)
                       Text('No deposits toward this goal yet.', style: Theme.of(context).textTheme.bodyMedium)
                     else
                       ...(() {
                         final now = DateTime.now();
                         final scheduled = <Transaction>[];
                         final history = <Transaction>[];
-                        for (final t in ready.transactions) {
+                        for (final t in state.transactions) {
                           if (TransactionDisplay.isPendingByDate(t, now)) {
                             scheduled.add(t);
                           } else {
@@ -232,7 +239,7 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                               ),
                             ),
                             ...items.map((t) {
-                              final accName = ready.accountsById[t.accountId]?.name ?? 'Unknown account';
+                              final accName = state.accountsById[t.accountId]?.name ?? 'Unknown account';
                               final style = mapTransactionToListStyle(t: t, now: now);
                               return Card(
                                 margin: const EdgeInsets.only(bottom: 8),
@@ -269,8 +276,7 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                       })(),
                   ],
                 ),
-              );
-            }(),
+              ),
           );
         },
       ),

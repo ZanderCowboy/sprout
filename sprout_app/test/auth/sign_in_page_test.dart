@@ -5,11 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hive/hive.dart';
 import 'package:sprout/core/config/app_config.dart';
 import 'package:sprout/core/config/app_environment.dart';
 import 'package:sprout/core/constants/app_strings.dart';
 import 'package:sprout/core/di/service_locator.dart';
+import 'package:sprout/core/router/app_route.dart';
 import 'package:sprout/core/storage/hive_adapters.dart';
 import 'package:sprout/core/theme/app_theme.dart';
 import 'package:sprout/core/user/user_context.dart';
@@ -165,9 +167,24 @@ void main() {
     });
 
     await tester.pumpWidget(
-      MaterialApp(
-        theme: buildAppTheme(),
-        home: BlocProvider.value(value: cubit, child: const SignInPage()),
+      BlocProvider.value(
+        value: cubit,
+        child: MaterialApp.router(
+          theme: buildAppTheme(),
+          routerConfig: GoRouter(
+            initialLocation: AppRoute.signIn.path,
+            routes: [
+              GoRoute(
+                path: AppRoute.signIn.path,
+                builder: (context, _) => const SignInPage(),
+              ),
+              GoRoute(
+                path: AppRoute.terms.path,
+                builder: (context, _) => const TermsPage(),
+              ),
+            ],
+          ),
+        ),
       ),
     );
 

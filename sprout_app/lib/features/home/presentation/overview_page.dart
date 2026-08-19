@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
+import '../../../core/router/app_route.dart';
 import '../../../core/utils/date_format.dart';
 import '../../../core/utils/money_format.dart';
 import '../../accounts/presentation/account_form_sheet.dart';
 import '../../goals/presentation/goals_bloc.dart';
 import '../../goals/presentation/create_goal_screen.dart';
-import '../../shell/presentation/shell_page.dart';
 import '../../shell/presentation/deposit_bottom_sheet.dart';
 import '../../transactions/domain/transaction.dart';
 import 'home_bloc.dart';
@@ -122,9 +123,7 @@ class OverviewPage extends StatelessWidget {
                             totalSavedCents: totalSavedCents,
                             totalTargetCents: totalTargetCents,
                             totalRemainingCents: totalRemainingCents,
-                            onTap: () {
-                              ShellPage.maybeOf(context)?.setTabIndex(2);
-                            },
+                            onTap: () => context.go(AppRoute.goals.path),
                           );
                         },
                       ),

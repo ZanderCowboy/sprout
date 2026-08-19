@@ -10,16 +10,16 @@ import '../domain/account.dart';
 import 'account_form_sheet.dart';
 
 class AccountDetailPage extends StatefulWidget {
-  const AccountDetailPage({super.key, required this.account});
+  const AccountDetailPage({super.key, required this.accountId});
 
-  final Account account;
+  final String accountId;
 
   @override
   State<AccountDetailPage> createState() => _AccountDetailPageState();
 }
 
 class _AccountDetailPageState extends State<AccountDetailPage> {
-  late Account _account;
+  Account? _account;
   List<Transaction> _tx = [];
   Map<String, Goal> _goals = {};
   bool _loading = true;
@@ -30,16 +30,34 @@ class _AccountDetailPageState extends State<AccountDetailPage> {
   @override
   void initState() {
     super.initState();
-    _account = widget.account;
     _load();
   }
 
   Future<void> _load() async {
     setState(() => _loading = true);
-    final txs = await _txService.getForAccount(_account.id);
+    final accounts = await sl<AccountsService>().getAccounts();
+    Account? account;
+    for (final a in accounts) {
+      if (a.id == widget.accountId) {
+        account = a;
+        break;
+      }
+    }
+    if (account == null) {
+      if (!mounted) return;
+      setState(() {
+        _account = null;
+        _tx = [];
+        _goals = {};
+        _loading = false;
+      });
+      return;
+    }
+    final txs = await _txService.getForAccount(account.id);
     final goals = await _goalsService.getGoals();
     if (!mounted) return;
     setState(() {
+      _account = account;
       _tx = txs;
       _goals = {for (final g in goals) g.id: g};
       _loading = false;
@@ -47,10 +65,12 @@ class _AccountDetailPageState extends State<AccountDetailPage> {
   }
 
   Future<void> _edit() async {
+    final account = _account;
+    if (account == null) return;
     final updated = await showModalBottomSheet<Account>(
       context: context,
       isScrollControlled: true,
-      builder: (_) => AccountFormSheet(initial: _account, defaultColor: Color(_account.color)),
+      builder: (_) => AccountFormSheet(initial: account, defaultColor: Color(account.color)),
     );
     if (updated != null && mounted) {
       setState(() => _account = updated);
@@ -58,6 +78,8 @@ class _AccountDetailPageState extends State<AccountDetailPage> {
   }
 
   Future<void> _delete() async {
+    final account = _account;
+    if (account == null) return;
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -73,18 +95,20 @@ class _AccountDetailPageState extends State<AccountDetailPage> {
       ),
     );
     if (ok == true && mounted) {
-      await sl<AccountsService>().removeAccount(_account.id);
+      await sl<AccountsService>().removeAccount(account.id);
       if (mounted) Navigator.of(context).pop();
     }
   }
 
   Future<void> _openDeposit() async {
+    final account = _account;
+    if (account == null) return;
     await showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
       builder: (_) => DepositBottomSheet(
-        initialAccountId: _account.id,
+        initialAccountId: account.id,
         initialMode: DepositBottomSheetMode.depositToAccountThenAllocate,
         lockAccountSelection: true,
         forceQuickAccountDepositUi: true,
@@ -126,6 +150,18 @@ class _AccountDetailPageState extends State<AccountDetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    final account = _account;
+    if (account == null) {
+      return Scaffold(
+        appBar: AppBar(),
+        body: Center(
+          child: _loading
+              ? const CircularProgressIndicator()
+              : const Text('Account not found.'),
+        ),
+      );
+    }
+
     final now = DateTime.now();
 
     int computeAccountDepositTotalCents(Iterable<Transaction> txs) {
@@ -155,7 +191,7 @@ class _AccountDetailPageState extends State<AccountDetailPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(_account.name),
+        title: Text(account.name),
         actions: [
           IconButton(icon: const Icon(Icons.edit_rounded), onPressed: _edit),
           IconButton(icon: const Icon(Icons.delete_outline_rounded), onPressed: _delete),
@@ -169,7 +205,7 @@ class _AccountDetailPageState extends State<AccountDetailPage> {
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
                 children: [
                   DetailDepositCallout(
-                    accentColor: Color(_account.color),
+                    accentColor: Color(account.color),
                     caption: AppStrings.addDepositCaptionAccount,
                     onPressed: _openDeposit,
                   ),

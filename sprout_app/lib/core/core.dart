@@ -2,6 +2,8 @@ export 'config/app_config.dart';
 export 'config/app_environment.dart';
 export 'constants/constants.dart';
 export 'error/error.dart';
+export 'router/app_redirect.dart';
+export 'router/app_route.dart';
 export 'routing/app_tab.dart';
 export 'theme/app_theme.dart';
 export 'user/user_context.dart';

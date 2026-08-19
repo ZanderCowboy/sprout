@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:sprout/core/core.dart';
 import 'package:sprout/ui/export.dart';
 import '../../home/presentation/home_bloc.dart';
-import 'account_detail_page.dart';
 
 class AccountsPage extends StatelessWidget {
   const AccountsPage({super.key});
@@ -75,9 +75,7 @@ class AccountsPage extends StatelessWidget {
                       subtitle: subtitleLines.join('\n'),
                       color: Color(a.color),
                       onTap: () {
-                        Navigator.of(
-                          context,
-                        ).push(MaterialPageRoute<void>(builder: (_) => AccountDetailPage(account: a)));
+                        context.push(AppRoute.accountDetail.location(id: a.id));
                       },
                       trailing: Icon(Icons.chevron_right_rounded, color: scheme.onSurfaceVariant),
                     );

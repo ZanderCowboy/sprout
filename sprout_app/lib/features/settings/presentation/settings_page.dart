@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:sprout/core/core.dart';
 import 'package:sprout/features/auth/export.dart';
 import 'package:sprout/features/purchases/presentation/premium_paywall_helper.dart';
 import 'package:purchases_ui_flutter/purchases_ui_flutter.dart';
-import 'package:sprout/features/transactions/presentation/recurring_payments_page.dart';
-import 'package:sprout/features/transactions/presentation/transactions_page.dart';
-import 'package:sprout/features/budget/presentation/budget_planner_screen.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -89,9 +87,7 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   void _openAccount() {
-    Navigator.of(
-      context,
-    ).push(MaterialPageRoute<void>(builder: (_) => const AccountPage()));
+    context.push(AppRoute.account.path);
   }
 
   @override
@@ -141,13 +137,7 @@ class _SettingsPageState extends State<SettingsPage> {
             title: const Text(AppStrings.transactions),
             subtitle: const Text('View all deposits and allocations'),
             trailing: const Icon(Icons.chevron_right_rounded),
-            onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                  builder: (_) => const TransactionsPage(),
-                ),
-              );
-            },
+            onTap: () => context.push(AppRoute.transactions.path),
           ),
           const Divider(height: 1),
           ListTile(
@@ -155,13 +145,7 @@ class _SettingsPageState extends State<SettingsPage> {
             title: const Text('Recurring payments'),
             subtitle: const Text('View, edit, or cancel recurring deposits'),
             trailing: const Icon(Icons.chevron_right_rounded),
-            onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                  builder: (_) => const RecurringPaymentsPage(),
-                ),
-              );
-            },
+            onTap: () => context.push(AppRoute.recurring.path),
           ),
           const Divider(height: 1),
           ListTile(
@@ -169,13 +153,7 @@ class _SettingsPageState extends State<SettingsPage> {
             title: const Text('Master Budget'),
             subtitle: const Text('Plan income and expenses (static template)'),
             trailing: const Icon(Icons.chevron_right_rounded),
-            onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                  builder: (_) => const BudgetPlannerScreen(),
-                ),
-              );
-            },
+            onTap: () => context.push(AppRoute.budget.path),
           ),
           const Divider(height: 1),
           ListTile(

@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:sprout/core/core.dart';
-import 'package:sprout/features/settings/presentation/settings_page.dart';
 import 'package:sprout/features/shell/shell.dart';
 import 'package:sprout/ui/export.dart';
-import 'goal_detail_page.dart';
 import 'goals_bloc.dart';
 import 'enums/goals_sort.dart';
 import 'utils/goals_sorting.dart';
@@ -112,13 +111,7 @@ class _GoalsPageState extends State<GoalsPage> {
                       IconButton(
                         tooltip: 'Settings',
                         icon: const Icon(Icons.settings_outlined),
-                        onPressed: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute<void>(
-                              builder: (_) => const SettingsPage(),
-                            ),
-                          );
-                        },
+                        onPressed: () => context.go(AppRoute.settings.path),
                       ),
                     ],
                   ),
@@ -187,11 +180,7 @@ class _GoalsPageState extends State<GoalsPage> {
                             '${g.name}\nSaved: ${formatZarFromCents(p.savedCents)} / ${formatZarFromCents(g.targetAmountCents)}',
                         color: Color(g.color),
                         onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute<void>(
-                              builder: (_) => GoalDetailPage(progress: p),
-                            ),
-                          );
+                          context.push(AppRoute.goalDetail.location(id: g.id));
                         },
                         trailing: SizedBox(
                           width: 56,

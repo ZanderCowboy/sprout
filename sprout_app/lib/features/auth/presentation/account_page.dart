@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:sprout/core/constants/app_strings.dart';
+import 'package:sprout/core/router/app_route.dart';
 import 'package:sprout/features/auth/domain/auth_user.dart';
 import 'package:sprout/features/auth/presentation/bloc/auth_cubit.dart';
-import 'package:sprout/features/auth/presentation/terms_page.dart';
 import 'package:sprout/features/auth/presentation/utils/account_identity_labels.dart';
 
 class AccountPage extends StatelessWidget {
@@ -69,9 +70,7 @@ class AccountPage extends StatelessWidget {
   }
 
   void _openTerms(BuildContext context) {
-    Navigator.of(
-      context,
-    ).push(MaterialPageRoute<void>(builder: (_) => const TermsPage()));
+    context.push(AppRoute.terms.path);
   }
 
   @override

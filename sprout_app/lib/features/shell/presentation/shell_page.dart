@@ -1,36 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:sprout/core/core.dart';
 import 'package:sprout/features/accounts/export.dart';
 import 'package:sprout/features/connectivity/export.dart';
 import 'package:sprout/features/goals/export.dart';
-import 'package:sprout/features/home/export.dart';
-import 'package:sprout/features/settings/presentation/settings_page.dart';
 import 'package:sprout/ui/export.dart';
 import 'deposit_bottom_sheet.dart';
 
-class ShellPage extends StatefulWidget {
-  const ShellPage({super.key});
+class ShellPage extends StatelessWidget {
+  const ShellPage({super.key, required this.navigationShell});
 
-  static ShellPageState? maybeOf(BuildContext context) {
-    return context.findAncestorStateOfType<ShellPageState>();
-  }
+  final StatefulNavigationShell navigationShell;
 
-  @override
-  State<ShellPage> createState() => ShellPageState();
-}
-
-class ShellPageState extends State<ShellPage> {
-  int _pageIndex = 0;
-
-  void setTabIndex(int index) {
-    if (!mounted) return;
-    if (index == _pageIndex) return;
-    setState(() => _pageIndex = index);
-  }
-
-  void _openActions() {
+  void _openActions(BuildContext context) {
     showModalBottomSheet<void>(
       context: context,
       showDragHandle: true,
@@ -87,6 +71,8 @@ class ShellPageState extends State<ShellPage> {
 
   @override
   Widget build(BuildContext context) {
+    final pageIndex = navigationShell.currentIndex;
+
     return BlocBuilder<ConnectivityCubit, bool>(
       builder: (context, online) {
         return Scaffold(
@@ -124,10 +110,7 @@ class ShellPageState extends State<ShellPage> {
               Expanded(
                 child: SafeArea(
                   bottom: false,
-                  child: IndexedStack(
-                    index: _pageIndex,
-                    children: const [OverviewPage(), AccountsPage(), GoalsPage(), SettingsPage()],
-                  ),
+                  child: navigationShell,
                 ),
               ),
             ],
@@ -144,42 +127,42 @@ class ShellPageState extends State<ShellPage> {
                   children: [
                     Expanded(
                       child: _ShellTabItem(
-                        selected: _pageIndex == 0,
+                        selected: pageIndex == 0,
                         icon: Icons.grid_view_outlined,
                         selectedIcon: Icons.grid_view_rounded,
                         label: AppStrings.tabOverview,
-                        onTap: () => setState(() => _pageIndex = 0),
+                        onTap: () => navigationShell.goBranch(0),
                       ),
                     ),
                     Expanded(
                       child: _ShellTabItem(
-                        selected: _pageIndex == 1,
+                        selected: pageIndex == 1,
                         icon: Icons.account_balance_wallet_outlined,
                         selectedIcon: Icons.account_balance_wallet_rounded,
                         label: AppStrings.tabAccounts,
-                        onTap: () => setState(() => _pageIndex = 1),
+                        onTap: () => navigationShell.goBranch(1),
                       ),
                     ),
                     Padding(
                       padding: const EdgeInsets.only(bottom: 20),
-                      child: EnticingAddButton(onPressed: _openActions),
+                      child: EnticingAddButton(onPressed: () => _openActions(context)),
                     ),
                     Expanded(
                       child: _ShellTabItem(
-                        selected: _pageIndex == 2,
+                        selected: pageIndex == 2,
                         icon: Icons.flag_outlined,
                         selectedIcon: Icons.flag_rounded,
                         label: AppStrings.tabGoals,
-                        onTap: () => setState(() => _pageIndex = 2),
+                        onTap: () => navigationShell.goBranch(2),
                       ),
                     ),
                     Expanded(
                       child: _ShellTabItem(
-                        selected: _pageIndex == 3,
+                        selected: pageIndex == 3,
                         icon: Icons.settings_outlined,
                         selectedIcon: Icons.settings_rounded,
                         label: AppStrings.tabSettings,
-                        onTap: () => setState(() => _pageIndex = 3),
+                        onTap: () => navigationShell.goBranch(3),
                       ),
                     ),
                   ],

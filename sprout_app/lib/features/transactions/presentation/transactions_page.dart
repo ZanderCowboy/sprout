@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:sprout/core/core.dart';
 import 'package:sprout/core/di/service_locator.dart';
@@ -160,11 +161,7 @@ class _TransactionCard extends StatelessWidget {
         opacity: style.opacity,
         child: InkWell(
           onTap: () {
-            Navigator.of(context).push(
-              MaterialPageRoute<void>(
-                builder: (_) => TransactionDetailPage(transactionId: t.id),
-              ),
-            );
+            context.push(AppRoute.transactionDetail.location(id: t.id));
           },
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
