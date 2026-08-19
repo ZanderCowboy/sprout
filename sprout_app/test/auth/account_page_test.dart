@@ -18,11 +18,10 @@ import 'package:sprout/core/user/user_context.dart';
 import 'package:sprout/features/accounts/export.dart';
 import 'package:sprout/features/auth/application/auth_service.dart';
 import 'package:sprout/features/auth/application/privacy_policy_service.dart';
-import 'package:sprout/features/auth/application/terms_of_service_service.dart';
+import 'package:sprout/features/auth/domain/auth_user.dart';
+import 'package:sprout/features/auth/presentation/account_page.dart';
 import 'package:sprout/features/auth/presentation/bloc/auth_cubit.dart';
 import 'package:sprout/features/auth/presentation/privacy_page.dart';
-import 'package:sprout/features/auth/presentation/sign_in_page.dart';
-import 'package:sprout/features/auth/presentation/terms_page.dart';
 import 'package:sprout/features/budget/export.dart';
 import 'package:sprout/features/goals/export.dart';
 import 'package:sprout/features/sync/export.dart';
@@ -44,7 +43,7 @@ void main() {
   late AuthCubit cubit;
 
   setUpAll(() {
-    tempDir = Directory.systemTemp.createTempSync('sprout_sign_in_');
+    tempDir = Directory.systemTemp.createTempSync('sprout_account_');
     Hive.init(tempDir.path);
     registerHiveAdapters();
   });
@@ -57,7 +56,14 @@ void main() {
     transactionsBox = await Hive.openBox<TransactionHiveModel>('tx_$stamp');
     pendingBox = await Hive.openBox<PendingSyncHiveModel>('pending_$stamp');
     settingsBox = await Hive.openBox<dynamic>('settings_$stamp');
-    fakeAuth = FakeAuthRepository();
+    fakeAuth = FakeAuthRepository(
+      initialUser: const AuthUser(
+        id: 'u1',
+        isAnonymous: false,
+        email: 'ada@example.com',
+        displayName: 'Ada',
+      ),
+    );
     cubit = AuthCubit(
       authService: AuthService(
         authRepository: fakeAuth,
@@ -104,101 +110,7 @@ void main() {
     }
   });
 
-  testWidgets('sign-in form is shown when unsigned', (tester) async {
-    await tester.pumpWidget(
-      MaterialApp(
-        theme: buildAppTheme(),
-        home: BlocProvider.value(value: cubit, child: const SignInPage()),
-      ),
-    );
-
-    expect(find.text('Send code'), findsOneWidget);
-    expect(find.text('Continue with Google'), findsOneWidget);
-    expect(find.text(AppStrings.termsOfService), findsOneWidget);
-    expect(find.text(AppStrings.privacyPolicy), findsOneWidget);
-    expect(find.text(AppStrings.displayNameOptional), findsNothing);
-  });
-
-  testWidgets('back button calls onBackToIntro', (tester) async {
-    var back = false;
-    await tester.pumpWidget(
-      MaterialApp(
-        theme: buildAppTheme(),
-        home: BlocProvider.value(
-          value: cubit,
-          child: SignInPage(onBackToIntro: () => back = true),
-        ),
-      ),
-    );
-
-    await tester.tap(find.byType(BackButton));
-    expect(back, isTrue);
-  });
-
-  testWidgets('optional display name appears after sending email OTP', (
-    tester,
-  ) async {
-    await tester.pumpWidget(
-      MaterialApp(
-        theme: buildAppTheme(),
-        home: BlocProvider.value(value: cubit, child: const SignInPage()),
-      ),
-    );
-
-    expect(find.text(AppStrings.displayNameOptional), findsNothing);
-
-    await tester.enterText(find.byType(TextField).first, 'user@example.com');
-    await tester.tap(find.text('Send code'));
-    await tester.pump();
-
-    expect(find.text(AppStrings.displayNameOptional), findsOneWidget);
-    expect(find.text('Continue with Google'), findsOneWidget);
-  });
-
-  testWidgets('Terms hyperlink opens TermsPage', (tester) async {
-    sl.registerSingleton<TermsOfServiceService>(
-      TermsOfServiceService(
-        remoteConfig: FakeRemoteConfigService(),
-        assetBundle: _FakeAssetBundle({
-          TermsOfServiceService.bundledAssetPath:
-              '# Bundled Terms\n\nLocal placeholder.',
-        }),
-      ),
-    );
-    addTearDown(() async {
-      await sl.reset(dispose: false);
-    });
-
-    await tester.pumpWidget(
-      BlocProvider.value(
-        value: cubit,
-        child: MaterialApp.router(
-          theme: buildAppTheme(),
-          routerConfig: GoRouter(
-            initialLocation: AppRoute.signIn.path,
-            routes: [
-              GoRoute(
-                path: AppRoute.signIn.path,
-                builder: (context, _) => const SignInPage(),
-              ),
-              GoRoute(
-                path: AppRoute.terms.path,
-                builder: (context, _) => const TermsPage(),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-
-    await tester.tap(find.text(AppStrings.termsOfService));
-    await tester.pumpAndSettle();
-
-    expect(find.byType(TermsPage), findsOneWidget);
-    expect(find.textContaining('Local placeholder.'), findsOneWidget);
-  });
-
-  testWidgets('Privacy hyperlink opens PrivacyPage', (tester) async {
+  testWidgets('Privacy row opens PrivacyPage', (tester) async {
     sl.registerSingleton<PrivacyPolicyService>(
       PrivacyPolicyService(
         remoteConfig: FakeRemoteConfigService(),
@@ -218,11 +130,11 @@ void main() {
         child: MaterialApp.router(
           theme: buildAppTheme(),
           routerConfig: GoRouter(
-            initialLocation: AppRoute.signIn.path,
+            initialLocation: AppRoute.account.path,
             routes: [
               GoRoute(
-                path: AppRoute.signIn.path,
-                builder: (context, _) => const SignInPage(),
+                path: AppRoute.account.path,
+                builder: (context, _) => const AccountPage(),
               ),
               GoRoute(
                 path: AppRoute.privacy.path,
@@ -233,6 +145,7 @@ void main() {
         ),
       ),
     );
+    await tester.pumpAndSettle();
 
     await tester.tap(find.text(AppStrings.privacyPolicy));
     await tester.pumpAndSettle();

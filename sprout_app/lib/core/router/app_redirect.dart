@@ -48,5 +48,6 @@ bool _isSafeInternalFrom(String from) {
   return from != AppRoute.signIn.path &&
       from != AppRoute.intro.path &&
       from != AppRoute.loading.path &&
-      from != AppRoute.terms.path;
+      from != AppRoute.terms.path &&
+      from != AppRoute.privacy.path;
 }

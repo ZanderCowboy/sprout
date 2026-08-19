@@ -73,6 +73,10 @@ class AccountPage extends StatelessWidget {
     context.push(AppRoute.terms.path);
   }
 
+  void _openPrivacy(BuildContext context) {
+    context.push(AppRoute.privacy.path);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -149,6 +153,14 @@ class AccountPage extends StatelessWidget {
                     trailing: const Icon(Icons.chevron_right_rounded),
                     enabled: !busy,
                     onTap: busy ? null : () => _openTerms(context),
+                  ),
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: const Icon(Icons.privacy_tip_outlined),
+                    title: const Text(AppStrings.privacyPolicy),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    enabled: !busy,
+                    onTap: busy ? null : () => _openPrivacy(context),
                   ),
                   const SizedBox(height: 24),
                   ListTile(

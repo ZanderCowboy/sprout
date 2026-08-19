@@ -3,6 +3,7 @@ enum AppRoute {
   intro('/intro'),
   signIn('/sign-in'),
   terms('/terms'),
+  privacy('/privacy'),
   overview('/overview'),
   accounts('/accounts'),
   accountDetail('/accounts/:id'),
@@ -29,7 +30,7 @@ enum AppRoute {
     return path;
   }
 
-  static const unsignedAllowed = <AppRoute>{intro, signIn, terms};
+  static const unsignedAllowed = <AppRoute>{intro, signIn, terms, privacy};
 
   static bool isUnsignedAllowed(String location) {
     return unsignedAllowed.any((route) => route.path == location);

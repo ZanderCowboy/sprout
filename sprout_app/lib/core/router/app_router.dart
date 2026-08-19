@@ -11,6 +11,7 @@ import 'package:sprout/features/accounts/export.dart';
 import 'package:sprout/features/auth/presentation/account_page.dart';
 import 'package:sprout/features/auth/presentation/bloc/auth_cubit.dart';
 import 'package:sprout/features/auth/presentation/intro_page.dart';
+import 'package:sprout/features/auth/presentation/privacy_page.dart';
 import 'package:sprout/features/auth/presentation/sign_in_page.dart';
 import 'package:sprout/features/auth/presentation/terms_page.dart';
 import 'package:sprout/features/budget/presentation/budget_planner_screen.dart';
@@ -70,6 +71,10 @@ GoRouter createAppRouter({
       GoRoute(
         path: AppRoute.terms.path,
         builder: (context, state) => const TermsPage(),
+      ),
+      GoRoute(
+        path: AppRoute.privacy.path,
+        builder: (context, state) => const PrivacyPage(),
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {

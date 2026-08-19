@@ -71,7 +71,7 @@ void main() {
       expect(redirect, '${AppRoute.signIn.path}?from=%2Foverview');
     });
 
-    test('unsigned with intro can stay on sign-in, intro, and terms', () {
+    test('unsigned with intro can stay on sign-in, intro, terms, and privacy', () {
       expect(
         resolveAuthRedirect(
           auth: guest,
@@ -93,6 +93,14 @@ void main() {
           auth: guest,
           introCompleted: true,
           location: AppRoute.terms.path,
+        ),
+        isNull,
+      );
+      expect(
+        resolveAuthRedirect(
+          auth: guest,
+          introCompleted: true,
+          location: AppRoute.privacy.path,
         ),
         isNull,
       );

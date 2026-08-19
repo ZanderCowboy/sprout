@@ -32,7 +32,7 @@ Tick here as you go. Each open item jumps to the step below.
 - [ ] [Sign-out keeps local data](#3-device-test-google-main-goal-for-tonight)
 - [x] [Re-login with Google works](#3-device-test-google-main-goal-for-tonight)
 - [x] [Optional cleanup](#5-optional-cleanup-dev-only): delete old anonymous users / orphaned rows
-- [ ] [Paste Terms into Firebase Remote Config](#7-terms-of-service-firebase-remote-config-dev)
+- [ ] [Paste Terms and Privacy into Firebase Remote Config](#7-terms-and-privacy-firebase-remote-config-dev)
 - [ ] [Apply delete-account migration](#8-delete-account-rpc-dev) on the **dev** Supabase project
 
 
@@ -181,19 +181,22 @@ Walkthrough if you ever need to redo it (or set up **prod**): [RESEND_SMTP_SUPAB
 
 
 
-### 7. Terms of Service (Firebase Remote Config, dev)
+### 7. Terms and Privacy (Firebase Remote Config, dev)
 
-The app shows Terms **in-app** (not a website). Markdown is loaded from Firebase Remote Config string `terms_of_service`. Until that parameter exists (or the device is offline / RC setup is skipped), it uses the current Terms draft bundled in [`sprout_app/assets/legal/terms.md`](../sprout_app/assets/legal/terms.md). Paste **that same markdown** into RC so fetched clients stay in sync with the bundle.
+The app shows Terms and the Privacy Policy **in-app** (not a website). Markdown is loaded from Firebase Remote Config strings `terms_of_service` and `privacy_policy`. Until those parameters exist (or the device is offline / RC setup is skipped), it uses the current drafts bundled in [`sprout_app/assets/legal/terms.md`](../sprout_app/assets/legal/terms.md) and [`sprout_app/assets/legal/privacy.md`](../sprout_app/assets/legal/privacy.md). Paste **that same markdown** into RC so fetched clients stay in sync with the bundle.
+
+A public Privacy Policy at `https://privacy.stackmint.app/` is intended later (you own DNS/hosting). Until then, the in-app version is current.
 
 **Where:** [Firebase → sprout-app-development → Remote Config](https://console.firebase.google.com/project/sprout-app-development/config)
 
-1. Add parameter **`terms_of_service`** (type **String**).
-2. Paste the markdown from `sprout_app/assets/legal/terms.md`.
+1. Add parameter **`terms_of_service`** (type **String**). Paste the markdown from `sprout_app/assets/legal/terms.md`.
+2. Add parameter **`privacy_policy`** (type **String**). Paste the markdown from `sprout_app/assets/legal/privacy.md`.
 3. Publish the changes.
 
-Prod keeps the bundled file until prod Firebase Remote Config is turned on.
+Prod keeps the bundled files until prod Firebase Remote Config is turned on.
 
 - [ ] Dev Remote Config: `terms_of_service` string published
+- [ ] Dev Remote Config: `privacy_policy` string published
 
 ---
 
@@ -487,7 +490,7 @@ If `APP_CONFIG_DEV_BASE64` is missing, CI still builds with a **placeholder** co
 4. Startup failure: **Retry only** — no Continue local-only.
 5. Providers: email OTP + Google on Android. No Apple / iOS yet.
 6. Email OTP: optional **display name** (saved to `user_metadata.display_name`). Google: use the Google profile name already in metadata; do not ask again.
-7. Sign-in agrees to **in-app Terms** (tappable link on the sign-in screen). Markdown comes from Firebase Remote Config `terms_of_service`, with bundled [`sprout_app/assets/legal/terms.md`](../sprout_app/assets/legal/terms.md) as fallback.
+7. Sign-in agrees to **in-app Terms and Privacy Policy** (tappable links on the sign-in screen; Account has the same rows). Markdown comes from Firebase Remote Config `terms_of_service` and `privacy_policy`, with bundled [`sprout_app/assets/legal/terms.md`](../sprout_app/assets/legal/terms.md) and [`sprout_app/assets/legal/privacy.md`](../sprout_app/assets/legal/privacy.md) as fallback.
 8. **Delete account** (in-app, Play requirement) calls `public.delete_own_account()` which deletes `auth.users` for `auth.uid()`. Cloud rows cascade. Local Hive entity boxes and pending sync are cleared; `intro_completed` stays. RevenueCat `logOut` runs if Purchases is configured. Sign-out then returns to the sign-in gate. **Premium / Play billing is separate** — deletion does not cancel or refund a subscription.
 
 Config shape: [supabase/README.md](../supabase/README.md).
@@ -498,7 +501,7 @@ Config shape: [supabase/README.md](../supabase/README.md).
 
 ## Deferred (not now)
 
-- Magic link deep links / Android intent-filters  
+- OS / magic-link deep links: Android intent-filters, Digital Asset Links, App Links / custom scheme, Additional Redirect URLs in Supabase. In-app paths already live on go_router (`AppRoute`); content URLs should reuse those paths. Auth magic-link callbacks must use a **distinct** path (not `/sign-in` or `/overview`) so `supabase_flutter` can handle them.
 - Apple / iOS  
 - Email + password + 2FA  
 - Prod auth console pass (after dev Google works)

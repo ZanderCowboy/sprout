@@ -62,6 +62,9 @@ abstract final class AppStrings {
       'If you subscribe to Premium, deletion does not cancel or refund Play '
       'billing. Manage or cancel Premium separately.';
   static const String termsOfService = 'Terms of Service';
+  static const String privacyPolicy = 'Privacy Policy';
   static const String byContinuingYouAgree = 'By continuing you agree to the';
+  static const String and = 'and';
   static const String termsLoadFailed = 'Could not load Terms of Service.';
+  static const String privacyLoadFailed = 'Could not load Privacy Policy.';
 }

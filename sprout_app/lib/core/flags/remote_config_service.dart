@@ -10,6 +10,9 @@ import 'package:sprout/core/flags/remote_feature_flag.dart';
 abstract final class RemoteConfigKeys {
   /// Markdown Terms of Service. Empty default falls back to the bundled asset.
   static const termsOfService = 'terms_of_service';
+
+  /// Markdown Privacy Policy. Empty default falls back to the bundled asset.
+  static const privacyPolicy = 'privacy_policy';
 }
 
 /// Owns Firebase + Remote Config setup, separate from reading flag values.
@@ -56,6 +59,7 @@ class RemoteConfigService {
         for (final flag in RemoteFeatureFlag.values)
           flag.key: flag.defaultValue,
         RemoteConfigKeys.termsOfService: '',
+        RemoteConfigKeys.privacyPolicy: '',
       });
       _remoteConfigReady = true;
     } on Object catch (e) {

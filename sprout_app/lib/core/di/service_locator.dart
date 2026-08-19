@@ -38,6 +38,9 @@ Future<void> configureDependencies({
   sl.registerLazySingleton<TermsOfServiceService>(
     () => TermsOfServiceService(remoteConfig: sl()),
   );
+  sl.registerLazySingleton<PrivacyPolicyService>(
+    () => PrivacyPolicyService(remoteConfig: sl()),
+  );
 
   sl.registerSingleton<Box<AccountHiveModel>>(accountsBox);
   sl.registerSingleton<Box<GoalHiveModel>>(goalsBox);

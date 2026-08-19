@@ -42,3 +42,4 @@ flutter:
     - assets/config/development.json
     - assets/config/production.json
     - assets/legal/terms.md
+    - assets/legal/privacy.md

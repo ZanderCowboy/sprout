@@ -41,6 +41,10 @@ class _SignInPageState extends State<SignInPage> {
     context.push(AppRoute.terms.path);
   }
 
+  void _openPrivacy() {
+    context.push(AppRoute.privacy.path);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -194,6 +198,24 @@ class _SignInPageState extends State<SignInPage> {
                               onTap: _openTerms,
                               child: Text(
                                 AppStrings.termsOfService,
+                                style: Theme.of(context).textTheme.bodySmall
+                                    ?.copyWith(
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.primary,
+                                      decoration: TextDecoration.underline,
+                                    ),
+                              ),
+                            ),
+                          ),
+                          const TextSpan(text: ' ${AppStrings.and} '),
+                          WidgetSpan(
+                            alignment: PlaceholderAlignment.baseline,
+                            baseline: TextBaseline.alphabetic,
+                            child: GestureDetector(
+                              onTap: _openPrivacy,
+                              child: Text(
+                                AppStrings.privacyPolicy,
                                 style: Theme.of(context).textTheme.bodySmall
                                     ?.copyWith(
                                       color: Theme.of(
