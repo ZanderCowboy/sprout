@@ -6,11 +6,9 @@ import '../domain/auth_repository.dart';
 import '../domain/auth_user.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
-  AuthRepositoryImpl({
-    SupabaseClient? supabase,
-    GoogleSignIn? googleSignIn,
-  })  : _supabase = supabase,
-        _googleSignIn = googleSignIn;
+  AuthRepositoryImpl({SupabaseClient? supabase, GoogleSignIn? googleSignIn})
+    : _supabase = supabase,
+      _googleSignIn = googleSignIn;
 
   final SupabaseClient? _supabase;
   final GoogleSignIn? _googleSignIn;

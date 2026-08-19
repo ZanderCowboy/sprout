@@ -12,7 +12,7 @@ Tick here as you go. Each open item jumps to the step below.
 
 ### Done (dev)
 
-- [x] Flutter auth (OTP UI, Google, sync gate, sign-out)
+- [x] Flutter auth (OTP UI, Google, sync gate, sign-out, **required sign-in after intro**)
 - [x] Dev Supabase URL + anon key in `development.json`
 - [x] Migrations applied (dev)
 - [x] Google provider enabled in Supabase (dev) with Web Client ID + secret
@@ -138,11 +138,11 @@ Email OTP already works. Google does not use SMTP or email templates.
 
 1. Run **development** flavor (VS Code **Sprout · dev · …**, or
   `flutter run --flavor development -t lib/main_development.dart`).
-2. Settings → **Account** → **Continue with Google**.
-3. Pick a Google account → should end signed in (email shown, Sign out available).
+2. Fresh install: intro → **Sign in** → **Continue with Google**. Later launches skip intro and land on sign-in.
+3. Pick a Google account → should end signed in (overview, not the sign-in form).
 4. Create a local account/goal while signed in → data should sync to Supabase (check Table Editor).
-5. Sign out → local data still there; sync off.
-6. Sign in with Google again → same user, data still there.
+5. Settings → **Account** → Sign out → back on sign-in, not an empty overview.
+6. Sign in with Google again → same user, cloud data still there.
 
 - [x] Google sign-in works on device (dev)
 - [ ] Sign-out keeps local data
@@ -162,7 +162,7 @@ Walkthrough if you ever need to redo it (or set up **prod**): [RESEND_SMTP_SUPAB
 
 - [x] Custom SMTP on **dev** Supabase
 - [x] Magic link template includes `{{ .Token }}`
-- [x] App: Settings → Account → send code → enter 6 digits → signed in
+- [x] App: intro → sign-in → send code → enter 6 digits → signed in
 
 ---
 
@@ -383,7 +383,7 @@ Email OTP is independent of package id. If Google fails, check **Logs → Auth**
 
 1. On the device: Settings → Apps → uninstall **Sprout** / **[DEV] Sprout** that was the old package (or uninstall both, then reinstall).
 2. Run development flavor: `flutter run --flavor development -t lib/main_development.dart` (or **Sprout · dev · …**).
-3. Repeat [step 3](#3-device-test-google-main-goal-for-tonight): Account → Google → signed in → sync → sign out keeps data → Google again.
+3. Repeat [step 3](#3-device-test-google-main-goal-for-tonight): intro or sign-in → Google → signed in → sync → sign out returns to sign-in → Google again.
 
 **Play Console (later, when you publish):** create the store listing with package `app.stackmint.sprout` **only**. Never create a Play app under `co.za.zanderkotze…`. Full publish steps: [PLAY_PUBLISH_PROD_ANDROID.md](PLAY_PUBLISH_PROD_ANDROID.md). Dev builds stay on Firebase App Distribution (`app.stackmint.sprout.dev` is not a Play app).
 
@@ -442,9 +442,11 @@ If `APP_CONFIG_DEV_BASE64` is missing, CI still builds with a **placeholder** co
 
 ## Locked product rules (short)
 
-1. Guest = local Hive only; sync only after verified (non-anonymous) session.
-2. Providers: email OTP + Google on Android. No Apple / iOS yet.
-3. Sign-out keeps local data. Switching to a different verified account replaces local Hive then pulls remote.
+1. **No guest mode.** First launch shows a custom intro, then sign-in. Later unsigned launches skip intro and land on sign-in. The shell is not reachable until there is a verified (non-anonymous) session.
+2. After sign-in: **discard leftover guest Hive** (do not migrate it onto the new uid), then pull cloud. Same-account re-login: keep local cache, flush pending, pull. Different verified account: clear Hive + pending, then pull.
+3. Sign-out: session only; return to sign-in. Local cache stays for that uid until a different account signs in.
+4. Startup failure: **Retry only** — no Continue local-only.
+5. Providers: email OTP + Google on Android. No Apple / iOS yet.
 
 Config shape: [supabase/README.md](../supabase/README.md).
 

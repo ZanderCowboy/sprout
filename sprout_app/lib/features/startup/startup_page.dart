@@ -57,10 +57,9 @@ class StartupPage extends StatelessWidget {
               const SizedBox(height: 16),
               Text(
                 'Config: $configAssetPath',
-                style: Theme.of(context)
-                    .textTheme
-                    .bodySmall
-                    ?.copyWith(color: Colors.white70),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodySmall?.copyWith(color: Colors.white70),
               ),
               const SizedBox(height: 16),
               Expanded(
@@ -99,16 +98,25 @@ class _StepTile extends StatelessWidget {
     final icon = switch (status) {
       StartupStepStatus.pending => const Icon(Icons.circle_outlined, size: 18),
       StartupStepStatus.running => const SizedBox(
-          width: 18,
-          height: 18,
-          child: CircularProgressIndicator(strokeWidth: 2),
-        ),
-      StartupStepStatus.done =>
-        const Icon(Icons.check_circle, size: 18, color: Colors.greenAccent),
-      StartupStepStatus.skipped =>
-        const Icon(Icons.remove_circle_outline, size: 18, color: Colors.white54),
-      StartupStepStatus.failed =>
-        const Icon(Icons.error, size: 18, color: Colors.redAccent),
+        width: 18,
+        height: 18,
+        child: CircularProgressIndicator(strokeWidth: 2),
+      ),
+      StartupStepStatus.done => const Icon(
+        Icons.check_circle,
+        size: 18,
+        color: Colors.greenAccent,
+      ),
+      StartupStepStatus.skipped => const Icon(
+        Icons.remove_circle_outline,
+        size: 18,
+        color: Colors.white54,
+      ),
+      StartupStepStatus.failed => const Icon(
+        Icons.error,
+        size: 18,
+        color: Colors.redAccent,
+      ),
     };
 
     return ListTile(
@@ -121,10 +129,9 @@ class _StepTile extends StatelessWidget {
               detail!,
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodySmall
-                  ?.copyWith(color: Colors.white70),
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(color: Colors.white70),
             ),
     );
   }
@@ -140,9 +147,7 @@ String _labelFor(StartupStep step) {
     StartupStep.configureDI => 'Configuring services',
     StartupStep.resolveUser => 'Resolving user',
     StartupStep.configurePurchases => 'Configuring purchases',
-    StartupStep.migrateUserIds => 'Migrating user data',
     StartupStep.flushPending => 'Flushing pending sync',
     StartupStep.pullRemote => 'Pulling remote data',
   };
 }
-

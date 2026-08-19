@@ -15,7 +15,7 @@ The human is product owner / tester only. The agent is the sole coder.
 1. **Clarify product intent** — ask only questions that change behavior, scope, or UX. Skip implementation how-tos.
 2. **Plan briefly when needed** — trade-offs, files touched, risks. Get approval if the change is large or irreversible.
 3. **Implement fully** — write/edit all code yourself. Run tooling yourself.
-4. **Verify** — analyze, tests, or targeted checks as appropriate for the change.
+4. **Verify** — analyze, tests, or targeted checks as appropriate. If tests fail or hang, finish and report; do not loop on them until asked.
 5. **Hand back for human QA** — describe what to tap/verify on device; do not ask them to change code.
 
 ## What to ask the human

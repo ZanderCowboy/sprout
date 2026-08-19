@@ -10,7 +10,6 @@ import 'package:sprout/core/di/service_locator.dart';
 import 'package:sprout/core/flags/remote_config_service.dart';
 import 'package:sprout/core/flags/remote_feature_flag.dart';
 import 'package:sprout/core/storage/hive_adapters.dart';
-import 'package:sprout/core/storage/migrate_hive_user_id_to_auth.dart';
 import 'package:sprout/core/user/user_context.dart';
 import 'package:sprout/features/accounts/export.dart';
 import 'package:sprout/features/auth/export.dart';
@@ -28,7 +27,6 @@ enum StartupStep {
   configureDI,
   resolveUser,
   configurePurchases,
-  migrateUserIds,
   flushPending,
   pullRemote,
 }
@@ -36,11 +34,7 @@ enum StartupStep {
 enum StartupStepStatus { pending, running, done, skipped, failed }
 
 abstract class StartupProgressReporter {
-  void update(
-    StartupStep step,
-    StartupStepStatus status, {
-    String? detail,
-  });
+  void update(StartupStep step, StartupStepStatus status, {String? detail});
 
   /// Called after Remote Config activates (or defaults are applied).
   void onShowStartupChecks(bool enabled);
@@ -71,10 +65,12 @@ Future<void> initializeApp({
   final accountsBox = await Hive.openBox<AccountHiveModel>(HiveBoxes.accounts);
   final goalsBox = await Hive.openBox<GoalHiveModel>(HiveBoxes.goals);
   final budgetGroupsBox = await _openBudgetGroupsBox();
-  final transactionsBox =
-      await Hive.openBox<TransactionHiveModel>(HiveBoxes.transactions);
-  final pendingSyncBox =
-      await Hive.openBox<PendingSyncHiveModel>(HiveBoxes.pendingSync);
+  final transactionsBox = await Hive.openBox<TransactionHiveModel>(
+    HiveBoxes.transactions,
+  );
+  final pendingSyncBox = await Hive.openBox<PendingSyncHiveModel>(
+    HiveBoxes.pendingSync,
+  );
   reporter.update(StartupStep.openBoxes, StartupStepStatus.done);
 
   reporter.update(StartupStep.loadConfig, StartupStepStatus.running);
@@ -165,29 +161,10 @@ Future<void> initializeApp({
   final userId = await sl<UserContext>().resolveUserId();
   reporter.update(StartupStep.resolveUser, StartupStepStatus.done);
 
-  await _configurePurchases(
-    config: config,
-    userId: userId,
-    reporter: reporter,
-  );
+  await _configurePurchases(config: config, userId: userId, reporter: reporter);
 
   final authService = sl<AuthService>();
   final canSync = authService.canSync;
-
-  reporter.update(StartupStep.migrateUserIds, StartupStepStatus.running);
-  final verifiedUser = authService.currentUser;
-  if (canSync && verifiedUser != null) {
-    await migrateHiveUserIdsToAuthUser(
-      authUserId: verifiedUser.id,
-      accounts: sl(),
-      goals: sl(),
-      budgetGroups: sl(),
-      transactions: sl(),
-    );
-    reporter.update(StartupStep.migrateUserIds, StartupStepStatus.done);
-  } else {
-    reporter.update(StartupStep.migrateUserIds, StartupStepStatus.skipped);
-  }
 
   if (canSync) {
     reporter.update(StartupStep.flushPending, StartupStepStatus.running);

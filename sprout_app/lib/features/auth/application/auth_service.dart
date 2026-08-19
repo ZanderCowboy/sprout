@@ -1,7 +1,6 @@
 import 'package:hive_flutter/hive_flutter.dart';
 
 import 'package:sprout/core/error/error.dart';
-import 'package:sprout/core/storage/migrate_hive_user_id_to_auth.dart';
 import 'package:sprout/core/user/user_context.dart';
 import 'package:sprout/features/accounts/export.dart';
 import 'package:sprout/features/budget/export.dart';
@@ -22,15 +21,15 @@ class AuthService {
     required PendingSyncQueue pendingSyncQueue,
     required Future<void> Function() flushPending,
     required Future<void> Function() pullRemote,
-  })  : _authRepository = authRepository,
-        _userContext = userContext,
-        _accountsBox = accountsBox,
-        _goalsBox = goalsBox,
-        _budgetGroupsBox = budgetGroupsBox,
-        _transactionsBox = transactionsBox,
-        _pendingSyncQueue = pendingSyncQueue,
-        _flushPending = flushPending,
-        _pullRemote = pullRemote;
+  }) : _authRepository = authRepository,
+       _userContext = userContext,
+       _accountsBox = accountsBox,
+       _goalsBox = goalsBox,
+       _budgetGroupsBox = budgetGroupsBox,
+       _transactionsBox = transactionsBox,
+       _pendingSyncQueue = pendingSyncQueue,
+       _flushPending = flushPending,
+       _pullRemote = pullRemote;
 
   final AuthRepository _authRepository;
   final UserContext _userContext;
@@ -76,7 +75,8 @@ class AuthService {
   /// Clears the Supabase session and keeps local Hive data / active_user_id.
   Future<void> signOut() => _authRepository.signOut();
 
-  /// Applies guest migrate / account switch / same-uid rules, then syncs.
+  /// Same-uid re-login keeps the cache and flushes pending, then pulls.
+  /// Any other bind discards leftover local Hive and pulls cloud only.
   Future<void> bindAfterVerifiedSignIn(AuthUser user) async {
     if (!user.isVerified) {
       throw const AuthAppException('Verified session required.');
@@ -84,7 +84,6 @@ class AuthService {
 
     final newUid = user.id;
     final previousUid = _userContext.cachedUserId;
-    final lastVerified = _userContext.lastVerifiedUserId;
 
     if (previousUid == newUid) {
       await _userContext.setActiveUserId(newUid);
@@ -94,28 +93,9 @@ class AuthService {
       return;
     }
 
-    final switchingVerifiedAccount =
-        lastVerified != null && lastVerified.isNotEmpty && lastVerified != newUid;
-
-    if (switchingVerifiedAccount) {
-      await _clearLocalEntityData();
-      await _userContext.setActiveUserId(newUid);
-      await _userContext.markVerifiedUserId(newUid);
-      await _pullRemote();
-      return;
-    }
-
-    // Guest local uuid → new verified uid: rewrite rows, then flush + pull.
-    await migrateHiveUserIdsToAuthUser(
-      authUserId: newUid,
-      accounts: _accountsBox,
-      goals: _goalsBox,
-      budgetGroups: _budgetGroupsBox,
-      transactions: _transactionsBox,
-    );
+    await _clearLocalEntityData();
     await _userContext.setActiveUserId(newUid);
     await _userContext.markVerifiedUserId(newUid);
-    await _flushPending();
     await _pullRemote();
   }
 

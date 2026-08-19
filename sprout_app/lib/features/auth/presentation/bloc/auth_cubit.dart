@@ -62,14 +62,14 @@ final class AuthViewGuest extends AuthViewState {
 
   @override
   List<Object?> get props => [
-        supabaseConfigured,
-        googleAvailable,
-        email,
-        otpSent,
-        busy,
-        errorMessage,
-        infoMessage,
-      ];
+    supabaseConfigured,
+    googleAvailable,
+    email,
+    otpSent,
+    busy,
+    errorMessage,
+    infoMessage,
+  ];
 }
 
 final class AuthViewSignedIn extends AuthViewState {
@@ -101,12 +101,10 @@ final class AuthViewSignedIn extends AuthViewState {
 }
 
 class AuthCubit extends Cubit<AuthViewState> {
-  AuthCubit({
-    required AuthService authService,
-    required AppConfig appConfig,
-  })  : _authService = authService,
-        _appConfig = appConfig,
-        super(const AuthViewLoading()) {
+  AuthCubit({required AuthService authService, required AppConfig appConfig})
+    : _authService = authService,
+      _appConfig = appConfig,
+      super(const AuthViewLoading()) {
     _subscription = _authService.authStateChanges().listen(_onAuthChanged);
     _emitFromCurrent();
   }
@@ -234,12 +232,7 @@ class AuthCubit extends Cubit<AuthViewState> {
       _emitFromCurrent();
     } on AppException catch (e) {
       if (isClosed) return;
-      emit(
-        current.copyWith(
-          busy: false,
-          errorMessage: e.toFailure().message,
-        ),
-      );
+      emit(current.copyWith(busy: false, errorMessage: e.toFailure().message));
     } on Object catch (e) {
       if (isClosed) return;
       emit(current.copyWith(busy: false, errorMessage: e.toString()));

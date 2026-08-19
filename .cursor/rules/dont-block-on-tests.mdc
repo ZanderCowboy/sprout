@@ -1,0 +1,24 @@
+---
+description: Do not stall a feature on failing or hanging tests — finish the work and report
+alwaysApply: true
+---
+
+# Do not block on failing tests
+
+Failing, hanging, or flaky tests must **not** delay finishing the requested work.
+
+## Hard rules
+
+- Implement the feature/fix to completion. Do not spend the session iterating on one stubborn test.
+- Run tests once (or a short targeted retry). If they fail or hang: **stop**, ship the implementation, and tell the human what failed.
+- The human decides whether to fix tests, skip them, or ignore them. Do not keep retrying until asked.
+- Never let `flutter test` / analyze loops eat the rest of the task. Kill hung test runs and move on.
+- Still write reasonable tests when the plan asks for them. Leaving a known-bad test hanging the suite is worse than omitting that case and reporting it.
+
+## Report
+
+When handing back, say plainly:
+
+- what landed
+- which checks passed
+- which tests failed or were skipped (name + one-line reason)

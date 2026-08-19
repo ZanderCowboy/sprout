@@ -40,10 +40,8 @@ void main() {
     final stamp = DateTime.now().microsecondsSinceEpoch;
     accountsBox = await Hive.openBox<AccountHiveModel>('accounts_$stamp');
     goalsBox = await Hive.openBox<GoalHiveModel>('goals_$stamp');
-    budgetGroupsBox =
-        await Hive.openBox<BudgetGroupHiveModel>('budget_$stamp');
-    transactionsBox =
-        await Hive.openBox<TransactionHiveModel>('tx_$stamp');
+    budgetGroupsBox = await Hive.openBox<BudgetGroupHiveModel>('budget_$stamp');
+    transactionsBox = await Hive.openBox<TransactionHiveModel>('tx_$stamp');
     pendingBox = await Hive.openBox<PendingSyncHiveModel>('pending_$stamp');
     settingsBox = await Hive.openBox<dynamic>('settings_$stamp');
     fakeAuth = FakeAuthRepository();
@@ -84,7 +82,7 @@ void main() {
     }
   });
 
-  test('guest sign-in migrates local Hive userIds then flush+pull', () async {
+  test('first sign-in clears leftover local then pull', () async {
     final localUid = await userContext.resolveUserId();
     final now = DateTime.now().millisecondsSinceEpoch;
     await accountsBox.put(
@@ -98,6 +96,9 @@ void main() {
         updatedAtMillis: now,
       ),
     );
+    await PendingSyncQueue(
+      pendingBox,
+    ).enqueue(PendingSyncOperationType.upsertAccount, '{}');
 
     final user = await authService.verifyEmailOtp(
       email: 'guest@example.com',
@@ -105,10 +106,11 @@ void main() {
     );
 
     expect(user.id, 'verified-uid');
-    expect(accountsBox.get('a1')!.userId, 'verified-uid');
+    expect(accountsBox.isEmpty, isTrue);
+    expect(pendingBox.isEmpty, isTrue);
     expect(userContext.cachedUserId, 'verified-uid');
     expect(userContext.lastVerifiedUserId, 'verified-uid');
-    expect(flushCalls, 1);
+    expect(flushCalls, 0);
     expect(pullCalls, 1);
   });
 
@@ -154,20 +156,15 @@ void main() {
         updatedAtMillis: now,
       ),
     );
-    await PendingSyncQueue(pendingBox).enqueue(
-      PendingSyncOperationType.upsertAccount,
-      '{}',
-    );
+    await PendingSyncQueue(
+      pendingBox,
+    ).enqueue(PendingSyncOperationType.upsertAccount, '{}');
 
     fakeAuth.verifyOtpError = null;
     // Override default verify uid via setting user manually through custom flow.
     // Fake returns verified-uid; mark A as previous verified.
     await authService.bindAfterVerifiedSignIn(
-      const AuthUser(
-        id: 'user-b',
-        email: 'b@example.com',
-        isAnonymous: false,
-      ),
+      const AuthUser(id: 'user-b', email: 'b@example.com', isAnonymous: false),
     );
 
     expect(accountsBox.isEmpty, isTrue);
@@ -182,11 +179,7 @@ void main() {
     await userContext.setActiveUserId('verified-uid');
     await userContext.markVerifiedUserId('verified-uid');
     fakeAuth.setUser(
-      const AuthUser(
-        id: 'verified-uid',
-        email: 'a@b.com',
-        isAnonymous: false,
-      ),
+      const AuthUser(id: 'verified-uid', email: 'a@b.com', isAnonymous: false),
     );
     final now = DateTime.now().millisecondsSinceEpoch;
     await accountsBox.put(

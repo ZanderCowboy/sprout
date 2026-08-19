@@ -27,4 +27,5 @@ The human does **not** write or edit project code. Every code change, fix, refac
 - Never leave unfinished implementation with "you can add X later" — implement it or ask a product question.
 - If blocked on a human-only action, say exactly what they must do (one short step), then continue everything else yourself.
 - Prefer doing the work over explaining how the human would do it.
-- After changes, verify with the project's usual checks when reasonable; report what you ran and what still needs human device testing.
+- After changes, run the usual checks when reasonable; report what you ran and what still needs human device testing.
+- Do **not** stall a feature on failing or hanging tests — finish the work, report the failure, and wait for the human to ask for a test fix. See `.cursor/rules/dont-block-on-tests.mdc`.

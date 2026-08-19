@@ -4,12 +4,11 @@ import 'package:uuid/uuid.dart';
 
 const String _kUserIdKey = 'active_user_id';
 const String _kLastVerifiedUserIdKey = 'last_verified_user_id';
+const String _kIntroCompletedKey = 'intro_completed';
 
 class UserContext {
-  UserContext(
-    this._settingsBox, {
-    SupabaseClient? supabaseClient,
-  }) : _supabase = supabaseClient;
+  UserContext(this._settingsBox, {SupabaseClient? supabaseClient})
+    : _supabase = supabaseClient;
 
   final Box<dynamic> _settingsBox;
   final SupabaseClient? _supabase;
@@ -45,5 +44,15 @@ class UserContext {
 
   Future<void> markVerifiedUserId(String userId) async {
     await _settingsBox.put(_kLastVerifiedUserIdKey, userId);
+  }
+
+  bool _introCompleted = false;
+
+  bool get introCompleted =>
+      _introCompleted || _settingsBox.get(_kIntroCompletedKey) == true;
+
+  Future<void> markIntroCompleted() async {
+    _introCompleted = true;
+    await _settingsBox.put(_kIntroCompletedKey, true);
   }
 }

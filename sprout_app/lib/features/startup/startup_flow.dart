@@ -38,19 +38,15 @@ class _SproutBootstrapAppState extends State<SproutBootstrapApp>
   Object? _error;
   StackTrace? _stackTrace;
   bool _running = false;
-  bool _showStartupChecks =
-      RemoteFeatureFlag.showStartupChecks.defaultValue;
+  bool _showStartupChecks = RemoteFeatureFlag.showStartupChecks.defaultValue;
 
   @override
   void initState() {
     super.initState();
-    _runInit(allowSupabase: true, strictConfig: true);
+    _runInit();
   }
 
-  Future<void> _runInit({
-    required bool allowSupabase,
-    required bool strictConfig,
-  }) async {
+  Future<void> _runInit() async {
     if (_running) return;
     setState(() {
       _running = true;
@@ -69,8 +65,8 @@ class _SproutBootstrapAppState extends State<SproutBootstrapApp>
         configAssetPath: widget.configAssetPath,
         environment: widget.environment,
         reporter: this,
-        allowSupabase: allowSupabase,
-        strictConfig: strictConfig,
+        allowSupabase: true,
+        strictConfig: true,
       );
       if (!mounted) return;
       setState(() {
@@ -140,20 +136,15 @@ class _SproutBootstrapAppState extends State<SproutBootstrapApp>
               stackTrace: stack,
               steps: _steps,
               details: _details,
-              onRetry: _running
-                  ? null
-                  : () => _runInit(allowSupabase: true, strictConfig: true),
-              onContinueLocalOnly: _running
-                  ? null
-                  : () => _runInit(allowSupabase: false, strictConfig: false),
+              onRetry: _running ? null : _runInit,
             )
           : _showStartupChecks
-              ? StartupPage(
-                  configAssetPath: widget.configAssetPath,
-                  steps: _steps,
-                  details: _details,
-                )
-              : const StartupSplashPage(),
+          ? StartupPage(
+              configAssetPath: widget.configAssetPath,
+              steps: _steps,
+              details: _details,
+            )
+          : const StartupSplashPage(),
     );
   }
 }
