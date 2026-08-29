@@ -21,12 +21,11 @@ appId: app.stackmint.sprout.dev
     timeout: 15000
 
 # Verify empty state guidance is shown
-- assertVisible: "Welcome to Sprout"
+- assertVisible: "1. Add an account"
 
 # Step 1: Create an account
 - tapOn:
-    text: "New account"
-    index: 0  # First "New account" button in guidance steps
+    id: "overview_empty_new_account"
 
 - extendedWaitUntil:
     visible:
@@ -47,8 +46,7 @@ appId: app.stackmint.sprout.dev
 
 # Step 2: Create a goal
 - tapOn:
-    text: "New goal"
-    index: 0  # First "New goal" button in guidance
+    id: "overview_empty_new_goal"
 
 - extendedWaitUntil:
     visible:

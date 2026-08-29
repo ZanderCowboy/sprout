@@ -97,4 +97,6 @@ abstract final class AppStrings {
       'Create an account first to hold money for this goal.';
   static const String addDepositCaptionAccountAmountOnly =
       'Enter an amount — this deposit goes to the account as unallocated.';
+  static const String overviewEmptyDepositDisabled =
+      'Available after you add a goal.';
 }

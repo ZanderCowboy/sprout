@@ -21,7 +21,7 @@ appId: app.stackmint.sprout.dev
     timeout: 15000
 
 # Verify empty state guidance is shown
-- assertVisible: "Welcome to Sprout"
+- assertVisible: "1. Add an account"
 
 # The deposit button in the empty state is disabled with 0 accounts and 0 goals.
 # Instead, use the center + button to open the action sheet.

@@ -383,7 +383,15 @@ class _EmptyStateGuidance extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(AppStrings.overviewEmptyTitle, style: titleStyle),
+                Semantics(
+                  identifier: 'overview_empty_title',
+                  header: true,
+                  child: Text(
+                    AppStrings.overviewEmptyTitle,
+                    key: const Key('overview_empty_title'),
+                    style: titleStyle,
+                  ),
+                ),
                 const SizedBox(height: 20),
                 _GuidanceStep(
                   stepText: AppStrings.overviewEmptyStep1,
@@ -394,6 +402,8 @@ class _EmptyStateGuidance extends StatelessWidget {
                   scheme: scheme,
                   actionLabel: AppStrings.newAccount,
                   onAction: onOpenAccount,
+                  actionKey: const Key('overview_empty_new_account'),
+                  actionIdentifier: 'overview_empty_new_account',
                 ),
                 const SizedBox(height: 16),
                 _GuidanceStep(
@@ -406,6 +416,8 @@ class _EmptyStateGuidance extends StatelessWidget {
                   actionLabel: AppStrings.newGoal,
                   onAction: onOpenGoal,
                   enabled: true,
+                  actionKey: const Key('overview_empty_new_goal'),
+                  actionIdentifier: 'overview_empty_new_goal',
                 ),
                 const SizedBox(height: 16),
                 _GuidanceStep(
@@ -418,6 +430,9 @@ class _EmptyStateGuidance extends StatelessWidget {
                   actionLabel: AppStrings.deposit,
                   onAction: onOpenDeposit,
                   enabled: hasGoals,
+                  actionKey: const Key('overview_empty_deposit'),
+                  actionIdentifier: 'overview_empty_deposit',
+                  disabledCaption: hasGoals ? null : AppStrings.overviewEmptyDepositDisabled,
                 ),
               ],
             ),
@@ -439,6 +454,9 @@ class _GuidanceStep extends StatelessWidget {
     required this.actionLabel,
     required this.onAction,
     this.enabled = true,
+    this.actionKey,
+    this.actionIdentifier,
+    this.disabledCaption,
   });
 
   final String stepText;
@@ -450,6 +468,9 @@ class _GuidanceStep extends StatelessWidget {
   final String actionLabel;
   final VoidCallback onAction;
   final bool enabled;
+  final Key? actionKey;
+  final String? actionIdentifier;
+  final String? disabledCaption;
 
   @override
   Widget build(BuildContext context) {
@@ -466,19 +487,32 @@ class _GuidanceStep extends StatelessWidget {
               const SizedBox(height: 4),
               Text(detailText, style: detailStyle),
               const SizedBox(height: 8),
-              TextButton.icon(
-                onPressed: enabled ? onAction : null,
-                icon: Icon(Icons.add_rounded, size: 18),
-                label: Text(actionLabel),
-                style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              Semantics(
+                identifier: actionIdentifier,
+                child: TextButton.icon(
+                  key: actionKey,
+                  onPressed: enabled ? onAction : null,
+                  icon: Icon(Icons.add_rounded, size: 18),
+                  label: Text(actionLabel),
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  ),
                 ),
               ),
+              if (!enabled && disabledCaption != null) ...[
+                const SizedBox(height: 4),
+                Text(
+                  disabledCaption!,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: scheme.onSurfaceVariant,
+                        fontStyle: FontStyle.italic,
+                      ),
+                ),
+              ],
             ],
           ),
         ),
       ],
     );
   }
-}
 

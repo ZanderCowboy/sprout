@@ -22,14 +22,13 @@ appId: app.stackmint.sprout.dev
     timeout: 15000
 
 # ===== 1. Empty Overview =====
-- assertVisible: "Welcome to Sprout"
+- assertVisible: "1. Add an account"
 
 - takeScreenshot: tour-01-overview-empty
 
 # ===== 2. Create Account =====
 - tapOn:
-    text: "New account"
-    index: 0
+    id: "overview_empty_new_account"
 
 - assertVisible:
     text: "New account"
