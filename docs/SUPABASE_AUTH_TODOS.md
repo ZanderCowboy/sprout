@@ -160,12 +160,13 @@ If Google fails: wrong SHA-1 / wrong package on the Android OAuth client is the 
 
 ### 4. Email OTP (dev) — done
 
-Custom SMTP + Magic link template (`{{ .Token }}`) + in-app sign-in with the 6-digit code.
+Custom SMTP + Magic link **and** Confirm signup templates (`{{ .Token }}`) + in-app sign-in with the 6-digit code.
 
-Walkthrough if you ever need to redo it (or set up **prod**): [RESEND_SMTP_SUPABASE.md](RESEND_SMTP_SUPABASE.md).
+First-time emails use **Confirm signup** (default subject “Confirm your email address”). Returning emails use **Magic link**. Both need `{{ .Token }}`. Details: [RESEND_SMTP_SUPABASE.md](RESEND_SMTP_SUPABASE.md#5-magic-link-and-confirm-signup-templates-the-otp-body).
 
 - [x] Custom SMTP on **dev** Supabase
 - [x] Magic link template includes `{{ .Token }}`
+- [ ] Confirm signup template includes `{{ .Token }}` (same body as Magic link)
 - [x] App: intro → sign-in → send code → enter 6 digits → signed in
 
 ---

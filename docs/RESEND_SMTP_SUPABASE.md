@@ -35,6 +35,7 @@ You are **not** running a mail server. Resend is the server. Hostname `smtp.rese
 |      | Domain shows **Verified** in Resend               |
 |      | Custom SMTP filled in on **dev** Supabase         |
 |      | Magic link template includes `{{ .Token }}`       |
+|      | Confirm signup template includes `{{ .Token }}` (same body) |
 |      | App: send code → inbox → enter 6 digits → signed in |
 
 
@@ -172,13 +173,27 @@ Resend + Supabase guide: [Send emails using Supabase with SMTP](https://resend.c
 
 ---
 
-## 5. Magic link template (the OTP body)
+## 5. Magic link **and** Confirm signup templates (the OTP body)
 
-**Where:** same Supabase project → **Authentication** → **Email Templates** → **Magic link**.
+Supabase does **not** have a separate “OTP” template. Which email you get depends on whether the address already exists in **Authentication → Users**:
 
-Custom SMTP unlocks editing this on Free tier. Email OTP uses this template (not a separate “OTP” template).
+| Who | Template used | Typical subject |
+| --- | ------------- | --------------- |
+| Email **already** in `auth.users` (returning sign-in) | **Magic link** | whatever you set there (e.g. login code) |
+| Email **not** in `auth.users` yet (first sign-in / create) | **Confirm signup** | default: **Confirm your email address** |
 
-Do **not** include `{{ .ConfirmationURL }}` for v1 — the app only accepts the typed 6-digit code.
+Display name in the app does not change this. Name is saved **after** the code is verified.
+
+**Where:** same Supabase project → **Authentication** → **Email Templates**.
+
+You must edit **both**:
+
+1. **Magic link**
+2. **Confirm signup**
+
+Custom SMTP unlocks editing these on Free tier.
+
+Do **not** include `{{ .ConfirmationURL }}` for v1 — the app only accepts the typed 6-digit code. Clicking a confirm link will not sign them into the app.
 
 ### Subject
 
@@ -205,7 +220,9 @@ Paste this into the **Body** field. Keep `{{ .Token }}` exactly as written (spac
 </div>
 ```
 
-Save the template.
+Save. Repeat the **same** subject and body on **Confirm signup** so a brand-new email also gets the 6-digit code instead of a “confirm your email” link.
+
+If Confirm signup still has the default confirm-link copy, first-time sign-in will never look like the OTP email.
 
 ---
 
@@ -226,7 +243,7 @@ When dev OTP works:
 
 1. Same Resend domain/API key can be reused.
 2. Enable Custom SMTP on the **prod** Supabase project with the same host/user/password.
-3. Edit the **prod** Magic link template the same way (`{{ .Token }}`).
+3. Edit the **prod** Magic link **and** Confirm signup templates the same way (`{{ .Token }}`).
 4. Prefer a dedicated sender if you like (`noreply@…` is fine for both).
 
 ---

@@ -72,8 +72,9 @@ class AuthRepositoryImpl implements AuthRepository {
       throw const ValidationAppException('Enter the verification code.');
     }
     try {
-      final response = await _client.auth.verifyOTP(
-        type: OtpType.email,
+      // Existing users get Magic link (type email). First-time users with
+      // Confirm email enabled get Confirm signup (type signup).
+      final response = await _verifyEmailOrSignupOtp(
         email: normalizedEmail,
         token: normalizedToken,
       );
@@ -199,6 +200,25 @@ class AuthRepositoryImpl implements AuthRepository {
       throw AuthAppException(e.message);
     } on Object catch (e) {
       throw AuthAppException(e.toString());
+    }
+  }
+
+  Future<AuthResponse> _verifyEmailOrSignupOtp({
+    required String email,
+    required String token,
+  }) async {
+    try {
+      return await _client.auth.verifyOTP(
+        type: OtpType.email,
+        email: email,
+        token: token,
+      );
+    } on AuthException {
+      return _client.auth.verifyOTP(
+        type: OtpType.signup,
+        email: email,
+        token: token,
+      );
     }
   }
 
