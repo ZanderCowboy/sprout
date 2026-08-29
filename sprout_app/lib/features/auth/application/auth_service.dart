@@ -1,5 +1,7 @@
 import 'package:hive_flutter/hive_flutter.dart';
 
+import 'package:sprout/core/config/app_config.dart';
+import 'package:sprout/core/config/app_environment.dart';
 import 'package:sprout/core/error/error.dart';
 import 'package:sprout/core/user/user_context.dart';
 import 'package:sprout/features/accounts/export.dart';
@@ -18,6 +20,7 @@ class AuthService {
   AuthService({
     required AuthRepository authRepository,
     required UserContext userContext,
+    required AppConfig appConfig,
     required Box<AccountHiveModel> accountsBox,
     required Box<GoalHiveModel> goalsBox,
     required Box<BudgetGroupHiveModel> budgetGroupsBox,
@@ -28,6 +31,7 @@ class AuthService {
     Future<void> Function()? logOutPurchases,
   }) : _authRepository = authRepository,
        _userContext = userContext,
+       _appConfig = appConfig,
        _accountsBox = accountsBox,
        _goalsBox = goalsBox,
        _budgetGroupsBox = budgetGroupsBox,
@@ -39,6 +43,7 @@ class AuthService {
 
   final AuthRepository _authRepository;
   final UserContext _userContext;
+  final AppConfig _appConfig;
   final Box<AccountHiveModel> _accountsBox;
   final Box<GoalHiveModel> _goalsBox;
   final Box<BudgetGroupHiveModel> _budgetGroupsBox;
@@ -52,17 +57,22 @@ class AuthService {
 
   Stream<AuthUser?> authStateChanges() => _authRepository.authStateChanges();
 
-  /// Development-only: true when MAESTRO_BYPASS_AUTH=true at compile time.
-  bool get maestroBypassAuthEnabled => _kMaestroBypassAuth;
+  /// Development-only: true when MAESTRO_BYPASS_AUTH=true at compile time
+  /// AND the app is running in development flavor.
+  ///
+  /// Production flavor always returns false, even if the flag is set.
+  bool get maestroBypassAuthEnabled =>
+      _kMaestroBypassAuth && _appConfig.environment == AppEnvironment.development;
 
   /// Development-only: bypass OTP/Google and set up a stable local test user.
   ///
-  /// Only callable when [maestroBypassAuthEnabled] is true. Binds a stable
-  /// local-only user ID for Maestro tests.
+  /// Only callable when [maestroBypassAuthEnabled] is true (compile flag + dev flavor).
+  /// Binds a stable local-only user ID for Maestro tests.
   Future<void> bypassAuthForMaestro() async {
-    if (!_kMaestroBypassAuth) {
+    if (!maestroBypassAuthEnabled) {
       throw const AuthAppException(
-        'MAESTRO_BYPASS_AUTH not enabled. Pass --dart-define=MAESTRO_BYPASS_AUTH=true.',
+        'MAESTRO_BYPASS_AUTH not enabled or not in development flavor. '
+        'Pass --dart-define=MAESTRO_BYPASS_AUTH=true to development flavor builds.',
       );
     }
 

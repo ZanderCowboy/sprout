@@ -77,6 +77,7 @@ Future<void> configureDependencies({
     () => AuthService(
       authRepository: sl(),
       userContext: sl(),
+      appConfig: sl(),
       accountsBox: sl(),
       goalsBox: sl(),
       budgetGroupsBox: sl(),

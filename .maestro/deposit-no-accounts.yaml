@@ -17,11 +17,22 @@ appId: app.stackmint.sprout.dev
 - assertVisible:
     text: "Welcome to Sprout"
 
-# Try to open deposit before creating any accounts
+# The deposit button in the empty state is disabled with 0 accounts and 0 goals.
+# Instead, use the center + button to open the action sheet.
+# Tap the center + button (look for the gradient add button in the nav bar)
+- tapOn:
+    point: "50%,95%"  # Bottom center where the + button is located
+
+# Wait for action sheet to appear
+- assertVisible:
+    text: "What would you like to do?"
+    timeout: 3000
+
+# Tap "Deposit" in the action sheet
 - tapOn:
     text: "Deposit"
-    index: 0  # First deposit button in guidance
 
+# Should now see the "Create an account first" message
 - assertVisible:
     text: "Create an account first"
     timeout: 5000

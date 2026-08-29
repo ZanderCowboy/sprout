@@ -120,10 +120,15 @@ class AuthCubit extends Cubit<AuthViewState> {
 
   bool get _googleAvailable => _appConfig.isGoogleSignInConfigured;
 
-  /// Development-only: true when MAESTRO_BYPASS_AUTH compile flag is set.
+  /// Development-only: true when MAESTRO_BYPASS_AUTH compile flag is set
+  /// AND the app is running in development flavor.
+  ///
+  /// Production flavor always returns false, even if the flag is set.
   bool get maestroBypassAuthEnabled => _authService.maestroBypassAuthEnabled;
 
   /// Development-only: bypass OTP/Google and bind a stable test user.
+  ///
+  /// Only works in development flavor with MAESTRO_BYPASS_AUTH=true.
   Future<void> bypassAuthForMaestro() async {
     await _authService.bypassAuthForMaestro();
     // After bypass, emit SignedIn with a synthetic local user.
