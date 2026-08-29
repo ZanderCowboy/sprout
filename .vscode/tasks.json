@@ -1,0 +1,21 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Sprout · Firebase · distribute dev APK",
+      "detail": "Build development APK and upload to Firebase App Distribution",
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}/sprout_app"
+      },
+      "command": "set -euo pipefail; FIREBASE_APP_ID=\"${FIREBASE_APP_ID:-$(python3 -c \"import json; from pathlib import Path; data=json.loads(Path('android/app/src/development/google-services.json').read_text()); print(next(c['client_info']['mobilesdk_app_id'] for c in data['client'] if c['client_info']['android_client_info']['package_name']=='app.stackmint.sprout.dev'))\")}\"; flutter build apk --flavor development -t lib/main_development.dart && firebase appdistribution:distribute build/app/outputs/flutter-apk/app-development-release.apk --app \"$FIREBASE_APP_ID\" --groups default",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "focus": true
+      },
+      "problemMatcher": []
+    }
+  ]
+}

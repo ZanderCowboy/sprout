@@ -4,6 +4,25 @@ Watch your money grow and for those who want to reach their goals quickly.
 
 Flutter savings app (offline-first with Hive, optional Supabase sync) in [`sprout_app/`](sprout_app/).
 
+
+### Build and distribute the development APK
+
+Flavor name is `development` (not `dev` / `develop`). Flutter looks for `app-<flavor>-release.apk`, so a shortened flavor name builds the APK then fails to find it.
+
+From the repo root:
+
+```bash
+cd sprout_app && flutter build apk --release --flavor development -t lib/main_development.dart && firebase appdistribution:distribute build/app/outputs/flutter-apk/app-development-release.apk --app 1:549104397391:android:4a8ab133ed8a2d67978e3a --groups default
+```
+
+If the APK is already built, from the repo root:
+
+```bash
+firebase appdistribution:distribute sprout_app/build/app/outputs/flutter-apk/app-development-release.apk --app 1:549104397391:android:4a8ab133ed8a2d67978e3a --groups default
+```
+
+Or run the Cursor/VS Code task **Sprout · Firebase · distribute dev APK**.
+
 ## Prerequisites
 
 | Tool | Version |
@@ -68,7 +87,7 @@ Copy `apiKey` / `appId` / etc. from the flavor’s `google-services.json` into t
 
 Empty URL/key → **local-only** mode (Hive, no sync). Fill them for Supabase sync — use the **development** Supabase project in `development.json` and the **production** project in `production.json`.
 
-Empty `revenueCatAndroidApiKey` → RevenueCat is skipped at startup. On **development**, a Firebase Remote Config kill switch (`revenuecat_enabled`, default off) must also be `true` before `Purchases.configure` runs — see [RevenueCat foundation](docs/REVENUECAT.md). Production always skips configure for now.
+Empty `revenueCatAndroidApiKey` → RevenueCat is skipped at startup. On **development**, a Firebase Remote Config kill switch (`revenuecat_enabled`, default off) must also be `true` before `Purchases.configure` runs — see [RevenueCat foundation](docs/REVENUECAT.md). Production always skips configure for now. A `test_…` key is also skipped in **release/profile** (the SDK rejects Test Store outside debug).
 
 Optional overrides: `--dart-define=SUPABASE_URL=...`, `--dart-define=SUPABASE_ANON_KEY=...`, and `--dart-define=REVENUECAT_ANDROID_API_KEY=...`.
 
@@ -94,6 +113,7 @@ flutter test
 ## More docs
 
 - [GitHub CLI (personal account)](docs/GITHUB_CLI_PERSONAL.md) — `gh` as `ZanderCowboy` in this workspace only
+- [Firebase CLI (personal account)](docs/FIREBASE_CLI_PERSONAL.md) — `firebase` login isolated via `XDG_CONFIG_HOME`
 - [Firebase Dev Distribution (Android)](docs/FIREBASE_DEV_DISTRIBUTION.md) — CI APK builds and GitHub secrets
 - [Play Store publish (Android)](docs/PLAY_PUBLISH_PROD_ANDROID.md) — dispatch-only production AAB upload
 - [RevenueCat foundation](docs/REVENUECAT.md) — SDK configure, identity, Test Store catalog

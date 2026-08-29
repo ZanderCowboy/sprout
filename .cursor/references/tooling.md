@@ -44,3 +44,13 @@ export GH_CONFIG_DIR="$HOME/.config/gh-zandercowboy"
 ```
 
 Must be account `ZanderCowboy`, never work `Zander-K`. Details: `docs/GITHUB_CLI_PERSONAL.md`.
+
+## Firebase CLI
+
+Firebase has no `GH_CONFIG_DIR` flag; auth is `$XDG_CONFIG_HOME/configstore/firebase-tools.json`. Agent shells may not inherit workspace `XDG_CONFIG_HOME`. Before any `firebase` command:
+
+```bash
+export XDG_CONFIG_HOME="$HOME/.config/firebase-personal"
+```
+
+Must be the personal Google account for Sprout, not work. Details: `docs/FIREBASE_CLI_PERSONAL.md`.

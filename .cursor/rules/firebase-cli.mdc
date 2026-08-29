@@ -1,0 +1,14 @@
+---
+description: Firebase CLI login for this personal repo (isolated configstore)
+alwaysApply: false
+---
+
+# Firebase CLI
+
+Before any `firebase` command:
+
+```bash
+export XDG_CONFIG_HOME="$HOME/.config/firebase-personal"
+```
+
+Firebase has no `GH_CONFIG_DIR`-style flag; it stores auth in `$XDG_CONFIG_HOME/configstore/firebase-tools.json`. Use the personal Google account for Sprout, not a work login. Do not run `firebase login:use` against the default (work) config. Details: `docs/FIREBASE_CLI_PERSONAL.md`.

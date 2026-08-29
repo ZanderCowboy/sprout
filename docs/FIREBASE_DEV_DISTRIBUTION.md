@@ -15,6 +15,8 @@ Production Play uploads are documented separately in [PLAY_PUBLISH_PROD_ANDROID.
 
 Both can be installed on the same device. Only **development** uses Firebase App Distribution.
 
+Local `firebase` commands in this workspace use a personal config directory. See [FIREBASE_CLI_PERSONAL.md](FIREBASE_CLI_PERSONAL.md).
+
 ## Firebase App Distribution prereqs (development)
 
 1. In the **development** Firebase project, register the Android app with package `app.stackmint.sprout.dev`.

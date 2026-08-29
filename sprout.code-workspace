@@ -6,7 +6,8 @@
 	],
 	"settings": {
 		"terminal.integrated.env.osx": {
-			"GH_CONFIG_DIR": "${env:HOME}/.config/gh-zandercowboy"
+			"GH_CONFIG_DIR": "${env:HOME}/.config/gh-zandercowboy",
+			"XDG_CONFIG_HOME": "${env:HOME}/.config/firebase-personal"
 		},
 		"workbench.colorCustomizations": {
 			"activityBar.background": "#4A2215",
