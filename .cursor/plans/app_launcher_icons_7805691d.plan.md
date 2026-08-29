@@ -4,13 +4,13 @@ overview: Replace the default Flutter Android launcher with the selected seedlin
 todos:
   - id: prod-mipmaps
     content: Resize selected 1024 PNG into main mipmap-*/ic_launcher.png densities
-    status: pending
+    status: completed
   - id: dev-badge
     content: Create badged DEV 1024 master and development flavor mipmaps
-    status: pending
+    status: completed
   - id: docs
     content: Update APP_ICON_BRIEF.md with implemented status and asset paths
-    status: pending
+    status: completed
 isProject: false
 ---
 

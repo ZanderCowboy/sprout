@@ -1,9 +1,9 @@
 # Sprout app icon — creative brief
 
-**Status:** Concept selected — not yet the app launcher  
-**Date:** 2026-08-19  
-**Audience:** Another AI creating the launcher icon (human review after)  
-**Purpose:** Audit trail of the brief, generated concepts, and human selection.
+**Status:** Implemented on Android (production + development flavors)  
+**Date:** 2026-08-19 (wired 2026-08-29)  
+**Audience:** Audit trail of the brief, generated concepts, human selection, and launcher wiring  
+**Purpose:** Record how the mark was chosen and where it lives in the app.
 
 ## Decision log
 
@@ -12,15 +12,28 @@
 | 2026-08-19 | Brief | Commission a seedling-on-disc mark (teal `#0D9488`, lime `#BEF264`, slate `#0F172A`). |
 | 2026-08-19 | Image AI | Returned a 3-up sheet: (1) seedling on disc, (2) leaf-in-circle, (3) sprout from split seed. |
 | 2026-08-19 | Human | **Chose the top icon** — two-leaf seedling on a circular disc. |
+| 2026-08-29 | Agent | Wired the selected crop as the Android launcher. Production uses the unbadged mark; development overlays an amber **DEV** band (`#F59E0B` / `#0F172A`). Splash `launch_image` was not changed. No iOS/web set yet. |
 
 Archived artwork:
 
 - Full sheet: [`docs/branding/icon-sheet-2026-08-19.jpg`](branding/icon-sheet-2026-08-19.jpg)
-- Selected crop, 1024×1024: [`docs/branding/sprout-icon-selected-1024.png`](branding/sprout-icon-selected-1024.png)
+- Production master, 1024×1024: [`docs/branding/sprout-icon-selected-1024.png`](branding/sprout-icon-selected-1024.png)
+- Development master, 1024×1024: [`docs/branding/sprout-icon-dev-1024.png`](branding/sprout-icon-dev-1024.png)
 
 **Selected mark:** A two-leaf sapling from a thick circular disc (soil/coin). Teal-to-emerald leaves, lime highlight on the upper-right leaf tip, dark charcoal field. Soft 3D lighting, not flat vector. Not chosen: leaf-in-circle (bottom left) and cracked-seed sprout (bottom right).
 
-Current Android launcher is still the default Flutter mark. Wiring this PNG into `mipmap/` is a separate step.
+## Android launcher (implemented)
+
+Manifest still points at `@mipmap/ic_launcher`. Single-layer PNGs only (no adaptive-icon XML this pass).
+
+| Flavor | Launcher name | Master | Mipmaps |
+|---|---|---|---|
+| production | Sprout | `sprout-icon-selected-1024.png` | `sprout_app/android/app/src/main/res/mipmap-*/ic_launcher.png` |
+| development | `[DEV] Sprout` | `sprout-icon-dev-1024.png` | `sprout_app/android/app/src/development/res/mipmap-*/ic_launcher.png` |
+
+Densities: mdpi 48, hdpi 72, xhdpi 96, xxhdpi 144, xxxhdpi 192. All opaque RGB.
+
+Uninstall/reinstall if a device still shows the old Flutter mark (launcher cache).
 
 ---
 
