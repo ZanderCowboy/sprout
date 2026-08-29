@@ -5,6 +5,13 @@ FLAVOR_PROD := production
 TARGET_DEV := lib/main_development.dart
 TARGET_PROD := lib/main_production.dart
 
+# Chocolatey GNU Make on Windows uses cmd.exe, which has no grep/awk/[ ].
+# Git for Windows bash runs the same recipes as macOS (including scripts/*.sh).
+ifeq ($(OS),Windows_NT)
+SHELL := C:/Program Files/Git/bin/bash.exe
+export PATH := C:/Program Files/Git/usr/bin;C:/Program Files/Git/bin;$(PATH)
+endif
+
 .PHONY: help get run run-dev run-prod run-dev-release run-prod-release \
 	analyze test check clean devices config \
 	config-export config-import config-status config-set-onedrive

@@ -15,7 +15,7 @@ Do not add `firebase_options*.dart`. Copy Firebase fields into the flavor JSON `
 
 Gitignored files are not in the clone. Copy them to `<OneDrive>/Projects/sprout-local-config` and restore on the other PC. Never print file contents. Do not copy `android/local.properties` (SDK path is machine-specific).
 
-- Windows (no Make): `scripts/sync-local-config.ps1 import -OneDrive "$env:OneDrive"` or `set-onedrive` (writes gitignored `.sprout-onedrive`). Use `powershell -ExecutionPolicy Bypass -File ...` if scripts are blocked.
+- Windows: `make config-import` (needs Git for Windows) or `scripts/sync-local-config.ps1 import -OneDrive "$env:OneDrive"`. `set-onedrive` writes gitignored `.sprout-onedrive`. Use `powershell -ExecutionPolicy Bypass -File ...` if scripts are blocked.
 - macOS: `scripts/sync-local-config.sh` or `make config-import`. Optional `ONEDRIVE=` / `DEST=`.
 
 ## Flavor JSON (shape)

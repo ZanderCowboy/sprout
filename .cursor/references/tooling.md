@@ -29,7 +29,7 @@ flutter test
 
 Repo Makefile wrappers from the workspace root: `make analyze`, `make test`, `make check`.
 
-Local gitignored config (flavor JSON, `google-services.json`, signing) → `<OneDrive>/Projects/sprout-local-config`. Windows: `scripts/sync-local-config.ps1` (no Make). macOS: `scripts/sync-local-config.sh` or `make config-export` / `config-import`. Details: [secrets.md](secrets.md).
+Local gitignored config (flavor JSON, `google-services.json`, signing) → `<OneDrive>/Projects/sprout-local-config`. `make config-export` / `config-import` works on macOS and on Windows when Git for Windows is installed. Windows without Make: `scripts/sync-local-config.ps1`. Details: [secrets.md](secrets.md).
 
 ## Codegen
 

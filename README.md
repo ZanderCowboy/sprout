@@ -87,7 +87,7 @@ Copy `apiKey` / `appId` / etc. from the flavor’s `google-services.json` into t
 
 To move these files to another machine (they are gitignored), export to **OneDrive Personal**, then import after cloning. Dest is `<OneDrive>/Projects/sprout-local-config`.
 
-**Windows** (PowerShell — Make is not required). From the repo root:
+**Windows.** `make` works if Git for Windows is installed (usual path `C:\Program Files\Git`). Or use PowerShell — Make is not required:
 
 ```powershell
 # one-off: point at this PC's OneDrive root (the folder that contains Projects\)

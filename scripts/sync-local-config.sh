@@ -295,8 +295,12 @@ cmd_status() {
     local paths
     paths="$(
       {
-        [[ -d "$ROOT/config" ]] && find "$ROOT/config" -type f ! -name '.DS_Store' -print | sed "s|^$ROOT/||"
-        [[ -d "$dest/config" ]] && find "$dest/config" -type f ! -name '.DS_Store' -print | sed "s|^$dest/||"
+        if [[ -d "$ROOT/config" ]]; then
+          find "$ROOT/config" -type f ! -name '.DS_Store' -print | sed "s|^$ROOT/||"
+        fi
+        if [[ -d "$dest/config" ]]; then
+          find "$dest/config" -type f ! -name '.DS_Store' -print | sed "s|^$dest/||"
+        fi
       } | sort -u
     )"
     while IFS= read -r f; do
