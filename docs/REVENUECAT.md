@@ -50,6 +50,20 @@ Fill `firebase` from the matching `google-services.json` (`mobilesdk_app_id` →
 
 Empty `revenueCatAndroidApiKey` → purchases step is **skipped**. Non-empty is not enough by itself: see the kill switch below.
 
+### Debug vs release (not flavor)
+
+Flavor (`development` / `production`) and build mode (`debug` / `release`) are independent. `flutter build apk --flavor development` is still a **release** binary.
+
+RevenueCat’s SDK **rejects** Test Store keys (`test_…`) in release and profile. That is intentional — Test Store must never ship to Play. Sprout currently has only a Test Store app in the dashboard (no Play `goog_…` key yet).
+
+| What you want | What to run |
+|---------------|-------------|
+| Paywall / Test Store purchases | Debug: `flutter run --flavor development -t lib/main_development.dart` |
+| Sideload / Firebase App Distribution APK | Release development APK is fine; startup **skips** Purchases when the key is `test_…` (Premium tile hidden) |
+| Real Play Billing | Later: add a Play Store app in RevenueCat, put a `goog_…` key in config, install from Play Internal Testing (not a sideloaded APK) |
+
+Do **not** point the development flavor at production.json or a production `goog_…` key. Production is a different package (`app.stackmint.sprout`) and is not wired for Purchases yet.
+
 ## Kill switch (Firebase Remote Config)
 
 Code:

@@ -194,6 +194,15 @@ Future<void> _configurePurchases({
     return;
   }
 
+  if (kReleaseMode && config.isRevenueCatTestStoreKey) {
+    reporter.update(
+      StartupStep.configurePurchases,
+      StartupStepStatus.skipped,
+      detail: 'test store key in release',
+    );
+    return;
+  }
+
   final enabled = _remoteConfigService.isEnabled(
     RemoteFeatureFlag.revenueCatEnabled,
   );

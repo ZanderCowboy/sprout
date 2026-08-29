@@ -58,6 +58,11 @@ class AppConfig {
 
   bool get isRevenueCatConfigured => revenueCatAndroidApiKey.isNotEmpty;
 
+  /// Test Store public keys (`test_…`). The native SDK rejects these in
+  /// release/profile; only `goog_…` / `appl_…` keys are valid there.
+  bool get isRevenueCatTestStoreKey =>
+      revenueCatAndroidApiKey.startsWith('test_');
+
   bool get isFirebaseConfigured =>
       firebaseApiKey.isNotEmpty &&
       firebaseAppId.isNotEmpty &&
