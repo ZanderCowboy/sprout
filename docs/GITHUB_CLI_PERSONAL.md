@@ -39,6 +39,9 @@ Set in both:
 "terminal.integrated.env.osx": {
   "GH_CONFIG_DIR": "${env:HOME}/.config/gh-zandercowboy"
 }
+"terminal.integrated.env.windows": {
+  "GH_CONFIG_DIR": "${env:USERPROFILE}/.config/gh-zandercowboy"
+}
 ```
 
 This overrides `gh` only in Cursor terminals for this workspace. User-level `gh` (Terminal.app, other windows) is unchanged.
@@ -76,11 +79,11 @@ gh auth status
 # Expect: Logged in to github.com account Zander-K
 ```
 
-In a **new** Cursor terminal in this window, `echo $GH_CONFIG_DIR` should be `/Users/<you>/.config/gh-zandercowboy` and plain `gh auth status` should show `ZanderCowboy`.
+In a **new** Cursor terminal in this window, `echo $GH_CONFIG_DIR` (PowerShell: `$env:GH_CONFIG_DIR`) should be `~/.config/gh-zandercowboy` and plain `gh auth status` should show `ZanderCowboy`.
 
 ## Recreate on a new machine
 
-1. Keep (or add) the `github.com-personal` SSH host and point `origin` at `git@github.com-personal:ZanderCowboy/sprout.git`.
-2. Create `~/.config/gh-zandercowboy` and set `GH_CONFIG_DIR` in the workspace files above.
+1. Point `origin` at SSH. On the Mac (work + personal keys): `git@github.com-personal:ZanderCowboy/sprout.git` with the `Host github.com-personal` SSH alias. On Windows, if the only key already authenticates as `ZanderCowboy`, `git@github.com:ZanderCowboy/sprout.git` is enough.
+2. Create `~/.config/gh-zandercowboy` and set `GH_CONFIG_DIR` in the workspace files above (Windows: `terminal.integrated.env.windows` + `%USERPROFILE%`).
 3. Run the `gh auth login` command in the previous section as `ZanderCowboy`.
 4. Confirm with `gh auth status` as in **Verify**.

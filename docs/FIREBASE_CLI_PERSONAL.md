@@ -32,6 +32,10 @@ Set in both:
   "GH_CONFIG_DIR": "${env:HOME}/.config/gh-zandercowboy",
   "XDG_CONFIG_HOME": "${env:HOME}/.config/firebase-personal"
 }
+"terminal.integrated.env.windows": {
+  "GH_CONFIG_DIR": "${env:USERPROFILE}/.config/gh-zandercowboy",
+  "XDG_CONFIG_HOME": "${env:USERPROFILE}/.config/firebase-personal"
+}
 ```
 
 This overrides Firebase CLI config only in Cursor terminals for this workspace. User-level `firebase` (Terminal.app, other windows) is unchanged.
