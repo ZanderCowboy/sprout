@@ -11,6 +11,10 @@ Never commit real keys, JSON configs, or generated Firebase options.
 
 Do not add `firebase_options*.dart`. Copy Firebase fields into the flavor JSON `firebase` object instead.
 
+## Copy to another machine
+
+Gitignored files are not in the clone. Use `scripts/sync-local-config.sh` (or `make config-export` / `make config-import`) to copy them to OneDrive Personal (`Projects/sprout-local-config`) and restore on the other PC. Never print file contents. Do not copy `android/local.properties` (SDK path is machine-specific).
+
 ## Flavor JSON (shape)
 
 See `README.md`. Empty `supabaseUrl`/`supabaseAnonKey` → local-only. Empty `revenueCatAndroidApiKey` → skip Purchases. Empty `googleWebClientId` → hide Google sign-in.

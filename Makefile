@@ -6,7 +6,7 @@ TARGET_DEV := lib/main_development.dart
 TARGET_PROD := lib/main_production.dart
 
 .PHONY: help get run run-dev run-prod run-dev-release run-prod-release \
-	analyze test check clean devices config
+	analyze test check clean devices config config-export config-import config-status
 
 help: ## Show available targets
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## ' $(MAKEFILE_LIST) | \
@@ -57,3 +57,12 @@ config: ## Create empty local config JSON assets if missing
 			echo "Exists  $$path"; \
 		fi; \
 	done
+
+config-export: ## Copy gitignored local config to OneDrive Personal
+	@scripts/sync-local-config.sh export
+
+config-import: ## Restore gitignored local config from OneDrive Personal
+	@scripts/sync-local-config.sh import
+
+config-status: ## Show which local-config files exist here vs OneDrive
+	@scripts/sync-local-config.sh status
