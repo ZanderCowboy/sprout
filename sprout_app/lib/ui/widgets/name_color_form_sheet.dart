@@ -15,6 +15,7 @@ class NameColorFormSheet extends StatelessWidget {
     required this.onPrimaryAction,
     required this.primaryActionEnabled,
     this.body,
+    this.nameFieldKey,
   });
 
   final String title;
@@ -31,6 +32,9 @@ class NameColorFormSheet extends StatelessWidget {
 
   /// Optional extra UI between name field and color picker (e.g. goal target).
   final List<Widget>? body;
+
+  /// Optional key for the name text field (for testing).
+  final Key? nameFieldKey;
 
   @override
   Widget build(BuildContext context) {
@@ -55,6 +59,7 @@ class NameColorFormSheet extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           TextField(
+            key: nameFieldKey,
             controller: nameController,
             decoration: InputDecoration(
               labelText: nameLabel,

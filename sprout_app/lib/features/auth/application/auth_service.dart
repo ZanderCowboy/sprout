@@ -10,6 +10,10 @@ import 'package:sprout/features/transactions/export.dart';
 import '../domain/auth_repository.dart';
 import '../domain/auth_user.dart';
 
+/// Development-only: read MAESTRO_BYPASS_AUTH from compile-time --dart-define.
+const bool _kMaestroBypassAuth =
+    bool.fromEnvironment('MAESTRO_BYPASS_AUTH', defaultValue: false);
+
 class AuthService {
   AuthService({
     required AuthRepository authRepository,
@@ -47,6 +51,26 @@ class AuthService {
   AuthUser? get currentUser => _authRepository.currentUser;
 
   Stream<AuthUser?> authStateChanges() => _authRepository.authStateChanges();
+
+  /// Development-only: true when MAESTRO_BYPASS_AUTH=true at compile time.
+  bool get maestroBypassAuthEnabled => _kMaestroBypassAuth;
+
+  /// Development-only: bypass OTP/Google and set up a stable local test user.
+  ///
+  /// Only callable when [maestroBypassAuthEnabled] is true. Binds a stable
+  /// local-only user ID for Maestro tests.
+  Future<void> bypassAuthForMaestro() async {
+    if (!_kMaestroBypassAuth) {
+      throw const AuthAppException(
+        'MAESTRO_BYPASS_AUTH not enabled. Pass --dart-define=MAESTRO_BYPASS_AUTH=true.',
+      );
+    }
+
+    const testUserId = 'maestro-test-user';
+    await _userContext.setActiveUserId(testUserId);
+    await _userContext.markIntroCompleted();
+    // Do not mark verified — keep sync disabled for local-only test data.
+  }
 
   /// Sync is allowed only with a verified (non-anonymous) Supabase session.
   bool get canSync {

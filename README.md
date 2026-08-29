@@ -136,6 +136,53 @@ flutter analyze
 flutter test
 ```
 
+## Maestro UI Tests (development flavor only)
+
+Maestro flows are in `.maestro/` and test the core savings loop (account → goal → deposit) against the **development** flavor.
+
+### Prerequisites
+
+1. Install Maestro: https://maestro.mobile.dev/getting-started/installing-maestro
+2. Build the development APK **with auth bypass**:
+
+```bash
+cd sprout_app
+flutter build apk --debug --flavor development -t lib/main_development.dart --dart-define=MAESTRO_BYPASS_AUTH=true
+```
+
+Or for a device/emulator already running the development flavor with bypass:
+
+```bash
+flutter run --flavor development -t lib/main_development.dart --dart-define=MAESTRO_BYPASS_AUTH=true
+```
+
+### Running tests
+
+With the app installed or running:
+
+```bash
+# Run all flows
+maestro test .maestro/
+
+# Run a specific flow
+maestro test .maestro/core-loop.yaml
+```
+
+### Auth bypass
+
+The `MAESTRO_BYPASS_AUTH=true` dart-define flag enables a **development-only** bypass that:
+- Skips intro and OTP/Google sign-in
+- Binds a stable local test user (`maestro-test-user`)
+- Lands directly on Overview with empty state
+
+**Production flavor is unaffected** — the bypass flag is a compile-time constant that does nothing outside development builds.
+
+### Available flows
+
+- `core-loop.yaml` — Create account, goal, deposit, verify progress
+- `deposit-no-accounts.yaml` — Deposit with 0 accounts shows "create account first" CTA
+- `goal-no-accounts.yaml` — Creating goal with 0 accounts shows guidance
+
 ## More docs
 
 - [GitHub CLI (personal account)](docs/GITHUB_CLI_PERSONAL.md) — `gh` as `ZanderCowboy` in this workspace only

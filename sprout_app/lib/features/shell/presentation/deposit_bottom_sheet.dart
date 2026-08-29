@@ -432,6 +432,7 @@ class _DepositBottomSheetState extends State<DepositBottomSheet> {
           ],
           if (_mode != DepositBottomSheetMode.allocateExistingUnallocated) ...[
             TextField(
+              key: const Key('deposit_amount_field'),
               controller: _amount,
               decoration: const InputDecoration(labelText: AppStrings.amount),
               keyboardType: const TextInputType.numberWithOptions(decimal: true),

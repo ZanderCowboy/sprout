@@ -1,0 +1,125 @@
+appId: app.stackmint.sprout.dev
+---
+# Core savings loop test: account → goal → deposit → verify progress
+# Requires: MAESTRO_BYPASS_AUTH=true at build time
+# Run: maestro test .maestro/core-loop.yaml
+
+- launchApp:
+    clearState: true
+    clearKeychain: true
+
+# Wait for app to load and bypass auth to land on Overview
+- assertVisible:
+    text: "Portfolio total"
+    timeout: 10000
+
+# Verify empty state guidance is shown
+- assertVisible:
+    text: "Welcome to Sprout"
+
+# Step 1: Create an account
+- tapOn:
+    text: "New account"
+    index: 0  # First "New account" button in guidance steps
+
+- assertVisible:
+    text: "New account"
+    timeout: 5000
+
+- tapOn:
+    id: "account_name_field"
+
+- inputText: "Test Savings"
+
+- tapOn:
+    text: "Save"
+
+- assertVisible:
+    text: "Portfolio total"
+    timeout: 5000
+
+# Step 2: Create a goal
+- tapOn:
+    text: "New goal"
+    index: 0  # First "New goal" button in guidance
+
+- assertVisible:
+    text: "New goal"
+    timeout: 5000
+
+- tapOn:
+    id: "goal_name_field"
+
+- inputText: "Vacation Fund"
+
+- tapOn:
+    id: "goal_target_field"
+
+- inputText: "5000"
+
+- tapOn:
+    text: "Save"
+
+- assertVisible:
+    text: "Portfolio total"
+    timeout: 5000
+
+# Step 3: Make a deposit
+- tapOn:
+    text: "Deposit"
+
+- assertVisible:
+    text: "Deposit"
+    timeout: 5000
+
+# Select account (should be pre-selected)
+- tapOn:
+    text: "Account"
+
+- tapOn:
+    text: "Test Savings"
+
+# Select goal
+- tapOn:
+    text: "Goal"
+
+- tapOn:
+    text: "Vacation Fund"
+
+# Enter amount
+- tapOn:
+    id: "deposit_amount_field"
+
+- inputText: "1000"
+
+- tapOn:
+    text: "Save"
+
+# Verify deposit succeeded and Overview updated
+- assertVisible:
+    text: "Portfolio total"
+    timeout: 5000
+
+# Navigate to Goals tab to verify progress
+- tapOn:
+    text: "Goals"
+
+- assertVisible:
+    text: "Goals"
+
+- assertVisible:
+    text: "Vacation Fund"
+
+# Tap on the goal to see details
+- tapOn:
+    text: "Vacation Fund"
+
+- assertVisible:
+    text: "Vacation Fund"
+    timeout: 5000
+
+# Verify progress shows
+- assertVisible:
+    text: "Remaining"
+
+# Success: The core loop (account → goal → deposit → progress) completed

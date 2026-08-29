@@ -1,0 +1,46 @@
+appId: app.stackmint.sprout.dev
+---
+# Test: Creating a goal with 0 accounts shows "create account first" message
+# Requires: MAESTRO_BYPASS_AUTH=true at build time
+# Run: maestro test .maestro/goal-no-accounts.yaml
+
+- launchApp:
+    clearState: true
+    clearKeychain: true
+
+# Wait for app to load and bypass auth to land on Overview
+- assertVisible:
+    text: "Portfolio total"
+    timeout: 10000
+
+# Verify empty state guidance is shown
+- assertVisible:
+    text: "Welcome to Sprout"
+
+# Try to create a goal before creating any accounts
+- tapOn:
+    text: "New goal"
+    index: 0  # First "New goal" button in guidance
+
+- assertVisible:
+    text: "New goal"
+    timeout: 5000
+
+# Should see the "create account first" message
+- assertVisible:
+    text: "Create an account first to hold money for this goal."
+
+# Verify the CTA is present
+- assertVisible:
+    text: "New account"
+
+# Tap the "New account" button
+- tapOn:
+    text: "New account"
+
+# Should now be in account creation
+- assertVisible:
+    text: "New account"
+    timeout: 5000
+
+# Success: User gets clear guidance instead of being trapped
