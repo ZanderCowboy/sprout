@@ -1,0 +1,11 @@
+# Copy to .sprout-onedrive (gitignored) or run:
+#   Windows:  scripts\sync-local-config.ps1 set-onedrive -OneDrive "C:\Users\you\OneDrive"
+#   macOS:    scripts/sync-local-config.sh set-onedrive "/Users/you/Library/CloudStorage/OneDrive-Personal"
+#
+# One line: your OneDrive *root* on this machine.
+# Dest becomes <this path>/Projects/sprout-local-config
+#
+# Windows:
+#   C:\Users\you\OneDrive
+# macOS:
+#   /Users/you/Library/CloudStorage/OneDrive-Personal

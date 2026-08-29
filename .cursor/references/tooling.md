@@ -29,6 +29,8 @@ flutter test
 
 Repo Makefile wrappers from the workspace root: `make analyze`, `make test`, `make check`.
 
+Local gitignored config (flavor JSON, `google-services.json`, signing) → `<OneDrive>/Projects/sprout-local-config`. `make config-export` / `config-import` works on macOS and on Windows when Git for Windows is installed. Windows without Make: `scripts/sync-local-config.ps1`. Details: [secrets.md](secrets.md).
+
 ## Codegen
 
 There is **no** `melos.yaml` and **no** `build_runner` today. Hive `TypeAdapter`s are hand-written in `sprout_app/lib/core/storage/hive_adapters.dart` and checked in.

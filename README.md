@@ -85,6 +85,32 @@ Use `app.stackmint.sprout` for production. `androidApplicationId` documents the 
 
 Copy `apiKey` / `appId` / etc. from the flavor’s `google-services.json` into the gitignored `firebase` object (do **not** commit those values in Dart sources).
 
+To move these files to another machine (they are gitignored), export to **OneDrive Personal**, then import after cloning. Dest is `<OneDrive>/Projects/sprout-local-config`.
+
+**Windows.** `make` works if Git for Windows is installed (usual path `C:\Program Files\Git`). Or use PowerShell — Make is not required:
+
+```powershell
+# one-off: point at this PC's OneDrive root (the folder that contains Projects\)
+powershell -ExecutionPolicy Bypass -File scripts\sync-local-config.ps1 import -OneDrive "$env:OneDrive"
+
+# or paste the path from File Explorer
+powershell -ExecutionPolicy Bypass -File scripts\sync-local-config.ps1 set-onedrive -OneDrive "C:\Users\you\OneDrive"
+powershell -ExecutionPolicy Bypass -File scripts\sync-local-config.ps1 import
+```
+
+`set-onedrive` writes gitignored `.sprout-onedrive` so later you only need `import`. Full dest: `-Dest "C:\Users\you\OneDrive\Projects\sprout-local-config"`.
+
+**macOS** (Make is optional):
+
+```bash
+make config-export
+make config-import
+# or
+scripts/sync-local-config.sh export|import|status|set-onedrive
+```
+
+This copies flavor JSON, `google-services.json`, release signing, `.secrets`, and `config/` — not `local.properties` or build artifacts.
+
 Empty URL/key → **local-only** mode (Hive, no sync). Fill them for Supabase sync — use the **development** Supabase project in `development.json` and the **production** project in `production.json`.
 
 Empty `revenueCatAndroidApiKey` → RevenueCat is skipped at startup. On **development**, a Firebase Remote Config kill switch (`revenuecat_enabled`, default off) must also be `true` before `Purchases.configure` runs — see [RevenueCat foundation](docs/REVENUECAT.md). Production always skips configure for now. A `test_…` key is also skipped in **release/profile** (the SDK rejects Test Store outside debug).
