@@ -1,7 +1,7 @@
 appId: app.stackmint.sprout.dev
 ---
 # Full app UX tour: walk every major surface for screenshots
-# Requires: MAESTRO_BYPASS_AUTH=true at build time
+# Requires: development flavor. Tap Debug sign in on intro or Sign in.
 # Run: maestro test .maestro/full-app-tour.yaml
 # Screenshots: saved to current directory with tour-01-... through tour-NN-... names
 
@@ -9,13 +9,20 @@ appId: app.stackmint.sprout.dev
     clearState: true
     clearKeychain: true
 
-# ===== 1. Empty Overview =====
-- assertVisible:
-    text: "Portfolio total"
-    timeout: 10000
+- extendedWaitUntil:
+    visible:
+      text: "Debug sign in"
+    timeout: 45000
 
-- assertVisible:
-    text: "Welcome to Sprout"
+- tapOn: "Debug sign in"
+
+- extendedWaitUntil:
+    visible:
+      text: "Portfolio total"
+    timeout: 15000
+
+# ===== 1. Empty Overview =====
+- assertVisible: "Welcome to Sprout"
 
 - takeScreenshot: tour-01-overview-empty
 
