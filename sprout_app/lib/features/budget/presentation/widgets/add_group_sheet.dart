@@ -44,7 +44,10 @@ class _AddGroupSheetState extends State<AddGroupSheet> {
 
     _category = i?.category ?? BudgetCategory.income;
     _colorArgb = _parseHexColor(i?.colorHex)?.toARGB32() ?? AppColors.cardColorAt(0).toARGB32();
-    _icon = _iconFromStored(codePoint: i?.iconCodePoint, fontFamily: i?.iconFontFamily) ?? Icons.category_rounded;
+    _icon = budgetGroupIconFromStored(
+      codePoint: i?.iconCodePoint,
+      fontFamily: i?.iconFontFamily,
+    );
 
     _loadExisting();
   }
@@ -197,7 +200,3 @@ Color? _parseHexColor(String? hex) {
   return Color(v);
 }
 
-IconData? _iconFromStored({required int? codePoint, required String? fontFamily}) {
-  if (codePoint == null) return null;
-  return IconData(codePoint, fontFamily: fontFamily ?? 'MaterialIcons');
-}

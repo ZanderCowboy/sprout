@@ -555,9 +555,10 @@ class _AddItemCard extends StatelessWidget {
 }
 
 IconData _iconForGroup(BudgetGroup group) {
-  final cp = group.iconCodePoint;
-  if (cp == null) return Icons.category_rounded;
-  return IconData(cp, fontFamily: group.iconFontFamily ?? 'MaterialIcons');
+  return budgetGroupIconFromStored(
+    codePoint: group.iconCodePoint,
+    fontFamily: group.iconFontFamily,
+  );
 }
 
 Color? _parseHexColor(String hex) {

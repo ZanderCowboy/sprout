@@ -67,6 +67,21 @@ class BudgetGroupIconPicker extends StatelessWidget {
   }
 }
 
+/// Maps persisted code points back to a const [IconData] from [BudgetGroupIconPicker.icons].
+///
+/// Release builds tree-shake icon fonts and reject `IconData(...)` constructed
+/// from runtime values.
+IconData budgetGroupIconFromStored({int? codePoint, String? fontFamily}) {
+  if (codePoint == null) return Icons.category_rounded;
+  for (final icon in BudgetGroupIconPicker.icons) {
+    if (icon.codePoint == codePoint &&
+        (fontFamily == null || icon.fontFamily == fontFamily)) {
+      return icon;
+    }
+  }
+  return Icons.category_rounded;
+}
+
 String budgetGroupColorToHex(Color c) {
   final v = c.toARGB32();
   final hex = v.toRadixString(16).padLeft(8, '0').toUpperCase();
