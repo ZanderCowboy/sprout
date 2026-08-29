@@ -6,7 +6,8 @@ TARGET_DEV := lib/main_development.dart
 TARGET_PROD := lib/main_production.dart
 
 .PHONY: help get run run-dev run-prod run-dev-release run-prod-release \
-	analyze test check clean devices config config-export config-import config-status
+	analyze test check clean devices config \
+	config-export config-import config-status config-set-onedrive
 
 help: ## Show available targets
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## ' $(MAKEFILE_LIST) | \
@@ -58,11 +59,37 @@ config: ## Create empty local config JSON assets if missing
 		fi; \
 	done
 
-config-export: ## Copy gitignored local config to OneDrive Personal
-	@scripts/sync-local-config.sh export
+# Optional: ONEDRIVE=C:/Users/you/OneDrive  or  DEST=/full/path/to/sprout-local-config
+config-export: ## Copy gitignored local config to OneDrive (ONEDRIVE= or DEST=)
+	@if [ -n "$(DEST)" ]; then \
+		scripts/sync-local-config.sh export --dest "$(DEST)"; \
+	elif [ -n "$(ONEDRIVE)" ]; then \
+		scripts/sync-local-config.sh export --onedrive "$(ONEDRIVE)"; \
+	else \
+		scripts/sync-local-config.sh export; \
+	fi
 
-config-import: ## Restore gitignored local config from OneDrive Personal
-	@scripts/sync-local-config.sh import
+config-import: ## Restore gitignored local config from OneDrive (ONEDRIVE= or DEST=)
+	@if [ -n "$(DEST)" ]; then \
+		scripts/sync-local-config.sh import --dest "$(DEST)"; \
+	elif [ -n "$(ONEDRIVE)" ]; then \
+		scripts/sync-local-config.sh import --onedrive "$(ONEDRIVE)"; \
+	else \
+		scripts/sync-local-config.sh import; \
+	fi
 
 config-status: ## Show which local-config files exist here vs OneDrive
-	@scripts/sync-local-config.sh status
+	@if [ -n "$(DEST)" ]; then \
+		scripts/sync-local-config.sh status --dest "$(DEST)"; \
+	elif [ -n "$(ONEDRIVE)" ]; then \
+		scripts/sync-local-config.sh status --onedrive "$(ONEDRIVE)"; \
+	else \
+		scripts/sync-local-config.sh status; \
+	fi
+
+config-set-onedrive: ## Save OneDrive root to gitignored .sprout-onedrive (ONEDRIVE= required)
+	@if [ -z "$(ONEDRIVE)" ]; then \
+		echo 'Usage: make config-set-onedrive ONEDRIVE="C:/Users/you/OneDrive"'; \
+		exit 1; \
+	fi
+	@scripts/sync-local-config.sh set-onedrive "$(ONEDRIVE)"

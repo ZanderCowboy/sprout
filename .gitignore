@@ -14,6 +14,8 @@
 
 # Secrets and Config
 .secrets
+.sprout-onedrive
+.sprout-local-config-dir
 /config/
 sprout_app/assets/config/*.json
 sprout_app/assets/config/*.md

@@ -7,57 +7,150 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
 DEST_NAME="sprout-local-config"
+DEST_REL="Projects/$DEST_NAME"
 MANIFEST_NAME="MANIFEST.txt"
+ONEDRIVE_FILE=".sprout-onedrive"
+DEST_FILE=".sprout-local-config-dir"
 
 usage() {
   cat <<'EOF'
 Usage:
-  scripts/sync-local-config.sh export [DEST]
-  scripts/sync-local-config.sh import [DEST]
-  scripts/sync-local-config.sh status [DEST]
+  scripts/sync-local-config.sh export [--onedrive PATH] [--dest PATH]
+  scripts/sync-local-config.sh import [--onedrive PATH] [--dest PATH]
+  scripts/sync-local-config.sh status [--onedrive PATH] [--dest PATH]
+  scripts/sync-local-config.sh set-onedrive PATH
 
 Copies portable gitignored files (flavor JSON, google-services, signing, .secrets,
 and repo-root config/) so another machine can run the app after a git clone.
 
-DEST defaults to OneDrive Personal:
-  ~/Library/CloudStorage/OneDrive-Personal/Projects/sprout-local-config
-  ~/OneDrive/Projects/sprout-local-config
-  $OneDrive/Projects/sprout-local-config
+Default dest is <OneDrive>/Projects/sprout-local-config
 
-Override with DEST, or SPROUT_LOCAL_CONFIG_DIR.
+Override OneDrive root (recommended on Windows), first match wins:
+  1. --onedrive PATH
+  2. make ONEDRIVE=...  /  env SPROUT_ONEDRIVE_DIR
+  3. gitignored .sprout-onedrive (one line; create with set-onedrive)
+  4. Windows %OneDrive% / $OneDrive, then common Personal folders
+
+Override the full dest folder instead:
+  --dest PATH, DEST=..., SPROUT_LOCAL_CONFIG_DIR, or .sprout-local-config-dir
+
+Windows (PowerShell, no Make):
+  powershell -ExecutionPolicy Bypass -File scripts\sync-local-config.ps1 import -OneDrive "$env:OneDrive"
+  powershell -ExecutionPolicy Bypass -File scripts\sync-local-config.ps1 set-onedrive -OneDrive "C:\Users\you\OneDrive"
 
 Not copied (machine-specific):
   android/local.properties, .dart_tool, build/, .gradle, IDE caches
 EOF
 }
 
+trim() {
+  local p="$1"
+  p="${p#"${p%%[![:space:]]*}"}"
+  p="${p%"${p##*[![:space:]]}"}"
+  printf '%s' "$p"
+}
+
+# Git Bash / make: accept C:\Users\... and quoted paths.
+normalize_path() {
+  local p
+  p="$(trim "${1:-}")"
+  [[ -z "$p" ]] && return 1
+  p="${p#\"}"
+  p="${p%\"}"
+  p="${p#\'}"
+  p="${p%\'}"
+  p="${p//\\//}"
+  if [[ "$p" == ~* ]]; then
+    p="${p/#\~/$HOME}"
+  fi
+  printf '%s' "$p"
+}
+
+read_override_file() {
+  local file="$1"
+  [[ -f "$file" ]] || return 1
+  local line
+  while IFS= read -r line || [[ -n "$line" ]]; do
+    line="$(trim "$line")"
+    [[ -z "$line" || "$line" == \#* ]] && continue
+    normalize_path "$line"
+    return 0
+  done <"$file"
+  return 1
+}
+
+dest_from_onedrive() {
+  local root
+  root="$(normalize_path "$1")"
+  printf '%s/%s' "${root%/}" "$DEST_REL"
+}
+
 detect_dest() {
-  if [[ -n "${1:-}" ]]; then
-    printf '%s\n' "$1"
+  local dest_override="${1:-}"
+  local onedrive_override="${2:-}"
+
+  if [[ -n "$dest_override" ]]; then
+    normalize_path "$dest_override"
+    return
+  fi
+  if [[ -n "${DEST:-}" ]]; then
+    normalize_path "$DEST"
     return
   fi
   if [[ -n "${SPROUT_LOCAL_CONFIG_DIR:-}" ]]; then
-    printf '%s\n' "$SPROUT_LOCAL_CONFIG_DIR"
+    normalize_path "$SPROUT_LOCAL_CONFIG_DIR"
+    return
+  fi
+  local file_dest
+  if file_dest="$(read_override_file "$ROOT/$DEST_FILE")"; then
+    printf '%s' "$file_dest"
     return
   fi
 
-  local candidates=(
-    "$HOME/Library/CloudStorage/OneDrive-Personal/Projects/$DEST_NAME"
-    "$HOME/OneDrive/Projects/$DEST_NAME"
-    "${OneDrive:-}/Projects/$DEST_NAME"
+  if [[ -n "$onedrive_override" ]]; then
+    dest_from_onedrive "$onedrive_override"
+    return
+  fi
+  if [[ -n "${SPROUT_ONEDRIVE_DIR:-}" ]]; then
+    dest_from_onedrive "$SPROUT_ONEDRIVE_DIR"
+    return
+  fi
+  # Make ONEDRIVE=... — do not treat empty Windows %OneDrive% as a miss later.
+  if [[ -n "${MAKE_ONEDRIVE:-}" ]]; then
+    dest_from_onedrive "$MAKE_ONEDRIVE"
+    return
+  fi
+  local file_od
+  if file_od="$(read_override_file "$ROOT/$ONEDRIVE_FILE")"; then
+    dest_from_onedrive "$file_od"
+    return
+  fi
+
+  local roots=()
+  [[ -n "${OneDrive:-}" ]] && roots+=("$(normalize_path "$OneDrive")")
+  [[ -n "${USERPROFILE:-}" ]] && roots+=(
+    "$(normalize_path "$USERPROFILE/OneDrive")"
+    "$(normalize_path "$USERPROFILE/OneDrive - Personal")"
   )
-  local c
-  for c in "${candidates[@]}"; do
-    [[ -z "$c" || "$c" == "/Projects/$DEST_NAME" ]] && continue
-    local parent
-    parent="$(dirname "$c")"
-    if [[ -d "$parent" ]] || [[ -d "$(dirname "$parent")" ]]; then
-      printf '%s\n' "$c"
+  roots+=(
+    "$HOME/Library/CloudStorage/OneDrive-Personal"
+    "$HOME/OneDrive"
+  )
+
+  local root dest parent
+  for root in "${roots[@]}"; do
+    [[ -z "$root" ]] && continue
+    dest="$(dest_from_onedrive "$root")"
+    parent="$(dirname "$dest")"
+    if [[ -d "$dest" || -d "$parent" || -d "$root" ]]; then
+      printf '%s' "$dest"
       return
     fi
   done
 
-  echo "Could not find OneDrive Personal. Pass DEST or set SPROUT_LOCAL_CONFIG_DIR." >&2
+  echo "Could not find OneDrive. Set it once:" >&2
+  echo "  scripts/sync-local-config.sh set-onedrive \"C:/Users/you/OneDrive\"" >&2
+  echo "Windows: scripts\\sync-local-config.ps1 set-onedrive -OneDrive \"C:\\Users\\you\\OneDrive\"" >&2
   exit 1
 }
 
@@ -147,6 +240,8 @@ cmd_import() {
   local dest="$1"
   if [[ ! -d "$dest" ]]; then
     echo "Export folder not found: $dest" >&2
+    echo "Point at this PC's OneDrive root (the folder that contains Projects/):" >&2
+    echo "  scripts/sync-local-config.sh set-onedrive \"C:/Users/you/OneDrive\"" >&2
     exit 1
   fi
 
@@ -178,6 +273,12 @@ cmd_status() {
   local dest="$1"
   echo "Repo: $ROOT"
   echo "Dest: $dest"
+  if [[ -f "$ROOT/$ONEDRIVE_FILE" ]]; then
+    echo "Override: $ONEDRIVE_FILE"
+  fi
+  if [[ -f "$ROOT/$DEST_FILE" ]]; then
+    echo "Override: $DEST_FILE"
+  fi
   echo
   printf '%-10s %-10s %s\n' "LOCAL" "DEST" "PATH"
   local f
@@ -209,13 +310,76 @@ cmd_status() {
   fi
 }
 
-main() {
+cmd_set_onedrive() {
+  local root dest
+  root="$(normalize_path "${1:-}")" || true
+  if [[ -z "$root" ]]; then
+    echo "Usage: scripts/sync-local-config.sh set-onedrive \"C:/Users/you/OneDrive\"" >&2
+    exit 1
+  fi
+  printf '%s\n' "$root" >"$ROOT/$ONEDRIVE_FILE"
+  dest="$(dest_from_onedrive "$root")"
+  echo "Wrote $ONEDRIVE_FILE (gitignored)"
+  echo "OneDrive: $root"
+  echo "Dest:     $dest"
+  if [[ ! -d "$root" ]]; then
+    echo "Warning: that OneDrive folder does not exist on this machine yet." >&2
+  fi
+}
+
+parse_and_run() {
   local action="${1:-}"
   shift || true
+
+  if [[ "$action" == "set-onedrive" ]]; then
+    cmd_set_onedrive "${1:-}"
+    return
+  fi
+
+  local dest_override=""
+  local onedrive_override=""
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --onedrive)
+        onedrive_override="${2:-}"
+        shift 2
+        ;;
+      --onedrive=*)
+        onedrive_override="${1#--onedrive=}"
+        shift
+        ;;
+      --dest)
+        dest_override="${2:-}"
+        shift 2
+        ;;
+      --dest=*)
+        dest_override="${1#--dest=}"
+        shift
+        ;;
+      -h|--help)
+        usage
+        exit 0
+        ;;
+      --)
+        shift
+        break
+        ;;
+      -*)
+        echo "Unknown option: $1" >&2
+        usage >&2
+        exit 1
+        ;;
+      *)
+        dest_override="$1"
+        shift
+        ;;
+    esac
+  done
+
   case "$action" in
     export|import|status)
       local dest
-      dest="$(detect_dest "${1:-}")"
+      dest="$(detect_dest "$dest_override" "$onedrive_override")"
       echo "$action → $dest"
       echo
       "cmd_$action" "$dest"
@@ -230,4 +394,4 @@ main() {
   esac
 }
 
-main "$@"
+parse_and_run "$@"
