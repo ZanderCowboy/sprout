@@ -431,11 +431,15 @@ class _DepositBottomSheetState extends State<DepositBottomSheet> {
             ],
           ],
           if (_mode != DepositBottomSheetMode.allocateExistingUnallocated) ...[
-            TextField(
-              key: const Key('deposit_amount_field'),
-              controller: _amount,
-              decoration: const InputDecoration(labelText: AppStrings.amount),
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            Semantics(
+              identifier: 'deposit_amount_field',
+              textField: true,
+              child: TextField(
+                key: const Key('deposit_amount_field'),
+                controller: _amount,
+                decoration: const InputDecoration(labelText: AppStrings.amount),
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              ),
             ),
           ] else ...[
             // In allocate-only mode we don’t create a new deposit; the user allocates

@@ -203,18 +203,23 @@ class _CreateGoalScreenState extends State<CreateGoalScreen> {
             onPrimaryAction: () => _submit(context, state),
             primaryActionEnabled: canSubmit,
             nameFieldKey: const Key('goal_name_field'),
+            nameFieldIdentifier: 'goal_name_field',
             body: [
               const SizedBox(height: 12),
-              TextField(
-                key: const Key('goal_target_field'),
-                controller: _target,
-                decoration: InputDecoration(
-                  labelText: AppStrings.targetAmount,
-                  errorText: _targetError,
-                ),
-                keyboardType: const TextInputType.numberWithOptions(
-                  decimal: true,
-                  signed: true,
+              Semantics(
+                identifier: 'goal_target_field',
+                textField: true,
+                child: TextField(
+                  key: const Key('goal_target_field'),
+                  controller: _target,
+                  decoration: InputDecoration(
+                    labelText: AppStrings.targetAmount,
+                    errorText: _targetError,
+                  ),
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                    signed: true,
+                  ),
                 ),
               ),
               const SizedBox(height: 12),

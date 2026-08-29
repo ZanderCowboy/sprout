@@ -34,6 +34,9 @@ appId: app.stackmint.sprout.dev
 
 - tapOn:
     id: "account_name_field"
+- optional: true
+  tapOn:
+    text: "Account name"
 
 - inputText: "Test Savings"
 
@@ -55,11 +58,17 @@ appId: app.stackmint.sprout.dev
 
 - tapOn:
     id: "goal_name_field"
+- optional: true
+  tapOn:
+    text: "Goal name"
 
 - inputText: "Vacation Fund"
 
 - tapOn:
     id: "goal_target_field"
+- optional: true
+  tapOn:
+    text: "Target amount (ZAR)"
 
 - inputText: "5000"
 
@@ -91,6 +100,9 @@ appId: app.stackmint.sprout.dev
 # Enter amount
 - tapOn:
     id: "deposit_amount_field"
+- optional: true
+  tapOn:
+    text: "Amount (ZAR)"
 
 - inputText: "1000"
 

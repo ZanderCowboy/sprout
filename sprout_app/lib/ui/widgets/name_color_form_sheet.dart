@@ -36,6 +36,25 @@ class NameColorFormSheet extends StatelessWidget {
   /// Optional key for the name text field (for testing).
   final Key? nameFieldKey;
 
+  /// Optional semantics identifier for the name text field (for Maestro).
+  final String? nameFieldIdentifier;
+
+  const NameColorFormSheet({
+    super.key,
+    required this.title,
+    required this.nameLabel,
+    required this.nameController,
+    required this.nameErrorText,
+    required this.colorArgb,
+    required this.onColorSelected,
+    required this.primaryActionLabel,
+    required this.onPrimaryAction,
+    required this.primaryActionEnabled,
+    this.body,
+    this.nameFieldKey,
+    this.nameFieldIdentifier,
+  });
+
   @override
   Widget build(BuildContext context) {
     final mq = MediaQuery.of(context);
@@ -58,14 +77,18 @@ class NameColorFormSheet extends StatelessWidget {
                 ),
           ),
           const SizedBox(height: 16),
-          TextField(
-            key: nameFieldKey,
-            controller: nameController,
-            decoration: InputDecoration(
-              labelText: nameLabel,
-              errorText: nameErrorText,
+          Semantics(
+            identifier: nameFieldIdentifier,
+            textField: true,
+            child: TextField(
+              key: nameFieldKey,
+              controller: nameController,
+              decoration: InputDecoration(
+                labelText: nameLabel,
+                errorText: nameErrorText,
+              ),
+              textCapitalization: TextCapitalization.words,
             ),
-            textCapitalization: TextCapitalization.words,
           ),
           if (body != null) ...body!,
           const SizedBox(height: 16),
@@ -79,13 +102,18 @@ class NameColorFormSheet extends StatelessWidget {
             runSpacing: 8,
             children: [
               for (var i = 0; i < AppColors.cardPalette.length; i++)
-                GestureDetector(
-                  onTap: () => onColorSelected(AppColors.cardPalette[i].toARGB32()),
-                  child: CircleAvatar(
-                    backgroundColor: AppColors.cardPalette[i],
-                    child: colorArgb == AppColors.cardPalette[i].toARGB32()
-                        ? const Icon(Icons.check, color: Colors.white)
-                        : null,
+                Semantics(
+                  button: true,
+                  label: 'Color ${i + 1}',
+                  selected: colorArgb == AppColors.cardPalette[i].toARGB32(),
+                  child: GestureDetector(
+                    onTap: () => onColorSelected(AppColors.cardPalette[i].toARGB32()),
+                    child: CircleAvatar(
+                      backgroundColor: AppColors.cardPalette[i],
+                      child: colorArgb == AppColors.cardPalette[i].toARGB32()
+                          ? const Icon(Icons.check, color: Colors.white)
+                          : null,
+                    ),
                   ),
                 ),
             ],
