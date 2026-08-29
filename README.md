@@ -173,6 +173,7 @@ Development builds show a **Debug sign in** button on intro and Sign in (`Maestr
 - `core-loop.yaml` — Create account, goal, deposit, verify progress
 - `deposit-no-accounts.yaml` — Deposit with 0 accounts shows "create account first" CTA
 - `goal-no-accounts.yaml` — Creating goal with 0 accounts shows guidance
+- `full-app-tour.yaml` — Walk every major surface with screenshots (UX review)
 
 ## More docs
 

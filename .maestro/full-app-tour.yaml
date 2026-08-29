@@ -1,0 +1,334 @@
+appId: app.stackmint.sprout.dev
+---
+# Full app UX tour: walk every major surface for screenshots
+# Requires: MAESTRO_BYPASS_AUTH=true at build time
+# Run: maestro test .maestro/full-app-tour.yaml
+# Screenshots: saved to current directory with tour-01-... through tour-NN-... names
+
+- launchApp:
+    clearState: true
+    clearKeychain: true
+
+# ===== 1. Empty Overview =====
+- assertVisible:
+    text: "Portfolio total"
+    timeout: 10000
+
+- assertVisible:
+    text: "Welcome to Sprout"
+
+- takeScreenshot: tour-01-overview-empty
+
+# ===== 2. Create Account =====
+- tapOn:
+    text: "New account"
+    index: 0
+
+- assertVisible:
+    text: "New account"
+    timeout: 5000
+
+- takeScreenshot: tour-02-account-form
+
+- tapOn:
+    id: "account_name_field"
+
+- inputText: "My Savings"
+
+- tapOn:
+    text: "Save"
+
+- assertVisible:
+    text: "Portfolio total"
+    timeout: 5000
+
+# Navigate to Accounts tab to see the account list
+- tapOn:
+    text: "Accounts"
+
+- assertVisible:
+    text: "Accounts"
+    timeout: 3000
+
+- takeScreenshot: tour-03-accounts-list
+
+# Open account detail
+- tapOn:
+    text: "My Savings"
+
+- assertVisible:
+    text: "My Savings"
+    timeout: 3000
+
+- assertVisible:
+    text: "Account value"
+
+- takeScreenshot: tour-04-account-detail
+
+# Back to Overview
+- back
+
+- tapOn:
+    text: "Overview"
+
+# ===== 3. Create Goal =====
+- tapOn:
+    text: "New goal"
+    index: 0
+
+- assertVisible:
+    text: "New goal"
+    timeout: 5000
+
+- takeScreenshot: tour-05-goal-form
+
+- tapOn:
+    id: "goal_name_field"
+
+- inputText: "Dream Vacation"
+
+- tapOn:
+    id: "goal_target_field"
+
+- inputText: "10000"
+
+- tapOn:
+    text: "Save"
+
+- assertVisible:
+    text: "Portfolio total"
+    timeout: 5000
+
+# Navigate to Goals tab
+- tapOn:
+    text: "Goals"
+
+- assertVisible:
+    text: "Goals"
+    timeout: 3000
+
+- assertVisible:
+    text: "Dream Vacation"
+
+- takeScreenshot: tour-06-goals-list
+
+# Open goal detail
+- tapOn:
+    text: "Dream Vacation"
+
+- assertVisible:
+    text: "Dream Vacation"
+    timeout: 3000
+
+- assertVisible:
+    text: "Remaining"
+
+- takeScreenshot: tour-07-goal-detail
+
+# Back to Overview
+- back
+
+- tapOn:
+    text: "Overview"
+
+# ===== 4. Make Deposit =====
+# Use center + button for consistent flow
+- tapOn:
+    point: "50%,95%"
+
+- assertVisible:
+    text: "What would you like to do?"
+    timeout: 3000
+
+- tapOn:
+    text: "Deposit"
+
+- assertVisible:
+    text: "Deposit"
+    timeout: 5000
+
+- takeScreenshot: tour-08-deposit-sheet
+
+# Select account (should be pre-selected)
+- tapOn:
+    text: "Account"
+
+- tapOn:
+    text: "My Savings"
+
+# Select goal
+- tapOn:
+    text: "Goal"
+
+- tapOn:
+    text: "Dream Vacation"
+
+# Enter amount
+- tapOn:
+    id: "deposit_amount_field"
+
+- inputText: "2500"
+
+- tapOn:
+    text: "Save"
+
+# Wait for deposit to complete
+- assertVisible:
+    text: "Portfolio total"
+    timeout: 5000
+
+# ===== 5. Overview with Data =====
+- takeScreenshot: tour-09-overview-with-data
+
+# ===== 6. Walk All Tabs =====
+
+# Overview already visible
+- assertVisible:
+    text: "Overview"
+
+- tapOn:
+    text: "Accounts"
+
+- assertVisible:
+    text: "Accounts"
+    timeout: 3000
+
+- takeScreenshot: tour-10-accounts-tab
+
+- tapOn:
+    text: "Goals"
+
+- assertVisible:
+    text: "Goals"
+    timeout: 3000
+
+- takeScreenshot: tour-11-goals-tab
+
+- tapOn:
+    text: "Settings"
+
+- assertVisible:
+    text: "Settings"
+    timeout: 3000
+
+- takeScreenshot: tour-12-settings
+
+# ===== 7. Settings Deep Dive (best-effort) =====
+
+# Transactions
+- tapOn:
+    text: "Transactions"
+    optional: true
+
+- assertVisible:
+    text: "Transactions"
+    timeout: 3000
+    optional: true
+
+- takeScreenshot: tour-13-transactions
+
+- back
+
+# Recurring deposits
+- tapOn:
+    text: "Recurring payments"
+    optional: true
+
+- assertVisible:
+    text: "Recurring payments"
+    timeout: 3000
+    optional: true
+
+- takeScreenshot: tour-14-recurring-payments
+
+- back
+
+# Master Budget
+- tapOn:
+    text: "Master Budget"
+    optional: true
+
+- assertVisible:
+    text: "Master Budget"
+    timeout: 3000
+    optional: true
+
+- takeScreenshot: tour-15-master-budget
+
+- back
+
+# Account / Profile (tap the account tile at top)
+- tapOn:
+    text: "Maestro Test"
+    optional: true
+
+- assertVisible:
+    text: "Account"
+    timeout: 3000
+    optional: true
+
+- takeScreenshot: tour-16-account-profile
+
+- back
+
+# ===== 8. Center + Sheet =====
+- tapOn:
+    point: "50%,95%"
+
+- assertVisible:
+    text: "What would you like to do?"
+    timeout: 3000
+
+- takeScreenshot: tour-17-center-action-sheet
+
+# Close the sheet
+- back
+
+# ===== 9. Legal Pages from Settings (best-effort) =====
+
+# Go back to Settings if not there
+- tapOn:
+    text: "Settings"
+
+# Scroll down to find Terms/Privacy if needed
+- scroll
+
+# Terms (if visible)
+- tapOn:
+    text: "Terms"
+    optional: true
+
+- assertVisible:
+    text: "Terms of Service"
+    timeout: 5000
+    optional: true
+
+- takeScreenshot: tour-18-terms
+
+- back
+
+# Privacy (if visible)
+- tapOn:
+    text: "Privacy"
+    optional: true
+
+- assertVisible:
+    text: "Privacy Policy"
+    timeout: 5000
+    optional: true
+
+- takeScreenshot: tour-19-privacy
+
+- back
+
+# ===== Tour Complete =====
+# Return to Overview for final screenshot
+- tapOn:
+    text: "Overview"
+
+- assertVisible:
+    text: "Portfolio total"
+
+- takeScreenshot: tour-20-tour-complete
+
+# Success: Full app tour completed with screenshots
