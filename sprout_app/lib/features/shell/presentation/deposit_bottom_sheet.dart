@@ -298,7 +298,35 @@ class _DepositBottomSheetState extends State<DepositBottomSheet> {
     if (_accounts.isEmpty) {
       return Padding(
         padding: const EdgeInsets.all(24),
-        child: Text('Add at least one account before depositing.', style: Theme.of(context).textTheme.bodyLarge),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              'Create an account first',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Add at least one account before depositing.',
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+            const SizedBox(height: 20),
+            FilledButton.icon(
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await showModalBottomSheet<void>(
+                  context: context,
+                  isScrollControlled: true,
+                  showDragHandle: true,
+                  builder: (_) => AccountFormSheet(defaultColor: AppColors.cardColorAt(0)),
+                );
+              },
+              icon: const Icon(Icons.account_balance_wallet_outlined),
+              label: const Text(AppStrings.newAccount),
+            ),
+          ],
+        ),
       );
     }
     final quickAccount = widget.forceQuickAccountDepositUi;

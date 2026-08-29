@@ -20,49 +20,57 @@ class ShellPage extends StatelessWidget {
       showDragHandle: true,
       builder: (ctx) {
         return SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                leading: const Icon(Icons.account_balance_wallet_outlined),
-                title: const Text(AppStrings.newAccount),
-                onTap: () {
-                  Navigator.pop(ctx);
-                  showModalBottomSheet<void>(
-                    context: context,
-                    isScrollControlled: true,
-                    showDragHandle: true,
-                    builder: (_) => AccountFormSheet(defaultColor: AppColors.cardColorAt(0)),
-                  );
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.flag_outlined),
-                title: const Text(AppStrings.newGoal),
-                onTap: () {
-                  Navigator.pop(ctx);
-                  showModalBottomSheet<void>(
-                    context: context,
-                    isScrollControlled: true,
-                    showDragHandle: true,
-                    builder: (_) => CreateGoalScreen(defaultColor: AppColors.cardColorAt(1)),
-                  );
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.payments_outlined),
-                title: const Text(AppStrings.deposit),
-                onTap: () {
-                  Navigator.pop(ctx);
-                  showModalBottomSheet<void>(
-                    context: context,
-                    isScrollControlled: true,
-                    showDragHandle: true,
-                    builder: (_) => const DepositBottomSheet(),
-                  );
-                },
-              ),
-            ],
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  AppStrings.sheetTitle,
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 16),
+                ListTile(
+                  leading: const Icon(Icons.account_balance_wallet_outlined),
+                  title: const Text(AppStrings.newAccount),
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    showModalBottomSheet<void>(
+                      context: context,
+                      isScrollControlled: true,
+                      showDragHandle: true,
+                      builder: (_) => AccountFormSheet(defaultColor: AppColors.cardColorAt(0)),
+                    );
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.flag_outlined),
+                  title: const Text(AppStrings.newGoal),
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    showModalBottomSheet<void>(
+                      context: context,
+                      isScrollControlled: true,
+                      showDragHandle: true,
+                      builder: (_) => CreateGoalScreen(defaultColor: AppColors.cardColorAt(1)),
+                    );
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.payments_outlined),
+                  title: const Text(AppStrings.deposit),
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    showModalBottomSheet<void>(
+                      context: context,
+                      isScrollControlled: true,
+                      showDragHandle: true,
+                      builder: (_) => const DepositBottomSheet(),
+                    );
+                  },
+                ),
+              ],
+            ),
           ),
         );
       },

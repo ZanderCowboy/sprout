@@ -33,10 +33,13 @@ class AccountsPage extends StatelessWidget {
               SliverFillRemaining(
                 hasScrollBody: false,
                 child: Center(
-                  child: Text(
-                    'Tap + to add an account.',
-                    style: Theme.of(context).textTheme.bodyMedium,
-                    textAlign: TextAlign.center,
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Text(
+                      AppStrings.accountsEmptyGuidance,
+                      style: Theme.of(context).textTheme.bodyLarge,
+                      textAlign: TextAlign.center,
+                    ),
                   ),
                 ),
               ),

@@ -48,10 +48,13 @@ class _GoalsPageState extends State<GoalsPage> {
                 SliverFillRemaining(
                   hasScrollBody: false,
                   child: Center(
-                    child: Text(
-                      'Tap + to add a goal.',
-                      style: Theme.of(context).textTheme.bodyMedium,
-                      textAlign: TextAlign.center,
+                    child: Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Text(
+                        AppStrings.goalsEmptyGuidance,
+                        style: Theme.of(context).textTheme.bodyLarge,
+                        textAlign: TextAlign.center,
+                      ),
                     ),
                   ),
                 ),
@@ -107,11 +110,6 @@ class _GoalsPageState extends State<GoalsPage> {
                               .toList();
                         },
                         icon: const Icon(Icons.sort_rounded),
-                      ),
-                      IconButton(
-                        tooltip: 'Settings',
-                        icon: const Icon(Icons.settings_outlined),
-                        onPressed: () => context.go(AppRoute.settings.path),
                       ),
                     ],
                   ),

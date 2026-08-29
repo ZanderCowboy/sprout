@@ -57,6 +57,9 @@ class OverviewPage extends StatelessWidget {
               fontWeight: FontWeight.bold,
             );
 
+        // Check if we need to show empty state guidance
+        final hasAccounts = state.accounts.isNotEmpty;
+
         return RefreshIndicator(
           onRefresh: () async {
             context.read<HomeBloc>().add(const HomeSubscriptionRequested());
@@ -127,39 +130,48 @@ class OverviewPage extends StatelessWidget {
                           );
                         },
                       ),
-                      const SizedBox(height: 18),
-                      Text(AppStrings.actionAdd, style: titleStyle),
-                      const SizedBox(height: 10),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: FilledButton.tonalIcon(
-                              onPressed: () => _openDeposit(context),
-                              icon: const Icon(Icons.payments_outlined),
-                              label: const Text(AppStrings.deposit),
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: OutlinedButton.icon(
-                              onPressed: () => _openNewAccount(context),
-                              icon: const Icon(
-                                Icons.account_balance_wallet_outlined,
-                              ),
-                              label: const Text(AppStrings.newAccount),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                      SizedBox(
-                        width: double.infinity,
-                        child: OutlinedButton.icon(
-                          onPressed: () => _openNewGoal(context),
-                          icon: const Icon(Icons.flag_outlined),
-                          label: const Text(AppStrings.newGoal),
+                      if (!hasAccounts) ...[
+                        const SizedBox(height: 18),
+                        _EmptyStateGuidance(
+                          onOpenAccount: () => _openNewAccount(context),
+                          onOpenGoal: () => _openNewGoal(context),
+                          onOpenDeposit: () => _openDeposit(context),
                         ),
-                      ),
+                      ] else ...[
+                        const SizedBox(height: 18),
+                        Text(AppStrings.actionAdd, style: titleStyle),
+                        const SizedBox(height: 10),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: FilledButton.tonalIcon(
+                                onPressed: () => _openDeposit(context),
+                                icon: const Icon(Icons.payments_outlined),
+                                label: const Text(AppStrings.deposit),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: OutlinedButton.icon(
+                                onPressed: () => _openNewAccount(context),
+                                icon: const Icon(
+                                  Icons.account_balance_wallet_outlined,
+                                ),
+                                label: const Text(AppStrings.newAccount),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        SizedBox(
+                          width: double.infinity,
+                          child: OutlinedButton.icon(
+                            onPressed: () => _openNewGoal(context),
+                            icon: const Icon(Icons.flag_outlined),
+                            label: const Text(AppStrings.newGoal),
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                 ),
@@ -201,6 +213,9 @@ class OverviewPage extends StatelessWidget {
                                   color: Theme.of(context).colorScheme.primary,
                                 )
                               : null,
+                          onTap: () {
+                            context.push(AppRoute.transactionDetail.location(id: t.id));
+                          },
                         ),
                       );
                     },
@@ -328,6 +343,141 @@ class _OverallGoalsProgressHeader extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _EmptyStateGuidance extends StatelessWidget {
+  const _EmptyStateGuidance({
+    required this.onOpenAccount,
+    required this.onOpenGoal,
+    required this.onOpenDeposit,
+  });
+
+  final VoidCallback onOpenAccount;
+  final VoidCallback onOpenGoal;
+  final VoidCallback onOpenDeposit;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final titleStyle = Theme.of(context).textTheme.titleLarge?.copyWith(
+          fontWeight: FontWeight.w800,
+        );
+    final stepStyle = Theme.of(context).textTheme.titleMedium?.copyWith(
+          fontWeight: FontWeight.w700,
+        );
+    final detailStyle = Theme.of(context).textTheme.bodyMedium?.copyWith(
+          color: scheme.onSurfaceVariant,
+        );
+
+    return BlocBuilder<GoalsBloc, GoalsState>(
+      builder: (context, goalsState) {
+        final hasGoals = goalsState is GoalsReady && goalsState.progressList.isNotEmpty;
+
+        return Card(
+          elevation: 0,
+          color: scheme.surfaceContainerHighest,
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(AppStrings.overviewEmptyTitle, style: titleStyle),
+                const SizedBox(height: 20),
+                _GuidanceStep(
+                  stepText: AppStrings.overviewEmptyStep1,
+                  detailText: AppStrings.overviewEmptyStep1Detail,
+                  icon: Icons.account_balance_wallet_outlined,
+                  stepStyle: stepStyle,
+                  detailStyle: detailStyle,
+                  scheme: scheme,
+                  actionLabel: AppStrings.newAccount,
+                  onAction: onOpenAccount,
+                ),
+                const SizedBox(height: 16),
+                _GuidanceStep(
+                  stepText: AppStrings.overviewEmptyStep2,
+                  detailText: AppStrings.overviewEmptyStep2Detail,
+                  icon: Icons.flag_outlined,
+                  stepStyle: stepStyle,
+                  detailStyle: detailStyle,
+                  scheme: scheme,
+                  actionLabel: AppStrings.newGoal,
+                  onAction: onOpenGoal,
+                  enabled: true,
+                ),
+                const SizedBox(height: 16),
+                _GuidanceStep(
+                  stepText: AppStrings.overviewEmptyStep3,
+                  detailText: AppStrings.overviewEmptyStep3Detail,
+                  icon: Icons.payments_outlined,
+                  stepStyle: stepStyle,
+                  detailStyle: detailStyle,
+                  scheme: scheme,
+                  actionLabel: AppStrings.deposit,
+                  onAction: onOpenDeposit,
+                  enabled: hasGoals,
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _GuidanceStep extends StatelessWidget {
+  const _GuidanceStep({
+    required this.stepText,
+    required this.detailText,
+    required this.icon,
+    required this.stepStyle,
+    required this.detailStyle,
+    required this.scheme,
+    required this.actionLabel,
+    required this.onAction,
+    this.enabled = true,
+  });
+
+  final String stepText;
+  final String detailText;
+  final IconData icon;
+  final TextStyle? stepStyle;
+  final TextStyle? detailStyle;
+  final ColorScheme scheme;
+  final String actionLabel;
+  final VoidCallback onAction;
+  final bool enabled;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, size: 24, color: scheme.primary),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(stepText, style: stepStyle),
+              const SizedBox(height: 4),
+              Text(detailText, style: detailStyle),
+              const SizedBox(height: 8),
+              TextButton.icon(
+                onPressed: enabled ? onAction : null,
+                icon: Icon(Icons.add_rounded, size: 18),
+                label: Text(actionLabel),
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

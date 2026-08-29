@@ -206,7 +206,7 @@ class _AccountDetailPageState extends State<AccountDetailPage> {
                 children: [
                   DetailDepositCallout(
                     accentColor: Color(account.color),
-                    caption: AppStrings.addDepositCaptionAccount,
+                    caption: AppStrings.addDepositCaptionAccountAmountOnly,
                     onPressed: _openDeposit,
                   ),
                   const SizedBox(height: 12),

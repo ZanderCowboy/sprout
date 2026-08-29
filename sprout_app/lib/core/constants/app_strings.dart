@@ -75,4 +75,24 @@ abstract final class AppStrings {
   static const String and = 'and';
   static const String termsLoadFailed = 'Could not load Terms of Service.';
   static const String privacyLoadFailed = 'Could not load Privacy Policy.';
+
+  // Empty state guidance
+  static const String overviewEmptyTitle = 'Welcome to Sprout';
+  static const String overviewEmptyStep1 = '1. Add an account';
+  static const String overviewEmptyStep1Detail =
+      'Create an account to hold your money (e.g. savings, wallet).';
+  static const String overviewEmptyStep2 = '2. Create a goal';
+  static const String overviewEmptyStep2Detail =
+      'Set a target to save toward (e.g. vacation, new phone).';
+  static const String overviewEmptyStep3 = '3. Make a deposit';
+  static const String overviewEmptyStep3Detail =
+      'Record money you put into an account and allocate it to a goal.';
+  static const String accountsEmptyGuidance =
+      'Add an account to track your money. Accounts hold deposits that you allocate to goals.';
+  static const String goalsEmptyGuidance =
+      'Create a goal to save toward. Goals track your progress toward targets.';
+  static const String createAccountFirst =
+      'Create an account first to hold money for this goal.';
+  static const String addDepositCaptionAccountAmountOnly =
+      'Enter an amount — this deposit goes to the account as unallocated.';
 }

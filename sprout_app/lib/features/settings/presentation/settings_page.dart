@@ -74,9 +74,7 @@ class _SettingsPageState extends State<SettingsPage> {
         break;
       case PaywallResult.cancelled:
       case PaywallResult.notPresented:
-        messenger.showSnackBar(
-          const SnackBar(content: Text('No purchase completed.')),
-        );
+        // Silence on cancel
         break;
       case PaywallResult.error:
         messenger.showSnackBar(
@@ -159,7 +157,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ListTile(
             leading: const Icon(Icons.info_outline_rounded),
             title: const Text(AppStrings.appTitle),
-            subtitle: const Text('Savings app prototype'),
+            subtitle: const Text('Savings app'),
           ),
         ],
       ),

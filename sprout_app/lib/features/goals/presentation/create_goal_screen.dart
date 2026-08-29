@@ -148,6 +148,47 @@ class _CreateGoalScreenState extends State<CreateGoalScreen> {
             );
           }
 
+          // If no accounts, show a message with CTA to create one
+          if (state.accounts.isEmpty) {
+            return Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    AppStrings.newGoal,
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    AppStrings.createAccountFirst,
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                  const SizedBox(height: 20),
+                  FilledButton.icon(
+                    onPressed: () async {
+                      Navigator.of(context).pop();
+                      await showModalBottomSheet<void>(
+                        context: context,
+                        isScrollControlled: true,
+                        showDragHandle: true,
+                        builder: (_) => AccountFormSheet(defaultColor: AppColors.cardColorAt(0)),
+                      );
+                    },
+                    icon: const Icon(Icons.account_balance_wallet_outlined),
+                    label: const Text(AppStrings.newAccount),
+                  ),
+                  const SizedBox(height: 12),
+                  OutlinedButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text(AppStrings.cancel),
+                  ),
+                ],
+              ),
+            );
+          }
+
           final showOpening = _alreadySavedCents > 0;
           final canSubmit = _canSubmit(state);
 
