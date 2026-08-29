@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:sprout/core/constants/app_colors.dart';
 import 'package:sprout/core/constants/app_strings.dart';
-import 'bloc/auth_cubit.dart';
+import 'widgets/debug_sign_in_button.dart';
 
 class IntroPage extends StatefulWidget {
   const IntroPage({super.key, required this.onCompleted, this.initialPage = 0});
@@ -26,21 +25,6 @@ class _IntroPageState extends State<IntroPage> {
     super.initState();
     _index = widget.initialPage.clamp(0, _slideCount - 1);
     _controller = PageController(initialPage: _index);
-
-    // Development-only: if MAESTRO_BYPASS_AUTH is set, skip intro and bypass auth.
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final authCubit = context.read<AuthCubit>();
-      if (authCubit.maestroBypassAuthEnabled) {
-        _bypassForMaestro();
-      }
-    });
-  }
-
-  Future<void> _bypassForMaestro() async {
-    final authCubit = context.read<AuthCubit>();
-    await authCubit.bypassAuthForMaestro();
-    if (!mounted) return;
-    widget.onCompleted();
   }
 
   @override
@@ -124,6 +108,8 @@ class _IntroPageState extends State<IntroPage> {
                   child: Text(_isLastSlide ? 'Sign in' : 'Next'),
                 ),
               ),
+              const SizedBox(height: 12),
+              const DebugSignInButton(),
             ],
           ),
         ),

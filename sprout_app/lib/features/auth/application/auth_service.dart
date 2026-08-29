@@ -12,10 +12,6 @@ import 'package:sprout/features/transactions/export.dart';
 import '../domain/auth_repository.dart';
 import '../domain/auth_user.dart';
 
-/// Development-only: read MAESTRO_BYPASS_AUTH from compile-time --dart-define.
-const bool _kMaestroBypassAuth =
-    bool.fromEnvironment('MAESTRO_BYPASS_AUTH', defaultValue: false);
-
 class AuthService {
   AuthService({
     required AuthRepository authRepository,
@@ -41,6 +37,15 @@ class AuthService {
        _pullRemote = pullRemote,
        _logOutPurchases = logOutPurchases;
 
+  static const maestroTestUserId = 'maestro-test-user';
+  static const maestroTestUser = AuthUser(
+    id: maestroTestUserId,
+    email: 'maestro@test.local',
+    displayName: 'Maestro Test',
+    isAnonymous: false,
+    signedInWithGoogle: false,
+  );
+
   final AuthRepository _authRepository;
   final UserContext _userContext;
   final AppConfig _appConfig;
@@ -52,32 +57,29 @@ class AuthService {
   final Future<void> Function() _flushPending;
   final Future<void> Function() _pullRemote;
   final Future<void> Function()? _logOutPurchases;
+  bool _debugSignedIn = false;
 
   AuthUser? get currentUser => _authRepository.currentUser;
 
   Stream<AuthUser?> authStateChanges() => _authRepository.authStateChanges();
 
-  /// Development-only: true when MAESTRO_BYPASS_AUTH=true at compile time
-  /// AND the app is running in development flavor.
-  ///
-  /// Production flavor always returns false, even if the flag is set.
-  bool get maestroBypassAuthEnabled =>
-      _kMaestroBypassAuth && _appConfig.environment == AppEnvironment.development;
+  /// Development flavor only. Production never shows or accepts debug sign-in.
+  bool get debugSignInAvailable =>
+      _appConfig.environment == AppEnvironment.development;
 
-  /// Development-only: bypass OTP/Google and set up a stable local test user.
-  ///
-  /// Only callable when [maestroBypassAuthEnabled] is true (compile flag + dev flavor).
-  /// Binds a stable local-only user ID for Maestro tests.
-  Future<void> bypassAuthForMaestro() async {
-    if (!maestroBypassAuthEnabled) {
+  /// True after [debugSignIn] until [signOut] or [deleteAccount].
+  bool get isDebugSignedIn => _debugSignedIn;
+
+  /// Development-only: skip OTP/Google and bind a stable local test user.
+  Future<void> debugSignIn() async {
+    if (!debugSignInAvailable) {
       throw const AuthAppException(
-        'MAESTRO_BYPASS_AUTH not enabled or not in development flavor. '
-        'Pass --dart-define=MAESTRO_BYPASS_AUTH=true to development flavor builds.',
+        'Debug sign-in is only available in the development flavor.',
       );
     }
 
-    const testUserId = 'maestro-test-user';
-    await _userContext.setActiveUserId(testUserId);
+    _debugSignedIn = true;
+    await _userContext.setActiveUserId(maestroTestUserId);
     await _userContext.markIntroCompleted();
     // Do not mark verified — keep sync disabled for local-only test data.
   }
@@ -115,12 +117,16 @@ class AuthService {
       _authRepository.updateDisplayName(displayName);
 
   /// Clears the Supabase session and keeps local Hive data / active_user_id.
-  Future<void> signOut() => _authRepository.signOut();
+  Future<void> signOut() async {
+    _debugSignedIn = false;
+    await _authRepository.signOut();
+  }
 
   /// Deletes the auth user remotely, wipes local entity Hive, then signs out.
   ///
   /// Keeps `intro_completed` in settings. Does not cancel Play billing.
   Future<void> deleteAccount() async {
+    _debugSignedIn = false;
     await _authRepository.deleteOwnAccount();
     await _clearLocalEntityData();
     final logOutPurchases = _logOutPurchases;

@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:sprout/core/constants/app_strings.dart';
 import 'package:sprout/core/router/app_route.dart';
 import 'package:sprout/features/auth/presentation/bloc/auth_cubit.dart';
+import 'package:sprout/features/auth/presentation/widgets/debug_sign_in_button.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({super.key, this.onBackToIntro});
@@ -242,6 +243,8 @@ class _SignInPageState extends State<SignInPage> {
                       ),
                     ),
                   ],
+                  const SizedBox(height: 24),
+                  DebugSignInButton(enabled: !busy),
                   if (busy) ...[
                     const SizedBox(height: 24),
                     const Center(child: CircularProgressIndicator()),

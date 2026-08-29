@@ -65,10 +65,12 @@ void main() {
     pendingBox = await Hive.openBox<PendingSyncHiveModel>('pending_$stamp');
     settingsBox = await Hive.openBox<dynamic>('settings_$stamp');
     fakeAuth = FakeAuthRepository();
+    final config = appConfig();
     cubit = AuthCubit(
       authService: AuthService(
         authRepository: fakeAuth,
         userContext: UserContext(settingsBox),
+        appConfig: config,
         accountsBox: accountsBox,
         goalsBox: goalsBox,
         budgetGroupsBox: budgetGroupsBox,
@@ -77,7 +79,7 @@ void main() {
         flushPending: () async {},
         pullRemote: () async {},
       ),
-      appConfig: appConfig(),
+      appConfig: config,
     );
   });
 
@@ -97,6 +99,26 @@ void main() {
     if (tempDir.existsSync()) {
       tempDir.deleteSync(recursive: true);
     }
+  });
+
+  test('debug sign-in stays signed in when Supabase has no session', () async {
+    expect(cubit.debugSignInAvailable, isTrue);
+    await cubit.debugSignIn();
+
+    expect(cubit.state, isA<AuthViewSignedIn>());
+    expect(
+      (cubit.state as AuthViewSignedIn).user.id,
+      AuthService.maestroTestUserId,
+    );
+    expect((cubit.state as AuthViewSignedIn).user.email, 'maestro@test.local');
+
+    fakeAuth.setUser(null);
+    await Future<void>.delayed(Duration.zero);
+    expect(cubit.state, isA<AuthViewSignedIn>());
+    expect(
+      (cubit.state as AuthViewSignedIn).user.id,
+      AuthService.maestroTestUserId,
+    );
   });
 
   test('starts as guest when signed out', () {

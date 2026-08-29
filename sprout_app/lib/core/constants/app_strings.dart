@@ -71,6 +71,8 @@ abstract final class AppStrings {
       'Could not delete your account. Try again.';
   static const String termsOfService = 'Terms of Service';
   static const String privacyPolicy = 'Privacy Policy';
+  static const String debugSignIn = 'Debug sign in';
+  static const String debugSignInDetails = 'Maestro Test · maestro@test.local';
   static const String byContinuingYouAgree = 'By continuing you agree to the';
   static const String and = 'and';
   static const String termsLoadFailed = 'Could not load Terms of Service.';

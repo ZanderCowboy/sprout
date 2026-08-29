@@ -1,0 +1,14 @@
+---
+description: Maestro UI flows and MCP — development flavor, auth bypass, .maestro YAML
+globs: .maestro/**/*.yaml
+alwaysApply: false
+---
+
+# Maestro
+
+Flows live in `.maestro/` and run against the **development** flavor only.
+
+- Prefer the **Maestro MCP** (`list_devices`, `inspect_screen`, `run`, `cheat_sheet`, `take_screenshot`). Call `cheat_sheet` before authoring unfamiliar commands.
+- App id: `app.stackmint.sprout.dev`. Use a development build. Flows tap **Debug sign in** (`Maestro Test · maestro@test.local`) then wait for Overview.
+- CLI fallback: `maestro test .maestro/` or `maestro test .maestro/<flow>.yaml`.
+- Do not point Maestro at production. Debug sign-in is hidden outside the development flavor.

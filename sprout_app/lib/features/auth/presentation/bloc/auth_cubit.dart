@@ -120,26 +120,32 @@ class AuthCubit extends Cubit<AuthViewState> {
 
   bool get _googleAvailable => _appConfig.isGoogleSignInConfigured;
 
-  /// Development-only: true when MAESTRO_BYPASS_AUTH compile flag is set
-  /// AND the app is running in development flavor.
-  ///
-  /// Production flavor always returns false, even if the flag is set.
-  bool get maestroBypassAuthEnabled => _authService.maestroBypassAuthEnabled;
+  /// Development flavor only. Production never shows the debug sign-in button.
+  bool get debugSignInAvailable => _authService.debugSignInAvailable;
 
-  /// Development-only: bypass OTP/Google and bind a stable test user.
-  ///
-  /// Only works in development flavor with MAESTRO_BYPASS_AUTH=true.
-  Future<void> bypassAuthForMaestro() async {
-    await _authService.bypassAuthForMaestro();
-    // After bypass, emit SignedIn with a synthetic local user.
-    const testUser = AuthUser(
-      id: 'maestro-test-user',
-      email: 'maestro@test.local',
-      displayName: 'Maestro Test',
-      isAnonymous: false,
-      signedInWithGoogle: false,
-    );
-    emit(const AuthViewSignedIn(user: testUser));
+  /// Development-only: skip OTP/Google and bind a stable local test user.
+  Future<void> debugSignIn() async {
+    final current = state;
+    if (current is AuthViewGuest && current.busy) return;
+    if (current is AuthViewGuest) {
+      emit(current.copyWith(busy: true, clearError: true, clearInfo: true));
+    }
+    try {
+      await _authService.debugSignIn();
+      if (isClosed) return;
+      emit(const AuthViewSignedIn(user: AuthService.maestroTestUser));
+    } on AppException catch (e) {
+      if (isClosed) return;
+      if (current is AuthViewGuest) {
+        emit(
+          current.copyWith(
+            busy: false,
+            errorMessage: e.toFailure().message,
+            clearInfo: true,
+          ),
+        );
+      }
+    }
   }
 
   void emailChanged(String email) {
@@ -330,6 +336,10 @@ class AuthCubit extends Cubit<AuthViewState> {
     if (isClosed) return;
     if (user != null && user.isVerified) {
       emit(AuthViewSignedIn(user: user));
+      return;
+    }
+    if (_authService.isDebugSignedIn) {
+      emit(const AuthViewSignedIn(user: AuthService.maestroTestUser));
       return;
     }
     final previous = state;

@@ -1,29 +1,36 @@
 appId: app.stackmint.sprout.dev
 ---
 # Core savings loop test: account → goal → deposit → verify progress
-# Requires: MAESTRO_BYPASS_AUTH=true at build time
+# Requires: development flavor. Tap Debug sign in on intro or Sign in.
 # Run: maestro test .maestro/core-loop.yaml
 
 - launchApp:
     clearState: true
     clearKeychain: true
 
-# Wait for app to load and bypass auth to land on Overview
-- assertVisible:
-    text: "Portfolio total"
-    timeout: 10000
+- extendedWaitUntil:
+    visible:
+      text: "Debug sign in"
+    timeout: 45000
+
+- tapOn: "Debug sign in"
+
+- extendedWaitUntil:
+    visible:
+      text: "Portfolio total"
+    timeout: 15000
 
 # Verify empty state guidance is shown
-- assertVisible:
-    text: "Welcome to Sprout"
+- assertVisible: "Welcome to Sprout"
 
 # Step 1: Create an account
 - tapOn:
     text: "New account"
     index: 0  # First "New account" button in guidance steps
 
-- assertVisible:
-    text: "New account"
+- extendedWaitUntil:
+    visible:
+      text: "New account"
     timeout: 5000
 
 - tapOn:
@@ -31,11 +38,11 @@ appId: app.stackmint.sprout.dev
 
 - inputText: "Test Savings"
 
-- tapOn:
-    text: "Save"
+- tapOn: "Save"
 
-- assertVisible:
-    text: "Portfolio total"
+- extendedWaitUntil:
+    visible:
+      text: "Portfolio total"
     timeout: 5000
 
 # Step 2: Create a goal
@@ -43,8 +50,9 @@ appId: app.stackmint.sprout.dev
     text: "New goal"
     index: 0  # First "New goal" button in guidance
 
-- assertVisible:
-    text: "New goal"
+- extendedWaitUntil:
+    visible:
+      text: "New goal"
     timeout: 5000
 
 - tapOn:
@@ -57,34 +65,30 @@ appId: app.stackmint.sprout.dev
 
 - inputText: "5000"
 
-- tapOn:
-    text: "Save"
+- tapOn: "Save"
 
-- assertVisible:
-    text: "Portfolio total"
+- extendedWaitUntil:
+    visible:
+      text: "Portfolio total"
     timeout: 5000
 
 # Step 3: Make a deposit
-- tapOn:
-    text: "Deposit"
+- tapOn: "Deposit"
 
-- assertVisible:
-    text: "Deposit"
+- extendedWaitUntil:
+    visible:
+      text: "Deposit"
     timeout: 5000
 
 # Select account (should be pre-selected)
-- tapOn:
-    text: "Account"
+- tapOn: "Account"
 
-- tapOn:
-    text: "Test Savings"
+- tapOn: "Test Savings"
 
 # Select goal
-- tapOn:
-    text: "Goal"
+- tapOn: "Goal"
 
-- tapOn:
-    text: "Vacation Fund"
+- tapOn: "Vacation Fund"
 
 # Enter amount
 - tapOn:
@@ -92,34 +96,30 @@ appId: app.stackmint.sprout.dev
 
 - inputText: "1000"
 
-- tapOn:
-    text: "Save"
+- tapOn: "Save"
 
 # Verify deposit succeeded and Overview updated
-- assertVisible:
-    text: "Portfolio total"
+- extendedWaitUntil:
+    visible:
+      text: "Portfolio total"
     timeout: 5000
 
 # Navigate to Goals tab to verify progress
-- tapOn:
-    text: "Goals"
+- tapOn: "Goals"
 
-- assertVisible:
-    text: "Goals"
+- assertVisible: "Goals"
 
-- assertVisible:
-    text: "Vacation Fund"
+- assertVisible: "Vacation Fund"
 
 # Tap on the goal to see details
-- tapOn:
-    text: "Vacation Fund"
+- tapOn: "Vacation Fund"
 
-- assertVisible:
-    text: "Vacation Fund"
+- extendedWaitUntil:
+    visible:
+      text: "Vacation Fund"
     timeout: 5000
 
 # Verify progress shows
-- assertVisible:
-    text: "Remaining"
+- assertVisible: "Remaining"
 
 # Success: The core loop (account → goal → deposit → progress) completed

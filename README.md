@@ -142,18 +142,12 @@ Maestro flows are in `.maestro/` and test the core savings loop (account → goa
 
 ### Prerequisites
 
-1. Install Maestro: https://maestro.mobile.dev/getting-started/installing-maestro
-2. Build the development APK **with auth bypass**:
+1. Install Maestro CLI (https://docs.maestro.dev/maestro-cli/how-to-install-maestro-cli). On this Windows machine it lives at `C:\Programming\maestro\bin`. The project MCP in `.cursor/mcp.json` launches `maestro mcp` so the agent can inspect devices and run flows.
+2. Build or run the **development** flavor (no dart-define needed):
 
 ```bash
 cd sprout_app
-flutter build apk --debug --flavor development -t lib/main_development.dart --dart-define=MAESTRO_BYPASS_AUTH=true
-```
-
-Or for a device/emulator already running the development flavor with bypass:
-
-```bash
-flutter run --flavor development -t lib/main_development.dart --dart-define=MAESTRO_BYPASS_AUTH=true
+flutter run --flavor development -t lib/main_development.dart
 ```
 
 ### Running tests
@@ -170,12 +164,9 @@ maestro test .maestro/core-loop.yaml
 
 ### Auth bypass
 
-The `MAESTRO_BYPASS_AUTH=true` dart-define flag enables a **development-only** bypass that:
-- Skips intro and OTP/Google sign-in
-- Binds a stable local test user (`maestro-test-user`)
-- Lands directly on Overview with empty state
+Development builds show a **Debug sign in** button on intro and Sign in (`Maestro Test · maestro@test.local`). It binds a local-only test user (`maestro-test-user`) and opens Overview. Sync stays off.
 
-**Production flavor is unaffected** — the bypass flag is a compile-time constant that does nothing outside development builds.
+**Production flavor never shows the button.**
 
 ### Available flows
 

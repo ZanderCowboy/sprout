@@ -58,10 +58,24 @@ void main() {
     pendingBox = await Hive.openBox<PendingSyncHiveModel>('pending_$stamp');
     settingsBox = await Hive.openBox<dynamic>('settings_$stamp');
     fakeAuth = FakeAuthRepository();
+    const config = AppConfig(
+      environment: AppEnvironment.development,
+      supabaseUrl: 'https://example.supabase.co',
+      supabaseAnonKey: 'sb_publishable_test_key_1234567890',
+      googleWebClientId: 'web-client.apps.googleusercontent.com',
+      androidApplicationId: 'app.stackmint.sprout.dev',
+      revenueCatAndroidApiKey: '',
+      firebaseApiKey: '',
+      firebaseAppId: '',
+      firebaseMessagingSenderId: '',
+      firebaseProjectId: '',
+      firebaseStorageBucket: '',
+    );
     cubit = AuthCubit(
       authService: AuthService(
         authRepository: fakeAuth,
         userContext: UserContext(settingsBox),
+        appConfig: config,
         accountsBox: accountsBox,
         goalsBox: goalsBox,
         budgetGroupsBox: budgetGroupsBox,
@@ -70,19 +84,7 @@ void main() {
         flushPending: () async {},
         pullRemote: () async {},
       ),
-      appConfig: const AppConfig(
-        environment: AppEnvironment.development,
-        supabaseUrl: 'https://example.supabase.co',
-        supabaseAnonKey: 'sb_publishable_test_key_1234567890',
-        googleWebClientId: 'web-client.apps.googleusercontent.com',
-        androidApplicationId: 'app.stackmint.sprout.dev',
-        revenueCatAndroidApiKey: '',
-        firebaseApiKey: '',
-        firebaseAppId: '',
-        firebaseMessagingSenderId: '',
-        firebaseProjectId: '',
-        firebaseStorageBucket: '',
-      ),
+      appConfig: config,
     );
   });
 

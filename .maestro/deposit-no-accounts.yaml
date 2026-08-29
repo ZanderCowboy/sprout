@@ -1,53 +1,58 @@
 appId: app.stackmint.sprout.dev
 ---
 # Test: Deposit with 0 accounts shows "create an account first" CTA
-# Requires: MAESTRO_BYPASS_AUTH=true at build time
+# Requires: development flavor. Tap Debug sign in on intro or Sign in.
 # Run: maestro test .maestro/deposit-no-accounts.yaml
 
 - launchApp:
     clearState: true
     clearKeychain: true
 
-# Wait for app to load and bypass auth to land on Overview
-- assertVisible:
-    text: "Portfolio total"
-    timeout: 10000
+- extendedWaitUntil:
+    visible:
+      text: "Debug sign in"
+    timeout: 45000
+
+- tapOn: "Debug sign in"
+
+- extendedWaitUntil:
+    visible:
+      text: "Portfolio total"
+    timeout: 15000
 
 # Verify empty state guidance is shown
-- assertVisible:
-    text: "Welcome to Sprout"
+- assertVisible: "Welcome to Sprout"
 
 # The deposit button in the empty state is disabled with 0 accounts and 0 goals.
 # Instead, use the center + button to open the action sheet.
-# Tap the center + button (look for the gradient add button in the nav bar)
 - tapOn:
     point: "50%,95%"  # Bottom center where the + button is located
 
 # Wait for action sheet to appear
-- assertVisible:
-    text: "What would you like to do?"
+- extendedWaitUntil:
+    visible:
+      text: "What would you like to do?"
     timeout: 3000
 
 # Tap "Deposit" in the action sheet
-- tapOn:
-    text: "Deposit"
+- tapOn: "Deposit"
 
 # Should now see the "Create an account first" message
-- assertVisible:
-    text: "Create an account first"
+- extendedWaitUntil:
+    visible:
+      text: "Create an account first"
     timeout: 5000
 
 # Verify the CTA is present
-- assertVisible:
-    text: "New account"
+- assertVisible: "New account"
 
 # Tap the "New account" button in the deposit sheet
-- tapOn:
-    text: "New account"
+- tapOn: "New account"
 
 # Should now be in account creation
-- assertVisible:
-    text: "New account"
+- extendedWaitUntil:
+    visible:
+      text: "New account"
     timeout: 5000
 
 # Success: User is not left on a dead-end sentence

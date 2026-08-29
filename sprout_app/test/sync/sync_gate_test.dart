@@ -82,6 +82,7 @@ void main() {
     final service = AuthService(
       authRepository: fake,
       userContext: UserContext(settingsBox),
+      appConfig: config(supabase: true),
       accountsBox: accountsBox,
       goalsBox: goalsBox,
       budgetGroupsBox: budgetGroupsBox,
