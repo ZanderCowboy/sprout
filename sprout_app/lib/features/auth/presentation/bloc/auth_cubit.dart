@@ -4,6 +4,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:sprout/core/config/app_config.dart';
+import 'package:sprout/core/constants/app_strings.dart';
 import 'package:sprout/core/error/error.dart';
 import '../../application/auth_service.dart';
 import '../../domain/auth_user.dart';
@@ -179,7 +180,7 @@ class AuthCubit extends Cubit<AuthViewState> {
         current.copyWith(
           busy: false,
           otpSent: true,
-          infoMessage: 'Check your email for a 6-digit code.',
+          infoMessage: AppStrings.checkEmailForCode,
           clearError: true,
         ),
       );

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'package:sprout/core/constants/app_colors.dart';
 import 'package:sprout/core/constants/app_strings.dart';
+import 'package:sprout/core/constants/semantics_ids.dart';
+import 'package:sprout/ui/export.dart';
 import 'widgets/debug_sign_in_button.dart';
 
 class IntroPage extends StatefulWidget {
@@ -72,23 +74,20 @@ class _IntroPageState extends State<IntroPage> {
                     _IntroSlide(
                       icon: Icons.savings_rounded,
                       accent: AppColors.seed,
-                      title: 'Track your savings in one place',
-                      body:
-                          'See your accounts, activity, and totals together so you always know where you stand.',
+                      title: AppStrings.introSlide1Title,
+                      body: AppStrings.introSlide1Body,
                     ),
                     _IntroSlide(
                       icon: Icons.flag_rounded,
                       accent: AppColors.accentViolet,
-                      title: 'Set goals and watch them grow',
-                      body:
-                          'Give each goal a target and watch progress build as you save.',
+                      title: AppStrings.introSlide2Title,
+                      body: AppStrings.introSlide2Body,
                     ),
                     _IntroSlide(
                       icon: Icons.cloud_sync_rounded,
                       accent: AppColors.accentSky,
-                      title: 'Sign in so your data stays with you',
-                      body:
-                          'Your savings stay with your account, not only on this device.',
+                      title: AppStrings.introSlide3Title,
+                      body: AppStrings.introSlide3Body,
                     ),
                   ],
                 ),
@@ -103,9 +102,10 @@ class _IntroPageState extends State<IntroPage> {
               const SizedBox(height: 24),
               SizedBox(
                 width: double.infinity,
-                child: FilledButton(
+                child: SproutFilledButton(
+                  identifier: SemanticsIds.introNext,
+                  label: _isLastSlide ? AppStrings.signIn : AppStrings.next,
                   onPressed: _goNext,
-                  child: Text(_isLastSlide ? 'Sign in' : 'Next'),
                 ),
               ),
               const SizedBox(height: 12),

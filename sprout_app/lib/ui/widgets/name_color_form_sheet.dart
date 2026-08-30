@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:sprout/core/core.dart';
+import 'package:sprout/ui/export.dart';
 
 class NameColorFormSheet extends StatelessWidget {
   const NameColorFormSheet({
@@ -16,6 +17,8 @@ class NameColorFormSheet extends StatelessWidget {
     required this.primaryActionEnabled,
     this.body,
     this.nameFieldKey,
+    this.nameFieldIdentifier,
+    this.primaryActionIdentifier,
   });
 
   final String title;
@@ -39,26 +42,34 @@ class NameColorFormSheet extends StatelessWidget {
   /// Optional semantics identifier for the name text field (for Maestro).
   final String? nameFieldIdentifier;
 
-  const NameColorFormSheet({
-    super.key,
-    required this.title,
-    required this.nameLabel,
-    required this.nameController,
-    required this.nameErrorText,
-    required this.colorArgb,
-    required this.onColorSelected,
-    required this.primaryActionLabel,
-    required this.onPrimaryAction,
-    required this.primaryActionEnabled,
-    this.body,
-    this.nameFieldKey,
-    this.nameFieldIdentifier,
-  });
+  /// Optional semantics identifier for the primary save button.
+  final String? primaryActionIdentifier;
 
   @override
   Widget build(BuildContext context) {
     final mq = MediaQuery.of(context);
     final bottomPadding = mq.viewInsets.bottom + mq.padding.bottom;
+    final nameField = nameFieldIdentifier == null
+        ? TextField(
+            key: nameFieldKey,
+            controller: nameController,
+            decoration: InputDecoration(
+              labelText: nameLabel,
+              errorText: nameErrorText,
+            ),
+            textCapitalization: TextCapitalization.words,
+          )
+        : SproutTextField(
+            identifier: nameFieldIdentifier!,
+            fieldKey: nameFieldKey,
+            controller: nameController,
+            decoration: InputDecoration(
+              labelText: nameLabel,
+              errorText: nameErrorText,
+            ),
+            textCapitalization: TextCapitalization.words,
+          );
+
     return Padding(
       padding: EdgeInsets.only(
         left: 20,
@@ -72,30 +83,15 @@ class NameColorFormSheet extends StatelessWidget {
         children: [
           Text(
             title,
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 16),
-          Semantics(
-            identifier: nameFieldIdentifier,
-            textField: true,
-            child: TextField(
-              key: nameFieldKey,
-              controller: nameController,
-              decoration: InputDecoration(
-                labelText: nameLabel,
-                errorText: nameErrorText,
-              ),
-              textCapitalization: TextCapitalization.words,
-            ),
-          ),
+          nameField,
           if (body != null) ...body!,
           const SizedBox(height: 16),
-          Text(
-            'Color',
-            style: Theme.of(context).textTheme.labelLarge,
-          ),
+          Text(AppStrings.color, style: Theme.of(context).textTheme.labelLarge),
           const SizedBox(height: 8),
           Wrap(
             spacing: 8,
@@ -103,11 +99,13 @@ class NameColorFormSheet extends StatelessWidget {
             children: [
               for (var i = 0; i < AppColors.cardPalette.length; i++)
                 Semantics(
+                  identifier: SemanticsIds.colorSwatchAt(i + 1),
                   button: true,
-                  label: 'Color ${i + 1}',
+                  label: AppStrings.colorNumber(i + 1),
                   selected: colorArgb == AppColors.cardPalette[i].toARGB32(),
                   child: GestureDetector(
-                    onTap: () => onColorSelected(AppColors.cardPalette[i].toARGB32()),
+                    onTap: () =>
+                        onColorSelected(AppColors.cardPalette[i].toARGB32()),
                     child: CircleAvatar(
                       backgroundColor: AppColors.cardPalette[i],
                       child: colorArgb == AppColors.cardPalette[i].toARGB32()
@@ -119,13 +117,13 @@ class NameColorFormSheet extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 24),
-          FilledButton(
+          SproutFilledButton(
+            identifier: primaryActionIdentifier ?? SemanticsIds.formSave,
+            label: primaryActionLabel,
             onPressed: primaryActionEnabled ? onPrimaryAction : null,
-            child: Text(primaryActionLabel),
           ),
         ],
       ),
     );
   }
 }
-

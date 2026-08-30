@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:sprout/core/constants/app_strings.dart';
 import 'package:sprout/core/startup/startup_initializer.dart';
 import 'package:sprout/features/startup/startup_error_page.dart';
 
@@ -21,7 +22,7 @@ void main() {
       ),
     );
 
-    expect(find.text('Retry'), findsOneWidget);
+    expect(find.text(AppStrings.retry), findsOneWidget);
     expect(find.text('Continue local-only'), findsNothing);
   });
 }

@@ -1,0 +1,27 @@
+appId: app.stackmint.sprout.dev
+---
+# Requires: deposit sheet open, account and goal exist.
+# Env: ACCOUNT_NAME, GOAL_NAME, AMOUNT (required).
+- tapOn:
+    id: "deposit_account_dropdown"
+
+- tapOn:
+    text: ${ACCOUNT_NAME}
+
+- tapOn:
+    id: "deposit_goal_dropdown"
+
+- tapOn:
+    text: ${GOAL_NAME}
+
+- tapOn:
+    id: "deposit_amount_field"
+
+- eraseText
+
+- inputText: ${AMOUNT}
+
+- tapOn:
+    id: "deposit_save"
+
+- runFlow: wait-overview.yaml

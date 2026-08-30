@@ -166,24 +166,27 @@ class _CreateGoalScreenState extends State<CreateGoalScreen> {
                     style: Theme.of(context).textTheme.bodyLarge,
                   ),
                   const SizedBox(height: 20),
-                  FilledButton.icon(
-                    onPressed: () async {
-                      Navigator.of(context).pop();
-                      await showModalBottomSheet<void>(
-                        context: context,
-                        isScrollControlled: true,
-                        showDragHandle: true,
-                        builder: (_) => AccountFormSheet(defaultColor: AppColors.cardColorAt(0)),
-                      );
-                    },
-                    icon: const Icon(Icons.account_balance_wallet_outlined),
-                    label: const Text(AppStrings.newAccount),
-                  ),
-                  const SizedBox(height: 12),
-                  OutlinedButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: const Text(AppStrings.cancel),
-                  ),
+                    SproutFilledButton.icon(
+                      identifier: SemanticsIds.goalNoAccountsNewAccount,
+                      label: AppStrings.newAccount,
+                      onPressed: () async {
+                        Navigator.of(context).pop();
+                        await showModalBottomSheet<void>(
+                          context: context,
+                          isScrollControlled: true,
+                          showDragHandle: true,
+                          builder: (_) => AccountFormSheet(defaultColor: AppColors.cardColorAt(0)),
+                        );
+                      },
+                      icon: const Icon(Icons.account_balance_wallet_outlined),
+                      labelWidget: const Text(AppStrings.newAccount),
+                    ),
+                    const SizedBox(height: 12),
+                    SproutOutlinedButton(
+                      identifier: SemanticsIds.goalNoAccountsCancel,
+                      label: AppStrings.cancel,
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
                 ],
               ),
             );
@@ -203,30 +206,28 @@ class _CreateGoalScreenState extends State<CreateGoalScreen> {
             onPrimaryAction: () => _submit(context, state),
             primaryActionEnabled: canSubmit,
             nameFieldKey: const Key('goal_name_field'),
-            nameFieldIdentifier: 'goal_name_field',
+            nameFieldIdentifier: SemanticsIds.goalNameField,
             body: [
               const SizedBox(height: 12),
-              Semantics(
-                identifier: 'goal_target_field',
-                textField: true,
-                child: TextField(
-                  key: const Key('goal_target_field'),
-                  controller: _target,
-                  decoration: InputDecoration(
-                    labelText: AppStrings.targetAmount,
-                    errorText: _targetError,
-                  ),
-                  keyboardType: const TextInputType.numberWithOptions(
-                    decimal: true,
-                    signed: true,
-                  ),
+              SproutTextField(
+                identifier: SemanticsIds.goalTargetField,
+                fieldKey: const Key('goal_target_field'),
+                controller: _target,
+                decoration: InputDecoration(
+                  labelText: AppStrings.targetAmount,
+                  errorText: _targetError,
+                ),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                  signed: true,
                 ),
               ),
               const SizedBox(height: 12),
-              TextField(
+              SproutTextField(
+                identifier: SemanticsIds.goalAlreadySavedField,
                 controller: _alreadySaved,
                 decoration: InputDecoration(
-                  labelText: 'Already Saved Amount (ZAR)',
+                  labelText: AppStrings.alreadySavedAmount,
                   errorText: _alreadySavedError,
                 ),
                 keyboardType: const TextInputType.numberWithOptions(
@@ -236,10 +237,12 @@ class _CreateGoalScreenState extends State<CreateGoalScreen> {
               ),
               if (showOpening) ...[
                 const SizedBox(height: 12),
-                DropdownButtonFormField<String>(
-                  value: _alreadySavedAccountId, // ignore: deprecated_member_use
+                SproutDropdownField<String>(
+                  identifier: SemanticsIds.goalAlreadySavedAccount,
+                  label: AppStrings.whichAccountHoldsMoney,
+                  value: _alreadySavedAccountId,
                   decoration: const InputDecoration(
-                    labelText: 'Which Account holds this money?',
+                    labelText: AppStrings.whichAccountHoldsMoney,
                   ),
                   items: [
                     for (final a in state.accounts)

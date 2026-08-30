@@ -4,9 +4,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:sprout/core/constants/app_strings.dart';
+import 'package:sprout/core/constants/semantics_ids.dart';
 import 'package:sprout/core/router/app_route.dart';
 import 'package:sprout/features/auth/presentation/bloc/auth_cubit.dart';
 import 'package:sprout/features/auth/presentation/widgets/debug_sign_in_button.dart';
+import 'package:sprout/ui/export.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({super.key, this.onBackToIntro});
@@ -52,8 +54,12 @@ class _SignInPageState extends State<SignInPage> {
       appBar: AppBar(
         leading: widget.onBackToIntro == null
             ? null
-            : BackButton(onPressed: widget.onBackToIntro),
-        title: const Text('Sign in'),
+            : SproutBackButton(
+                identifier: SemanticsIds.signInBack,
+                label: AppStrings.back,
+                onPressed: widget.onBackToIntro,
+              ),
+        title: const Text(AppStrings.signIn),
       ),
       body: BlocConsumer<AuthCubit, AuthViewState>(
         listener: (context, state) {
@@ -103,21 +109,22 @@ class _SignInPageState extends State<SignInPage> {
                   ),
                   const SizedBox(height: 24),
                   Text(
-                    'Sign in to sync your savings across devices.',
+                    AppStrings.signInSubtitle,
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.bodyLarge,
                   ),
                   const SizedBox(height: 8),
                   if (!supabaseConfigured)
                     Text(
-                      'Sign-in isn’t configured for this build.',
+                      AppStrings.signInNotConfigured,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                     ),
                   if (supabaseConfigured) ...[
                     const SizedBox(height: 16),
-                    TextField(
+                    SproutTextField(
+                      identifier: SemanticsIds.signInDisplayNameField,
                       controller: _displayNameController,
                       enabled: !busy,
                       textCapitalization: TextCapitalization.words,
@@ -130,27 +137,28 @@ class _SignInPageState extends State<SignInPage> {
                       onChanged: context.read<AuthCubit>().displayNameChanged,
                     ),
                     const SizedBox(height: 12),
-                    TextField(
+                    SproutTextField(
+                      identifier: SemanticsIds.signInEmailField,
                       controller: _emailController,
                       enabled: !busy,
                       keyboardType: TextInputType.emailAddress,
                       autofillHints: const [AutofillHints.email],
                       decoration: const InputDecoration(
-                        labelText: 'Email',
+                        labelText: AppStrings.email,
                         border: OutlineInputBorder(),
                       ),
                       onChanged: context.read<AuthCubit>().emailChanged,
                     ),
                     const SizedBox(height: 12),
-                    FilledButton(
-                      onPressed: busy
-                          ? null
-                          : () => context.read<AuthCubit>().sendOtp(),
-                      child: const Text('Send code'),
+                    SproutFilledButton(
+                      identifier: SemanticsIds.signInSendCode,
+                      label: AppStrings.sendCode,
+                      onPressed: busy ? null : () => context.read<AuthCubit>().sendOtp(),
                     ),
                     if (otpSent) ...[
                       const SizedBox(height: 16),
-                      TextField(
+                      SproutTextField(
+                        identifier: SemanticsIds.signInOtpField,
                         controller: _otpController,
                         enabled: !busy,
                         keyboardType: TextInputType.number,
@@ -159,18 +167,19 @@ class _SignInPageState extends State<SignInPage> {
                           LengthLimitingTextInputFormatter(8),
                         ],
                         decoration: const InputDecoration(
-                          labelText: 'Verification code',
+                          labelText: AppStrings.verificationCode,
                           border: OutlineInputBorder(),
                         ),
                       ),
                       const SizedBox(height: 12),
-                      FilledButton.tonal(
+                      SproutFilledButton.tonal(
+                        identifier: SemanticsIds.signInVerifyCode,
+                        label: AppStrings.verifyCode,
                         onPressed: busy
                             ? null
                             : () => context.read<AuthCubit>().verifyOtp(
-                                _otpController.text,
-                              ),
-                        child: const Text('Verify code'),
+                                  _otpController.text,
+                                ),
                       ),
                     ],
                     if (googleAvailable) ...[
@@ -180,19 +189,20 @@ class _SignInPageState extends State<SignInPage> {
                           Expanded(child: Divider()),
                           Padding(
                             padding: EdgeInsets.symmetric(horizontal: 12),
-                            child: Text('or'),
+                            child: Text(AppStrings.or),
                           ),
                           Expanded(child: Divider()),
                         ],
                       ),
                       const SizedBox(height: 16),
-                      OutlinedButton.icon(
+                      SproutOutlinedButton.icon(
+                        identifier: SemanticsIds.signInGoogle,
+                        label: AppStrings.continueWithGoogle,
                         onPressed: busy
                             ? null
-                            : () =>
-                                  context.read<AuthCubit>().signInWithGoogle(),
+                            : () => context.read<AuthCubit>().signInWithGoogle(),
                         icon: const Icon(Icons.g_mobiledata_rounded),
-                        label: const Text('Continue with Google'),
+                        labelWidget: const Text(AppStrings.continueWithGoogle),
                       ),
                     ],
                     const SizedBox(height: 24),
@@ -206,8 +216,15 @@ class _SignInPageState extends State<SignInPage> {
                           WidgetSpan(
                             alignment: PlaceholderAlignment.baseline,
                             baseline: TextBaseline.alphabetic,
-                            child: GestureDetector(
-                              onTap: _openTerms,
+                            child: SproutTextButton(
+                              identifier: SemanticsIds.signInTermsLink,
+                              label: AppStrings.termsOfService,
+                              onPressed: _openTerms,
+                              style: TextButton.styleFrom(
+                                padding: EdgeInsets.zero,
+                                minimumSize: Size.zero,
+                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              ),
                               child: Text(
                                 AppStrings.termsOfService,
                                 style: Theme.of(context).textTheme.bodySmall
@@ -224,8 +241,15 @@ class _SignInPageState extends State<SignInPage> {
                           WidgetSpan(
                             alignment: PlaceholderAlignment.baseline,
                             baseline: TextBaseline.alphabetic,
-                            child: GestureDetector(
-                              onTap: _openPrivacy,
+                            child: SproutTextButton(
+                              identifier: SemanticsIds.signInPrivacyLink,
+                              label: AppStrings.privacyPolicy,
+                              onPressed: _openPrivacy,
+                              style: TextButton.styleFrom(
+                                padding: EdgeInsets.zero,
+                                minimumSize: Size.zero,
+                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              ),
                               child: Text(
                                 AppStrings.privacyPolicy,
                                 style: Theme.of(context).textTheme.bodySmall
@@ -244,7 +268,10 @@ class _SignInPageState extends State<SignInPage> {
                     ),
                   ],
                   const SizedBox(height: 24),
-                  DebugSignInButton(enabled: !busy),
+                  DebugSignInButton(
+                    enabled: !busy,
+                    identifier: SemanticsIds.signInDebugSignIn,
+                  ),
                   if (busy) ...[
                     const SizedBox(height: 24),
                     const Center(child: CircularProgressIndicator()),

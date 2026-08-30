@@ -6,6 +6,7 @@ import 'package:sprout/core/di/service_locator.dart';
 import 'package:sprout/features/accounts/export.dart';
 import 'package:sprout/features/goals/export.dart';
 import 'package:sprout/features/transactions/export.dart';
+import 'package:sprout/ui/export.dart';
 
 enum DepositBottomSheetMode {
   /// Current behavior: deposit and immediately assign to a single goal.
@@ -175,7 +176,7 @@ class _DepositBottomSheetState extends State<DepositBottomSheet> {
   Future<void> _submit() async {
     final cents = parseZarToCents(_amount.text);
     if (_accountId == null) {
-      setState(() => _error = 'Pick an account.');
+      setState(() => _error = AppStrings.pickAnAccount);
       return;
     }
 
@@ -186,11 +187,11 @@ class _DepositBottomSheetState extends State<DepositBottomSheet> {
 
     if (_mode == DepositBottomSheetMode.fullDepositToGoal) {
       if (cents == null || cents <= 0) {
-        setState(() => _error = 'Enter a valid amount.');
+        setState(() => _error = AppStrings.invalidAmount);
         return;
       }
       if (_goalId == null) {
-        setState(() => _error = 'Pick a goal.');
+        setState(() => _error = AppStrings.pickAGoal);
         return;
       }
       await tx.recordDeposit(
@@ -209,7 +210,7 @@ class _DepositBottomSheetState extends State<DepositBottomSheet> {
     if (_mode == DepositBottomSheetMode.allocateExistingUnallocated) {
       final maxAllowed = _availableUnallocatedForAccountCents;
       if (maxAllowed == null || maxAllowed <= 0) {
-        setState(() => _error = 'No unallocated funds available for this account.');
+        setState(() => _error = AppStrings.noUnallocatedForAccount);
         return;
       }
       var allocatedTotal = 0;
@@ -220,11 +221,11 @@ class _DepositBottomSheetState extends State<DepositBottomSheet> {
         allocatedTotal += aCents;
       }
       if (allocatedTotal <= 0) {
-        setState(() => _error = 'Enter at least one allocation amount.');
+        setState(() => _error = AppStrings.enterAtLeastOneAllocation);
         return;
       }
       if (allocatedTotal > maxAllowed) {
-        setState(() => _error = 'Allocations exceed available unallocated funds.');
+        setState(() => _error = AppStrings.allocationsExceedUnallocated);
         return;
       }
       final groupId = _uuid.v4();
@@ -246,7 +247,7 @@ class _DepositBottomSheetState extends State<DepositBottomSheet> {
 
     // Deposit to account (unallocated), then optionally allocate/split.
     if (cents == null || cents <= 0) {
-      setState(() => _error = 'Enter a valid amount.');
+      setState(() => _error = AppStrings.invalidAmount);
       return;
     }
     final groupId = _uuid.v4();
@@ -267,7 +268,7 @@ class _DepositBottomSheetState extends State<DepositBottomSheet> {
       allocatedTotal += aCents;
     }
     if (allocatedTotal > cents) {
-      setState(() => _error = 'Allocations exceed deposited amount.');
+      setState(() => _error = AppStrings.allocationsExceedDeposit);
       return;
     }
     for (final row in _allocations) {
@@ -303,16 +304,18 @@ class _DepositBottomSheetState extends State<DepositBottomSheet> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              'Create an account first',
+              AppStrings.createAccountFirstShort,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
             Text(
-              'Add at least one account before depositing.',
+              AppStrings.addAccountBeforeDepositing,
               style: Theme.of(context).textTheme.bodyLarge,
             ),
             const SizedBox(height: 20),
-            FilledButton.icon(
+            SproutFilledButton.icon(
+              identifier: SemanticsIds.depositNoAccountsNewAccount,
+              label: AppStrings.newAccount,
               onPressed: () async {
                 Navigator.of(context).pop();
                 await showModalBottomSheet<void>(
@@ -323,7 +326,7 @@ class _DepositBottomSheetState extends State<DepositBottomSheet> {
                 );
               },
               icon: const Icon(Icons.account_balance_wallet_outlined),
-              label: const Text(AppStrings.newAccount),
+              labelWidget: const Text(AppStrings.newAccount),
             ),
           ],
         ),
@@ -348,16 +351,26 @@ class _DepositBottomSheetState extends State<DepositBottomSheet> {
           if (quickGoal) ...[
             SegmentedButton<DepositBottomSheetMode>(
               segments: [
-                const ButtonSegment(
+                ButtonSegment(
                   value: DepositBottomSheetMode.fullDepositToGoal,
-                  label: Text('Add new money'),
-                  icon: Icon(Icons.add_rounded),
+                  label: Semantics(
+                    identifier: SemanticsIds.depositModeAddNewMoney,
+                    button: true,
+                    label: AppStrings.addNewMoney,
+                    child: const Text(AppStrings.addNewMoney),
+                  ),
+                  icon: const Icon(Icons.add_rounded),
                 ),
                 if (widget.allowUseUnallocatedWhenGoalLocked)
-                  const ButtonSegment(
+                  ButtonSegment(
                     value: DepositBottomSheetMode.allocateExistingUnallocated,
-                    label: Text('Use unallocated'),
-                    icon: Icon(Icons.savings_outlined),
+                    label: Semantics(
+                      identifier: SemanticsIds.depositModeUseUnallocated,
+                      button: true,
+                      label: AppStrings.useUnallocated,
+                      child: const Text(AppStrings.useUnallocated),
+                    ),
+                    icon: const Icon(Icons.savings_outlined),
                   ),
               ],
               selected: {_mode},
@@ -374,21 +387,36 @@ class _DepositBottomSheetState extends State<DepositBottomSheet> {
             SegmentedButton<DepositBottomSheetMode>(
               segments: [
                 if (canDepositToGoal)
-                  const ButtonSegment(
+                  ButtonSegment(
                     value: DepositBottomSheetMode.fullDepositToGoal,
-                    label: Text('To goal'),
-                    icon: Icon(Icons.flag_outlined),
+                    label: Semantics(
+                      identifier: SemanticsIds.depositModeToGoal,
+                      button: true,
+                      label: AppStrings.toGoal,
+                      child: const Text(AppStrings.toGoal),
+                    ),
+                    icon: const Icon(Icons.flag_outlined),
                   ),
-                const ButtonSegment(
+                ButtonSegment(
                   value: DepositBottomSheetMode.depositToAccountThenAllocate,
-                  label: Text('To account'),
-                  icon: Icon(Icons.account_balance_wallet_outlined),
+                  label: Semantics(
+                    identifier: SemanticsIds.depositModeToAccount,
+                    button: true,
+                    label: AppStrings.toAccount,
+                    child: const Text(AppStrings.toAccount),
+                  ),
+                  icon: const Icon(Icons.account_balance_wallet_outlined),
                 ),
                 if (widget.maxAllocatableCents != null && (widget.maxAllocatableCents ?? 0) > 0 && _goals.isNotEmpty)
-                  const ButtonSegment(
+                  ButtonSegment(
                     value: DepositBottomSheetMode.allocateExistingUnallocated,
-                    label: Text('Use unallocated'),
-                    icon: Icon(Icons.savings_outlined),
+                    label: Semantics(
+                      identifier: SemanticsIds.depositModeUseUnallocated,
+                      button: true,
+                      label: AppStrings.useUnallocated,
+                      child: const Text(AppStrings.useUnallocated),
+                    ),
+                    icon: const Icon(Icons.savings_outlined),
                   ),
               ],
               selected: {_mode},
@@ -402,8 +430,10 @@ class _DepositBottomSheetState extends State<DepositBottomSheet> {
             ),
             const SizedBox(height: 12),
           ],
-          DropdownButtonFormField<String>(
-            value: _accountId, // ignore: deprecated_member_use
+          SproutDropdownField<String>(
+            identifier: SemanticsIds.depositAccountDropdown,
+            label: AppStrings.selectAccount,
+            value: _accountId,
             decoration: const InputDecoration(labelText: AppStrings.selectAccount),
             items: [for (final a in _accounts) DropdownMenuItem(value: a.id, child: Text(a.name))],
             onChanged: widget.lockAccountSelection
@@ -418,11 +448,13 @@ class _DepositBottomSheetState extends State<DepositBottomSheet> {
           const SizedBox(height: 12),
           if (_mode == DepositBottomSheetMode.fullDepositToGoal) ...[
             if (!canDepositToGoal) ...[
-              Text('Add a goal first to deposit directly to a goal.', style: Theme.of(context).textTheme.bodyMedium),
+              Text(AppStrings.addGoalFirstToDeposit, style: Theme.of(context).textTheme.bodyMedium),
               const SizedBox(height: 12),
             ] else ...[
-              DropdownButtonFormField<String>(
-                value: _goalId, // ignore: deprecated_member_use
+              SproutDropdownField<String>(
+                identifier: SemanticsIds.depositGoalDropdown,
+                label: AppStrings.selectGoal,
+                value: _goalId,
                 decoration: const InputDecoration(labelText: AppStrings.selectGoal),
                 items: [for (final g in _goals) DropdownMenuItem(value: g.id, child: Text(g.name))],
                 onChanged: widget.lockGoalSelection ? null : (v) => setState(() => _goalId = v),
@@ -431,21 +463,18 @@ class _DepositBottomSheetState extends State<DepositBottomSheet> {
             ],
           ],
           if (_mode != DepositBottomSheetMode.allocateExistingUnallocated) ...[
-            Semantics(
-              identifier: 'deposit_amount_field',
-              textField: true,
-              child: TextField(
-                key: const Key('deposit_amount_field'),
-                controller: _amount,
-                decoration: const InputDecoration(labelText: AppStrings.amount),
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              ),
+            SproutTextField(
+              identifier: SemanticsIds.depositAmountField,
+              fieldKey: const Key('deposit_amount_field'),
+              controller: _amount,
+              decoration: const InputDecoration(labelText: AppStrings.amount),
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
             ),
           ] else ...[
             // In allocate-only mode we don’t create a new deposit; the user allocates
             // from existing available unallocated funds.
             InputDecorator(
-              decoration: const InputDecoration(labelText: 'Available unallocated'),
+              decoration: const InputDecoration(labelText: AppStrings.availableUnallocated),
               child: Text(
                 formatZarFromCents(_availableUnallocatedForAccountCents ?? 0),
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w700),
@@ -454,7 +483,9 @@ class _DepositBottomSheetState extends State<DepositBottomSheet> {
           ],
           if (widget.showRecurringToggle && _mode != DepositBottomSheetMode.allocateExistingUnallocated) ...[
             const SizedBox(height: 12),
-            OutlinedButton.icon(
+            SproutOutlinedButton.icon(
+              identifier: SemanticsIds.depositDatePicker,
+              label: AppStrings.date,
               onPressed: () async {
                 final picked = await showDatePicker(
                   context: context,
@@ -466,23 +497,27 @@ class _DepositBottomSheetState extends State<DepositBottomSheet> {
                 setState(() => _selectedDate = picked);
               },
               icon: const Icon(Icons.calendar_today_outlined),
-              label: Text('Date · $dateLabel'),
+              labelWidget: Text(AppStrings.dateWithLabel(dateLabel)),
             ),
-            SwitchListTile.adaptive(
-              contentPadding: EdgeInsets.zero,
+            SproutSwitchTile(
+              identifier: SemanticsIds.depositRecurringToggle,
+              label: AppStrings.makeRecurringDeposit,
               value: _isRecurring,
               onChanged: (v) => setState(() => _isRecurring = v),
-              title: const Text('Make this a recurring deposit'),
+              contentPadding: EdgeInsets.zero,
+              title: const Text(AppStrings.makeRecurringDeposit),
             ),
             if (_isRecurring) ...[
               const SizedBox(height: 8),
-              DropdownButtonFormField<TransactionFrequency>(
-                value: _frequency, // ignore: deprecated_member_use
-                decoration: const InputDecoration(labelText: 'Frequency'),
+              SproutDropdownField<TransactionFrequency>(
+                identifier: SemanticsIds.depositFrequencyDropdown,
+                label: AppStrings.frequency,
+                value: _frequency,
+                decoration: const InputDecoration(labelText: AppStrings.frequency),
                 items: const [
-                  DropdownMenuItem(value: TransactionFrequency.daily, child: Text('Daily')),
-                  DropdownMenuItem(value: TransactionFrequency.weekly, child: Text('Weekly')),
-                  DropdownMenuItem(value: TransactionFrequency.monthly, child: Text('Monthly')),
+                  DropdownMenuItem(value: TransactionFrequency.daily, child: Text(AppStrings.frequencyDaily)),
+                  DropdownMenuItem(value: TransactionFrequency.weekly, child: Text(AppStrings.frequencyWeekly)),
+                  DropdownMenuItem(value: TransactionFrequency.monthly, child: Text(AppStrings.frequencyMonthly)),
                 ],
                 onChanged: (v) {
                   if (v == null) return;
@@ -494,12 +529,12 @@ class _DepositBottomSheetState extends State<DepositBottomSheet> {
           if (!isQuickUi && _mode != DepositBottomSheetMode.fullDepositToGoal) ...[
             const SizedBox(height: 16),
             Text(
-              'Allocate now (optional)',
+              AppStrings.allocateNowOptional,
               style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 8),
             if (_goals.isEmpty) ...[
-              Text('No goals yet — this deposit will stay unallocated.', style: Theme.of(context).textTheme.bodyMedium),
+              Text(AppStrings.noGoalsYetUnallocated, style: Theme.of(context).textTheme.bodyMedium),
               const SizedBox(height: 8),
             ] else ...[
               for (var i = 0; i < _allocations.length; i++) ...[
@@ -509,7 +544,7 @@ class _DepositBottomSheetState extends State<DepositBottomSheet> {
                       flex: 3,
                       child: DropdownButtonFormField<String>(
                         value: _allocations[i].goalId, // ignore: deprecated_member_use
-                        decoration: const InputDecoration(labelText: 'Goal'),
+                        decoration: const InputDecoration(labelText: AppStrings.selectGoal),
                         items: [for (final g in _goals) DropdownMenuItem(value: g.id, child: Text(g.name))],
                         onChanged: (v) => setState(() => _allocations[i].goalId = v),
                       ),
@@ -523,8 +558,10 @@ class _DepositBottomSheetState extends State<DepositBottomSheet> {
                         keyboardType: const TextInputType.numberWithOptions(decimal: true),
                       ),
                     ),
-                    IconButton(
-                      tooltip: 'Remove',
+                    SproutIconButton(
+                      identifier: SemanticsIds.depositRemoveAllocation,
+                      label: AppStrings.removeAllocation,
+                      tooltip: AppStrings.remove,
                       onPressed: _allocations.length <= 1
                           ? null
                           : () {
@@ -541,14 +578,16 @@ class _DepositBottomSheetState extends State<DepositBottomSheet> {
               ],
               Align(
                 alignment: Alignment.centerLeft,
-                child: TextButton.icon(
+                child: SproutTextButton.icon(
+                  identifier: SemanticsIds.depositAddAllocation,
+                  label: AppStrings.addAnotherGoal,
                   onPressed: () {
                     setState(() {
                       _allocations.add(_AllocationRow(goalId: _goalId, amountController: TextEditingController()));
                     });
                   },
                   icon: const Icon(Icons.add_rounded),
-                  label: const Text('Add another goal'),
+                  labelWidget: const Text(AppStrings.addAnotherGoal),
                 ),
               ),
             ],
@@ -558,7 +597,11 @@ class _DepositBottomSheetState extends State<DepositBottomSheet> {
             Text(_error!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
           ],
           const SizedBox(height: 20),
-          FilledButton(onPressed: _submit, child: const Text(AppStrings.save)),
+          SproutFilledButton(
+            identifier: SemanticsIds.depositSave,
+            label: AppStrings.save,
+            onPressed: _submit,
+          ),
         ],
       ),
     );

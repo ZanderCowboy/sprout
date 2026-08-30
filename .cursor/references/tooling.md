@@ -64,3 +64,5 @@ Project MCP in `.cursor/mcp.json` starts the Maestro CLI MCP (`maestro mcp`). Af
 Local CLI (Windows): `C:\Programming\maestro\bin` — `maestro.bat` is on the user PATH. Requires Java 17+ (`JAVA_HOME` is `C:\Programming\Java\jdk-21`).
 
 Use the MCP to inspect devices, run `.maestro/` flows, and author YAML. Call `cheat_sheet` before unfamiliar commands. Flows target the **development** flavor and tap **Debug sign in**. Human docs: `README.md` (Maestro UI Tests).
+
+**After Dart/UI/semantics changes**, rebuild and reinstall before running Maestro (`flutter build apk --flavor development -t lib/main_development.dart` then `flutter install …`, or keep `flutter run --flavor development …` active on the device). Maestro hits the installed binary, not hot-reload state.

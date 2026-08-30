@@ -1,0 +1,13 @@
+appId: app.stackmint.sprout.dev
+---
+# Requires: intro screen with Debug sign in visible.
+- extendedWaitUntil:
+    visible:
+      id: "intro_debug_sign_in"
+    timeout: 45000
+
+- tapOn:
+    id: "intro_debug_sign_in"
+
+- runFlow:
+    file: wait-overview.yaml

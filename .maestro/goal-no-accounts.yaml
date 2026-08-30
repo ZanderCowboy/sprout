@@ -1,29 +1,16 @@
 appId: app.stackmint.sprout.dev
 ---
-# Test: Creating a goal with 0 accounts shows "create account first" message
-# Requires: development flavor. Tap Debug sign in on intro or Sign in.
+# Creating a goal with 0 accounts shows guidance CTA
 # Run: maestro test .maestro/goal-no-accounts.yaml
 
 - launchApp:
     clearState: true
     clearKeychain: true
 
-- extendedWaitUntil:
-    visible:
-      text: "Debug sign in"
-    timeout: 45000
+- runFlow: shared/debug-signin-intro.yaml
 
-- tapOn: "Debug sign in"
-
-- extendedWaitUntil:
-    visible:
-      text: "Portfolio total"
-    timeout: 15000
-
-# Verify empty state guidance is shown
 - assertVisible: "1. Add an account"
 
-# Try to create a goal before creating any accounts
 - tapOn:
     id: "overview_empty_new_goal"
 
@@ -32,19 +19,14 @@ appId: app.stackmint.sprout.dev
       text: "New goal"
     timeout: 5000
 
-# Should see the "create account first" message
 - assertVisible: "Create an account first to hold money for this goal."
 
-# Verify the CTA is present
 - assertVisible: "New account"
 
-# Tap the "New account" button
-- tapOn: "New account"
+- tapOn:
+    id: "goal_no_accounts_new_account"
 
-# Should now be in account creation
 - extendedWaitUntil:
     visible:
       text: "New account"
     timeout: 5000
-
-# Success: User gets clear guidance instead of being trapped

@@ -1,29 +1,16 @@
 appId: app.stackmint.sprout.dev
 ---
-# Core savings loop test: account → goal → deposit → verify progress
-# Requires: development flavor. Tap Debug sign in on intro or Sign in.
+# Core savings loop: account → goal → deposit → verify progress
 # Run: maestro test .maestro/core-loop.yaml
 
 - launchApp:
     clearState: true
     clearKeychain: true
 
-- extendedWaitUntil:
-    visible:
-      text: "Debug sign in"
-    timeout: 45000
+- runFlow: shared/debug-signin-intro.yaml
 
-- tapOn: "Debug sign in"
-
-- extendedWaitUntil:
-    visible:
-      text: "Portfolio total"
-    timeout: 15000
-
-# Verify empty state guidance is shown
 - assertVisible: "1. Add an account"
 
-# Step 1: Create an account
 - tapOn:
     id: "overview_empty_new_account"
 
@@ -32,104 +19,59 @@ appId: app.stackmint.sprout.dev
       text: "New account"
     timeout: 5000
 
+- runFlow:
+    file: shared/fill-account-form.yaml
+    env:
+      ACCOUNT_NAME: "Test Savings"
+      COLOR_INDEX: "2"
+
+- runFlow: shared/wait-overview.yaml
+
 - tapOn:
-    id: "account_name_field"
-- optional: true
-  tapOn:
-    text: "Account name"
-
-- inputText: "Test Savings"
-
-- tapOn: "Save"
-
-- extendedWaitUntil:
-    visible:
-      text: "Portfolio total"
-    timeout: 5000
-
-# Step 2: Create a goal
-- tapOn:
-    id: "overview_empty_new_goal"
+    id: "overview_new_goal"
 
 - extendedWaitUntil:
     visible:
       text: "New goal"
     timeout: 5000
 
+- runFlow:
+    file: shared/fill-goal-form.yaml
+    env:
+      GOAL_NAME: "Vacation Fund"
+      TARGET: "5000"
+
+- runFlow: shared/wait-overview.yaml
+
 - tapOn:
-    id: "goal_name_field"
-- optional: true
-  tapOn:
-    text: "Goal name"
-
-- inputText: "Vacation Fund"
-
-- tapOn:
-    id: "goal_target_field"
-- optional: true
-  tapOn:
-    text: "Target amount (ZAR)"
-
-- inputText: "5000"
-
-- tapOn: "Save"
-
-- extendedWaitUntil:
-    visible:
-      text: "Portfolio total"
-    timeout: 5000
-
-# Step 3: Make a deposit
-- tapOn: "Deposit"
+    id: "overview_deposit"
 
 - extendedWaitUntil:
     visible:
       text: "Deposit"
     timeout: 5000
 
-# Select account (should be pre-selected)
-- tapOn: "Account"
+- runFlow:
+    file: shared/deposit-to-goal.yaml
+    env:
+      ACCOUNT_NAME: "Test Savings"
+      GOAL_NAME: "Vacation Fund"
+      AMOUNT: "1000"
 
-- tapOn: "Test Savings"
-
-# Select goal
-- tapOn: "Goal"
-
-- tapOn: "Vacation Fund"
-
-# Enter amount
 - tapOn:
-    id: "deposit_amount_field"
-- optional: true
-  tapOn:
-    text: "Amount (ZAR)"
-
-- inputText: "1000"
-
-- tapOn: "Save"
-
-# Verify deposit succeeded and Overview updated
-- extendedWaitUntil:
-    visible:
-      text: "Portfolio total"
-    timeout: 5000
-
-# Navigate to Goals tab to verify progress
-- tapOn: "Goals"
+    id: "shell_tab_goals"
 
 - assertVisible: "Goals"
 
 - assertVisible: "Vacation Fund"
 
-# Tap on the goal to see details
-- tapOn: "Vacation Fund"
+- tapOn:
+    id: "goal_card"
+    text: "Vacation Fund"
 
 - extendedWaitUntil:
     visible:
       text: "Vacation Fund"
     timeout: 5000
 
-# Verify progress shows
 - assertVisible: "Remaining"
-
-# Success: The core loop (account → goal → deposit → progress) completed

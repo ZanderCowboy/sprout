@@ -155,27 +155,46 @@ flutter run --flavor development -t lib/main_development.dart
 With the app installed or running:
 
 ```bash
-# Run all flows
+# Run all root journeys (helpers in .maestro/shared/ are not executed alone)
 maestro test .maestro/
 
-# Run a specific flow
+# Run a specific journey
 maestro test .maestro/core-loop.yaml
+maestro test .maestro/full-app-tour.yaml
 ```
 
-### Auth bypass
+### Flow layout
 
-Development builds show a **Debug sign in** button on intro and Sign in (`Maestro Test · maestro@test.local`). It binds a local-only test user (`maestro-test-user`) and opens Overview. Sync stays off.
-
-**Production flavor never shows the button.**
+- **Root journeys** (`.maestro/*.yaml`) — runnable end-to-end tests. `config.yaml` sets `flows: ["*"]` so only these are discovered.
+- **Shared helpers** (`.maestro/shared/*.yaml`) — `runFlow` subflows for debug sign-in, form fill, deposits, etc. Not runnable alone; compose them from root journeys with `env` parameters.
 
 ### Available flows
 
 - `core-loop.yaml` — Create account, goal, deposit, verify progress
 - `deposit-no-accounts.yaml` — Deposit with 0 accounts shows "create account first" CTA
 - `goal-no-accounts.yaml` — Creating goal with 0 accounts shows guidance
-- `full-app-tour.yaml` — Walk every major surface with screenshots (UX review)
+- `full-app-tour.yaml` — Full user journey: every screen and tappable control (composes `shared/` helpers)
 
-## More docs
+### Shared helpers (not runnable alone)
+
+| Helper | Purpose |
+|--------|---------|
+| `shared/debug-signin-intro.yaml` | Debug sign-in from intro |
+| `shared/wait-overview.yaml` | Wait for Overview after sign-in |
+| `shared/open-center-sheet.yaml` | Open shell FAB action sheet |
+| `shared/fill-account-form.yaml` | Fill account name + color + save (`ACCOUNT_NAME`, `COLOR_INDEX`) |
+| `shared/fill-goal-form.yaml` | Fill goal form + save (`GOAL_NAME`, `TARGET`, optional `ALREADY_SAVED` + `ACCOUNT_NAME`) |
+| `shared/deposit-to-goal.yaml` | Deposit to goal (`ACCOUNT_NAME`, `GOAL_NAME`, `AMOUNT`) |
+
+Development builds show a **Debug sign in** button on intro and Sign in (`Maestro Test · maestro@test.local`). Flows tap it with `id: intro_debug_sign_in` (intro) or `id: sign_in_debug_sign_in` (sign-in screen). It binds a local-only test user (`maestro-test-user`) and opens Overview. Sync stays off.
+
+**Production flavor never shows the button.**
+
+### Semantic IDs for taps
+
+Maestro `tapOn: id:` maps to Flutter `Semantics.identifier`. All tappable controls expose stable IDs from [`sprout_app/lib/core/constants/semantics_ids.dart`](sprout_app/lib/core/constants/semantics_ids.dart) (`SemanticsIds`). Prefer `id:` in `.maestro/` YAML; use visible `text:` for dropdown menu items and `assertVisible` checks only. Feature code should use shared **`Sprout*` widgets** in [`sprout_app/lib/ui/`](sprout_app/lib/ui/export.dart) so semantics stay consistent.
+
+### Auth bypass
 
 - [GitHub CLI (personal account)](docs/GITHUB_CLI_PERSONAL.md) — `gh` as `ZanderCowboy` in this workspace only
 - [Firebase CLI (personal account)](docs/FIREBASE_CLI_PERSONAL.md) — `firebase` login isolated via `XDG_CONFIG_HOME`

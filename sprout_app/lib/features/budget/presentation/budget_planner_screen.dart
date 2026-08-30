@@ -12,6 +12,7 @@ import 'budget_bloc.dart';
 import 'utils/budget_sorting.dart';
 import 'widgets/add_group_card.dart';
 import 'widgets/group_card.dart';
+import 'package:sprout/ui/export.dart';
 
 class BudgetPlannerScreen extends StatefulWidget {
   const BudgetPlannerScreen({super.key});
@@ -28,12 +29,18 @@ class _BudgetPlannerScreenState extends State<BudgetPlannerScreen> {
     final initialGroupSort = _groupSort;
     final initialItemSort = _itemSort;
 
-    final selected = await showModalBottomSheet<({BudgetSortOption groupSort, BudgetSortOption itemSort})>(
-      context: context,
-      showDragHandle: true,
-      isScrollControlled: true,
-      builder: (context) => _BudgetSortModal(initialGroupSort: initialGroupSort, initialItemSort: initialItemSort),
-    );
+    final selected =
+        await showModalBottomSheet<
+          ({BudgetSortOption groupSort, BudgetSortOption itemSort})
+        >(
+          context: context,
+          showDragHandle: true,
+          isScrollControlled: true,
+          builder: (context) => _BudgetSortModal(
+            initialGroupSort: initialGroupSort,
+            initialItemSort: initialItemSort,
+          ),
+        );
 
     if (!mounted || selected == null) return;
     setState(() {
@@ -45,14 +52,22 @@ class _BudgetPlannerScreenState extends State<BudgetPlannerScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => BudgetBloc(budgetService: sl<BudgetService>())..add(const BudgetSubscriptionRequested()),
+      create: (_) =>
+          BudgetBloc(budgetService: sl<BudgetService>())
+            ..add(const BudgetSubscriptionRequested()),
       child: DefaultTabController(
         length: 3,
         child: Scaffold(
           appBar: AppBar(
-            title: const Text('Master Budget'),
+            title: const Text(AppStrings.masterBudget),
             actions: [
-              IconButton(onPressed: _openSortModal, tooltip: 'Sort budget', icon: const Icon(Icons.sort_rounded)),
+              SproutIconButton(
+                identifier: SemanticsIds.budgetSort,
+                label: AppStrings.sortBudget,
+                tooltip: AppStrings.sortBudget,
+                onPressed: _openSortModal,
+                icon: const Icon(Icons.sort_rounded),
+              ),
             ],
           ),
           body: BlocBuilder<BudgetBloc, BudgetState>(
@@ -110,7 +125,10 @@ class _BudgetPlannerScreenState extends State<BudgetPlannerScreen> {
 }
 
 class _BudgetSortModal extends StatefulWidget {
-  const _BudgetSortModal({required this.initialGroupSort, required this.initialItemSort});
+  const _BudgetSortModal({
+    required this.initialGroupSort,
+    required this.initialItemSort,
+  });
 
   final BudgetSortOption initialGroupSort;
   final BudgetSortOption initialItemSort;
@@ -144,20 +162,30 @@ class _BudgetSortModalState extends State<_BudgetSortModal> {
                 width: 64,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.35),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurfaceVariant.withValues(alpha: 0.35),
                   borderRadius: BorderRadius.circular(999),
                 ),
               ),
             ),
             const SizedBox(height: 12),
-            Text('Sort budget', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900)),
+            Text(
+              AppStrings.sortBudget,
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900),
+            ),
             const SizedBox(height: 16),
             DropdownButtonFormField<BudgetSortOption>(
               initialValue: _groupSort,
-              decoration: const InputDecoration(labelText: 'Groups'),
+              decoration: const InputDecoration(labelText: AppStrings.groups),
               items: [
                 for (final opt in BudgetSortOption.values)
-                  DropdownMenuItem(value: opt, child: Text(budgetSortOptionLabel(opt))),
+                  DropdownMenuItem(
+                    value: opt,
+                    child: Text(budgetSortOptionLabel(opt)),
+                  ),
               ],
               onChanged: (v) {
                 if (v == null) return;
@@ -167,10 +195,13 @@ class _BudgetSortModalState extends State<_BudgetSortModal> {
             const SizedBox(height: 14),
             DropdownButtonFormField<BudgetSortOption>(
               initialValue: _itemSort,
-              decoration: const InputDecoration(labelText: 'Items'),
+              decoration: const InputDecoration(labelText: AppStrings.items),
               items: [
                 for (final opt in BudgetSortOption.values)
-                  DropdownMenuItem(value: opt, child: Text(budgetSortOptionLabel(opt))),
+                  DropdownMenuItem(
+                    value: opt,
+                    child: Text(budgetSortOptionLabel(opt)),
+                  ),
               ],
               onChanged: (v) {
                 if (v == null) return;
@@ -178,9 +209,13 @@ class _BudgetSortModalState extends State<_BudgetSortModal> {
               },
             ),
             const SizedBox(height: 18),
-            FilledButton(
-              onPressed: () => Navigator.of(context).pop((groupSort: _groupSort, itemSort: _itemSort)),
-              child: const Text('Done'),
+            SproutFilledButton(
+              identifier: SemanticsIds.budgetSortSave,
+              label: AppStrings.done,
+              onPressed: () => Navigator.of(
+                context,
+              ).pop((groupSort: _groupSort, itemSort: _itemSort)),
+              child: const Text(AppStrings.done),
             ),
           ],
         ),
@@ -227,16 +262,23 @@ class _BudgetSummaryHeaderState extends State<_BudgetSummaryHeader> {
                   padding: const EdgeInsets.symmetric(vertical: 2),
                   child: Row(
                     children: [
-                      Icon(Icons.account_tree_rounded, size: 16, color: scheme.primary),
+                      Icon(
+                        Icons.account_tree_rounded,
+                        size: 16,
+                        color: scheme.primary,
+                      ),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          'Theoretical disposable income',
-                          style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
+                          AppStrings.theoreticalDisposableIncome,
+                          style: Theme.of(context).textTheme.titleSmall
+                              ?.copyWith(fontWeight: FontWeight.w800),
                         ),
                       ),
                       Icon(
-                        _showBreakdown ? Icons.expand_less_rounded : Icons.expand_more_rounded,
+                        _showBreakdown
+                            ? Icons.expand_less_rounded
+                            : Icons.expand_more_rounded,
                         color: scheme.onSurfaceVariant,
                         size: 20,
                       ),
@@ -248,15 +290,18 @@ class _BudgetSummaryHeaderState extends State<_BudgetSummaryHeader> {
             const SizedBox(height: 6),
             Text(
               formatZarFromCents(disposableCents),
-              style: Theme.of(
-                context,
-              ).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w900, color: valueColor),
+              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                fontWeight: FontWeight.w900,
+                color: valueColor,
+              ),
             ),
             if (!_showBreakdown) ...[
               const SizedBox(height: 4),
               Text(
-                'Tap above for breakdown',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+                AppStrings.tapAboveForBreakdown,
+                style: Theme.of(
+                  context,
+                ).textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
               ),
             ],
             if (_showBreakdown) ...[
@@ -266,20 +311,26 @@ class _BudgetSummaryHeaderState extends State<_BudgetSummaryHeader> {
                 runSpacing: 8,
                 children: [
                   _MiniTotalPill(
-                    label: 'Income',
-                    value: formatZarFromCents((state.totalIncome * 100).round()),
+                    label: AppStrings.budgetIncome,
+                    value: formatZarFromCents(
+                      (state.totalIncome * 100).round(),
+                    ),
                     icon: Icons.trending_up_rounded,
                     color: scheme.primary,
                   ),
                   _MiniTotalPill(
-                    label: 'Essentials',
-                    value: formatZarFromCents((state.totalEssentials * 100).round()),
+                    label: AppStrings.budgetEssentials,
+                    value: formatZarFromCents(
+                      (state.totalEssentials * 100).round(),
+                    ),
                     icon: Icons.home_rounded,
                     color: scheme.tertiary,
                   ),
                   _MiniTotalPill(
-                    label: 'Lifestyle',
-                    value: formatZarFromCents((state.totalLifestyle * 100).round()),
+                    label: AppStrings.budgetLifestyle,
+                    value: formatZarFromCents(
+                      (state.totalLifestyle * 100).round(),
+                    ),
                     icon: Icons.local_cafe_rounded,
                     color: scheme.secondary,
                   ),
@@ -304,12 +355,40 @@ class _BudgetTabHeader extends StatelessWidget {
       child: TabBar(
         dividerColor: Colors.transparent,
         indicatorSize: TabBarIndicatorSize.tab,
-        labelStyle: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
-        unselectedLabelStyle: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
-        tabs: const [
-          Tab(height: 42, text: 'Income'),
-          Tab(height: 42, text: 'Essentials'),
-          Tab(height: 42, text: 'Lifestyle'),
+        labelStyle: Theme.of(
+          context,
+        ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
+        unselectedLabelStyle: Theme.of(
+          context,
+        ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+        tabs: [
+          Tab(
+            height: 42,
+            child: Semantics(
+              identifier: SemanticsIds.budgetTabIncome,
+              button: true,
+              label: AppStrings.budgetIncome,
+              child: const Text(AppStrings.budgetIncome),
+            ),
+          ),
+          Tab(
+            height: 42,
+            child: Semantics(
+              identifier: SemanticsIds.budgetTabEssentials,
+              button: true,
+              label: AppStrings.budgetEssentials,
+              child: const Text(AppStrings.budgetEssentials),
+            ),
+          ),
+          Tab(
+            height: 42,
+            child: Semantics(
+              identifier: SemanticsIds.budgetTabLifestyle,
+              button: true,
+              label: AppStrings.budgetLifestyle,
+              child: const Text(AppStrings.budgetLifestyle),
+            ),
+          ),
         ],
       ),
     );
@@ -317,7 +396,12 @@ class _BudgetTabHeader extends StatelessWidget {
 }
 
 class _MiniTotalPill extends StatelessWidget {
-  const _MiniTotalPill({required this.label, required this.value, required this.icon, required this.color});
+  const _MiniTotalPill({
+    required this.label,
+    required this.value,
+    required this.icon,
+    required this.color,
+  });
 
   final String label;
   final String value;
@@ -332,7 +416,9 @@ class _MiniTotalPill extends StatelessWidget {
       decoration: BoxDecoration(
         color: scheme.surface,
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.35)),
+        border: Border.all(
+          color: scheme.outlineVariant.withValues(alpha: 0.35),
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -341,11 +427,17 @@ class _MiniTotalPill extends StatelessWidget {
           const SizedBox(width: 8),
           Text(
             '$label: ',
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(
+              fontWeight: FontWeight.w700,
+              color: scheme.onSurfaceVariant,
+            ),
+          ),
+          Text(
+            value,
             style: Theme.of(
               context,
-            ).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w700, color: scheme.onSurfaceVariant),
+            ).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w900),
           ),
-          Text(value, style: Theme.of(context).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w900)),
         ],
       ),
     );
@@ -403,9 +495,11 @@ class _BudgetCategoryTabBodyState extends State<_BudgetCategoryTabBody> {
 
   final List<BudgetGroup> _draftGroups = [];
 
-  List<BudgetGroup> get _existing => widget.groups.where((g) => g.category == widget.category).toList();
+  List<BudgetGroup> get _existing =>
+      widget.groups.where((g) => g.category == widget.category).toList();
 
-  List<BudgetGroup> get _drafts => _draftGroups.where((g) => g.category == widget.category).toList();
+  List<BudgetGroup> get _drafts =>
+      _draftGroups.where((g) => g.category == widget.category).toList();
 
   Future<void> _addDraft() async {
     final uid = await sl<UserContext>().resolveUserId();
@@ -469,12 +563,17 @@ class _BudgetCategoryTabBodyState extends State<_BudgetCategoryTabBody> {
           onDiscardDraft: isDraft ? () => _removeDraft(g.id) : null,
           onDraftChanged: isDraft ? _upsertDraft : null,
           allGroupsForNameValidation: widget.groups,
-          onUpsertGroup: (updated) => context.read<BudgetBloc>().add(BudgetGroupUpsertRequested(updated)),
-          onDeleteGroup: (groupId) => context.read<BudgetBloc>().add(BudgetGroupDeleted(groupId)),
-          onUpsertItem: (groupId, item) =>
-              context.read<BudgetBloc>().add(BudgetItemUpsertRequested(groupId: groupId, item: item)),
-          onDeleteItem: (groupId, itemId) =>
-              context.read<BudgetBloc>().add(BudgetItemDeleted(groupId: groupId, itemId: itemId)),
+          onUpsertGroup: (updated) => context.read<BudgetBloc>().add(
+            BudgetGroupUpsertRequested(updated),
+          ),
+          onDeleteGroup: (groupId) =>
+              context.read<BudgetBloc>().add(BudgetGroupDeleted(groupId)),
+          onUpsertItem: (groupId, item) => context.read<BudgetBloc>().add(
+            BudgetItemUpsertRequested(groupId: groupId, item: item),
+          ),
+          onDeleteItem: (groupId, itemId) => context.read<BudgetBloc>().add(
+            BudgetItemDeleted(groupId: groupId, itemId: itemId),
+          ),
         );
       },
     );

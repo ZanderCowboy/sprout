@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'package:sprout/core/config/app_environment.dart';
 import 'package:sprout/core/constants/app_colors.dart';
+import 'package:sprout/core/constants/app_strings.dart';
 
 /// Diagonal corner ribbon indicating the active [AppEnvironment].
 ///
@@ -21,8 +22,8 @@ class EnvironmentBanner extends StatelessWidget {
       environment == AppEnvironment.production && kReleaseMode;
 
   String get _label => switch (environment) {
-        AppEnvironment.development => 'DEV',
-        AppEnvironment.production => 'PROD',
+        AppEnvironment.development => AppStrings.environmentDev,
+        AppEnvironment.production => AppStrings.environmentProd,
       };
 
   Color get _color => switch (environment) {

@@ -1,5 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import 'package:sprout/core/core.dart';
@@ -13,6 +14,7 @@ import '../domain/goal.dart';
 import 'goal_detail_bloc.dart';
 import 'utils/goal_growth_chart.dart';
 import 'goal_form_sheet.dart';
+import 'package:sprout/ui/export.dart';
 
 class GoalDetailPage extends StatefulWidget {
   const GoalDetailPage({super.key, required this.goalId});
@@ -43,11 +45,11 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text(AppStrings.delete),
-        content: const Text('Remove this goal? Past deposits stay in your history.'),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text(AppStrings.cancel)),
-          FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text(AppStrings.delete)),
-        ],
+        content: const Text(AppStrings.removeGoalConfirm),
+        actions: SproutDialogActions.cancelDelete(
+          onCancel: () => Navigator.pop(ctx, false),
+          onDelete: () => Navigator.pop(ctx, true),
+        ),
       ),
     );
     if (ok == true && mounted) {
@@ -88,15 +90,17 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Clear scheduled transactions?'),
+        title: const Text(AppStrings.clearScheduledTransactions),
         content: Text(
-          'This will remove ${scheduledIds.length} future-dated '
-          'transaction${scheduledIds.length == 1 ? '' : 's'} from this goal.',
+          AppStrings.clearScheduledBody(
+            count: scheduledIds.length,
+            scope: 'goal',
+          ),
         ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text(AppStrings.cancel)),
-          FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text(AppStrings.delete)),
-        ],
+        actions: SproutDialogActions.cancelDelete(
+          onCancel: () => Navigator.pop(ctx, false),
+          onDelete: () => Navigator.pop(ctx, true),
+        ),
       ),
     );
     if (ok != true || !mounted) return;
@@ -121,9 +125,11 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
             return Scaffold(
               appBar: AppBar(
                 actions: [
-                  IconButton(
-                    icon: const Icon(Icons.delete_outline_rounded),
+                  SproutIconButton(
+                    identifier: SemanticsIds.goalDetailDelete,
+                    label: AppStrings.delete,
                     onPressed: _delete,
+                    icon: const Icon(Icons.delete_outline_rounded),
                   ),
                 ],
               ),
@@ -137,11 +143,18 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
             appBar: AppBar(
               title: Text(g.name),
               actions: [
-                IconButton(
-                  icon: const Icon(Icons.edit_rounded),
+                SproutIconButton(
+                  identifier: SemanticsIds.goalDetailEdit,
+                  label: AppStrings.edit,
                   onPressed: () => _edit(g),
+                  icon: const Icon(Icons.edit_rounded),
                 ),
-                IconButton(icon: const Icon(Icons.delete_outline_rounded), onPressed: _delete),
+                SproutIconButton(
+                  identifier: SemanticsIds.goalDetailDelete,
+                  label: AppStrings.delete,
+                  onPressed: _delete,
+                  icon: const Icon(Icons.delete_outline_rounded),
+                ),
               ],
             ),
             body: RefreshIndicator(
@@ -168,19 +181,24 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                           ),
                         ),
                         Text(
-                          'Saved: ${formatZarFromCents(progress.savedCents)} / '
-                          '${formatZarFromCents(g.targetAmountCents)}',
+                          AppStrings.savedSlashTarget(
+                            formatZarFromCents(progress.savedCents),
+                            formatZarFromCents(g.targetAmountCents),
+                          ),
                           style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700),
                         ),
                       ],
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      '${AppStrings.remaining}: ${formatZarFromCents(progress.remainingCents)}',
+                      AppStrings.remainingColon(
+                        formatZarFromCents(progress.remainingCents),
+                      ),
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
                     const SizedBox(height: 22),
                     DetailDepositCallout(
+                      identifier: SemanticsIds.goalDetailDeposit,
                       accentColor: Color(g.color),
                       caption: AppStrings.addDepositCaptionGoal,
                       onPressed: _openDeposit,
@@ -203,16 +221,18 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                           ),
                         ),
                         if (state.transactions.any((t) => TransactionDisplay.isPendingByDate(t, DateTime.now())))
-                          TextButton.icon(
+                          SproutTextButton.icon(
+                            identifier: SemanticsIds.goalDetailClearScheduled,
+                            label: AppStrings.clearScheduled,
                             onPressed: () => _clearScheduledForGoal(state, goalId: g.id),
                             icon: const Icon(Icons.delete_outline_rounded),
-                            label: const Text('Clear scheduled'),
+                            labelWidget: const Text(AppStrings.clearScheduled),
                           ),
                       ],
                     ),
                     const SizedBox(height: 12),
                     if (state.transactions.isEmpty)
-                      Text('No deposits toward this goal yet.', style: Theme.of(context).textTheme.bodyMedium)
+                      Text(AppStrings.noDepositsTowardGoal, style: Theme.of(context).textTheme.bodyMedium)
                     else
                       ...(() {
                         final now = DateTime.now();
@@ -239,13 +259,16 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                               ),
                             ),
                             ...items.map((t) {
-                              final accName = state.accountsById[t.accountId]?.name ?? 'Unknown account';
+                              final accName = state.accountsById[t.accountId]?.name ?? AppStrings.unknownAccount;
                               final style = mapTransactionToListStyle(t: t, now: now);
                               return Card(
                                 margin: const EdgeInsets.only(bottom: 8),
+                                clipBehavior: Clip.antiAlias,
                                 child: Opacity(
                                   opacity: style.opacity,
-                                  child: ListTile(
+                                  child: SproutListTile(
+                                    identifier: SemanticsIds.goalDetailTransactionRow,
+                                    label: '${AppStrings.deposit} ${formatZarFromCents(t.amountCents)}',
                                     leading: style.leadingIcon == null ? null : Icon(style.leadingIcon),
                                     title: Text(formatZarFromCents(t.amountCents)),
                                     subtitle: Text(
@@ -262,6 +285,9 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                                             color: Theme.of(context).colorScheme.primary,
                                           )
                                         : null,
+                                    onTap: () {
+                                      context.push(AppRoute.transactionDetail.location(id: t.id));
+                                    },
                                   ),
                                 ),
                               );
@@ -270,8 +296,8 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                         }
 
                         return [
-                          ...section(title: 'Scheduled', items: scheduled),
-                          ...section(title: 'History', items: history),
+                          ...section(title: AppStrings.scheduled, items: scheduled),
+                          ...section(title: AppStrings.history, items: history),
                         ];
                       })(),
                   ],
@@ -349,7 +375,7 @@ class _GoalGrowthChart extends StatelessWidget {
                         fontWeight: FontWeight.w700,
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
-                      labelResolver: (_) => 'Goal: ${formatZarFromCents(goalTargetCents)}',
+                      labelResolver: (_) => AppStrings.goalChartLabel(formatZarFromCents(goalTargetCents)),
                     ),
                   ),
                 ],

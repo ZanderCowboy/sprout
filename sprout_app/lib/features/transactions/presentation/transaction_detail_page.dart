@@ -9,6 +9,7 @@ import 'package:sprout/features/goals/export.dart';
 import 'package:sprout/features/transactions/export.dart';
 import 'bloc/transaction_detail_bloc.dart';
 import 'utils/transaction_frequency_label.dart';
+import 'package:sprout/ui/export.dart';
 
 class TransactionDetailPage extends StatelessWidget {
   const TransactionDetailPage({super.key, required this.transactionId});
@@ -27,11 +28,11 @@ class TransactionDetailPage extends StatelessWidget {
       child: BlocBuilder<TransactionDetailBloc, TransactionDetailState>(
         builder: (context, state) {
           return Scaffold(
-            appBar: AppBar(title: const Text('Transaction')),
+            appBar: AppBar(title: const Text(AppStrings.transaction)),
             body: switch (state) {
               TransactionDetailReady s => _TransactionDetailBody(state: s),
               TransactionDetailMissing _ => const Center(
-                  child: Text('Transaction not found.'),
+                  child: Text(AppStrings.transactionNotFound),
                 ),
               _ => const Center(child: CircularProgressIndicator()),
             },
@@ -85,12 +86,12 @@ class _TransactionDetailBodyState extends State<_TransactionDetailBody> {
       );
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Note saved.')),
+        const SnackBar(content: Text(AppStrings.noteSaved)),
       );
     } on Object catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Could not save note: $e')),
+        SnackBar(content: Text('${AppStrings.couldNotSaveNotePrefix}$e')),
       );
     } finally {
       if (mounted) setState(() => _savingNote = false);
@@ -100,14 +101,14 @@ class _TransactionDetailBodyState extends State<_TransactionDetailBody> {
   @override
   Widget build(BuildContext context) {
     final t = widget.state.transaction;
-    final accountName =
-        widget.state.accountsById[t.accountId]?.name ?? 'Unknown account';
+    final accountName = widget.state.accountsById[t.accountId]?.name ??
+        AppStrings.unknownAccount;
     final goalName = t.goalId == null
-        ? 'Unallocated'
-        : (widget.state.goalsById[t.goalId!]?.name ?? 'Unknown goal');
+        ? AppStrings.unallocated
+        : (widget.state.goalsById[t.goalId!]?.name ?? AppStrings.unknownGoal);
     final kindLabel = switch (t.kind) {
-      TransactionKind.deposit => 'Deposit',
-      TransactionKind.allocation => 'Allocation',
+      TransactionKind.deposit => AppStrings.deposit,
+      TransactionKind.allocation => AppStrings.allocation,
     };
 
     final group = widget.state.groupTransactions;
@@ -134,40 +135,50 @@ class _TransactionDetailBodyState extends State<_TransactionDetailBody> {
         ),
         const SizedBox(height: 10),
         _SectionCard(
-          title: 'Details',
+          title: AppStrings.details,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _kv('Kind', kindLabel),
-              _kv('Account', accountName),
-              _kv('Goal', goalName),
-              _kv('Date', formatDate(t.occurredAt)),
-              _kv('Time', formatDateTime(t.occurredAt)),
+              _kv(AppStrings.kind, kindLabel),
+              _kv(AppStrings.selectAccount, accountName),
+              _kv(AppStrings.selectGoal, goalName),
+              _kv(AppStrings.date, formatDate(t.occurredAt)),
+              _kv(AppStrings.time, formatDateTime(t.occurredAt)),
               _kv(
-                'Recurring',
+                AppStrings.recurring,
                 t.isRecurring && t.frequency != TransactionFrequency.none
-                    ? 'Yes (${transactionFrequencyLabel(t.frequency)})'
-                    : 'No',
+                    ? AppStrings.yesWithFrequency(
+                        transactionFrequencyLabel(t.frequency),
+                      )
+                    : AppStrings.no,
               ),
               if (t.nextScheduledDate != null)
-                _kv('Next scheduled', formatDateTime(t.nextScheduledDate!)),
-              _kv('Pending sync', t.pendingSync ? 'Yes' : 'No'),
-              if (t.groupId != null) _kv('Group', t.groupId!),
+                _kv(
+                  AppStrings.nextScheduled,
+                  formatDateTime(t.nextScheduledDate!),
+                ),
+              _kv(
+                AppStrings.pendingSync,
+                t.pendingSync ? AppStrings.yes : AppStrings.no,
+              ),
+              if (t.groupId != null) _kv(AppStrings.group, t.groupId!),
             ],
           ),
         ),
         if (t.isRecurring && t.frequency != TransactionFrequency.none) ...[
           const SizedBox(height: 10),
           _SectionCard(
-            title: 'Recurring payment',
+            title: AppStrings.recurringPayment,
             child: Align(
               alignment: Alignment.centerLeft,
-              child: FilledButton.icon(
+              child: SproutFilledButton.icon(
+                identifier: SemanticsIds.transactionManageRecurring,
+                label: AppStrings.manageRecurringPayments,
                 onPressed: () {
                   context.push(AppRoute.recurring.path);
                 },
                 icon: const Icon(Icons.autorenew_rounded),
-                label: const Text('Manage recurring payments'),
+                labelWidget: const Text(AppStrings.manageRecurringPayments),
               ),
             ),
           ),
@@ -175,16 +186,24 @@ class _TransactionDetailBodyState extends State<_TransactionDetailBody> {
         if (hasGroup) ...[
           const SizedBox(height: 10),
           _SectionCard(
-            title: 'Split (group)',
+            title: AppStrings.splitGroup,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 if (groupDepositCents > 0) ...[
-                  _kv('Deposit total', formatZarFromCents(groupDepositCents)),
-                  _kv('Allocated total', formatZarFromCents(groupAllocatedCents)),
                   _kv(
-                    'Remaining',
-                    formatZarFromCents(groupRemainingCents < 0 ? 0 : groupRemainingCents),
+                    AppStrings.depositTotal,
+                    formatZarFromCents(groupDepositCents),
+                  ),
+                  _kv(
+                    AppStrings.allocatedTotal,
+                    formatZarFromCents(groupAllocatedCents),
+                  ),
+                  _kv(
+                    AppStrings.remaining,
+                    formatZarFromCents(
+                      groupRemainingCents < 0 ? 0 : groupRemainingCents,
+                    ),
                   ),
                   const Divider(height: 20),
                 ],
@@ -192,15 +211,16 @@ class _TransactionDetailBodyState extends State<_TransactionDetailBody> {
                   _AllocationRowView(
                     amount: formatZarFromCents(a.amountCents),
                     goalName: a.goalId == null
-                        ? 'Unallocated'
-                        : (widget.state.goalsById[a.goalId!]?.name ?? 'Unknown goal'),
+                        ? AppStrings.unallocated
+                        : (widget.state.goalsById[a.goalId!]?.name ??
+                            AppStrings.unknownGoal),
                     occurredAt: a.occurredAt,
                   ),
                   const SizedBox(height: 8),
                 ],
                 if (allocationsInGroup.isEmpty)
                   Text(
-                    'No allocations in this group.',
+                    AppStrings.noAllocationsInGroup,
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
               ],
@@ -209,22 +229,27 @@ class _TransactionDetailBodyState extends State<_TransactionDetailBody> {
         ],
         const SizedBox(height: 10),
         _SectionCard(
-          title: 'Note',
+          title: AppStrings.note,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              TextField(
+              SproutTextField(
+                identifier: SemanticsIds.transactionNoteField,
                 controller: _note,
                 minLines: 2,
                 maxLines: 6,
                 decoration: const InputDecoration(
-                  hintText: 'Add a note…',
+                  hintText: AppStrings.addANoteHint,
                 ),
               ),
               const SizedBox(height: 12),
-              FilledButton(
+              SproutFilledButton(
+                identifier: SemanticsIds.transactionNoteSave,
+                label: AppStrings.save,
                 onPressed: _savingNote ? null : _saveNote,
-                child: Text(_savingNote ? 'Saving…' : AppStrings.save),
+                child: Text(
+                  _savingNote ? AppStrings.saving : AppStrings.save,
+                ),
               ),
             ],
           ),

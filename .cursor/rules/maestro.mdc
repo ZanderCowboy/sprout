@@ -1,14 +1,31 @@
 ---
-description: Maestro UI flows and MCP — development flavor, auth bypass, .maestro YAML
+description: Maestro UI flows and MCP — development flavor, auth bypass, rebuild before run, .maestro YAML
 globs: .maestro/**/*.yaml
-alwaysApply: false
+alwaysApply: true
 ---
 
 # Maestro
 
 Flows live in `.maestro/` and run against the **development** flavor only.
 
+## Rebuild before run (required)
+
+Maestro exercises the **installed** app on the device/emulator, not hot-reload or workspace source. If **any** Dart change landed since the last install (UI, semantics IDs, routing, flavor config), **rebuild and reinstall the development flavor before** `maestro test`, Maestro MCP `run`, or asking the human to verify flows:
+
+```bash
+cd sprout_app
+flutter build apk --flavor development -t lib/main_development.dart
+flutter install --flavor development -t lib/main_development.dart
+```
+
+For day-to-day iteration, `flutter run --flavor development -t lib/main_development.dart` on the target device is enough — then run Maestro in another terminal. Do **not** run Maestro against a stale APK after semantics or presentation edits.
+
+## Authoring and running flows
+
 - Prefer the **Maestro MCP** (`list_devices`, `inspect_screen`, `run`, `cheat_sheet`, `take_screenshot`). Call `cheat_sheet` before authoring unfamiliar commands.
-- App id: `app.stackmint.sprout.dev`. Use a development build. Flows tap **Debug sign in** (`Maestro Test · maestro@test.local`) then wait for Overview.
+- App id: `app.stackmint.sprout.dev`. Use a development build. Flows tap **Debug sign in** via `id: intro_debug_sign_in` (or `sign_in_debug_sign_in` on the sign-in screen), then wait for Overview.
+- Tap controls by **`Semantics.identifier`** (`tapOn: id: …`), not visible text. IDs are defined in `sprout_app/lib/core/constants/semantics_ids.dart` (`SemanticsIds`). Use `text:` only for dropdown menu items and assertions.
+- New tappable UI in presentation must use **`Sprout*` widgets** from `sprout_app/lib/ui/` (exported via `lib/ui/export.dart`) with a `SemanticsIds` value — not raw `FilledButton` / inline `Semantics` wrappers.
+- **Root journeys** (`.maestro/*.yaml`) are the only runnable flows; `config.yaml` uses `flows: ["*"]`. **Shared helpers** (`.maestro/shared/*.yaml`) are `runFlow` subflows — no `launchApp`, parameterized via `env`. Reuse helpers instead of duplicating sign-in or form-fill in new journeys.
 - CLI fallback: `maestro test .maestro/` or `maestro test .maestro/<flow>.yaml`.
 - Do not point Maestro at production. Debug sign-in is hidden outside the development flavor.

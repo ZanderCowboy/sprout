@@ -9,6 +9,7 @@ import 'package:sprout/features/transactions/export.dart';
 
 import 'bloc/recurring_payments_bloc.dart';
 import 'utils/transaction_frequency_label.dart';
+import 'package:sprout/ui/export.dart';
 
 class RecurringPaymentsPage extends StatelessWidget {
   const RecurringPaymentsPage({super.key});
@@ -24,7 +25,7 @@ class RecurringPaymentsPage extends StatelessWidget {
       child: BlocBuilder<RecurringPaymentsBloc, RecurringPaymentsState>(
         builder: (context, state) {
           return Scaffold(
-            appBar: AppBar(title: const Text('Recurring payments')),
+            appBar: AppBar(title: const Text(AppStrings.recurringPayments)),
             body: switch (state) {
               RecurringPaymentsReady s => _RecurringPaymentsBody(state: s),
               _ => const Center(child: CircularProgressIndicator()),
@@ -44,7 +45,12 @@ class _RecurringPaymentsBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (state.items.isEmpty) {
-      return Center(child: Text('No recurring deposits yet.', style: Theme.of(context).textTheme.bodyMedium));
+      return Center(
+        child: Text(
+          AppStrings.noRecurringDepositsYet,
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
+      );
     }
 
     return ListView.separated(
@@ -52,21 +58,28 @@ class _RecurringPaymentsBody extends StatelessWidget {
       separatorBuilder: (_, _) => const Divider(height: 1),
       itemBuilder: (context, i) {
         final item = state.items[i];
-        final goalName = item.goalId == null ? 'Unallocated' : (state.goalsById[item.goalId!]?.name ?? 'Unknown goal');
-        final accountName = state.accountsById[item.accountId]?.name ?? 'Unknown account';
+        final goalName = item.goalId == null
+            ? AppStrings.unallocated
+            : (state.goalsById[item.goalId!]?.name ?? AppStrings.unknownGoal);
+        final accountName =
+            state.accountsById[item.accountId]?.name ?? AppStrings.unknownAccount;
 
-        return ListTile(
+        return SproutListTile(
+          identifier: SemanticsIds.recurringRow,
+          label: formatZarFromCents(item.amountCents),
           leading: const Icon(Icons.autorenew_rounded),
           title: Text(formatZarFromCents(item.amountCents)),
           subtitle: Text(
             '$goalName · $accountName · ${transactionFrequencyLabel(item.frequency)}'
-            '${item.recurringEnabled && item.nextScheduledDate != null ? ' · next ${formatDateTime(item.nextScheduledDate!)}' : ''}'
-            '${!item.recurringEnabled ? ' · disabled' : ''}',
+            '${item.recurringEnabled && item.nextScheduledDate != null ? ' · ${AppStrings.nextColon(formatDateTime(item.nextScheduledDate!))}' : ''}'
+            '${!item.recurringEnabled ? ' · ${AppStrings.disabledStatus}' : ''}',
           ),
-          trailing: IconButton(
-            tooltip: 'Edit',
-            icon: const Icon(Icons.edit_rounded),
+          trailing: SproutIconButton(
+            identifier: SemanticsIds.recurringEdit,
+            label: AppStrings.editRecurringPayment,
+            tooltip: AppStrings.edit,
             onPressed: () => _openEdit(context, item),
+            icon: const Icon(Icons.edit_rounded),
           ),
           onTap: () => _openEdit(context, item),
         );
@@ -131,15 +144,14 @@ class _EditRecurringSheetState extends State<_EditRecurringSheet> {
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Cancel recurring payment?'),
-        content: const Text(
-          'This will remove the recurring payment. Existing transactions '
-          'already in your history will remain.',
+        title: const Text(AppStrings.cancelRecurringPaymentTitle),
+        content: const Text(AppStrings.cancelRecurringPaymentBody),
+        actions: SproutDialogActions.cancelDelete(
+          onCancel: () => Navigator.pop(ctx, false),
+          onDelete: () => Navigator.pop(ctx, true),
+          cancelIdentifier: SemanticsIds.recurringCancel,
+          deleteIdentifier: SemanticsIds.recurringDelete,
         ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text(AppStrings.cancel)),
-          FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text(AppStrings.delete)),
-        ],
       ),
     );
     if (ok != true) return;
@@ -169,7 +181,9 @@ class _EditRecurringSheetState extends State<_EditRecurringSheet> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            _enabled ? 'Recurring deposit' : 'Recurring deposit (Disabled)',
+            _enabled
+                ? AppStrings.recurringDeposit
+                : AppStrings.recurringDepositDisabled,
             style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 12),
@@ -177,19 +191,33 @@ class _EditRecurringSheetState extends State<_EditRecurringSheet> {
             contentPadding: EdgeInsets.zero,
             value: _enabled,
             onChanged: _saving ? null : (v) => setState(() => _enabled = v),
-            title: Text(_enabled ? 'Enabled' : 'Disabled'),
-            subtitle: _enabled ? null : const Text('This recurring deposit won’t be applied.'),
+            title: Text(_enabled ? AppStrings.enabled : AppStrings.disabled),
+            subtitle: _enabled
+                ? null
+                : const Text(AppStrings.recurringDepositWontApply),
           ),
           if (_enabled) ...[
             const SizedBox(height: 8),
             DropdownButtonFormField<TransactionFrequency>(
               value: _frequency, // ignore: deprecated_member_use
-              decoration: const InputDecoration(labelText: 'Frequency'),
+              decoration: const InputDecoration(labelText: AppStrings.frequency),
               items: const [
-                DropdownMenuItem(value: TransactionFrequency.daily, child: Text('Daily')),
-                DropdownMenuItem(value: TransactionFrequency.weekly, child: Text('Weekly')),
-                DropdownMenuItem(value: TransactionFrequency.monthly, child: Text('Monthly')),
-                DropdownMenuItem(value: TransactionFrequency.yearly, child: Text('Yearly')),
+                DropdownMenuItem(
+                  value: TransactionFrequency.daily,
+                  child: Text(AppStrings.frequencyDaily),
+                ),
+                DropdownMenuItem(
+                  value: TransactionFrequency.weekly,
+                  child: Text(AppStrings.frequencyWeekly),
+                ),
+                DropdownMenuItem(
+                  value: TransactionFrequency.monthly,
+                  child: Text(AppStrings.frequencyMonthly),
+                ),
+                DropdownMenuItem(
+                  value: TransactionFrequency.yearly,
+                  child: Text(AppStrings.frequencyYearly),
+                ),
               ],
               onChanged: _saving
                   ? null
@@ -207,14 +235,20 @@ class _EditRecurringSheetState extends State<_EditRecurringSheet> {
           Row(
             children: [
               Expanded(
-                child: OutlinedButton(
+                child: SproutOutlinedButton(
+                  identifier: SemanticsIds.recurringDelete,
+                  label: AppStrings.cancelRemove,
                   onPressed: _saving ? null : _cancelRecurring,
-                  child: const Text('Cancel (remove)'),
+                  child: const Text(AppStrings.cancelRemove),
                 ),
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: FilledButton(onPressed: _saving ? null : _save, child: const Text(AppStrings.save)),
+                child: SproutFilledButton(
+                  identifier: SemanticsIds.recurringSave,
+                  label: AppStrings.save,
+                  onPressed: _saving ? null : _save,
+                ),
               ),
             ],
           ),

@@ -10,6 +10,7 @@ import '../../domain/budget_category.dart';
 import '../../domain/budget_group.dart';
 import '../budget_bloc.dart';
 import 'budget_group_icon_picker.dart';
+import 'package:sprout/ui/export.dart';
 
 class AddGroupSheet extends StatefulWidget {
   const AddGroupSheet({super.key, this.initial});
@@ -43,7 +44,9 @@ class _AddGroupSheetState extends State<AddGroupSheet> {
     _description.addListener(_onFieldChanged);
 
     _category = i?.category ?? BudgetCategory.income;
-    _colorArgb = _parseHexColor(i?.colorHex)?.toARGB32() ?? AppColors.cardColorAt(0).toARGB32();
+    _colorArgb =
+        _parseHexColor(i?.colorHex)?.toARGB32() ??
+        AppColors.cardColorAt(0).toARGB32();
     _icon = budgetGroupIconFromStored(
       codePoint: i?.iconCodePoint,
       fontFamily: i?.iconFontFamily,
@@ -69,8 +72,10 @@ class _AddGroupSheetState extends State<AddGroupSheet> {
     final name = _name.text.trim();
     if (name.isEmpty) return null;
     final key = name.toLowerCase();
-    final taken = _existing.any((g) => g.id != widget.initial?.id && g.name.trim().toLowerCase() == key);
-    if (taken) return 'You already have a group with this name.';
+    final taken = _existing.any(
+      (g) => g.id != widget.initial?.id && g.name.trim().toLowerCase() == key,
+    );
+    if (taken) return AppStrings.duplicateGroupName;
     return null;
   }
 
@@ -122,40 +127,66 @@ class _AddGroupSheetState extends State<AddGroupSheet> {
 
     return SafeArea(
       child: SingleChildScrollView(
-        padding: EdgeInsets.only(left: 20, right: 20, top: 20, bottom: bottomPadding + 20),
+        padding: EdgeInsets.only(
+          left: 20,
+          right: 20,
+          top: 20,
+          bottom: bottomPadding + 20,
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              widget.initial == null ? 'New budget group' : 'Edit group',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+              widget.initial == null
+                  ? AppStrings.newBudgetGroup
+                  : AppStrings.editGroup,
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
             TextField(
               controller: _name,
-              decoration: InputDecoration(labelText: 'Group name', errorText: _nameError),
+              decoration: InputDecoration(
+                labelText: AppStrings.groupName,
+                errorText: _nameError,
+              ),
               textCapitalization: TextCapitalization.words,
             ),
             const SizedBox(height: 12),
             TextField(
               controller: _description,
-              decoration: const InputDecoration(labelText: 'Description (optional)'),
+              decoration: const InputDecoration(
+                labelText: AppStrings.descriptionOptional,
+              ),
               textCapitalization: TextCapitalization.sentences,
             ),
             const SizedBox(height: 16),
             DropdownButtonFormField<BudgetCategory>(
               initialValue: _category,
-              decoration: const InputDecoration(labelText: 'Category'),
+              decoration: const InputDecoration(labelText: AppStrings.category),
               items: const [
-                DropdownMenuItem(value: BudgetCategory.income, child: Text('Income')),
-                DropdownMenuItem(value: BudgetCategory.essentials, child: Text('Essentials')),
-                DropdownMenuItem(value: BudgetCategory.lifestyle, child: Text('Lifestyle')),
+                DropdownMenuItem(
+                  value: BudgetCategory.income,
+                  child: Text(AppStrings.budgetIncome),
+                ),
+                DropdownMenuItem(
+                  value: BudgetCategory.essentials,
+                  child: Text(AppStrings.budgetEssentials),
+                ),
+                DropdownMenuItem(
+                  value: BudgetCategory.lifestyle,
+                  child: Text(AppStrings.budgetLifestyle),
+                ),
               ],
               onChanged: (v) => setState(() => _category = v ?? _category),
             ),
             const SizedBox(height: 16),
-            Text('Color', style: Theme.of(context).textTheme.labelLarge),
+            Text(
+              AppStrings.color,
+              style: Theme.of(context).textTheme.labelLarge,
+            ),
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
@@ -166,13 +197,18 @@ class _AddGroupSheetState extends State<AddGroupSheet> {
                     onTap: () => setState(() => _colorArgb = c.toARGB32()),
                     child: CircleAvatar(
                       backgroundColor: c,
-                      child: _colorArgb == c.toARGB32() ? const Icon(Icons.check, color: Colors.white) : null,
+                      child: _colorArgb == c.toARGB32()
+                          ? const Icon(Icons.check, color: Colors.white)
+                          : null,
                     ),
                   ),
               ],
             ),
             const SizedBox(height: 16),
-            Text('Icon', style: Theme.of(context).textTheme.labelLarge),
+            Text(
+              AppStrings.icon,
+              style: Theme.of(context).textTheme.labelLarge,
+            ),
             const SizedBox(height: 8),
             BudgetGroupIconPicker(
               selected: _icon,
@@ -180,7 +216,11 @@ class _AddGroupSheetState extends State<AddGroupSheet> {
               accent: Color(_colorArgb),
             ),
             const SizedBox(height: 24),
-            FilledButton(onPressed: _canSave ? _save : null, child: const Text(AppStrings.save)),
+            SproutFilledButton(
+              identifier: SemanticsIds.budgetGroupSave,
+              label: AppStrings.save,
+              onPressed: _canSave ? _save : null,
+            ),
           ],
         ),
       ),
@@ -199,4 +239,3 @@ Color? _parseHexColor(String? hex) {
   if (v == null) return null;
   return Color(v);
 }
-

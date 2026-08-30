@@ -2,6 +2,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 import 'package:sprout/core/config/app_config.dart';
 import 'package:sprout/core/config/app_environment.dart';
+import 'package:sprout/core/constants/app_strings.dart';
 import 'package:sprout/core/error/error.dart';
 import 'package:sprout/core/user/user_context.dart';
 import 'package:sprout/features/accounts/export.dart';
@@ -73,9 +74,7 @@ class AuthService {
   /// Development-only: skip OTP/Google and bind a stable local test user.
   Future<void> debugSignIn() async {
     if (!debugSignInAvailable) {
-      throw const AuthAppException(
-        'Debug sign-in is only available in the development flavor.',
-      );
+      throw const AuthAppException(AppStrings.debugSignInDevOnly);
     }
 
     _debugSignedIn = true;
@@ -144,7 +143,7 @@ class AuthService {
   /// Any other bind discards leftover local Hive and pulls cloud only.
   Future<void> bindAfterVerifiedSignIn(AuthUser user) async {
     if (!user.isVerified) {
-      throw const AuthAppException('Verified session required.');
+      throw const AuthAppException(AppStrings.verifiedSessionRequired);
     }
 
     final newUid = user.id;

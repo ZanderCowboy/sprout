@@ -1,58 +1,32 @@
 appId: app.stackmint.sprout.dev
 ---
-# Test: Deposit with 0 accounts shows "create an account first" CTA
-# Requires: development flavor. Tap Debug sign in on intro or Sign in.
+# Deposit with 0 accounts shows "create an account first" CTA
 # Run: maestro test .maestro/deposit-no-accounts.yaml
 
 - launchApp:
     clearState: true
     clearKeychain: true
 
-- extendedWaitUntil:
-    visible:
-      text: "Debug sign in"
-    timeout: 45000
+- runFlow: shared/debug-signin-intro.yaml
 
-- tapOn: "Debug sign in"
-
-- extendedWaitUntil:
-    visible:
-      text: "Portfolio total"
-    timeout: 15000
-
-# Verify empty state guidance is shown
 - assertVisible: "1. Add an account"
 
-# The deposit button in the empty state is disabled with 0 accounts and 0 goals.
-# Instead, use the center + button to open the action sheet.
+- runFlow: shared/open-center-sheet.yaml
+
 - tapOn:
-    point: "50%,95%"  # Bottom center where the + button is located
+    id: "shell_action_deposit"
 
-# Wait for action sheet to appear
-- extendedWaitUntil:
-    visible:
-      text: "What would you like to do?"
-    timeout: 3000
-
-# Tap "Deposit" in the action sheet
-- tapOn: "Deposit"
-
-# Should now see the "Create an account first" message
 - extendedWaitUntil:
     visible:
       text: "Create an account first"
     timeout: 5000
 
-# Verify the CTA is present
 - assertVisible: "New account"
 
-# Tap the "New account" button in the deposit sheet
-- tapOn: "New account"
+- tapOn:
+    id: "deposit_no_accounts_new_account"
 
-# Should now be in account creation
 - extendedWaitUntil:
     visible:
       text: "New account"
     timeout: 5000
-
-# Success: User is not left on a dead-end sentence

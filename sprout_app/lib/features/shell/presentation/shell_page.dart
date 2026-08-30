@@ -30,7 +30,9 @@ class ShellPage extends StatelessWidget {
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 16),
-                ListTile(
+                SproutListTile(
+                  identifier: SemanticsIds.shellActionNewAccount,
+                  label: AppStrings.newAccount,
                   leading: const Icon(Icons.account_balance_wallet_outlined),
                   title: const Text(AppStrings.newAccount),
                   onTap: () {
@@ -43,7 +45,9 @@ class ShellPage extends StatelessWidget {
                     );
                   },
                 ),
-                ListTile(
+                SproutListTile(
+                  identifier: SemanticsIds.shellActionNewGoal,
+                  label: AppStrings.newGoal,
                   leading: const Icon(Icons.flag_outlined),
                   title: const Text(AppStrings.newGoal),
                   onTap: () {
@@ -56,7 +60,9 @@ class ShellPage extends StatelessWidget {
                     );
                   },
                 ),
-                ListTile(
+                SproutListTile(
+                  identifier: SemanticsIds.shellActionDeposit,
+                  label: AppStrings.deposit,
                   leading: const Icon(Icons.payments_outlined),
                   title: const Text(AppStrings.deposit),
                   onTap: () {
@@ -135,6 +141,7 @@ class ShellPage extends StatelessWidget {
                   children: [
                     Expanded(
                       child: _ShellTabItem(
+                        identifier: SemanticsIds.shellTabOverview,
                         selected: pageIndex == 0,
                         icon: Icons.grid_view_outlined,
                         selectedIcon: Icons.grid_view_rounded,
@@ -144,6 +151,7 @@ class ShellPage extends StatelessWidget {
                     ),
                     Expanded(
                       child: _ShellTabItem(
+                        identifier: SemanticsIds.shellTabAccounts,
                         selected: pageIndex == 1,
                         icon: Icons.account_balance_wallet_outlined,
                         selectedIcon: Icons.account_balance_wallet_rounded,
@@ -157,6 +165,7 @@ class ShellPage extends StatelessWidget {
                     ),
                     Expanded(
                       child: _ShellTabItem(
+                        identifier: SemanticsIds.shellTabGoals,
                         selected: pageIndex == 2,
                         icon: Icons.flag_outlined,
                         selectedIcon: Icons.flag_rounded,
@@ -166,6 +175,7 @@ class ShellPage extends StatelessWidget {
                     ),
                     Expanded(
                       child: _ShellTabItem(
+                        identifier: SemanticsIds.shellTabSettings,
                         selected: pageIndex == 3,
                         icon: Icons.settings_outlined,
                         selectedIcon: Icons.settings_rounded,
@@ -184,10 +194,9 @@ class ShellPage extends StatelessWidget {
   }
 }
 
-/// Center nav action: gradient disc, soft glow, gentle breathing scale, haptic tap.
-
 class _ShellTabItem extends StatelessWidget {
   const _ShellTabItem({
+    required this.identifier,
     required this.selected,
     required this.icon,
     required this.selectedIcon,
@@ -195,6 +204,7 @@ class _ShellTabItem extends StatelessWidget {
     required this.onTap,
   });
 
+  final String identifier;
   final bool selected;
   final IconData icon;
   final IconData selectedIcon;
@@ -205,21 +215,27 @@ class _ShellTabItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final color = selected ? scheme.primary : scheme.onSurfaceVariant;
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(selected ? selectedIcon : icon, color: color, size: 26),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: TextStyle(fontSize: 12, fontWeight: selected ? FontWeight.w600 : FontWeight.w500, color: color),
-            ),
-          ],
+    return Semantics(
+      identifier: identifier,
+      button: true,
+      selected: selected,
+      label: label,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(selected ? selectedIcon : icon, color: color, size: 26),
+              const SizedBox(height: 4),
+              Text(
+                label,
+                style: TextStyle(fontSize: 12, fontWeight: selected ? FontWeight.w600 : FontWeight.w500, color: color),
+              ),
+            ],
+          ),
         ),
       ),
     );

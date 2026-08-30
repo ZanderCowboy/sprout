@@ -31,8 +31,7 @@ class BudgetService {
       (g) => g.id != group.id && g.name.trim().toLowerCase() == normalizedName,
     );
     if (duplicate) {
-      // Reuse existing copy since Sprout already has a message.
-      throw ValidationAppException(AppStrings.duplicateAccountName);
+      throw ValidationAppException(AppStrings.duplicateGroupName);
     }
 
     await _repository.upsertBudgetGroup(

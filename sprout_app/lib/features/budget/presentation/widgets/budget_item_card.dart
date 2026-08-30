@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:sprout/core/utils/money_format.dart';
+import 'package:sprout/core/core.dart';
+import 'package:sprout/ui/export.dart';
 
 import '../../domain/budget_item.dart';
 
@@ -149,7 +150,7 @@ class _BudgetItemCardState extends State<BudgetItemCard> {
       if (p == null) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(const SnackBar(content: Text('Enter a valid amount.')));
+        ).showSnackBar(const SnackBar(content: Text(AppStrings.invalidAmount)));
         return;
       }
       amount = p;
@@ -165,7 +166,7 @@ class _BudgetItemCardState extends State<BudgetItemCard> {
     if (name.isEmpty) return;
     if (amount < 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Amount cannot be negative.')),
+        const SnackBar(content: Text(AppStrings.amountCannotBeNegative)),
       );
       return;
     }
@@ -180,20 +181,19 @@ class _BudgetItemCardState extends State<BudgetItemCard> {
     final ok = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Remove item?'),
+        title: const Text(AppStrings.removeItemTitle),
         content: Text(
-          'This will remove “${widget.item.name.trim().isEmpty ? BudgetItem.defaultDraftName : widget.item.name}”.',
+          AppStrings.removeNamedConfirm(
+            widget.item.name.trim().isEmpty
+                ? BudgetItem.defaultDraftName
+                : widget.item.name,
+          ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Remove'),
-          ),
-        ],
+        actions: SproutDialogActions.cancelConfirm(
+          onCancel: () => Navigator.of(context).pop(false),
+          onConfirm: () => Navigator.of(context).pop(true),
+          confirmLabel: AppStrings.remove,
+        ),
       ),
     );
     if (ok == true && mounted) widget.onDelete();
@@ -217,7 +217,11 @@ class _BudgetItemCardState extends State<BudgetItemCard> {
     final scheme = Theme.of(context).colorScheme;
     final surface = scheme.surfaceContainerHighest.withValues(alpha: 0.45);
 
-    return Card(
+    return Semantics(
+      identifier: SemanticsIds.budgetItemCard,
+      button: true,
+      label: widget.item.name.trim().isEmpty ? BudgetItem.defaultDraftName : widget.item.name,
+      child: Card(
       elevation: 0,
       color: surface,
       clipBehavior: Clip.antiAlias,
@@ -235,7 +239,7 @@ class _BudgetItemCardState extends State<BudgetItemCard> {
                         decoration: const InputDecoration(
                           isDense: true,
                           border: InputBorder.none,
-                          hintText: 'Item name',
+                          hintText: AppStrings.itemName,
                         ),
                         textCapitalization: TextCapitalization.words,
                         textInputAction: TextInputAction.next,
@@ -321,6 +325,7 @@ class _BudgetItemCardState extends State<BudgetItemCard> {
           ),
         ),
       ),
+    ),
     );
   }
 }

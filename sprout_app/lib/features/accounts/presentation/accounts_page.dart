@@ -70,10 +70,12 @@ class AccountsPage extends StatelessWidget {
                     final currentCents = state.accountCurrentTotalsById[a.id] ?? 0;
                     final scheduledCents = state.accountScheduledTotalsById[a.id] ?? 0;
                     final subtitleLines = <String>[
-                      'Current: ${formatZarFromCents(currentCents)}',
-                      if (scheduledCents > 0) 'Scheduled: ${formatZarFromCents(scheduledCents)}',
+                      AppStrings.currentColon(formatZarFromCents(currentCents)),
+                      if (scheduledCents > 0) AppStrings.scheduledColon(formatZarFromCents(scheduledCents)),
                     ];
                     return ColoredEntityCard(
+                      identifier: SemanticsIds.accountCard,
+                      semanticsLabel: a.name,
                       title: a.name,
                       subtitle: subtitleLines.join('\n'),
                       color: Color(a.color),

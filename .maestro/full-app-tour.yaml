@@ -1,352 +1,763 @@
 appId: app.stackmint.sprout.dev
 ---
-# Full app UX tour: walk every major surface for screenshots
-# Requires: development flavor. Tap Debug sign in on intro or Sign in.
+# Full app journey: every reachable screen and tappable control.
+# Requires development flavor. Composes shared helpers from .maestro/shared/.
 # Run: maestro test .maestro/full-app-tour.yaml
-# Screenshots: saved to current directory with tour-01-... through tour-NN-... names
 
 - launchApp:
     clearState: true
     clearKeychain: true
 
+# ===== 1. Intro + Sign in (tour-only auth path) =====
 - extendedWaitUntil:
     visible:
-      text: "Debug sign in"
+      id: "intro_next"
     timeout: 45000
 
-- tapOn: "Debug sign in"
+- tapOn:
+    id: "intro_next"
+
+- tapOn:
+    id: "intro_next"
+
+- tapOn:
+    id: "intro_next"
 
 - extendedWaitUntil:
     visible:
-      text: "Portfolio total"
-    timeout: 15000
+      id: "sign_in_debug_sign_in"
+    timeout: 5000
 
-# ===== 1. Empty Overview =====
+- tapOn:
+    id: "sign_in_terms_link"
+
+- extendedWaitUntil:
+    visible:
+      text: "Terms of Service"
+    timeout: 10000
+
+- back
+
+- tapOn:
+    id: "sign_in_privacy_link"
+
+- extendedWaitUntil:
+    visible:
+      text: "Privacy Policy"
+    timeout: 10000
+
+- back
+
+- tapOn:
+    id: "sign_in_display_name_field"
+
+- inputText: "Tour User"
+
+- tapOn:
+    id: "sign_in_email_field"
+
+- inputText: "tour@example.com"
+
+- tapOn:
+    id: "sign_in_debug_sign_in"
+
+- runFlow: shared/wait-overview.yaml
+
+# ===== 2. Empty states =====
 - assertVisible: "1. Add an account"
 
 - takeScreenshot: tour-01-overview-empty
 
-# ===== 2. Create Account =====
+- tapOn:
+    id: "overview_empty_new_goal"
+
+- extendedWaitUntil:
+    visible:
+      text: "New goal"
+    timeout: 5000
+
+- assertVisible: "Create an account first to hold money for this goal."
+
+- tapOn:
+    id: "goal_no_accounts_cancel"
+
+- runFlow: shared/open-center-sheet.yaml
+
+- tapOn:
+    id: "shell_action_deposit"
+
+- extendedWaitUntil:
+    visible:
+      text: "Create an account first"
+    timeout: 5000
+
+- back
+
 - tapOn:
     id: "overview_empty_new_account"
 
-- assertVisible:
-    text: "New account"
+- extendedWaitUntil:
+    visible:
+      text: "New account"
     timeout: 5000
 
-- takeScreenshot: tour-02-account-form
+- runFlow:
+    file: shared/fill-account-form.yaml
+    env:
+      ACCOUNT_NAME: "Everyday"
+      COLOR_INDEX: "2"
+
+- runFlow: shared/wait-overview.yaml
 
 - tapOn:
-    id: "account_name_field"
-- optional: true
-  tapOn:
-    text: "Account name"
+    id: "shell_tab_goals"
 
-- inputText: "My Savings"
+- assertVisible: "Goals"
 
 - tapOn:
-    text: "Save"
+    id: "shell_tab_overview"
 
-- assertVisible:
-    text: "Portfolio total"
+# ===== 3. Seed data via helpers =====
+- tapOn:
+    id: "overview_new_account"
+
+- extendedWaitUntil:
+    visible:
+      text: "New account"
     timeout: 5000
 
-# Navigate to Accounts tab to see the account list
-- tapOn:
-    text: "Accounts"
+- runFlow:
+    file: shared/fill-account-form.yaml
+    env:
+      ACCOUNT_NAME: "Spare"
+      COLOR_INDEX: "3"
 
-- assertVisible:
-    text: "Accounts"
+- runFlow: shared/wait-overview.yaml
+
+- tapOn:
+    id: "overview_new_goal"
+
+- extendedWaitUntil:
+    visible:
+      text: "New goal"
+    timeout: 5000
+
+- runFlow:
+    file: shared/fill-goal-form.yaml
+    env:
+      GOAL_NAME: "Everyday Fund"
+      TARGET: "10000"
+      ALREADY_SAVED: "500"
+      ACCOUNT_NAME: "Everyday"
+
+- runFlow: shared/wait-overview.yaml
+
+- tapOn:
+    id: "overview_new_goal"
+
+- extendedWaitUntil:
+    visible:
+      text: "New goal"
+    timeout: 5000
+
+- runFlow:
+    file: shared/fill-goal-form.yaml
+    env:
+      GOAL_NAME: "Spare Goal"
+      TARGET: "5000"
+
+- runFlow: shared/wait-overview.yaml
+
+- tapOn:
+    id: "overview_deposit"
+
+- extendedWaitUntil:
+    visible:
+      text: "Deposit"
+    timeout: 5000
+
+- runFlow:
+    file: shared/deposit-to-goal.yaml
+    env:
+      ACCOUNT_NAME: "Everyday"
+      GOAL_NAME: "Everyday Fund"
+      AMOUNT: "2500"
+
+- runFlow: shared/open-center-sheet.yaml
+
+- tapOn:
+    id: "shell_action_deposit"
+
+- extendedWaitUntil:
+    visible:
+      text: "Deposit"
+    timeout: 5000
+
+- tapOn:
+    id: "deposit_mode_to_account"
+
+- tapOn:
+    id: "deposit_account_dropdown"
+
+- tapOn:
+    text: "Everyday"
+
+- tapOn:
+    id: "deposit_amount_field"
+
+- eraseText
+
+- inputText: "1000"
+
+- tapOn:
+    id: "deposit_save"
+
+- runFlow: shared/wait-overview.yaml
+
+- tapOn:
+    id: "overview_deposit"
+
+- extendedWaitUntil:
+    visible:
+      text: "Deposit"
+    timeout: 5000
+
+- tapOn:
+    id: "deposit_account_dropdown"
+
+- tapOn:
+    text: "Everyday"
+
+- tapOn:
+    id: "deposit_goal_dropdown"
+
+- tapOn:
+    text: "Everyday Fund"
+
+- tapOn:
+    id: "deposit_amount_field"
+
+- eraseText
+
+- inputText: "200"
+
+- tapOn:
+    id: "deposit_date_picker"
+
+- tapOn:
+    text: "OK"
+    optional: true
+
+- tapOn:
+    id: "deposit_recurring_toggle"
+
+- tapOn:
+    id: "deposit_frequency_dropdown"
+
+- tapOn:
+    text: "Monthly"
+
+- tapOn:
+    id: "deposit_save"
+
+- runFlow: shared/wait-overview.yaml
+
+- takeScreenshot: tour-02-overview-populated
+
+# ===== 4. Overview populated controls =====
+- tapOn:
+    id: "overview_progress_header"
+
+- tapOn:
+    id: "shell_tab_overview"
+
+- tapOn:
+    id: "overview_deposit"
+
+- extendedWaitUntil:
+    visible:
+      text: "Deposit"
     timeout: 3000
 
-- takeScreenshot: tour-03-accounts-list
-
-# Open account detail
-- tapOn:
-    text: "My Savings"
-
-- assertVisible:
-    text: "My Savings"
-    timeout: 3000
-
-- assertVisible:
-    text: "Account value"
-
-- takeScreenshot: tour-04-account-detail
-
-# Back to Overview
 - back
 
 - tapOn:
-    text: "Overview"
+    id: "overview_new_account"
 
-# ===== 3. Create Goal =====
+- extendedWaitUntil:
+    visible:
+      text: "New account"
+    timeout: 3000
+
+- back
+
 - tapOn:
-    text: "New goal"
-    index: 0
+    id: "overview_new_goal"
 
-- assertVisible:
-    text: "New goal"
+- extendedWaitUntil:
+    visible:
+      text: "New goal"
+    timeout: 3000
+
+- back
+
+- tapOn:
+    id: "overview_transaction_row"
+    optional: true
+
+- extendedWaitUntil:
+    visible:
+      text: "Transaction"
+    timeout: 5000
+    optional: true
+
+- back
+    optional: true
+
+# ===== 5. Shell FAB actions =====
+- runFlow: shared/open-center-sheet.yaml
+
+- tapOn:
+    id: "shell_action_new_account"
+
+- extendedWaitUntil:
+    visible:
+      text: "New account"
+    timeout: 3000
+
+- back
+
+- runFlow: shared/open-center-sheet.yaml
+
+- tapOn:
+    id: "shell_action_new_goal"
+
+- extendedWaitUntil:
+    visible:
+      text: "New goal"
+    timeout: 3000
+
+- back
+
+- runFlow: shared/open-center-sheet.yaml
+
+- tapOn:
+    id: "shell_action_deposit"
+
+- extendedWaitUntil:
+    visible:
+      text: "Deposit"
+    timeout: 3000
+
+- back
+
+# ===== 6. Accounts tab + detail =====
+- tapOn:
+    id: "shell_tab_accounts"
+
+- assertVisible: "Accounts"
+
+- tapOn:
+    id: "account_card"
+    text: "Everyday"
+
+- extendedWaitUntil:
+    visible:
+      text: "Account value"
     timeout: 5000
 
-- takeScreenshot: tour-05-goal-form
+- tapOn:
+    id: "account_detail_edit"
+
+- extendedWaitUntil:
+    visible:
+      text: "Edit"
+    timeout: 3000
+
+- tapOn:
+    id: "color_swatch_1"
+
+- tapOn:
+    id: "form_save"
+
+- tapOn:
+    id: "account_detail_deposit"
+
+- extendedWaitUntil:
+    visible:
+      text: "Deposit"
+    timeout: 3000
+
+- back
+
+- tapOn:
+    id: "account_detail_transaction_row"
+    optional: true
+
+- extendedWaitUntil:
+    visible:
+      text: "Transaction"
+    timeout: 5000
+    optional: true
+
+- tapOn:
+    id: "transaction_note_field"
+    optional: true
+
+- inputText: "Tour note"
+    optional: true
+
+- tapOn:
+    id: "transaction_note_save"
+    optional: true
+
+- back
+    optional: true
+
+- tapOn:
+    id: "account_detail_clear_scheduled"
+    optional: true
+
+- tapOn:
+    id: "dialog_delete"
+    optional: true
+
+- back
+
+- tapOn:
+    id: "account_card"
+    text: "Spare"
+
+- extendedWaitUntil:
+    visible:
+      text: "Spare"
+    timeout: 5000
+
+- tapOn:
+    id: "account_detail_delete"
+
+- tapOn:
+    id: "dialog_delete"
+
+- tapOn:
+    id: "shell_tab_accounts"
+
+# ===== 7. Goals tab + detail =====
+- tapOn:
+    id: "shell_tab_goals"
+
+- assertVisible: "Goals"
+
+- tapOn:
+    id: "goal_sort_menu"
+
+- tapOn:
+    text: "Remaining (low → high)"
+
+- tapOn:
+    id: "goal_sort_menu"
+
+- tapOn:
+    text: "Progress (high → low)"
+
+- tapOn:
+    id: "goal_sort_menu"
+
+- tapOn:
+    text: "Name (A → Z)"
+
+- tapOn:
+    id: "goal_unallocated_card"
+    optional: true
+
+- extendedWaitUntil:
+    visible:
+      text: "Deposit"
+    timeout: 5000
+    optional: true
+
+- back
+    optional: true
+
+- tapOn:
+    id: "goal_card"
+    text: "Everyday Fund"
+
+- extendedWaitUntil:
+    visible:
+      text: "Remaining"
+    timeout: 5000
+
+- tapOn:
+    id: "goal_detail_edit"
+
+- extendedWaitUntil:
+    visible:
+      text: "Edit"
+    timeout: 3000
 
 - tapOn:
     id: "goal_name_field"
-- optional: true
-  tapOn:
-    text: "Goal name"
 
-- inputText: "Dream Vacation"
+- eraseText
 
-- tapOn:
-    id: "goal_target_field"
-- optional: true
-  tapOn:
-    text: "Target amount (ZAR)"
-
-- inputText: "10000"
+- inputText: "Everyday Fund"
 
 - tapOn:
-    text: "Save"
+    id: "form_save"
 
-- assertVisible:
-    text: "Portfolio total"
-    timeout: 5000
-
-# Navigate to Goals tab
 - tapOn:
-    text: "Goals"
+    id: "goal_detail_deposit"
 
-- assertVisible:
-    text: "Goals"
+- extendedWaitUntil:
+    visible:
+      text: "Deposit"
     timeout: 3000
 
-- assertVisible:
-    text: "Dream Vacation"
-
-- takeScreenshot: tour-06-goals-list
-
-# Open goal detail
-- tapOn:
-    text: "Dream Vacation"
-
-- assertVisible:
-    text: "Dream Vacation"
-    timeout: 3000
-
-- assertVisible:
-    text: "Remaining"
-
-- takeScreenshot: tour-07-goal-detail
-
-# Back to Overview
 - back
 
 - tapOn:
-    text: "Overview"
-
-# ===== 4. Make Deposit =====
-# Use center + button for consistent flow
-- tapOn:
-    point: "50%,95%"
-
-- assertVisible:
-    text: "What would you like to do?"
-    timeout: 3000
-
-- tapOn:
-    text: "Deposit"
-
-- assertVisible:
-    text: "Deposit"
-    timeout: 5000
-
-- takeScreenshot: tour-08-deposit-sheet
-
-# Select account (should be pre-selected)
-- tapOn:
-    text: "Account"
-
-- tapOn:
-    text: "My Savings"
-
-# Select goal
-- tapOn:
-    text: "Goal"
-
-- tapOn:
-    text: "Dream Vacation"
-
-# Enter amount
-- tapOn:
-    id: "deposit_amount_field"
-- optional: true
-  tapOn:
-    text: "Amount (ZAR)"
-
-- inputText: "2500"
-
-- tapOn:
-    text: "Save"
-
-# Wait for deposit to complete
-- assertVisible:
-    text: "Portfolio total"
-    timeout: 5000
-
-# ===== 5. Overview with Data =====
-- takeScreenshot: tour-09-overview-with-data
-
-# ===== 6. Walk All Tabs =====
-
-# Overview already visible
-- assertVisible:
-    text: "Overview"
-
-- tapOn:
-    text: "Accounts"
-
-- assertVisible:
-    text: "Accounts"
-    timeout: 3000
-
-- takeScreenshot: tour-10-accounts-tab
-
-- tapOn:
-    text: "Goals"
-
-- assertVisible:
-    text: "Goals"
-    timeout: 3000
-
-- takeScreenshot: tour-11-goals-tab
-
-- tapOn:
-    text: "Settings"
-
-- assertVisible:
-    text: "Settings"
-    timeout: 3000
-
-- takeScreenshot: tour-12-settings
-
-# ===== 7. Settings Deep Dive (best-effort) =====
-
-# Transactions
-- tapOn:
-    text: "Transactions"
+    id: "goal_detail_transaction_row"
     optional: true
 
-- assertVisible:
-    text: "Transactions"
-    timeout: 3000
+- extendedWaitUntil:
+    visible:
+      text: "Transaction"
+    timeout: 5000
     optional: true
 
-- takeScreenshot: tour-13-transactions
+- tapOn:
+    id: "transaction_manage_recurring"
+    optional: true
+
+- back
+    optional: true
+
+- back
+    optional: true
+
+- tapOn:
+    id: "goal_detail_clear_scheduled"
+    optional: true
+
+- tapOn:
+    id: "dialog_delete"
+    optional: true
 
 - back
 
-# Recurring deposits
 - tapOn:
-    text: "Recurring payments"
+    id: "goal_card"
+    text: "Spare Goal"
+
+- tapOn:
+    id: "goal_detail_delete"
+
+- tapOn:
+    id: "dialog_delete"
+
+- tapOn:
+    id: "shell_tab_goals"
+
+# ===== 8. Deposit modes (allocate unallocated) =====
+- runFlow: shared/open-center-sheet.yaml
+
+- tapOn:
+    id: "shell_action_deposit"
+
+- extendedWaitUntil:
+    visible:
+      text: "Deposit"
+    timeout: 5000
+
+- tapOn:
+    id: "deposit_mode_use_unallocated"
     optional: true
 
-- assertVisible:
-    text: "Recurring payments"
-    timeout: 3000
+- tapOn:
+    id: "deposit_add_allocation"
     optional: true
 
-- takeScreenshot: tour-14-recurring-payments
+- tapOn:
+    id: "deposit_remove_allocation"
+    optional: true
 
 - back
 
-# Master Budget
+# ===== 9. Settings subtree =====
+- tapOn:
+    id: "shell_tab_settings"
+
+- assertVisible: "Settings"
+
+- takeScreenshot: tour-03-settings
+
+- tapOn:
+    id: "settings_premium"
+    optional: true
+
+- back
+    optional: true
+
+- tapOn:
+    id: "settings_transactions"
+
+- extendedWaitUntil:
+    visible:
+      text: "Transactions"
+    timeout: 5000
+
+- tapOn:
+    id: "transaction_row"
+    optional: true
+
+- extendedWaitUntil:
+    visible:
+      text: "Transaction"
+    timeout: 5000
+    optional: true
+
+- back
+    optional: true
+
+- back
+
+- tapOn:
+    id: "settings_recurring"
+
+- extendedWaitUntil:
+    visible:
+      text: "Recurring payments"
+    timeout: 5000
+
+- tapOn:
+    id: "recurring_row"
+    optional: true
+
+- tapOn:
+    id: "recurring_edit"
+    optional: true
+
+- tapOn:
+    id: "recurring_save"
+    optional: true
+
+- tapOn:
+    id: "recurring_delete"
+    optional: true
+
+- tapOn:
+    id: "recurring_cancel"
+    optional: true
+
+- back
+
+- tapOn:
+    id: "settings_budget"
+
+- extendedWaitUntil:
+    visible:
+      text: "Master Budget"
+    timeout: 5000
+
+- tapOn:
+    id: "budget_tab_income"
+
+- tapOn:
+    id: "budget_tab_essentials"
+
+- tapOn:
+    id: "budget_tab_lifestyle"
+
+- tapOn:
+    id: "budget_tab_income"
+
+- tapOn:
+    id: "budget_add_group"
+
+- tapOn:
+    text: "Untitled group"
+
+- inputText: "Salary"
+
 - tapOn:
     text: "Master Budget"
+
+- tapOn:
+    id: "budget_sort"
+
+- tapOn:
+    id: "budget_sort_save"
+
+- longPressOn:
+    id: "budget_group_card"
     optional: true
 
-- assertVisible:
-    text: "Master Budget"
-    timeout: 3000
+- tapOn:
+    id: "dialog_cancel"
     optional: true
-
-- takeScreenshot: tour-15-master-budget
 
 - back
 
-# Account / Profile (tap the account tile at top)
 - tapOn:
-    text: "Maestro Test"
-    optional: true
+    id: "settings_account"
 
-- assertVisible:
-    text: "Account"
-    timeout: 3000
-    optional: true
-
-- takeScreenshot: tour-16-account-profile
-
-- back
-
-# ===== 8. Center + Sheet =====
-- tapOn:
-    point: "50%,95%"
-
-- assertVisible:
-    text: "What would you like to do?"
-    timeout: 3000
-
-- takeScreenshot: tour-17-center-action-sheet
-
-# Close the sheet
-- back
-
-# ===== 9. Legal Pages from Settings (best-effort) =====
-
-# Go back to Settings if not there
-- tapOn:
-    text: "Settings"
-
-# Scroll down to find Terms/Privacy if needed
-- scroll
-
-# Terms (if visible)
-- tapOn:
-    text: "Terms"
-    optional: true
-
-- assertVisible:
-    text: "Terms of Service"
+- extendedWaitUntil:
+    visible:
+      text: "Account"
     timeout: 5000
-    optional: true
 
-- takeScreenshot: tour-18-terms
+- tapOn:
+    id: "account_edit_display_name"
+
+- tapOn:
+    id: "account_edit_name_field"
+
+- eraseText
+
+- inputText: "Tour User"
+
+- tapOn:
+    id: "account_edit_name_save"
+
+- tapOn:
+    id: "account_terms"
+
+- extendedWaitUntil:
+    visible:
+      text: "Terms of Service"
+    timeout: 10000
 
 - back
 
-# Privacy (if visible)
 - tapOn:
-    text: "Privacy"
-    optional: true
+    id: "account_privacy"
 
-- assertVisible:
-    text: "Privacy Policy"
-    timeout: 5000
-    optional: true
-
-- takeScreenshot: tour-19-privacy
+- extendedWaitUntil:
+    visible:
+      text: "Privacy Policy"
+    timeout: 10000
 
 - back
 
-# ===== Tour Complete =====
-# Return to Overview for final screenshot
 - tapOn:
-    text: "Overview"
+    id: "account_delete"
 
-- assertVisible:
-    text: "Portfolio total"
+- tapOn:
+    id: "account_delete_cancel"
 
-- takeScreenshot: tour-20-tour-complete
+- back
 
-# Success: Full app tour completed with screenshots
+# ===== 10. Sign out (last) =====
+- tapOn:
+    id: "settings_account"
+
+- tapOn:
+    id: "account_sign_out"
+
+- extendedWaitUntil:
+    visible:
+      id: "intro_next"
+    timeout: 15000
+
+- takeScreenshot: tour-04-signed-out

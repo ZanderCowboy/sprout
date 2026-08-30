@@ -3,10 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:sprout/core/constants/app_strings.dart';
+import 'package:sprout/core/constants/semantics_ids.dart';
 import 'package:sprout/core/router/app_route.dart';
 import 'package:sprout/features/auth/domain/auth_user.dart';
 import 'package:sprout/features/auth/presentation/bloc/auth_cubit.dart';
 import 'package:sprout/features/auth/presentation/utils/account_identity_labels.dart';
+import 'package:sprout/ui/export.dart';
 
 class AccountPage extends StatelessWidget {
   const AccountPage({super.key});
@@ -47,18 +49,20 @@ class AccountPage extends StatelessWidget {
               const SizedBox(height: 12),
               const Text(AppStrings.deleteAccountPremiumNote),
               const SizedBox(height: 24),
-              OutlinedButton(
+              SproutOutlinedButton(
+                identifier: SemanticsIds.accountDeleteCancel,
+                label: AppStrings.cancel,
                 onPressed: () => Navigator.pop(sheetContext, false),
-                child: const Text(AppStrings.cancel),
               ),
               const SizedBox(height: 8),
-              FilledButton(
+              SproutFilledButton(
+                identifier: SemanticsIds.accountDeleteConfirm,
+                label: AppStrings.deleteAccount,
                 style: FilledButton.styleFrom(
                   backgroundColor: scheme.error,
                   foregroundColor: scheme.onError,
                 ),
                 onPressed: () => Navigator.pop(sheetContext, true),
-                child: const Text(AppStrings.deleteAccount),
               ),
             ],
           ),
@@ -123,7 +127,9 @@ class AccountPage extends StatelessWidget {
                   _AccountSectionCard(
                     title: AppStrings.accountSectionProfile,
                     children: [
-                      ListTile(
+                      SproutListTile(
+                        identifier: SemanticsIds.accountEditDisplayName,
+                        label: AppStrings.editDisplayName,
                         leading: const Icon(Icons.edit_rounded),
                         title: const Text(AppStrings.editDisplayName),
                         enabled: !busy,
@@ -137,7 +143,9 @@ class AccountPage extends StatelessWidget {
                   _AccountSectionCard(
                     title: AppStrings.accountSectionSession,
                     children: [
-                      ListTile(
+                      SproutListTile(
+                        identifier: SemanticsIds.accountSignOut,
+                        label: AppStrings.signOut,
                         leading: const Icon(Icons.logout_rounded),
                         title: const Text(AppStrings.signOut),
                         subtitle: const Text(AppStrings.signOutKeepsLocalData),
@@ -152,14 +160,18 @@ class AccountPage extends StatelessWidget {
                   _AccountSectionCard(
                     title: AppStrings.accountSectionLegal,
                     children: [
-                      ListTile(
+                      SproutListTile(
+                        identifier: SemanticsIds.accountTerms,
+                        label: AppStrings.termsOfService,
                         leading: const Icon(Icons.article_outlined),
                         title: const Text(AppStrings.termsOfService),
                         trailing: const Icon(Icons.chevron_right_rounded),
                         enabled: !busy,
                         onTap: busy ? null : () => _openTerms(context),
                       ),
-                      ListTile(
+                      SproutListTile(
+                        identifier: SemanticsIds.accountPrivacy,
+                        label: AppStrings.privacyPolicy,
                         leading: const Icon(Icons.privacy_tip_outlined),
                         title: const Text(AppStrings.privacyPolicy),
                         trailing: const Icon(Icons.chevron_right_rounded),
@@ -172,7 +184,9 @@ class AccountPage extends StatelessWidget {
                   _AccountSectionCard(
                     title: AppStrings.accountSectionDanger,
                     children: [
-                      ListTile(
+                      SproutListTile(
+                        identifier: SemanticsIds.accountDelete,
+                        label: AppStrings.deleteAccount,
                         leading: Icon(
                           Icons.delete_forever_rounded,
                           color: Theme.of(context).colorScheme.error,
@@ -282,20 +296,20 @@ class _EditDisplayNameDialogState extends State<_EditDisplayNameDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: const Text(AppStrings.editDisplayName),
-      content: TextField(
+      content: SproutTextField(
+        identifier: SemanticsIds.accountEditNameField,
         controller: _controller,
         autofocus: true,
         textCapitalization: TextCapitalization.words,
         decoration: const InputDecoration(labelText: AppStrings.displayName),
         onSubmitted: (_) => _submit(),
       ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text(AppStrings.cancel),
-        ),
-        FilledButton(onPressed: _submit, child: const Text(AppStrings.save)),
-      ],
+      actions: SproutDialogActions.cancelSave(
+        onCancel: () => Navigator.pop(context),
+        onSave: _submit,
+        cancelIdentifier: SemanticsIds.accountEditNameCancel,
+        saveIdentifier: SemanticsIds.accountEditNameSave,
+      ),
     );
   }
 }

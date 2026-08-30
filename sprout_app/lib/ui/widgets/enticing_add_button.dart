@@ -3,11 +3,18 @@ import 'package:flutter/services.dart';
 
 import 'package:sprout/core/core.dart';
 
+import '_semantic.dart';
+
 /// Center nav action: gradient disc, soft glow, gentle breathing scale, haptic tap.
 class EnticingAddButton extends StatefulWidget {
-  const EnticingAddButton({super.key, required this.onPressed});
+  const EnticingAddButton({
+    super.key,
+    required this.onPressed,
+    this.identifier = SemanticsIds.shellAdd,
+  });
 
   final VoidCallback onPressed;
+  final String identifier;
 
   @override
   State<EnticingAddButton> createState() => _EnticingAddButtonState();
@@ -25,9 +32,10 @@ class _EnticingAddButtonState extends State<EnticingAddButton>
       vsync: this,
       duration: const Duration(milliseconds: 2400),
     )..repeat(reverse: true);
-    _scale = Tween<double>(begin: 1.0, end: 1.072).animate(
-      CurvedAnimation(parent: _breath, curve: Curves.easeInOutCubic),
-    );
+    _scale = Tween<double>(
+      begin: 1.0,
+      end: 1.072,
+    ).animate(CurvedAnimation(parent: _breath, curve: Curves.easeInOutCubic));
   }
 
   @override
@@ -48,8 +56,8 @@ class _EnticingAddButtonState extends State<EnticingAddButton>
 
     return Tooltip(
       message: AppStrings.actionAdd,
-      child: Semantics(
-        button: true,
+      child: semanticButton(
+        identifier: widget.identifier,
         label: AppStrings.actionAdd,
         child: ScaleTransition(
           scale: _scale,
@@ -144,4 +152,3 @@ class _EnticingAddButtonState extends State<EnticingAddButton>
     );
   }
 }
-
