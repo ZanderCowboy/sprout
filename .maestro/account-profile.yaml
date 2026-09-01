@@ -1,0 +1,14 @@
+appId: app.stackmint.sprout.dev
+tags:
+  - page
+---
+# Account profile: edit name, legal links, delete cancel (no sign-out).
+# Run: maestro test .maestro/account-profile.yaml
+
+- launchApp:
+    clearState: true
+    clearKeychain: true
+
+- runFlow: shared/debug-signin-intro.yaml
+
+- runFlow: shared/chapter-account-profile.yaml

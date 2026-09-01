@@ -148,6 +148,50 @@ class _CreateGoalScreenState extends State<CreateGoalScreen> {
             );
           }
 
+          // If no accounts, show a message with CTA to create one
+          if (state.accounts.isEmpty) {
+            return Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    AppStrings.newGoal,
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    AppStrings.createAccountFirst,
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                  const SizedBox(height: 20),
+                    SproutFilledButton.icon(
+                      identifier: SemanticsIds.goalNoAccountsNewAccount,
+                      label: AppStrings.newAccount,
+                      onPressed: () async {
+                        Navigator.of(context).pop();
+                        await showModalBottomSheet<void>(
+                          context: context,
+                          isScrollControlled: true,
+                          showDragHandle: true,
+                          builder: (_) => AccountFormSheet(defaultColor: AppColors.cardColorAt(0)),
+                        );
+                      },
+                      icon: const Icon(Icons.account_balance_wallet_outlined),
+                      labelWidget: const Text(AppStrings.newAccount),
+                    ),
+                    const SizedBox(height: 12),
+                    SproutOutlinedButton(
+                      identifier: SemanticsIds.goalNoAccountsCancel,
+                      label: AppStrings.cancel,
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                ],
+              ),
+            );
+          }
+
           final showOpening = _alreadySavedCents > 0;
           final canSubmit = _canSubmit(state);
 
@@ -161,9 +205,13 @@ class _CreateGoalScreenState extends State<CreateGoalScreen> {
             primaryActionLabel: AppStrings.save,
             onPrimaryAction: () => _submit(context, state),
             primaryActionEnabled: canSubmit,
+            nameFieldKey: const Key('goal_name_field'),
+            nameFieldIdentifier: SemanticsIds.goalNameField,
             body: [
               const SizedBox(height: 12),
-              TextField(
+              SproutTextField(
+                identifier: SemanticsIds.goalTargetField,
+                fieldKey: const Key('goal_target_field'),
                 controller: _target,
                 decoration: InputDecoration(
                   labelText: AppStrings.targetAmount,
@@ -175,10 +223,11 @@ class _CreateGoalScreenState extends State<CreateGoalScreen> {
                 ),
               ),
               const SizedBox(height: 12),
-              TextField(
+              SproutTextField(
+                identifier: SemanticsIds.goalAlreadySavedField,
                 controller: _alreadySaved,
                 decoration: InputDecoration(
-                  labelText: 'Already Saved Amount (ZAR)',
+                  labelText: AppStrings.alreadySavedAmount,
                   errorText: _alreadySavedError,
                 ),
                 keyboardType: const TextInputType.numberWithOptions(
@@ -188,10 +237,12 @@ class _CreateGoalScreenState extends State<CreateGoalScreen> {
               ),
               if (showOpening) ...[
                 const SizedBox(height: 12),
-                DropdownButtonFormField<String>(
-                  value: _alreadySavedAccountId, // ignore: deprecated_member_use
+                SproutDropdownField<String>(
+                  identifier: SemanticsIds.goalAlreadySavedAccount,
+                  label: AppStrings.whichAccountHoldsMoney,
+                  value: _alreadySavedAccountId,
                   decoration: const InputDecoration(
-                    labelText: 'Which Account holds this money?',
+                    labelText: AppStrings.whichAccountHoldsMoney,
                   ),
                   items: [
                     for (final a in state.accounts)

@@ -19,8 +19,9 @@ class UnallocatedFundsCard extends StatelessWidget {
     final border = scheme.tertiary;
 
     return Semantics(
+      identifier: SemanticsIds.goalUnallocatedCard,
       button: true,
-      label: 'Unallocated funds',
+      label: AppStrings.unallocatedFunds,
       child: Material(
         color: bg,
         borderRadius: BorderRadius.circular(16),
@@ -39,21 +40,23 @@ class UnallocatedFundsCard extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               child: Row(
                 children: [
-                  Icon(
-                    Icons.tips_and_updates_outlined,
-                    color: border,
-                  ),
+                  Icon(Icons.tips_and_updates_outlined, color: border),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      'Ready to Sprout! You have ${formatZarFromCents(unallocatedCents)} waiting to be assigned.',
+                      AppStrings.readyToSproutUnallocated(
+                        formatZarFromCents(unallocatedCents),
+                      ),
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 8),
-                  Icon(Icons.chevron_right_rounded, color: scheme.onSurfaceVariant),
+                  Icon(
+                    Icons.chevron_right_rounded,
+                    color: scheme.onSurfaceVariant,
+                  ),
                 ],
               ),
             ),
@@ -111,4 +114,3 @@ class _DashedRoundedRectPainter extends CustomPainter {
         oldDelegate.radius != radius;
   }
 }
-

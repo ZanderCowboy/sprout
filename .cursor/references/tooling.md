@@ -57,6 +57,16 @@ export XDG_CONFIG_HOME="$HOME/.config/firebase-personal"
 
 Must be the personal Google account for Sprout, not work. Details: `docs/FIREBASE_CLI_PERSONAL.md`.
 
+## Maestro MCP
+
+Project MCP in `.cursor/mcp.json` starts the Maestro CLI MCP (`maestro mcp`). After adding or changing it, toggle the server in Cursor Settings → Tools & MCPs (or reload the window).
+
+Local CLI (Windows): `C:\Programming\maestro\bin` — `maestro.bat` is on the user PATH. Requires Java 17+ (`JAVA_HOME` is `C:\Programming\Java\jdk-21`).
+
+Use the MCP to inspect devices, run `.maestro/` flows, and author YAML. Call `cheat_sheet` before unfamiliar commands. Flows target the **development** flavor and tap **Debug sign in**. Human docs: `README.md` (Maestro UI Tests).
+
+**After Dart/UI/semantics changes**, rebuild and reinstall before running Maestro (`flutter build apk --flavor development -t lib/main_development.dart` then `flutter install …`, or keep `flutter run --flavor development …` active on the device). Maestro hits the installed binary, not hot-reload state.
+
 ## gcloud CLI
 
 gcloud stores auth and ADC under `$CLOUDSDK_CONFIG` (default `~/.config/gcloud`). Agent shells may not inherit workspace `CLOUDSDK_CONFIG`. Before any `gcloud` command:

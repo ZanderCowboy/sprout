@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:sprout/core/core.dart';
 import 'package:sprout/core/di/service_locator.dart';
@@ -8,6 +9,7 @@ import 'package:sprout/features/transactions/export.dart';
 import '../application/accounts_service.dart';
 import '../domain/account.dart';
 import 'account_form_sheet.dart';
+import 'package:sprout/ui/export.dart';
 
 class AccountDetailPage extends StatefulWidget {
   const AccountDetailPage({super.key, required this.accountId});
@@ -84,14 +86,11 @@ class _AccountDetailPageState extends State<AccountDetailPage> {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text(AppStrings.delete),
-        content: const Text(
-          'Remove this account? Deposits stay in history locally; '
-          'when online, the account row is removed from the server.',
+        content: const Text(AppStrings.removeAccountConfirm),
+        actions: SproutDialogActions.cancelDelete(
+          onCancel: () => Navigator.pop(ctx, false),
+          onDelete: () => Navigator.pop(ctx, true),
         ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text(AppStrings.cancel)),
-          FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text(AppStrings.delete)),
-        ],
       ),
     );
     if (ok == true && mounted) {
@@ -129,15 +128,14 @@ class _AccountDetailPageState extends State<AccountDetailPage> {
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Clear scheduled transactions?'),
+        title: const Text(AppStrings.clearScheduledTransactions),
         content: Text(
-          'This will remove ${scheduledIds.length} future-dated '
-          'transaction${scheduledIds.length == 1 ? '' : 's'} from this account.',
+          AppStrings.clearScheduledBody(count: scheduledIds.length, scope: 'account'),
         ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text(AppStrings.cancel)),
-          FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text(AppStrings.delete)),
-        ],
+        actions: SproutDialogActions.cancelDelete(
+          onCancel: () => Navigator.pop(ctx, false),
+          onDelete: () => Navigator.pop(ctx, true),
+        ),
       ),
     );
     if (ok != true || !mounted) return;
@@ -157,7 +155,7 @@ class _AccountDetailPageState extends State<AccountDetailPage> {
         body: Center(
           child: _loading
               ? const CircularProgressIndicator()
-              : const Text('Account not found.'),
+              : const Text(AppStrings.accountNotFound),
         ),
       );
     }
@@ -193,8 +191,18 @@ class _AccountDetailPageState extends State<AccountDetailPage> {
       appBar: AppBar(
         title: Text(account.name),
         actions: [
-          IconButton(icon: const Icon(Icons.edit_rounded), onPressed: _edit),
-          IconButton(icon: const Icon(Icons.delete_outline_rounded), onPressed: _delete),
+          SproutIconButton(
+            identifier: SemanticsIds.accountDetailEdit,
+            label: AppStrings.edit,
+            onPressed: _edit,
+            icon: const Icon(Icons.edit_rounded),
+          ),
+          SproutIconButton(
+            identifier: SemanticsIds.accountDetailDelete,
+            label: AppStrings.delete,
+            onPressed: _delete,
+            icon: const Icon(Icons.delete_outline_rounded),
+          ),
         ],
       ),
       body: _loading
@@ -205,8 +213,9 @@ class _AccountDetailPageState extends State<AccountDetailPage> {
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
                 children: [
                   DetailDepositCallout(
+                    identifier: SemanticsIds.accountDetailDeposit,
                     accentColor: Color(account.color),
-                    caption: AppStrings.addDepositCaptionAccount,
+                    caption: AppStrings.addDepositCaptionAccountAmountOnly,
                     onPressed: _openDeposit,
                   ),
                   const SizedBox(height: 12),
@@ -220,24 +229,26 @@ class _AccountDetailPageState extends State<AccountDetailPage> {
                             children: [
                               Expanded(
                                 child: Text(
-                                  'Account value',
+                                  AppStrings.accountValue,
                                   style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
                                 ),
                               ),
                               if (scheduledTotalCents > 0)
-                                TextButton.icon(
+                                SproutTextButton.icon(
+                                  identifier: SemanticsIds.accountDetailClearScheduled,
+                                  label: AppStrings.clearScheduled,
                                   onPressed: _clearScheduled,
                                   icon: const Icon(Icons.delete_outline_rounded),
-                                  label: const Text('Clear scheduled'),
+                                  labelWidget: const Text(AppStrings.clearScheduled),
                                 ),
                             ],
                           ),
                           const SizedBox(height: 10),
-                          _ValueRow(label: 'Current', value: formatZarFromCents(currentTotalCents)),
+                          _ValueRow(label: AppStrings.current, value: formatZarFromCents(currentTotalCents)),
                           const SizedBox(height: 6),
-                          _ValueRow(label: 'Scheduled', value: formatZarFromCents(scheduledTotalCents)),
+                          _ValueRow(label: AppStrings.scheduled, value: formatZarFromCents(scheduledTotalCents)),
                           const Divider(height: 18),
-                          _ValueRow(label: 'Total', value: formatZarFromCents(grandTotalCents), isEmphasis: true),
+                          _ValueRow(label: AppStrings.total, value: formatZarFromCents(grandTotalCents), isEmphasis: true),
                         ],
                       ),
                     ),
@@ -249,22 +260,25 @@ class _AccountDetailPageState extends State<AccountDetailPage> {
                   ),
                   const SizedBox(height: 12),
                   if (_tx.isEmpty)
-                    Text('No deposits yet for this account.', style: Theme.of(context).textTheme.bodyMedium)
+                    Text(AppStrings.noDepositsForAccount, style: Theme.of(context).textTheme.bodyMedium)
                   else
                     ..._tx.map((t) {
                       final goalName = t.goalId == null || t.goalId!.isEmpty
-                          ? 'Unallocated'
-                          : (_goals[t.goalId!]?.name ?? 'Unknown goal');
+                          ? AppStrings.unallocated
+                          : (_goals[t.goalId!]?.name ?? AppStrings.unknownGoal);
                       final kindLabel = switch (t.kind) {
-                        TransactionKind.deposit => 'Deposit',
-                        TransactionKind.allocation => 'Allocation',
+                        TransactionKind.deposit => AppStrings.deposit,
+                        TransactionKind.allocation => AppStrings.allocation,
                       };
                       final style = mapTransactionToListStyle(t: t, now: now);
                       return Card(
                         margin: const EdgeInsets.only(bottom: 8),
+                        clipBehavior: Clip.antiAlias,
                         child: Opacity(
                           opacity: style.opacity,
-                          child: ListTile(
+                          child: SproutListTile(
+                            identifier: SemanticsIds.accountDetailTransactionRow,
+                            label: AppStrings.kindAmountLabel(kindLabel, formatZarFromCents(t.amountCents)),
                             leading: style.leadingIcon == null ? null : Icon(style.leadingIcon),
                             title: Text(formatZarFromCents(t.amountCents)),
                             subtitle: Text(
@@ -278,6 +292,9 @@ class _AccountDetailPageState extends State<AccountDetailPage> {
                             trailing: t.pendingSync
                                 ? Icon(Icons.sync_rounded, size: 20, color: Theme.of(context).colorScheme.primary)
                                 : null,
+                            onTap: () {
+                              context.push(AppRoute.transactionDetail.location(id: t.id));
+                            },
                           ),
                         ),
                       );

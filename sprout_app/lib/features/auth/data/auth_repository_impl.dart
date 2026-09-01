@@ -17,9 +17,7 @@ class AuthRepositoryImpl implements AuthRepository {
   SupabaseClient get _client {
     final client = _supabase;
     if (client == null) {
-      throw const AuthAppException(
-        'Supabase is not configured. Sign-in is unavailable.',
-      );
+      throw const AuthAppException(AppStrings.supabaseNotConfigured);
     }
     return client;
   }
@@ -42,7 +40,7 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<void> sendEmailOtp(String email) async {
     final normalized = email.trim();
     if (normalized.isEmpty) {
-      throw const ValidationAppException('Enter an email address.');
+      throw const ValidationAppException(AppStrings.enterEmailAddress);
     }
     try {
       await _client.auth.signInWithOtp(
@@ -66,10 +64,10 @@ class AuthRepositoryImpl implements AuthRepository {
     final normalizedEmail = email.trim();
     final normalizedToken = token.trim();
     if (normalizedEmail.isEmpty) {
-      throw const ValidationAppException('Enter an email address.');
+      throw const ValidationAppException(AppStrings.enterEmailAddress);
     }
     if (normalizedToken.isEmpty) {
-      throw const ValidationAppException('Enter the verification code.');
+      throw const ValidationAppException(AppStrings.enterVerificationCode);
     }
     try {
       // Existing users get Magic link (type email). First-time users with
@@ -80,7 +78,7 @@ class AuthRepositoryImpl implements AuthRepository {
       );
       final user = _mapUser(response.user ?? _client.auth.currentUser);
       if (user == null || !user.isVerified) {
-        throw const AuthAppException('Could not verify the code.');
+        throw const AuthAppException(AppStrings.couldNotVerifyCode);
       }
       return user;
     } on AuthException catch (e) {
@@ -98,17 +96,13 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<AuthUser> signInWithGoogle() async {
     final google = _googleSignIn;
     if (google == null) {
-      throw const AuthAppException(
-        'Google Sign-In is not configured. Add googleWebClientId to the flavor config.',
-      );
+      throw const AuthAppException(AppStrings.googleSignInNotConfigured);
     }
     try {
       final account = await google.authenticate();
       final idToken = account.authentication.idToken;
       if (idToken == null || idToken.isEmpty) {
-        throw const AuthAppException(
-          'Google Sign-In did not return an ID token.',
-        );
+        throw const AuthAppException(AppStrings.googleSignInNoIdToken);
       }
 
       String? accessToken;
@@ -127,7 +121,7 @@ class AuthRepositoryImpl implements AuthRepository {
       );
       final user = _mapUser(response.user ?? _client.auth.currentUser);
       if (user == null || !user.isVerified) {
-        throw const AuthAppException('Google Sign-In failed.');
+        throw const AuthAppException(AppStrings.googleSignInFailed);
       }
       return user;
     } on AuthAppException {
@@ -136,7 +130,7 @@ class AuthRepositoryImpl implements AuthRepository {
       throw AuthAppException(e.message);
     } on GoogleSignInException catch (e) {
       if (e.code == GoogleSignInExceptionCode.canceled) {
-        throw const AuthAppException('Google Sign-In was cancelled.');
+        throw const AuthAppException(AppStrings.googleSignInCancelled);
       }
       throw AuthAppException(e.description ?? e.toString());
     } on Object catch (e) {
@@ -156,7 +150,7 @@ class AuthRepositoryImpl implements AuthRepository {
       );
       final user = _mapUser(response.user ?? _client.auth.currentUser);
       if (user == null || !user.isVerified) {
-        throw const AuthAppException('Could not update display name.');
+        throw const AuthAppException(AppStrings.couldNotUpdateDisplayName);
       }
       return user;
     } on AuthException catch (e) {

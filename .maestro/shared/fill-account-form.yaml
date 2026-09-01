@@ -1,0 +1,20 @@
+appId: app.stackmint.sprout.dev
+env:
+  COLOR_INDEX: "2"
+---
+# Requires: account form sheet open (New account or Edit).
+# Env: ACCOUNT_NAME (required), COLOR_INDEX (optional, default 2).
+- tapOn:
+    id: "account_name_field"
+
+- eraseText
+
+- inputText: ${ACCOUNT_NAME}
+
+- hideKeyboard
+
+- tapOn:
+    id: "color_swatch_${COLOR_INDEX}"
+
+- tapOn:
+    id: "form_save"

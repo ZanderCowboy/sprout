@@ -20,4 +20,4 @@ Never instruct the human to edit source files or apply patches. If something req
 - Firebase CLI must use the personal Google account, not work. Before any `firebase` command: `export XDG_CONFIG_HOME=$HOME/.config/firebase-personal`.
 - gcloud must use the personal Google account and `sprout-app-development`, not work. Before any `gcloud` command: `export CLOUDSDK_CONFIG=$HOME/.config/gcloud-personal`.
 - After Dart changes: `cd sprout_app && flutter analyze && flutter test`. If tests fail or hang, finish the work and report — do not loop on them until the human asks.
-- RevenueCat: plugin MCP + `docs/REVENUECAT.md`. Supabase: MCP + `supabase/README.md`.
+- RevenueCat: plugin MCP + `docs/REVENUECAT.md`. Supabase: MCP + `supabase/README.md`. Maestro: project MCP (`maestro mcp`) + `.maestro/` flows.

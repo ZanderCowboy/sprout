@@ -1,0 +1,4 @@
+# Maestro workspace config — only root-level journeys are discovered.
+appId: app.stackmint.sprout.dev
+flows:
+  - "*"

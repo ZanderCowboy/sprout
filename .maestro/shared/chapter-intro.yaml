@@ -1,0 +1,38 @@
+appId: app.stackmint.sprout.dev
+---
+# Requires: intro screen visible (fresh launch).
+# Walks intro slides, returns via sign-in back, then debug-signs in.
+- extendedWaitUntil:
+    visible:
+      id: "intro_next"
+    timeout: 45000
+
+- tapOn:
+    id: "intro_next"
+
+- tapOn:
+    id: "intro_next"
+
+- tapOn:
+    id: "intro_next"
+
+- extendedWaitUntil:
+    visible:
+      id: "sign_in_debug_sign_in"
+    timeout: 5000
+
+- tapOn:
+    id: "sign_in_back"
+
+- extendedWaitUntil:
+    visible:
+      id: "intro_next"
+    timeout: 5000
+
+- assertVisible:
+    id: "intro_debug_sign_in"
+
+- tapOn:
+    id: "intro_debug_sign_in"
+
+- runFlow: wait-overview.yaml

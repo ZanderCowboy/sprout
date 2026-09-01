@@ -1,0 +1,35 @@
+appId: app.stackmint.sprout.dev
+tags:
+  - edge
+---
+# Deposit with 0 accounts shows "create an account first" CTA
+# Run: maestro test .maestro/deposit-no-accounts.yaml
+
+- launchApp:
+    clearState: true
+    clearKeychain: true
+
+- runFlow: shared/debug-signin-intro.yaml
+
+- assertVisible:
+    id: "overview_empty_new_account"
+
+- runFlow: shared/open-center-sheet.yaml
+
+- tapOn:
+    id: "shell_action_deposit"
+
+- extendedWaitUntil:
+    visible:
+      text: "Create an account first"
+    timeout: 5000
+
+- assertVisible: "New account"
+
+- tapOn:
+    id: "deposit_no_accounts_new_account"
+
+- extendedWaitUntil:
+    visible:
+      text: "New account"
+    timeout: 5000

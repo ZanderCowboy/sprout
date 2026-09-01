@@ -11,7 +11,12 @@ Package name is `sprout`. App root is `sprout_app/`.
 - Cross-feature and core imports: `package:sprout/...`. Same-feature files may use relative imports.
 - Register new repositories/services in `sprout_app/lib/core/di/service_locator.dart` (`sl`).
 - Blocs/cubits: `sealed` events/states + `Equatable`. Prefer `flutter_bloc` already used in the feature.
-- User-visible copy: `AppStrings`. Do not hard-code new UI strings.
+- User-visible copy: `AppStrings` (`lib/core/constants/app_strings.dart`). Do **not** hard-code UI strings.
+  - Includes: on-screen `Text`, `AppBar` titles, button/chip labels, tooltips, hints, dialogs, snackbars, Semantics/`label`/`semanticsLabel`, enum **display** labels (sort, frequency, category, kind), and `ValidationAppException` / user-facing `AuthAppException` messages.
+  - Add the constant (or reuse an existing one) **before** using it in a widget. Prefer reuse over inventing near-duplicates.
+  - Keep interpolation at the call site (or a small `AppStrings` helper). Do not invent a new string per formatted amount.
+  - **Not** copy: `SemanticsIds`, widget `Key`s, route paths, Hive/API wire values (`'deposit'`, `'daily'`), user-generated names.
+  - No ARB / `gen-l10n` — one `AppStrings` class with section comments.
 - Validation errors: throw `ValidationAppException` with an `AppStrings` message.
 - Money: integer **cents**. Format for display with existing `core/utils` helpers.
 - Theme: `buildAppTheme()`; app is dark (`ThemeMode.dark`). Reuse `lib/ui` widgets before inventing new cards/sheets.

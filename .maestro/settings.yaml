@@ -1,0 +1,14 @@
+appId: app.stackmint.sprout.dev
+tags:
+  - page
+---
+# Settings hub tiles (open each child and back).
+# Run: maestro test .maestro/settings.yaml
+
+- launchApp:
+    clearState: true
+    clearKeychain: true
+
+- runFlow: shared/debug-signin-intro.yaml
+
+- runFlow: shared/chapter-settings.yaml

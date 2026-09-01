@@ -1,6 +1,9 @@
+import 'package:flutter/material.dart';
+
+import 'package:sprout/core/core.dart';
+
 import '../../domain/budget_group.dart';
 import '../../domain/budget_item.dart';
-import 'package:flutter/material.dart';
 
 enum BudgetSortOption {
   asIs,
@@ -12,11 +15,11 @@ enum BudgetSortOption {
 
 String budgetSortOptionLabel(BudgetSortOption s) {
   return switch (s) {
-    BudgetSortOption.asIs => 'As is',
-    BudgetSortOption.nameAToZ => 'Name (A \u2192 Z)',
-    BudgetSortOption.nameZToA => 'Name (Z \u2192 A)',
-    BudgetSortOption.valueHighToLow => 'Value (high \u2192 low)',
-    BudgetSortOption.valueLowToHigh => 'Value (low \u2192 high)',
+    BudgetSortOption.asIs => AppStrings.sortAsIs,
+    BudgetSortOption.nameAToZ => AppStrings.sortNameAToZ,
+    BudgetSortOption.nameZToA => AppStrings.sortNameZToA,
+    BudgetSortOption.valueHighToLow => AppStrings.sortValueHighToLow,
+    BudgetSortOption.valueLowToHigh => AppStrings.sortValueLowToHigh,
   };
 }
 
@@ -47,19 +50,23 @@ List<BudgetGroup> sortBudgetGroups(
     switch (sort) {
       case BudgetSortOption.nameAToZ:
         byPrimary = va.name.trim().toLowerCase().compareTo(
-              vb.name.trim().toLowerCase(),
-            );
+          vb.name.trim().toLowerCase(),
+        );
         break;
       case BudgetSortOption.nameZToA:
         byPrimary = vb.name.trim().toLowerCase().compareTo(
-              va.name.trim().toLowerCase(),
-            );
+          va.name.trim().toLowerCase(),
+        );
         break;
       case BudgetSortOption.valueHighToLow:
-        byPrimary = _toCents(vb.totalAmount).compareTo(_toCents(va.totalAmount));
+        byPrimary = _toCents(
+          vb.totalAmount,
+        ).compareTo(_toCents(va.totalAmount));
         break;
       case BudgetSortOption.valueLowToHigh:
-        byPrimary = _toCents(va.totalAmount).compareTo(_toCents(vb.totalAmount));
+        byPrimary = _toCents(
+          va.totalAmount,
+        ).compareTo(_toCents(vb.totalAmount));
         break;
       case BudgetSortOption.asIs:
         byPrimary = 0;
@@ -89,13 +96,13 @@ List<BudgetItem> sortBudgetItems(
     switch (sort) {
       case BudgetSortOption.nameAToZ:
         byPrimary = va.name.trim().toLowerCase().compareTo(
-              vb.name.trim().toLowerCase(),
-            );
+          vb.name.trim().toLowerCase(),
+        );
         break;
       case BudgetSortOption.nameZToA:
         byPrimary = vb.name.trim().toLowerCase().compareTo(
-              va.name.trim().toLowerCase(),
-            );
+          va.name.trim().toLowerCase(),
+        );
         break;
       case BudgetSortOption.valueHighToLow:
         byPrimary = _toCents(vb.amount).compareTo(_toCents(va.amount));
@@ -115,4 +122,3 @@ List<BudgetItem> sortBudgetItems(
 
   return indexed.map((e) => e.value).toList();
 }
-

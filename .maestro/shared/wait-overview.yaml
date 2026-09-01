@@ -1,0 +1,7 @@
+appId: app.stackmint.sprout.dev
+---
+# Requires: signed in, shell visible.
+- extendedWaitUntil:
+    visible:
+      text: "Portfolio total"
+    timeout: 15000

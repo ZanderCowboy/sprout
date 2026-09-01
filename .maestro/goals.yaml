@@ -1,0 +1,70 @@
+appId: app.stackmint.sprout.dev
+tags:
+  - page
+---
+# Goals sort, unallocated card, Everyday Fund detail (delete cancel).
+# Seeds unallocated via to-account deposit, then a goal deposit.
+# Run: maestro test .maestro/goals.yaml
+
+- launchApp:
+    clearState: true
+    clearKeychain: true
+
+- runFlow: shared/debug-signin-intro.yaml
+
+- runFlow:
+    file: shared/seed-core.yaml
+    env:
+      SEED_GOAL: "true"
+
+- runFlow: shared/open-center-sheet.yaml
+
+- tapOn:
+    id: "shell_action_deposit"
+
+- extendedWaitUntil:
+    visible:
+      text: "Deposit"
+    timeout: 5000
+
+- tapOn:
+    id: "deposit_mode_to_account"
+
+- tapOn:
+    id: "deposit_account_dropdown"
+
+- tapOn:
+    text: "Everyday"
+
+- tapOn:
+    id: "deposit_amount_field"
+
+- eraseText
+
+- inputText: "1000"
+
+- hideKeyboard
+
+- tapOn:
+    id: "deposit_save"
+
+- runFlow: shared/wait-overview.yaml
+
+- tapOn:
+    id: "overview_deposit"
+
+- extendedWaitUntil:
+    visible:
+      text: "Deposit"
+    timeout: 5000
+
+- runFlow:
+    file: shared/deposit-to-goal.yaml
+    env:
+      ACCOUNT_NAME: "Everyday"
+      GOAL_NAME: "Everyday Fund"
+      AMOUNT: "500"
+
+- runFlow: shared/wait-overview.yaml
+
+- runFlow: shared/chapter-goals.yaml

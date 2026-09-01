@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
+import 'package:sprout/core/constants/app_strings.dart';
 import 'package:sprout/core/storage/hive_adapters.dart';
 import 'package:sprout/core/theme/app_theme.dart';
 import 'package:sprout/core/user/user_context.dart';
@@ -21,19 +22,19 @@ void main() {
         ),
       );
 
-      expect(find.text('Track your savings in one place'), findsOneWidget);
+      expect(find.text(AppStrings.introSlide1Title), findsOneWidget);
 
-      await tester.tap(find.text('Next'));
+      await tester.tap(find.text(AppStrings.next));
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 350));
-      expect(find.text('Set goals and watch them grow'), findsOneWidget);
+      expect(find.text(AppStrings.introSlide2Title), findsOneWidget);
 
-      await tester.tap(find.text('Next'));
+      await tester.tap(find.text(AppStrings.next));
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 350));
-      expect(find.text('Sign in so your data stays with you'), findsOneWidget);
+      expect(find.text(AppStrings.introSlide3Title), findsOneWidget);
 
-      await tester.tap(find.text('Sign in'));
+      await tester.tap(find.text(AppStrings.signIn));
       await tester.pump();
       expect(completed, isTrue);
     });

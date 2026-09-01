@@ -2,16 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../core/constants/app_colors.dart';
-import '../../../core/constants/app_strings.dart';
-import '../../../core/router/app_route.dart';
-import '../../../core/utils/date_format.dart';
-import '../../../core/utils/money_format.dart';
+import 'package:sprout/core/core.dart';
 import '../../accounts/presentation/account_form_sheet.dart';
 import '../../goals/presentation/goals_bloc.dart';
 import '../../goals/presentation/create_goal_screen.dart';
 import '../../shell/presentation/deposit_bottom_sheet.dart';
 import '../../transactions/domain/transaction.dart';
+import 'package:sprout/ui/export.dart';
 import 'home_bloc.dart';
 
 class OverviewPage extends StatelessWidget {
@@ -53,9 +50,12 @@ class OverviewPage extends StatelessWidget {
         }
 
         final scheme = Theme.of(context).colorScheme;
-        final titleStyle = Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-            );
+        final titleStyle = Theme.of(
+          context,
+        ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold);
+
+        // Check if we need to show empty state guidance
+        final hasAccounts = state.accounts.isNotEmpty;
 
         return RefreshIndicator(
           onRefresh: () async {
@@ -73,24 +73,24 @@ class OverviewPage extends StatelessWidget {
                       Text(
                         AppStrings.portfolioTotal,
                         style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                              color: scheme.onSurfaceVariant,
-                            ),
+                          color: scheme.onSurfaceVariant,
+                        ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         formatZarFromCents(state.portfolio.totalCents),
-                        style:
-                            Theme.of(context).textTheme.displaySmall?.copyWith(
-                                  fontWeight: FontWeight.w800,
-                                  color: scheme.primary,
-                                ),
+                        style: Theme.of(context).textTheme.displaySmall
+                            ?.copyWith(
+                              fontWeight: FontWeight.w800,
+                              color: scheme.primary,
+                            ),
                       ),
                       const SizedBox(height: 8),
                       Text(
                         '${AppStrings.lastUpdated}: ${state.portfolio.lastActivityAt != null ? formatDateTime(state.portfolio.lastActivityAt!) : AppStrings.neverUpdated}',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: scheme.onSurfaceVariant,
-                            ),
+                          color: scheme.onSurfaceVariant,
+                        ),
                       ),
                       const SizedBox(height: 14),
                       BlocBuilder<GoalsBloc, GoalsState>(
@@ -100,20 +100,17 @@ class OverviewPage extends StatelessWidget {
                             return const SizedBox.shrink();
                           }
 
-                          final totalTargetCents =
-                              goalsState.progressList.fold<int>(
-                            0,
-                            (sum, p) => sum + p.goal.targetAmountCents,
-                          );
-                          final totalSavedCents =
-                              goalsState.progressList.fold<int>(
-                            0,
-                            (sum, p) => sum + p.savedCents,
-                          );
+                          final totalTargetCents = goalsState.progressList
+                              .fold<int>(
+                                0,
+                                (sum, p) => sum + p.goal.targetAmountCents,
+                              );
+                          final totalSavedCents = goalsState.progressList
+                              .fold<int>(0, (sum, p) => sum + p.savedCents);
                           final totalRemainingCents =
                               (totalTargetCents - totalSavedCents) < 0
-                                  ? 0
-                                  : (totalTargetCents - totalSavedCents);
+                              ? 0
+                              : (totalTargetCents - totalSavedCents);
                           final overallPercent = totalTargetCents <= 0
                               ? 0
                               : (totalSavedCents * 100) ~/ totalTargetCents;
@@ -127,39 +124,54 @@ class OverviewPage extends StatelessWidget {
                           );
                         },
                       ),
-                      const SizedBox(height: 18),
-                      Text(AppStrings.actionAdd, style: titleStyle),
-                      const SizedBox(height: 10),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: FilledButton.tonalIcon(
-                              onPressed: () => _openDeposit(context),
-                              icon: const Icon(Icons.payments_outlined),
-                              label: const Text(AppStrings.deposit),
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: OutlinedButton.icon(
-                              onPressed: () => _openNewAccount(context),
-                              icon: const Icon(
-                                Icons.account_balance_wallet_outlined,
-                              ),
-                              label: const Text(AppStrings.newAccount),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                      SizedBox(
-                        width: double.infinity,
-                        child: OutlinedButton.icon(
-                          onPressed: () => _openNewGoal(context),
-                          icon: const Icon(Icons.flag_outlined),
-                          label: const Text(AppStrings.newGoal),
+                      if (!hasAccounts) ...[
+                        const SizedBox(height: 18),
+                        _EmptyStateGuidance(
+                          onOpenAccount: () => _openNewAccount(context),
+                          onOpenGoal: () => _openNewGoal(context),
+                          onOpenDeposit: () => _openDeposit(context),
                         ),
-                      ),
+                      ] else ...[
+                        const SizedBox(height: 18),
+                        Text(AppStrings.actionAdd, style: titleStyle),
+                        const SizedBox(height: 10),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: SproutFilledButton.tonalIcon(
+                                identifier: SemanticsIds.overviewDeposit,
+                                label: AppStrings.deposit,
+                                onPressed: () => _openDeposit(context),
+                                icon: const Icon(Icons.payments_outlined),
+                                labelWidget: const Text(AppStrings.deposit),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: SproutOutlinedButton.icon(
+                                identifier: SemanticsIds.overviewNewAccount,
+                                label: AppStrings.newAccount,
+                                onPressed: () => _openNewAccount(context),
+                                icon: const Icon(
+                                  Icons.account_balance_wallet_outlined,
+                                ),
+                                labelWidget: const Text(AppStrings.newAccount),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        SizedBox(
+                          width: double.infinity,
+                          child: SproutOutlinedButton.icon(
+                            identifier: SemanticsIds.overviewNewGoal,
+                            label: AppStrings.newGoal,
+                            onPressed: () => _openNewGoal(context),
+                            icon: const Icon(Icons.flag_outlined),
+                            labelWidget: const Text(AppStrings.newGoal),
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                 ),
@@ -168,7 +180,7 @@ class OverviewPage extends StatelessWidget {
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(20, 6, 20, 10),
-                    child: Text('Recent activity', style: titleStyle),
+                    child: Text(AppStrings.recentActivity, style: titleStyle),
                   ),
                 ),
               if (state.recentTransactions.isNotEmpty)
@@ -181,19 +193,29 @@ class OverviewPage extends StatelessWidget {
                     itemBuilder: (context, i) {
                       final t = state.recentTransactions[i];
                       final kindLabel = switch (t.kind) {
-                        TransactionKind.deposit => 'Deposit',
-                        TransactionKind.allocation => 'Allocation',
+                        TransactionKind.deposit => AppStrings.deposit,
+                        TransactionKind.allocation => AppStrings.allocation,
                       };
                       return Card(
                         clipBehavior: Clip.antiAlias,
-                        child: ListTile(
+                        child: SproutListTile(
+                          identifier: SemanticsIds.overviewTransactionRow,
+                          label: AppStrings.kindAmountLabel(
+                            kindLabel,
+                            formatZarFromCents(t.amountCents),
+                          ),
                           leading: Icon(
                             t.kind == TransactionKind.deposit
                                 ? Icons.payments_outlined
                                 : Icons.swap_horiz_rounded,
                           ),
                           title: Text(formatZarFromCents(t.amountCents)),
-                          subtitle: Text('$kindLabel · ${formatDateTime(t.occurredAt)}'),
+                          subtitle: Text(
+                            AppStrings.kindSubtitle(
+                              kindLabel,
+                              formatDateTime(t.occurredAt),
+                            ),
+                          ),
                           trailing: t.pendingSync
                               ? Icon(
                                   Icons.sync_rounded,
@@ -201,6 +223,11 @@ class OverviewPage extends StatelessWidget {
                                   color: Theme.of(context).colorScheme.primary,
                                 )
                               : null,
+                          onTap: () {
+                            context.push(
+                              AppRoute.transactionDetail.location(id: t.id),
+                            );
+                          },
                         ),
                       );
                     },
@@ -237,9 +264,13 @@ class _OverallGoalsProgressHeader extends StatelessWidget {
     final progress = (overallPercent / 100).clamp(0.0, 1.0);
 
     return Semantics(
+      identifier: SemanticsIds.overviewProgressHeader,
       button: onTap != null,
-      label:
-          'Overall goals progress. $overallPercent percent. Saved ${formatZarFromCents(totalSavedCents)} of ${formatZarFromCents(totalTargetCents)}.',
+      label: AppStrings.overallGoalsProgressSemantics(
+        percent: overallPercent,
+        saved: formatZarFromCents(totalSavedCents),
+        target: formatZarFromCents(totalTargetCents),
+      ),
       child: Card(
         elevation: 0,
         color: scheme.surfaceContainerHighest,
@@ -261,17 +292,15 @@ class _OverallGoalsProgressHeader extends StatelessWidget {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'Overall goals progress',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.w800,
-                            ),
+                        AppStrings.overallGoalsProgress,
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(fontWeight: FontWeight.w800),
                       ),
                     ),
                     Text(
                       '$overallPercent%',
-                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                            fontWeight: FontWeight.w900,
-                          ),
+                      style: Theme.of(context).textTheme.headlineSmall
+                          ?.copyWith(fontWeight: FontWeight.w900),
                     ),
                   ],
                 ),
@@ -281,26 +310,31 @@ class _OverallGoalsProgressHeader extends StatelessWidget {
                   minHeight: 12,
                   borderRadius: BorderRadius.circular(8),
                   color: scheme.primary,
-                  backgroundColor:
-                      scheme.onSurfaceVariant.withValues(alpha: 0.18),
+                  backgroundColor: scheme.onSurfaceVariant.withValues(
+                    alpha: 0.18,
+                  ),
                 ),
                 const SizedBox(height: 12),
                 Row(
                   children: [
                     Expanded(
                       child: Text(
-                        'Saved ${formatZarFromCents(totalSavedCents)}',
+                        AppStrings.savedAmount(
+                          formatZarFromCents(totalSavedCents),
+                        ),
                         style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                              fontWeight: FontWeight.w800,
-                            ),
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
                     ),
                     Text(
-                      'Target ${formatZarFromCents(totalTargetCents)}',
+                      AppStrings.targetAmountLabel(
+                        formatZarFromCents(totalTargetCents),
+                      ),
                       style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.w700,
-                            color: scheme.onSurfaceVariant,
-                          ),
+                        fontWeight: FontWeight.w700,
+                        color: scheme.onSurfaceVariant,
+                      ),
                     ),
                   ],
                 ),
@@ -309,11 +343,13 @@ class _OverallGoalsProgressHeader extends StatelessWidget {
                   children: [
                     Expanded(
                       child: Text(
-                        '${formatZarFromCents(totalRemainingCents)} to go to complete all goals.',
+                        AppStrings.toGoCompleteAllGoals(
+                          formatZarFromCents(totalRemainingCents),
+                        ),
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.w600,
-                              color: scheme.onSurfaceVariant,
-                            ),
+                          fontWeight: FontWeight.w600,
+                          color: scheme.onSurfaceVariant,
+                        ),
                       ),
                     ),
                     if (onTap != null)
@@ -332,3 +368,191 @@ class _OverallGoalsProgressHeader extends StatelessWidget {
   }
 }
 
+class _EmptyStateGuidance extends StatelessWidget {
+  const _EmptyStateGuidance({
+    required this.onOpenAccount,
+    required this.onOpenGoal,
+    required this.onOpenDeposit,
+  });
+
+  final VoidCallback onOpenAccount;
+  final VoidCallback onOpenGoal;
+  final VoidCallback onOpenDeposit;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final titleStyle = Theme.of(
+      context,
+    ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800);
+    final stepStyle = Theme.of(
+      context,
+    ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700);
+    final detailStyle = Theme.of(
+      context,
+    ).textTheme.bodyMedium?.copyWith(color: scheme.onSurfaceVariant);
+
+    return BlocBuilder<GoalsBloc, GoalsState>(
+      builder: (context, goalsState) {
+        final hasGoals =
+            goalsState is GoalsReady && goalsState.progressList.isNotEmpty;
+
+        return Card(
+          elevation: 0,
+          color: scheme.surfaceContainerHighest,
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Semantics(
+                  identifier: SemanticsIds.overviewEmptyTitle,
+                  header: true,
+                  child: Text(
+                    AppStrings.overviewEmptyTitle,
+                    key: const Key('overview_empty_title'),
+                    style: titleStyle,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                _GuidanceStep(
+                  stepText: AppStrings.overviewEmptyStep1,
+                  detailText: AppStrings.overviewEmptyStep1Detail,
+                  icon: Icons.account_balance_wallet_outlined,
+                  stepStyle: stepStyle,
+                  detailStyle: detailStyle,
+                  scheme: scheme,
+                  actionLabel: AppStrings.newAccount,
+                  onAction: onOpenAccount,
+                  actionKey: const Key('overview_empty_new_account'),
+                  actionIdentifier: SemanticsIds.overviewEmptyNewAccount,
+                ),
+                const SizedBox(height: 16),
+                _GuidanceStep(
+                  stepText: AppStrings.overviewEmptyStep2,
+                  detailText: AppStrings.overviewEmptyStep2Detail,
+                  icon: Icons.flag_outlined,
+                  stepStyle: stepStyle,
+                  detailStyle: detailStyle,
+                  scheme: scheme,
+                  actionLabel: AppStrings.newGoal,
+                  onAction: onOpenGoal,
+                  enabled: true,
+                  actionKey: const Key('overview_empty_new_goal'),
+                  actionIdentifier: SemanticsIds.overviewEmptyNewGoal,
+                ),
+                const SizedBox(height: 16),
+                _GuidanceStep(
+                  stepText: AppStrings.overviewEmptyStep3,
+                  detailText: AppStrings.overviewEmptyStep3Detail,
+                  icon: Icons.payments_outlined,
+                  stepStyle: stepStyle,
+                  detailStyle: detailStyle,
+                  scheme: scheme,
+                  actionLabel: AppStrings.deposit,
+                  onAction: onOpenDeposit,
+                  enabled: hasGoals,
+                  actionKey: const Key('overview_empty_deposit'),
+                  actionIdentifier: SemanticsIds.overviewEmptyDeposit,
+                  disabledCaption: hasGoals
+                      ? null
+                      : AppStrings.overviewEmptyDepositDisabled,
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _GuidanceStep extends StatelessWidget {
+  const _GuidanceStep({
+    required this.stepText,
+    required this.detailText,
+    required this.icon,
+    required this.stepStyle,
+    required this.detailStyle,
+    required this.scheme,
+    required this.actionLabel,
+    required this.onAction,
+    this.enabled = true,
+    this.actionKey,
+    this.actionIdentifier,
+    this.disabledCaption,
+  });
+
+  final String stepText;
+  final String detailText;
+  final IconData icon;
+  final TextStyle? stepStyle;
+  final TextStyle? detailStyle;
+  final ColorScheme scheme;
+  final String actionLabel;
+  final VoidCallback onAction;
+  final bool enabled;
+  final Key? actionKey;
+  final String? actionIdentifier;
+  final String? disabledCaption;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, size: 24, color: scheme.primary),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(stepText, style: stepStyle),
+              const SizedBox(height: 4),
+              Text(detailText, style: detailStyle),
+              const SizedBox(height: 8),
+              if (actionIdentifier != null)
+                SproutTextButton.icon(
+                  key: actionKey,
+                  identifier: actionIdentifier!,
+                  label: actionLabel,
+                  onPressed: enabled ? onAction : null,
+                  icon: Icon(Icons.add_rounded, size: 18),
+                  labelWidget: Text(actionLabel),
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                  ),
+                )
+              else
+                TextButton.icon(
+                  key: actionKey,
+                  onPressed: enabled ? onAction : null,
+                  icon: Icon(Icons.add_rounded, size: 18),
+                  label: Text(actionLabel),
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                  ),
+                ),
+              if (!enabled && disabledCaption != null) ...[
+                const SizedBox(height: 4),
+                Text(
+                  disabledCaption!,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: scheme.onSurfaceVariant,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}

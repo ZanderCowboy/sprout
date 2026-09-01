@@ -28,9 +28,9 @@ class _GoalsPageState extends State<GoalsPage> {
           return const Center(child: CircularProgressIndicator());
         }
         final scheme = Theme.of(context).colorScheme;
-        final titleStyle = Theme.of(context).textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
-            );
+        final titleStyle = Theme.of(
+          context,
+        ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold);
         if (state.progressList.isEmpty) {
           return RefreshIndicator(
             onRefresh: () async {
@@ -48,10 +48,13 @@ class _GoalsPageState extends State<GoalsPage> {
                 SliverFillRemaining(
                   hasScrollBody: false,
                   child: Center(
-                    child: Text(
-                      'Tap + to add a goal.',
-                      style: Theme.of(context).textTheme.bodyMedium,
-                      textAlign: TextAlign.center,
+                    child: Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Text(
+                        AppStrings.goalsEmptyGuidance,
+                        style: Theme.of(context).textTheme.bodyLarge,
+                        textAlign: TextAlign.center,
+                      ),
                     ),
                   ),
                 ),
@@ -75,8 +78,9 @@ class _GoalsPageState extends State<GoalsPage> {
             ? 0
             : (totalSavedCents * 100) ~/ totalTargetCents;
         final sorted = sortGoals(state.progressList, _sort);
-        final firstCompletedIndex =
-            sorted.indexWhere((p) => p.percentComplete >= 100);
+        final firstCompletedIndex = sorted.indexWhere(
+          (p) => p.percentComplete >= 100,
+        );
         final hasCompleted = firstCompletedIndex != -1;
 
         return RefreshIndicator(
@@ -91,27 +95,29 @@ class _GoalsPageState extends State<GoalsPage> {
                   padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
                   child: Row(
                     children: [
-                      Expanded(child: Text(AppStrings.goals, style: titleStyle)),
-                      PopupMenuButton<GoalsSort>(
-                        tooltip: 'Sort goals',
-                        initialValue: _sort,
-                        onSelected: (s) => setState(() => _sort = s),
-                        itemBuilder: (context) {
-                          return GoalsSort.values
-                              .map(
-                                (s) => PopupMenuItem<GoalsSort>(
-                                  value: s,
-                                  child: Text(goalsSortLabel(s)),
-                                ),
-                              )
-                              .toList();
-                        },
-                        icon: const Icon(Icons.sort_rounded),
+                      Expanded(
+                        child: Text(AppStrings.goals, style: titleStyle),
                       ),
-                      IconButton(
-                        tooltip: 'Settings',
-                        icon: const Icon(Icons.settings_outlined),
-                        onPressed: () => context.go(AppRoute.settings.path),
+                      Semantics(
+                        identifier: SemanticsIds.goalSortMenu,
+                        button: true,
+                        label: AppStrings.sortGoals,
+                        child: PopupMenuButton<GoalsSort>(
+                          tooltip: AppStrings.sortGoals,
+                          initialValue: _sort,
+                          onSelected: (s) => setState(() => _sort = s),
+                          itemBuilder: (context) {
+                            return GoalsSort.values
+                                .map(
+                                  (s) => PopupMenuItem<GoalsSort>(
+                                    value: s,
+                                    child: Text(goalsSortLabel(s)),
+                                  ),
+                                )
+                                .toList();
+                          },
+                          icon: const Icon(Icons.sort_rounded),
+                        ),
                       ),
                     ],
                   ),
@@ -133,7 +139,8 @@ class _GoalsPageState extends State<GoalsPage> {
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
                     child: UnallocatedFundsCard(
-                      unallocatedCents: (state.unallocatedBalance * 100).round(),
+                      unallocatedCents: (state.unallocatedBalance * 100)
+                          .round(),
                       onTap: () {
                         showModalBottomSheet<void>(
                           context: context,
@@ -142,8 +149,8 @@ class _GoalsPageState extends State<GoalsPage> {
                           builder: (_) => DepositBottomSheet(
                             maxAllocatableCents:
                                 (state.unallocatedBalance * 100).round(),
-                            initialMode:
-                                DepositBottomSheetMode.allocateExistingUnallocated,
+                            initialMode: DepositBottomSheetMode
+                                .allocateExistingUnallocated,
                           ),
                         );
                       },
@@ -159,7 +166,7 @@ class _GoalsPageState extends State<GoalsPage> {
                   itemBuilder: (context, i) {
                     if (hasCompleted && i == firstCompletedIndex) {
                       return _GoalsSectionSeparator(
-                        title: 'Completed',
+                        title: AppStrings.completed,
                       );
                     }
                     final idx = (hasCompleted && i > firstCompletedIndex)
@@ -167,46 +174,43 @@ class _GoalsPageState extends State<GoalsPage> {
                         : i;
                     final p = sorted[idx];
                     final g = p.goal;
-                    return Semantics(
-                      button: true,
-                      label:
-                          '${g.name}. ${AppStrings.remaining} ${formatZarFromCents(p.remainingCents)}. '
-                          'Saved ${formatZarFromCents(p.savedCents)} of ${formatZarFromCents(g.targetAmountCents)}. '
-                          '${AppStrings.progress} ${p.percentComplete} percent.',
-                      child: ColoredEntityCard(
-                        title:
-                            '${AppStrings.remaining}: ${formatZarFromCents(p.remainingCents)}',
-                        subtitle:
-                            '${g.name}\nSaved: ${formatZarFromCents(p.savedCents)} / ${formatZarFromCents(g.targetAmountCents)}',
-                        color: Color(g.color),
-                        onTap: () {
-                          context.push(AppRoute.goalDetail.location(id: g.id));
-                        },
-                        trailing: SizedBox(
-                          width: 56,
-                          height: 56,
-                          child: Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              CircularProgressIndicator(
-                                value:
-                                    (p.percentComplete / 100).clamp(0.0, 1.0),
-                                strokeWidth: 5,
-                                backgroundColor: scheme.surfaceContainerHighest
-                                    .withValues(alpha: 0.8),
-                                color: Color(g.color),
-                              ),
-                              Text(
-                                '${p.percentComplete}%',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .labelSmall
-                                    ?.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                              ),
-                            ],
-                          ),
+                    return ColoredEntityCard(
+                      identifier: SemanticsIds.goalCard,
+                      semanticsLabel: AppStrings.goalCardSemantics(
+                        name: g.name,
+                        remaining: formatZarFromCents(p.remainingCents),
+                        saved: formatZarFromCents(p.savedCents),
+                        target: formatZarFromCents(g.targetAmountCents),
+                        percent: p.percentComplete,
+                      ),
+                      title: AppStrings.remainingColon(
+                        formatZarFromCents(p.remainingCents),
+                      ),
+                      subtitle:
+                          '${g.name}\n${AppStrings.savedSlashTarget(formatZarFromCents(p.savedCents), formatZarFromCents(g.targetAmountCents))}',
+                      color: Color(g.color),
+                      onTap: () {
+                        context.push(AppRoute.goalDetail.location(id: g.id));
+                      },
+                      trailing: SizedBox(
+                        width: 56,
+                        height: 56,
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            CircularProgressIndicator(
+                              value: (p.percentComplete / 100).clamp(0.0, 1.0),
+                              strokeWidth: 5,
+                              backgroundColor: scheme.surfaceContainerHighest
+                                  .withValues(alpha: 0.8),
+                              color: Color(g.color),
+                            ),
+                            Text(
+                              '${p.percentComplete}%',
+                              style: Theme.of(context).textTheme.labelSmall
+                                  ?.copyWith(fontWeight: FontWeight.bold),
+                            ),
+                          ],
                         ),
                       ),
                     );
@@ -245,9 +249,9 @@ class _GoalsSectionSeparator extends StatelessWidget {
             child: Text(
               title,
               style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                    fontWeight: FontWeight.w800,
-                    color: scheme.onSurfaceVariant,
-                  ),
+                fontWeight: FontWeight.w800,
+                color: scheme.onSurfaceVariant,
+              ),
             ),
           ),
           Expanded(
@@ -282,8 +286,11 @@ class _OverallGoalsProgressHeader extends StatelessWidget {
     final progress = (overallPercent / 100).clamp(0.0, 1.0);
 
     return Semantics(
-      label:
-          'Overall goals progress. $overallPercent percent. Saved ${formatZarFromCents(totalSavedCents)} of ${formatZarFromCents(totalTargetCents)}.',
+      label: AppStrings.overallGoalsProgressSemantics(
+        percent: overallPercent,
+        saved: formatZarFromCents(totalSavedCents),
+        target: formatZarFromCents(totalTargetCents),
+      ),
       child: Card(
         elevation: 0,
         color: scheme.surfaceContainerHighest,
@@ -302,17 +309,17 @@ class _OverallGoalsProgressHeader extends StatelessWidget {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'Overall progress',
+                      AppStrings.overallProgress,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w800,
-                          ),
+                        fontWeight: FontWeight.w800,
+                      ),
                     ),
                   ),
                   Text(
                     '$overallPercent%',
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.w900,
-                        ),
+                      fontWeight: FontWeight.w900,
+                    ),
                   ),
                 ],
               ),
@@ -322,35 +329,43 @@ class _OverallGoalsProgressHeader extends StatelessWidget {
                 minHeight: 12,
                 borderRadius: BorderRadius.circular(8),
                 color: scheme.primary,
-                backgroundColor: scheme.onSurfaceVariant.withValues(alpha: 0.18),
+                backgroundColor: scheme.onSurfaceVariant.withValues(
+                  alpha: 0.18,
+                ),
               ),
               const SizedBox(height: 12),
               Row(
                 children: [
                   Expanded(
                     child: Text(
-                      'Saved ${formatZarFromCents(totalSavedCents)}',
+                      AppStrings.savedAmount(
+                        formatZarFromCents(totalSavedCents),
+                      ),
                       style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.w800,
-                          ),
+                        fontWeight: FontWeight.w800,
+                      ),
                     ),
                   ),
                   Text(
-                    'Target ${formatZarFromCents(totalTargetCents)}',
+                    AppStrings.targetAmountLabel(
+                      formatZarFromCents(totalTargetCents),
+                    ),
                     style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.w700,
-                          color: scheme.onSurfaceVariant,
-                        ),
+                      fontWeight: FontWeight.w700,
+                      color: scheme.onSurfaceVariant,
+                    ),
                   ),
                 ],
               ),
               const SizedBox(height: 6),
               Text(
-                '${formatZarFromCents(totalRemainingCents)} to go to complete all goals.',
+                AppStrings.toGoCompleteAllGoals(
+                  formatZarFromCents(totalRemainingCents),
+                ),
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: scheme.onSurfaceVariant,
-                    ),
+                  fontWeight: FontWeight.w600,
+                  color: scheme.onSurfaceVariant,
+                ),
               ),
             ],
           ),

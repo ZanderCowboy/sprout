@@ -1,0 +1,51 @@
+appId: app.stackmint.sprout.dev
+---
+# Requires: signed in on populated Overview (account + activity).
+- tapOn:
+    id: "overview_progress_header"
+
+- tapOn:
+    id: "shell_tab_overview"
+
+- tapOn:
+    id: "overview_deposit"
+
+- extendedWaitUntil:
+    visible:
+      text: "Deposit"
+    timeout: 3000
+
+- back
+
+- tapOn:
+    id: "overview_new_account"
+
+- extendedWaitUntil:
+    visible:
+      text: "New account"
+    timeout: 3000
+
+- back
+
+- tapOn:
+    id: "overview_new_goal"
+
+- extendedWaitUntil:
+    visible:
+      text: "New goal"
+    timeout: 3000
+
+- back
+
+- tapOn:
+    id: "overview_transaction_row"
+    optional: true
+
+- extendedWaitUntil:
+    visible:
+      text: "Transaction"
+    timeout: 5000
+    optional: true
+
+- back:
+    optional: true

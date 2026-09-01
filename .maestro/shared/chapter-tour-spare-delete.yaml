@@ -1,0 +1,40 @@
+appId: app.stackmint.sprout.dev
+---
+# Tour-only: confirm-delete Spare account and Spare Goal.
+# Requires: Spare account + Spare Goal exist; Everyday left intact.
+- tapOn:
+    id: "shell_tab_accounts"
+
+- tapOn:
+    id: "account_card"
+    text: ".*Spare.*"
+
+- extendedWaitUntil:
+    visible:
+      text: "Spare"
+    timeout: 5000
+
+- tapOn:
+    id: "account_detail_delete"
+
+- tapOn:
+    id: "dialog_delete"
+
+- tapOn:
+    id: "shell_tab_accounts"
+
+- tapOn:
+    id: "shell_tab_goals"
+
+- tapOn:
+    id: "goal_card"
+    text: ".*Spare Goal.*"
+
+- tapOn:
+    id: "goal_detail_delete"
+
+- tapOn:
+    id: "dialog_delete"
+
+- tapOn:
+    id: "shell_tab_goals"

@@ -136,7 +136,89 @@ flutter analyze
 flutter test
 ```
 
-## More docs
+## Maestro UI Tests (development flavor only)
+
+Maestro flows are in `.maestro/` and cover per-page journeys plus smoke/edge flows against the **development** flavor.
+
+### Prerequisites
+
+1. Install Maestro CLI (https://docs.maestro.dev/maestro-cli/how-to-install-maestro-cli). On this Windows machine it lives at `C:\Programming\maestro\bin`. The project MCP in `.cursor/mcp.json` launches `maestro mcp` so the agent can inspect devices and run flows.
+2. Build or run the **development** flavor (no dart-define needed):
+
+```bash
+cd sprout_app
+flutter run --flavor development -t lib/main_development.dart
+```
+
+### Running tests
+
+With the app installed or running:
+
+```bash
+# Run all root journeys (helpers in .maestro/shared/ are not executed alone)
+maestro test .maestro/
+
+# Tag subsets
+maestro test .maestro/ --include-tags page    # per-page journeys
+maestro test .maestro/ --include-tags smoke   # core-loop + full-app-tour
+maestro test .maestro/ --include-tags edge    # no-accounts edge cases
+
+# Run a specific journey
+maestro test .maestro/overview.yaml
+maestro test .maestro/full-app-tour.yaml
+```
+
+### Flow layout
+
+- **Root journeys** (`.maestro/*.yaml`) — runnable end-to-end tests. `config.yaml` sets `flows: ["*"]` so only these are discovered.
+- **Shared helpers** (`.maestro/shared/*.yaml`) — `runFlow` subflows (seed, chapters, form fill). Not runnable alone; compose them from root journeys with `env` parameters.
+- **Tags**: `page` (one surface), `smoke` (core-loop + full-app-tour), `edge` (no-accounts CTAs).
+
+### Available flows
+
+**Page** (`tags: [page]`):
+
+- `intro.yaml` — Intro slides, back from Sign in, debug sign-in
+- `sign-in.yaml` — Legal links, fields, debug sign-in (no OTP / Google)
+- `overview.yaml` — Empty CTAs then populated Overview
+- `goals.yaml` — Goals sort, unallocated, Everyday Fund detail
+- `deposit.yaml` — Deposit sheet modes (FAB + goal detail)
+- `settings.yaml` — Settings hub tiles
+- `account-profile.yaml` — Edit name, legal, delete cancel (no sign-out)
+- `transactions.yaml` — Transactions list + detail note
+
+**Smoke** (`tags: [smoke]`):
+
+- `core-loop.yaml` — Create account, goal, deposit, verify progress
+- `full-app-tour.yaml` — Orchestrator: every surface via shared chapters
+
+**Edge** (`tags: [edge]`):
+
+- `deposit-no-accounts.yaml` — Deposit with 0 accounts shows CTA
+- `goal-no-accounts.yaml` — Creating goal with 0 accounts shows guidance
+
+### Shared helpers (not runnable alone)
+
+| Helper | Purpose |
+|--------|---------|
+| `shared/debug-signin-intro.yaml` | Debug sign-in from intro |
+| `shared/wait-overview.yaml` | Wait for Overview after sign-in |
+| `shared/open-center-sheet.yaml` | Open shell FAB action sheet |
+| `shared/fill-account-form.yaml` | Fill account name + color + save (`ACCOUNT_NAME`, `COLOR_INDEX`) |
+| `shared/fill-goal-form.yaml` | Fill goal form + save (`GOAL_NAME`, `TARGET`, optional `ALREADY_SAVED` + `ACCOUNT_NAME`) |
+| `shared/deposit-to-goal.yaml` | Deposit to goal (`ACCOUNT_NAME`, `GOAL_NAME`, `AMOUNT`); does not wait Overview |
+| `shared/seed-core.yaml` | Empty Overview → Everyday account; optional `SEED_GOAL` / `SEED_DEPOSIT` / `SEED_RECURRING` |
+| `shared/chapter-*.yaml` | Per-surface steps (no `launchApp`); composed by page journeys and the tour |
+
+Development builds show a **Debug sign in** button on intro and Sign in (`Maestro Test · maestro@test.local`). Flows tap it with `id: intro_debug_sign_in` (intro) or `id: sign_in_debug_sign_in` (sign-in screen). It binds a local-only test user (`maestro-test-user`) and opens Overview. Sync stays off.
+
+**Production flavor never shows the button.**
+
+### Semantic IDs for taps
+
+Maestro `tapOn: id:` maps to Flutter `Semantics.identifier`. All tappable controls expose stable IDs from [`sprout_app/lib/core/constants/semantics_ids.dart`](sprout_app/lib/core/constants/semantics_ids.dart) (`SemanticsIds`). Prefer `id:` in `.maestro/` YAML; use visible `text:` for dropdown menu items and `assertVisible` checks only. Feature code should use shared **`Sprout*` widgets** in [`sprout_app/lib/ui/`](sprout_app/lib/ui/export.dart) so semantics stay consistent.
+
+### Auth bypass
 
 - [GitHub CLI (personal account)](docs/GITHUB_CLI_PERSONAL.md) — `gh` as `ZanderCowboy` in this workspace only
 - [Firebase CLI (personal account)](docs/FIREBASE_CLI_PERSONAL.md) — `firebase` login isolated via `XDG_CONFIG_HOME`

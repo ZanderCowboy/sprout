@@ -1,0 +1,88 @@
+appId: app.stackmint.sprout.dev
+tags:
+  - smoke
+---
+# Full-app smoke tour: composes shared chapters + seed.
+# Requires development flavor.
+# Run: maestro test .maestro/full-app-tour.yaml
+
+- launchApp:
+    clearState: true
+    clearKeychain: true
+
+# ===== 1. Sign in (legal links + debug) =====
+- runFlow: shared/chapter-sign-in.yaml
+
+# ===== 2. Empty states =====
+- takeScreenshot: tour-01-overview-empty
+
+- runFlow: shared/chapter-overview-empty.yaml
+
+# ===== 3. Seed core + unallocated + Spare =====
+- runFlow:
+    file: shared/seed-core.yaml
+    env:
+      SEED_GOAL: "true"
+      SEED_DEPOSIT: "true"
+
+- runFlow: shared/open-center-sheet.yaml
+
+- tapOn:
+    id: "shell_action_deposit"
+
+- extendedWaitUntil:
+    visible:
+      text: "Deposit"
+    timeout: 5000
+
+- tapOn:
+    id: "deposit_mode_to_account"
+
+- tapOn:
+    id: "deposit_account_dropdown"
+
+- tapOn:
+    text: "Everyday"
+
+- tapOn:
+    id: "deposit_amount_field"
+
+- eraseText
+
+- inputText: "1000"
+
+- hideKeyboard
+
+- tapOn:
+    id: "deposit_save"
+
+- runFlow: shared/wait-overview.yaml
+
+- runFlow: shared/chapter-tour-spare-seed.yaml
+
+- takeScreenshot: tour-02-overview-populated
+
+# ===== 4. Populated surfaces =====
+- runFlow: shared/chapter-overview-populated.yaml
+
+- runFlow: shared/chapter-shell-fab.yaml
+
+- runFlow: shared/chapter-goals.yaml
+
+- runFlow: shared/chapter-deposit.yaml
+
+- runFlow: shared/chapter-tour-spare-delete.yaml
+
+# ===== 5. Settings subtree =====
+- takeScreenshot: tour-03-settings
+
+- runFlow: shared/chapter-settings.yaml
+
+- runFlow: shared/chapter-transactions.yaml
+
+- runFlow: shared/chapter-account-profile.yaml
+
+# ===== 6. Sign out =====
+- runFlow: shared/chapter-sign-out.yaml
+
+- takeScreenshot: tour-04-signed-out

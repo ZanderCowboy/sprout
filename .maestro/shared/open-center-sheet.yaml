@@ -1,0 +1,10 @@
+appId: app.stackmint.sprout.dev
+---
+# Requires: shell visible (any tab).
+- tapOn:
+    id: "shell_add"
+
+- extendedWaitUntil:
+    visible:
+      text: "What would you like to do?"
+    timeout: 3000

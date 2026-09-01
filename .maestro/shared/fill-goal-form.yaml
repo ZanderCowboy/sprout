@@ -1,0 +1,35 @@
+appId: app.stackmint.sprout.dev
+---
+# Requires: goal form sheet open, at least one account exists.
+# Env: GOAL_NAME, TARGET (required); ALREADY_SAVED, ACCOUNT_NAME (optional).
+- tapOn:
+    id: "goal_name_field"
+
+- eraseText
+
+- inputText: ${GOAL_NAME}
+
+- tapOn:
+    id: "goal_target_field"
+
+- eraseText
+
+- inputText: ${TARGET}
+
+- hideKeyboard
+
+- runFlow:
+    when:
+      true: ${ALREADY_SAVED}
+    commands:
+      - tapOn:
+          id: "goal_already_saved_field"
+      - eraseText
+      - inputText: ${ALREADY_SAVED}
+      - tapOn:
+          id: "goal_already_saved_account"
+      - tapOn:
+          text: ${ACCOUNT_NAME}
+
+- tapOn:
+    id: "form_save"

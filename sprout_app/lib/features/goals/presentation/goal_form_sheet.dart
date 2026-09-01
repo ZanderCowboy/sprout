@@ -136,6 +136,7 @@ class _GoalFormSheetState extends State<GoalFormSheet> {
       nameLabel: AppStrings.goalName,
       nameController: _name,
       nameErrorText: _nameError,
+      nameFieldIdentifier: SemanticsIds.goalNameField,
       colorArgb: _colorArgb,
       onColorSelected: (argb) => setState(() => _colorArgb = argb),
       primaryActionLabel: AppStrings.save,
@@ -143,7 +144,9 @@ class _GoalFormSheetState extends State<GoalFormSheet> {
       primaryActionEnabled: _canSave,
       body: [
         const SizedBox(height: 12),
-        TextField(
+        SproutTextField(
+          identifier: SemanticsIds.goalTargetField,
+          fieldKey: const Key('goal_target_field'),
           controller: _target,
           decoration: InputDecoration(
             labelText: AppStrings.targetAmount,

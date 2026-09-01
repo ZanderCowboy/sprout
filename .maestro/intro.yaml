@@ -1,0 +1,12 @@
+appId: app.stackmint.sprout.dev
+tags:
+  - page
+---
+# Intro slides + back from sign-in + debug sign-in.
+# Run: maestro test .maestro/intro.yaml
+
+- launchApp:
+    clearState: true
+    clearKeychain: true
+
+- runFlow: shared/chapter-intro.yaml

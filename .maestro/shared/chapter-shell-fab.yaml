@@ -1,0 +1,38 @@
+appId: app.stackmint.sprout.dev
+---
+# Shell FAB: open each action and dismiss without saving.
+- runFlow: open-center-sheet.yaml
+
+- tapOn:
+    id: "shell_action_new_account"
+
+- extendedWaitUntil:
+    visible:
+      text: "New account"
+    timeout: 3000
+
+- back
+
+- runFlow: open-center-sheet.yaml
+
+- tapOn:
+    id: "shell_action_new_goal"
+
+- extendedWaitUntil:
+    visible:
+      text: "New goal"
+    timeout: 3000
+
+- back
+
+- runFlow: open-center-sheet.yaml
+
+- tapOn:
+    id: "shell_action_deposit"
+
+- extendedWaitUntil:
+    visible:
+      text: "Deposit"
+    timeout: 3000
+
+- back

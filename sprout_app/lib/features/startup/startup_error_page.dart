@@ -2,7 +2,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:sprout/core/constants/app_strings.dart';
+import 'package:sprout/core/constants/semantics_ids.dart';
 import 'package:sprout/core/startup/startup_initializer.dart';
+import 'package:sprout/ui/export.dart';
 
 class StartupErrorPage extends StatelessWidget {
   const StartupErrorPage({
@@ -40,12 +42,12 @@ class StartupErrorPage extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                "We couldn’t finish starting Sprout.",
+                AppStrings.startupFailedTitle,
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               const SizedBox(height: 8),
               Text(
-                'Config: $configAssetPath',
+                '${AppStrings.configPrefix}$configAssetPath',
                 style: Theme.of(
                   context,
                 ).textTheme.bodySmall?.copyWith(color: Colors.white70),
@@ -53,9 +55,13 @@ class StartupErrorPage extends StatelessWidget {
               const SizedBox(height: 12),
               SizedBox(
                 width: double.infinity,
-                child: FilledButton(
+                child: SproutFilledButton(
+                  identifier: SemanticsIds.startupRetry,
+                  label: canRetry ? AppStrings.retry : AppStrings.retrying,
                   onPressed: onRetry,
-                  child: Text(canRetry ? 'Retry' : 'Retrying…'),
+                  child: Text(
+                    canRetry ? AppStrings.retry : AppStrings.retrying,
+                  ),
                 ),
               ),
               const SizedBox(height: 16),
@@ -63,7 +69,7 @@ class StartupErrorPage extends StatelessWidget {
                 child: ListView(
                   children: [
                     _Section(
-                      title: 'Details',
+                      title: AppStrings.details,
                       child: Text(
                         '$error',
                         style: Theme.of(
@@ -73,7 +79,7 @@ class StartupErrorPage extends StatelessWidget {
                     ),
                     if (kDebugMode && stackTrace != null)
                       _Section(
-                        title: 'Stack trace (debug only)',
+                        title: AppStrings.stackTraceDebugOnly,
                         child: Text(
                           '$stackTrace',
                           style: Theme.of(context).textTheme.bodySmall
@@ -81,7 +87,7 @@ class StartupErrorPage extends StatelessWidget {
                         ),
                       ),
                     _Section(
-                      title: 'Startup steps',
+                      title: AppStrings.startupSteps,
                       child: Column(
                         children: [
                           for (final step in StartupStep.values)
@@ -198,15 +204,15 @@ class _StepRow extends StatelessWidget {
 
 String _labelFor(StartupStep step) {
   return switch (step) {
-    StartupStep.hiveInit => 'Initializing local storage',
-    StartupStep.openBoxes => 'Opening boxes',
-    StartupStep.loadConfig => 'Loading config',
-    StartupStep.initRemoteConfig => 'Loading feature flags',
-    StartupStep.initSupabase => 'Connecting to Supabase',
-    StartupStep.configureDI => 'Configuring services',
-    StartupStep.resolveUser => 'Resolving user',
-    StartupStep.configurePurchases => 'Configuring purchases',
-    StartupStep.flushPending => 'Flushing pending sync',
-    StartupStep.pullRemote => 'Pulling remote data',
+    StartupStep.hiveInit => AppStrings.startupHiveInit,
+    StartupStep.openBoxes => AppStrings.startupOpenBoxes,
+    StartupStep.loadConfig => AppStrings.startupLoadConfig,
+    StartupStep.initRemoteConfig => AppStrings.startupInitRemoteConfig,
+    StartupStep.initSupabase => AppStrings.startupInitSupabase,
+    StartupStep.configureDI => AppStrings.startupConfigureDI,
+    StartupStep.resolveUser => AppStrings.startupResolveUser,
+    StartupStep.configurePurchases => AppStrings.startupConfigurePurchases,
+    StartupStep.flushPending => AppStrings.startupFlushPending,
+    StartupStep.pullRemote => AppStrings.startupPullRemote,
   };
 }

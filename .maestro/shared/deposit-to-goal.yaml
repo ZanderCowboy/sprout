@@ -1,0 +1,28 @@
+appId: app.stackmint.sprout.dev
+---
+# Requires: deposit sheet open, account and goal exist.
+# Env: ACCOUNT_NAME, GOAL_NAME, AMOUNT (required).
+# Does NOT wait for Overview — parents call wait-overview when on Overview.
+- tapOn:
+    id: "deposit_account_dropdown"
+
+- tapOn:
+    text: ${ACCOUNT_NAME}
+
+- tapOn:
+    id: "deposit_goal_dropdown"
+
+- tapOn:
+    text: ${GOAL_NAME}
+
+- tapOn:
+    id: "deposit_amount_field"
+
+- eraseText
+
+- inputText: ${AMOUNT}
+
+- hideKeyboard
+
+- tapOn:
+    id: "deposit_save"

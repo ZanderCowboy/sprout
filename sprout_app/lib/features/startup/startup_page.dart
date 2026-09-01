@@ -56,7 +56,7 @@ class StartupPage extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               Text(
-                'Config: $configAssetPath',
+                '${AppStrings.configPrefix}$configAssetPath',
                 style: Theme.of(
                   context,
                 ).textTheme.bodySmall?.copyWith(color: Colors.white70),
@@ -139,15 +139,15 @@ class _StepTile extends StatelessWidget {
 
 String _labelFor(StartupStep step) {
   return switch (step) {
-    StartupStep.hiveInit => 'Initializing local storage',
-    StartupStep.openBoxes => 'Opening boxes',
-    StartupStep.loadConfig => 'Loading config',
-    StartupStep.initRemoteConfig => 'Loading feature flags',
-    StartupStep.initSupabase => 'Connecting to Supabase',
-    StartupStep.configureDI => 'Configuring services',
-    StartupStep.resolveUser => 'Resolving user',
-    StartupStep.configurePurchases => 'Configuring purchases',
-    StartupStep.flushPending => 'Flushing pending sync',
-    StartupStep.pullRemote => 'Pulling remote data',
+    StartupStep.hiveInit => AppStrings.startupHiveInit,
+    StartupStep.openBoxes => AppStrings.startupOpenBoxes,
+    StartupStep.loadConfig => AppStrings.startupLoadConfig,
+    StartupStep.initRemoteConfig => AppStrings.startupInitRemoteConfig,
+    StartupStep.initSupabase => AppStrings.startupInitSupabase,
+    StartupStep.configureDI => AppStrings.startupConfigureDI,
+    StartupStep.resolveUser => AppStrings.startupResolveUser,
+    StartupStep.configurePurchases => AppStrings.startupConfigurePurchases,
+    StartupStep.flushPending => AppStrings.startupFlushPending,
+    StartupStep.pullRemote => AppStrings.startupPullRemote,
   };
 }

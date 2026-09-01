@@ -6,6 +6,7 @@ import 'package:sprout/core/core.dart';
 import 'package:sprout/features/auth/export.dart';
 import 'package:sprout/features/purchases/presentation/premium_paywall_helper.dart';
 import 'package:purchases_ui_flutter/purchases_ui_flutter.dart';
+import 'package:sprout/ui/export.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -69,18 +70,16 @@ class _SettingsPageState extends State<SettingsPage> {
       case PaywallResult.purchased:
       case PaywallResult.restored:
         messenger.showSnackBar(
-          const SnackBar(content: Text('Premium unlocked.')),
+          const SnackBar(content: Text(AppStrings.premiumUnlocked)),
         );
         break;
       case PaywallResult.cancelled:
       case PaywallResult.notPresented:
-        messenger.showSnackBar(
-          const SnackBar(content: Text('No purchase completed.')),
-        );
+        // Silence on cancel
         break;
       case PaywallResult.error:
         messenger.showSnackBar(
-          const SnackBar(content: Text('Subscription update failed.')),
+          const SnackBar(content: Text(AppStrings.subscriptionUpdateFailed)),
         );
         break;
     }
@@ -93,19 +92,21 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     final premiumSubtitle = _loadingPremiumStatus
-        ? 'Checking subscription...'
+        ? AppStrings.checkingSubscription
         : _hasPremium
-        ? 'Premium active'
-        : 'Unlock premium with Monthly or Annual';
+        ? AppStrings.premiumActive
+        : AppStrings.unlockPremium;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
+      appBar: AppBar(title: const Text(AppStrings.tabSettings)),
       body: ListView(
         children: [
           BlocBuilder<AuthCubit, AuthViewState>(
             builder: (context, state) {
               final user = state is AuthViewSignedIn ? state.user : null;
-              return ListTile(
+              return SproutListTile(
+                identifier: SemanticsIds.settingsAccount,
+                label: user == null ? AppStrings.account : accountTileTitle(user),
                 leading: user == null
                     ? const Icon(Icons.manage_accounts_rounded)
                     : CircleAvatar(child: Text(accountAvatarInitial(user))),
@@ -122,9 +123,11 @@ class _SettingsPageState extends State<SettingsPage> {
           if (_purchasesReady)
             Column(
               children: [
-                ListTile(
+                SproutListTile(
+                  identifier: SemanticsIds.settingsPremium,
+                  label: AppStrings.sproutPremium,
                   leading: const Icon(Icons.workspace_premium_rounded),
-                  title: const Text('Sprout Premium'),
+                  title: const Text(AppStrings.sproutPremium),
                   subtitle: Text(premiumSubtitle),
                   trailing: const Icon(Icons.chevron_right_rounded),
                   onTap: () => _presentPaywall(),
@@ -132,26 +135,32 @@ class _SettingsPageState extends State<SettingsPage> {
                 const Divider(height: 1),
               ],
             ),
-          ListTile(
+          SproutListTile(
+            identifier: SemanticsIds.settingsTransactions,
+            label: AppStrings.transactions,
             leading: const Icon(Icons.receipt_long_rounded),
             title: const Text(AppStrings.transactions),
-            subtitle: const Text('View all deposits and allocations'),
+            subtitle: const Text(AppStrings.viewAllDeposits),
             trailing: const Icon(Icons.chevron_right_rounded),
             onTap: () => context.push(AppRoute.transactions.path),
           ),
           const Divider(height: 1),
-          ListTile(
+          SproutListTile(
+            identifier: SemanticsIds.settingsRecurring,
+            label: AppStrings.recurringPayments,
             leading: const Icon(Icons.autorenew_rounded),
-            title: const Text('Recurring payments'),
-            subtitle: const Text('View, edit, or cancel recurring deposits'),
+            title: const Text(AppStrings.recurringPayments),
+            subtitle: const Text(AppStrings.viewEditCancelRecurring),
             trailing: const Icon(Icons.chevron_right_rounded),
             onTap: () => context.push(AppRoute.recurring.path),
           ),
           const Divider(height: 1),
-          ListTile(
+          SproutListTile(
+            identifier: SemanticsIds.settingsBudget,
+            label: AppStrings.masterBudget,
             leading: const Icon(Icons.account_tree_rounded),
-            title: const Text('Master Budget'),
-            subtitle: const Text('Plan income and expenses (static template)'),
+            title: const Text(AppStrings.masterBudget),
+            subtitle: const Text(AppStrings.planIncomeExpenses),
             trailing: const Icon(Icons.chevron_right_rounded),
             onTap: () => context.push(AppRoute.budget.path),
           ),
@@ -159,7 +168,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ListTile(
             leading: const Icon(Icons.info_outline_rounded),
             title: const Text(AppStrings.appTitle),
-            subtitle: const Text('Savings app prototype'),
+            subtitle: const Text(AppStrings.savingsApp),
           ),
         ],
       ),

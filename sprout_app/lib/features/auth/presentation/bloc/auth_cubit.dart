@@ -4,6 +4,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:sprout/core/config/app_config.dart';
+import 'package:sprout/core/constants/app_strings.dart';
 import 'package:sprout/core/error/error.dart';
 import '../../application/auth_service.dart';
 import '../../domain/auth_user.dart';
@@ -120,6 +121,34 @@ class AuthCubit extends Cubit<AuthViewState> {
 
   bool get _googleAvailable => _appConfig.isGoogleSignInConfigured;
 
+  /// Development flavor only. Production never shows the debug sign-in button.
+  bool get debugSignInAvailable => _authService.debugSignInAvailable;
+
+  /// Development-only: skip OTP/Google and bind a stable local test user.
+  Future<void> debugSignIn() async {
+    final current = state;
+    if (current is AuthViewGuest && current.busy) return;
+    if (current is AuthViewGuest) {
+      emit(current.copyWith(busy: true, clearError: true, clearInfo: true));
+    }
+    try {
+      await _authService.debugSignIn();
+      if (isClosed) return;
+      emit(const AuthViewSignedIn(user: AuthService.maestroTestUser));
+    } on AppException catch (e) {
+      if (isClosed) return;
+      if (current is AuthViewGuest) {
+        emit(
+          current.copyWith(
+            busy: false,
+            errorMessage: e.toFailure().message,
+            clearInfo: true,
+          ),
+        );
+      }
+    }
+  }
+
   void emailChanged(String email) {
     final current = state;
     if (current is! AuthViewGuest || current.busy) return;
@@ -151,7 +180,7 @@ class AuthCubit extends Cubit<AuthViewState> {
         current.copyWith(
           busy: false,
           otpSent: true,
-          infoMessage: 'Check your email for a 6-digit code.',
+          infoMessage: AppStrings.checkEmailForCode,
           clearError: true,
         ),
       );
@@ -308,6 +337,10 @@ class AuthCubit extends Cubit<AuthViewState> {
     if (isClosed) return;
     if (user != null && user.isVerified) {
       emit(AuthViewSignedIn(user: user));
+      return;
+    }
+    if (_authService.isDebugSignedIn) {
+      emit(const AuthViewSignedIn(user: AuthService.maestroTestUser));
       return;
     }
     final previous = state;

@@ -1,0 +1,35 @@
+appId: app.stackmint.sprout.dev
+tags:
+  - edge
+---
+# Creating a goal with 0 accounts shows guidance CTA
+# Run: maestro test .maestro/goal-no-accounts.yaml
+
+- launchApp:
+    clearState: true
+    clearKeychain: true
+
+- runFlow: shared/debug-signin-intro.yaml
+
+- assertVisible:
+    id: "overview_empty_new_account"
+
+- tapOn:
+    id: "overview_empty_new_goal"
+
+- extendedWaitUntil:
+    visible:
+      text: "New goal"
+    timeout: 5000
+
+- assertVisible: "Create an account first to hold money for this goal."
+
+- assertVisible: "New account"
+
+- tapOn:
+    id: "goal_no_accounts_new_account"
+
+- extendedWaitUntil:
+    visible:
+      text: "New account"
+    timeout: 5000

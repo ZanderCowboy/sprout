@@ -37,12 +37,12 @@ final class CreateGoalSubmitted extends CreateGoalEvent {
 
   @override
   List<Object?> get props => [
-        name,
-        targetAmountCents,
-        colorArgb,
-        alreadySavedAmountCents,
-        alreadySavedAccountId,
-      ];
+    name,
+    targetAmountCents,
+    colorArgb,
+    alreadySavedAmountCents,
+    alreadySavedAccountId,
+  ];
 }
 
 sealed class CreateGoalState extends Equatable {
@@ -96,11 +96,11 @@ class CreateGoalBloc extends Bloc<CreateGoalEvent, CreateGoalState> {
     required AccountsService accountsService,
     required TransactionsService transactionsService,
     required UserContext userContext,
-  })  : _goalsService = goalsService,
-        _accountsService = accountsService,
-        _transactionsService = transactionsService,
-        _userContext = userContext,
-        super(const CreateGoalInitial()) {
+  }) : _goalsService = goalsService,
+       _accountsService = accountsService,
+       _transactionsService = transactionsService,
+       _userContext = userContext,
+       super(const CreateGoalInitial()) {
     on<CreateGoalStarted>(_onStarted, transformer: restartable());
     on<CreateGoalSubmitted>(_onSubmitted, transformer: sequential());
   }
@@ -156,11 +156,11 @@ class CreateGoalBloc extends Bloc<CreateGoalEvent, CreateGoalState> {
       final openingAccountId = event.alreadySavedAccountId;
       if (openingCents > 0) {
         if (openingAccountId == null || openingAccountId.isEmpty) {
-          throw ValidationAppException('Pick an account for the opening balance.');
+          throw ValidationAppException(AppStrings.pickAccountForOpeningBalance);
         }
 
         final groupId = _uuid.v4();
-        const note = 'Opening Balance';
+        const note = AppStrings.openingBalance;
 
         await _transactionsService.recordAccountDeposit(
           accountId: openingAccountId,
@@ -189,4 +189,3 @@ class CreateGoalBloc extends Bloc<CreateGoalEvent, CreateGoalState> {
     }
   }
 }
-

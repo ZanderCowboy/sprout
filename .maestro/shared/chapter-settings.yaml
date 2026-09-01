@@ -1,0 +1,57 @@
+appId: app.stackmint.sprout.dev
+---
+# Requires: signed in on shell.
+# Opens each Settings tile and backs out. Premium is optional (open + back only if visible).
+- tapOn:
+    id: "shell_tab_settings"
+
+- assertVisible: "Settings"
+
+- runFlow:
+    when:
+      visible:
+        id: "settings_premium"
+    commands:
+      - tapOn:
+          id: "settings_premium"
+      - back
+
+- tapOn:
+    id: "settings_transactions"
+
+- extendedWaitUntil:
+    visible:
+      text: "Transactions"
+    timeout: 5000
+
+- back
+
+- tapOn:
+    id: "settings_recurring"
+
+- extendedWaitUntil:
+    visible:
+      text: "Recurring payments"
+    timeout: 5000
+
+- back
+
+- tapOn:
+    id: "settings_budget"
+
+- extendedWaitUntil:
+    visible:
+      text: "Master Budget"
+    timeout: 5000
+
+- back
+
+- tapOn:
+    id: "settings_account"
+
+- extendedWaitUntil:
+    visible:
+      text: "Account"
+    timeout: 5000
+
+- back

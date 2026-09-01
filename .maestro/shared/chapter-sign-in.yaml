@@ -1,0 +1,60 @@
+appId: app.stackmint.sprout.dev
+---
+# Requires: intro screen visible (fresh launch).
+# Slides to Sign in, opens terms/privacy, focuses fields, debug-signs in.
+# Does NOT send OTP or tap Google.
+- extendedWaitUntil:
+    visible:
+      id: "intro_next"
+    timeout: 45000
+
+- tapOn:
+    id: "intro_next"
+
+- tapOn:
+    id: "intro_next"
+
+- tapOn:
+    id: "intro_next"
+
+- extendedWaitUntil:
+    visible:
+      id: "sign_in_debug_sign_in"
+    timeout: 5000
+
+- tapOn:
+    id: "sign_in_terms_link"
+
+- extendedWaitUntil:
+    visible:
+      text: "Terms of Service"
+    timeout: 10000
+
+- back
+
+- tapOn:
+    id: "sign_in_privacy_link"
+
+- extendedWaitUntil:
+    visible:
+      text: "Privacy Policy"
+    timeout: 10000
+
+- back
+
+- tapOn:
+    id: "sign_in_display_name_field"
+
+- inputText: "Tour User"
+
+- tapOn:
+    id: "sign_in_email_field"
+
+- inputText: "tour@example.com"
+
+- hideKeyboard
+
+- tapOn:
+    id: "sign_in_debug_sign_in"
+
+- runFlow: wait-overview.yaml

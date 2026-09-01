@@ -116,6 +116,8 @@ class _AccountFormSheetState extends State<AccountFormSheet> {
       primaryActionLabel: AppStrings.save,
       onPrimaryAction: _save,
       primaryActionEnabled: _canSave,
+      nameFieldKey: const Key('account_name_field'),
+      nameFieldIdentifier: SemanticsIds.accountNameField,
     );
   }
 }

@@ -1,0 +1,71 @@
+appId: app.stackmint.sprout.dev
+---
+# Requires: signed in, Everyday account + Everyday Fund goal exist.
+# Optional unallocated balance unlocks use_unallocated / allocations.
+# Also opens deposit from goal detail for add_new_money mode.
+
+# FAB deposit modes
+- runFlow: open-center-sheet.yaml
+
+- tapOn:
+    id: "shell_action_deposit"
+
+- extendedWaitUntil:
+    visible:
+      text: "Deposit"
+    timeout: 5000
+
+- tapOn:
+    id: "deposit_mode_to_goal"
+    optional: true
+
+- tapOn:
+    id: "deposit_mode_to_account"
+    optional: true
+
+- tapOn:
+    id: "deposit_mode_use_unallocated"
+    optional: true
+
+- tapOn:
+    id: "deposit_add_allocation"
+    optional: true
+
+- tapOn:
+    id: "deposit_remove_allocation"
+    optional: true
+
+- back
+
+# Goal-detail quick deposit (add new money segment)
+- tapOn:
+    id: "shell_tab_goals"
+
+- tapOn:
+    id: "goal_card"
+    text: ".*Everyday Fund.*"
+
+- extendedWaitUntil:
+    visible:
+      id: "goal_detail_deposit"
+    timeout: 5000
+
+- tapOn:
+    id: "goal_detail_deposit"
+
+- extendedWaitUntil:
+    visible:
+      text: "Deposit"
+    timeout: 3000
+
+- tapOn:
+    id: "deposit_mode_add_new_money"
+    optional: true
+
+- tapOn:
+    id: "deposit_mode_use_unallocated"
+    optional: true
+
+- back
+
+- back

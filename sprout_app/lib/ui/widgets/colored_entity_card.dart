@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '_semantic.dart';
+
 class ColoredEntityCard extends StatelessWidget {
   const ColoredEntityCard({
     super.key,
@@ -8,6 +10,8 @@ class ColoredEntityCard extends StatelessWidget {
     required this.color,
     this.onTap,
     this.trailing,
+    this.identifier,
+    this.semanticsLabel,
   });
 
   final String title;
@@ -15,19 +19,19 @@ class ColoredEntityCard extends StatelessWidget {
   final Color color;
   final VoidCallback? onTap;
   final Widget? trailing;
+  final String? identifier;
+  final String? semanticsLabel;
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    return Card(
+    final card = Card(
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
         child: Container(
           decoration: BoxDecoration(
-            border: Border(
-              left: BorderSide(color: color, width: 6),
-            ),
+            border: Border(left: BorderSide(color: color, width: 6)),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           child: Row(
@@ -39,17 +43,17 @@ class ColoredEntityCard extends StatelessWidget {
                     Text(
                       title,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w700,
-                            color: scheme.onSurface,
-                          ),
+                        fontWeight: FontWeight.w700,
+                        color: scheme.onSurface,
+                      ),
                     ),
                     const SizedBox(height: 8),
                     Text(
                       subtitle,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: scheme.onSurfaceVariant,
-                            height: 1.2,
-                          ),
+                        color: scheme.onSurfaceVariant,
+                        height: 1.2,
+                      ),
                     ),
                   ],
                 ),
@@ -59,6 +63,20 @@ class ColoredEntityCard extends StatelessWidget {
           ),
         ),
       ),
+    );
+
+    if (identifier != null) {
+      return semanticButton(
+        identifier: identifier!,
+        label: semanticsLabel ?? title,
+        child: card,
+      );
+    }
+
+    return Semantics(
+      button: onTap != null,
+      label: semanticsLabel ?? title,
+      child: card,
     );
   }
 }

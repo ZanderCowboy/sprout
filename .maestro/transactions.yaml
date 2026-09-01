@@ -1,0 +1,20 @@
+appId: app.stackmint.sprout.dev
+tags:
+  - page
+---
+# Transactions list + detail note save.
+# Run: maestro test .maestro/transactions.yaml
+
+- launchApp:
+    clearState: true
+    clearKeychain: true
+
+- runFlow: shared/debug-signin-intro.yaml
+
+- runFlow:
+    file: shared/seed-core.yaml
+    env:
+      SEED_GOAL: "true"
+      SEED_DEPOSIT: "true"
+
+- runFlow: shared/chapter-transactions.yaml

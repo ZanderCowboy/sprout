@@ -33,10 +33,13 @@ class AccountsPage extends StatelessWidget {
               SliverFillRemaining(
                 hasScrollBody: false,
                 child: Center(
-                  child: Text(
-                    'Tap + to add an account.',
-                    style: Theme.of(context).textTheme.bodyMedium,
-                    textAlign: TextAlign.center,
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Text(
+                      AppStrings.accountsEmptyGuidance,
+                      style: Theme.of(context).textTheme.bodyLarge,
+                      textAlign: TextAlign.center,
+                    ),
                   ),
                 ),
               ),
@@ -67,10 +70,12 @@ class AccountsPage extends StatelessWidget {
                     final currentCents = state.accountCurrentTotalsById[a.id] ?? 0;
                     final scheduledCents = state.accountScheduledTotalsById[a.id] ?? 0;
                     final subtitleLines = <String>[
-                      'Current: ${formatZarFromCents(currentCents)}',
-                      if (scheduledCents > 0) 'Scheduled: ${formatZarFromCents(scheduledCents)}',
+                      AppStrings.currentColon(formatZarFromCents(currentCents)),
+                      if (scheduledCents > 0) AppStrings.scheduledColon(formatZarFromCents(scheduledCents)),
                     ];
                     return ColoredEntityCard(
+                      identifier: SemanticsIds.accountCard,
+                      semanticsLabel: a.name,
                       title: a.name,
                       subtitle: subtitleLines.join('\n'),
                       color: Color(a.color),

@@ -1,0 +1,100 @@
+appId: app.stackmint.sprout.dev
+---
+# Requires: signed in, Everyday Fund goal exists.
+# Prefers unallocated card when present. Deletes are cancelled only.
+- tapOn:
+    id: "shell_tab_goals"
+
+- assertVisible: "Goals"
+
+- tapOn:
+    id: "goal_sort_menu"
+
+- tapOn:
+    text: "Remaining (low → high)"
+
+- tapOn:
+    id: "goal_sort_menu"
+
+- tapOn:
+    text: "Progress (high → low)"
+
+- tapOn:
+    id: "goal_sort_menu"
+
+- tapOn:
+    text: "Name (A → Z)"
+
+- tapOn:
+    id: "goal_unallocated_card"
+    optional: true
+
+- extendedWaitUntil:
+    visible:
+      text: "Deposit"
+    timeout: 5000
+    optional: true
+
+- back:
+    optional: true
+
+- tapOn:
+    id: "goal_card"
+    text: ".*Everyday Fund.*"
+
+- extendedWaitUntil:
+    visible:
+      id: "goal_detail_deposit"
+    timeout: 5000
+
+- tapOn:
+    id: "goal_detail_edit"
+
+- extendedWaitUntil:
+    visible:
+      text: "Edit"
+    timeout: 3000
+
+- tapOn:
+    id: "goal_name_field"
+
+- eraseText
+
+- inputText: "Everyday Fund"
+
+- tapOn:
+    id: "form_save"
+
+- tapOn:
+    id: "goal_detail_deposit"
+
+- extendedWaitUntil:
+    visible:
+      text: "Deposit"
+    timeout: 3000
+
+- back
+
+- tapOn:
+    id: "goal_detail_transaction_row"
+    optional: true
+
+- extendedWaitUntil:
+    visible:
+      text: "Transaction"
+    timeout: 5000
+    optional: true
+
+- back:
+    optional: true
+
+- tapOn:
+    id: "goal_detail_delete"
+
+- tapOn:
+    id: "dialog_cancel"
+
+- back
+
+- tapOn:
+    id: "shell_tab_goals"

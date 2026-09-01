@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:sprout/core/core.dart';
+import 'package:sprout/ui/export.dart';
 
 import '../../domain/budget_group.dart';
 import '../../domain/budget_item.dart';
@@ -118,12 +119,12 @@ class _GroupCardState extends State<GroupCard> {
 
   String? _validateName(String name) {
     final trimmed = name.trim();
-    if (trimmed.isEmpty) return widget.isDraft ? null : 'Name required';
+    if (trimmed.isEmpty) return widget.isDraft ? null : AppStrings.nameRequiredShort;
     final key = trimmed.toLowerCase();
     final dup = widget.allGroupsForNameValidation.any(
       (g) => g.id != widget.group.id && g.name.trim().toLowerCase() == key,
     );
-    if (dup) return 'You already have a group with this name.';
+    if (dup) return AppStrings.duplicateGroupName;
     return null;
   }
 
@@ -209,14 +210,14 @@ class _GroupCardState extends State<GroupCard> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      'Color & icon',
+                      AppStrings.colorAndIcon,
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'Color',
+                      AppStrings.color,
                       style: Theme.of(context).textTheme.labelLarge,
                     ),
                     const SizedBox(height: 8),
@@ -238,7 +239,7 @@ class _GroupCardState extends State<GroupCard> {
                       ],
                     ),
                     const SizedBox(height: 16),
-                    Text('Icon', style: Theme.of(context).textTheme.labelLarge),
+                    Text(AppStrings.icon, style: Theme.of(context).textTheme.labelLarge),
                     const SizedBox(height: 8),
                     BudgetGroupIconPicker(
                       selected: icon,
@@ -251,7 +252,7 @@ class _GroupCardState extends State<GroupCard> {
                         _applyAppearance(Color(colorArgb), icon);
                         Navigator.of(context).pop();
                       },
-                      child: const Text('Done'),
+                      child: const Text(AppStrings.done),
                     ),
                   ],
                 ),
@@ -267,20 +268,19 @@ class _GroupCardState extends State<GroupCard> {
     final ok = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Remove group?'),
+        title: const Text(AppStrings.removeGroupTitle),
         content: Text(
-          'This will remove “${widget.group.name.trim().isEmpty ? 'Untitled group' : widget.group.name}”.',
+          AppStrings.removeNamedConfirm(
+            widget.group.name.trim().isEmpty
+                ? AppStrings.untitledGroup
+                : widget.group.name,
+          ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Remove'),
-          ),
-        ],
+        actions: SproutDialogActions.cancelConfirm(
+          onCancel: () => Navigator.of(context).pop(false),
+          onConfirm: () => Navigator.of(context).pop(true),
+          confirmLabel: AppStrings.remove,
+        ),
       ),
     );
     if (ok == true && mounted) {
@@ -332,7 +332,11 @@ class _GroupCardState extends State<GroupCard> {
     final itemsUnsorted = [...widget.group.items, ..._draftItems];
     final items = sortBudgetItems(itemsUnsorted, widget.itemSort);
 
-    return GestureDetector(
+    return Semantics(
+      identifier: SemanticsIds.budgetGroupCard,
+      button: true,
+      label: widget.group.name,
+      child: GestureDetector(
       onLongPress: widget.isDraft ? widget.onDiscardDraft : _confirmDeleteGroup,
       child: Card(
         clipBehavior: Clip.antiAlias,
@@ -356,7 +360,7 @@ class _GroupCardState extends State<GroupCard> {
             shape: const Border(),
             collapsedShape: const Border(),
             leading: Tooltip(
-              message: 'Color & icon',
+              message: AppStrings.colorAndIcon,
               child: Material(
                 color: Colors.transparent,
                 child: InkWell(
@@ -388,7 +392,7 @@ class _GroupCardState extends State<GroupCard> {
                     decoration: const InputDecoration(
                       isDense: true,
                       border: InputBorder.none,
-                      hintText: 'Group name',
+                      hintText: AppStrings.groupName,
                     ),
                     textCapitalization: TextCapitalization.words,
                     autofocus: true,
@@ -403,7 +407,7 @@ class _GroupCardState extends State<GroupCard> {
                     },
                     child: Text(
                       widget.group.name.trim().isEmpty
-                          ? 'Untitled group'
+                          ? AppStrings.untitledGroup
                           : widget.group.name,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w900,
@@ -417,7 +421,7 @@ class _GroupCardState extends State<GroupCard> {
                     decoration: const InputDecoration(
                       isDense: true,
                       border: InputBorder.none,
-                      hintText: 'Description (optional)',
+                      hintText: AppStrings.descriptionOptional,
                     ),
                     textCapitalization: TextCapitalization.sentences,
                     autofocus: true,
@@ -435,7 +439,7 @@ class _GroupCardState extends State<GroupCard> {
                           child: Padding(
                             padding: const EdgeInsets.only(top: 6),
                             child: Text(
-                              'Tap to add a description',
+                              AppStrings.tapToAddDescription,
                               style: Theme.of(context).textTheme.bodyMedium
                                   ?.copyWith(
                                     color: scheme.onSurfaceVariant,
@@ -516,6 +520,7 @@ class _GroupCardState extends State<GroupCard> {
           ),
         ),
       ),
+    ),
     );
   }
 }
@@ -541,7 +546,7 @@ class _AddItemCard extends StatelessWidget {
               Icon(Icons.add_rounded, color: scheme.primary, size: 18),
               const SizedBox(width: 10),
               Text(
-                'Add item',
+                AppStrings.addItem,
                 style: Theme.of(
                   context,
                 ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w800),

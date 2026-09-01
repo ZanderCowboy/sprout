@@ -1,11 +1,13 @@
+import 'package:sprout/core/constants/app_strings.dart';
+
 import '../../domain/goal_progress.dart';
 import '../enums/goals_sort.dart';
 
 String goalsSortLabel(GoalsSort s) {
   return switch (s) {
-    GoalsSort.remainingLowToHigh => 'Remaining (low → high)',
-    GoalsSort.progressHighToLow => 'Progress (high → low)',
-    GoalsSort.nameAToZ => 'Name (A → Z)',
+    GoalsSort.remainingLowToHigh => AppStrings.sortRemainingLowToHigh,
+    GoalsSort.progressHighToLow => AppStrings.sortProgressHighToLow,
+    GoalsSort.nameAToZ => AppStrings.sortNameAToZ,
   };
 }
 
@@ -20,8 +22,8 @@ List<GoalProgress> sortGoals(List<GoalProgress> input, GoalsSort sort) {
 
     int byName() {
       return a.goal.name.trim().toLowerCase().compareTo(
-            b.goal.name.trim().toLowerCase(),
-          );
+        b.goal.name.trim().toLowerCase(),
+      );
     }
 
     int byRemaining() => a.remainingCents.compareTo(b.remainingCents);
@@ -48,4 +50,3 @@ List<GoalProgress> sortGoals(List<GoalProgress> input, GoalsSort sort) {
 
   return list;
 }
-

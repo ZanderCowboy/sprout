@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
+import 'package:sprout/core/config/app_config.dart';
+import 'package:sprout/core/config/app_environment.dart';
 import 'package:sprout/core/error/error.dart';
 import 'package:sprout/core/storage/hive_adapters.dart';
 import 'package:sprout/core/user/user_context.dart';
@@ -14,6 +16,20 @@ import 'package:sprout/features/sync/export.dart';
 import 'package:sprout/features/transactions/export.dart';
 
 import '../mocks/mocks.dart';
+
+const _testAppConfig = AppConfig(
+  environment: AppEnvironment.development,
+  supabaseUrl: 'https://example.supabase.co',
+  supabaseAnonKey: 'sb_publishable_test_key_1234567890',
+  googleWebClientId: 'web-client.apps.googleusercontent.com',
+  androidApplicationId: 'app.stackmint.sprout.dev',
+  revenueCatAndroidApiKey: '',
+  firebaseApiKey: '',
+  firebaseAppId: '',
+  firebaseMessagingSenderId: '',
+  firebaseProjectId: '',
+  firebaseStorageBucket: '',
+);
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -52,6 +68,7 @@ void main() {
     authService = AuthService(
       authRepository: fakeAuth,
       userContext: userContext,
+      appConfig: _testAppConfig,
       accountsBox: accountsBox,
       goalsBox: goalsBox,
       budgetGroupsBox: budgetGroupsBox,
@@ -257,6 +274,7 @@ void main() {
       authService = AuthService(
         authRepository: fakeAuth,
         userContext: userContext,
+        appConfig: _testAppConfig,
         accountsBox: accountsBox,
         goalsBox: goalsBox,
         budgetGroupsBox: budgetGroupsBox,
@@ -284,6 +302,50 @@ void main() {
       expect(purchasesLogOutCalls, 1);
     },
   );
+
+  test('debugSignIn binds local test user without Supabase', () async {
+    expect(authService.debugSignInAvailable, isTrue);
+    await authService.debugSignIn();
+
+    expect(authService.isDebugSignedIn, isTrue);
+    expect(userContext.cachedUserId, AuthService.maestroTestUserId);
+    expect(userContext.introCompleted, isTrue);
+    expect(authService.canSync, isFalse);
+
+    await authService.signOut();
+    expect(authService.isDebugSignedIn, isFalse);
+  });
+
+  test('debugSignIn is rejected in production', () async {
+    final prod = AuthService(
+      authRepository: fakeAuth,
+      userContext: userContext,
+      appConfig: const AppConfig(
+        environment: AppEnvironment.production,
+        supabaseUrl: '',
+        supabaseAnonKey: '',
+        googleWebClientId: '',
+        androidApplicationId: 'app.stackmint.sprout',
+        revenueCatAndroidApiKey: '',
+        firebaseApiKey: '',
+        firebaseAppId: '',
+        firebaseMessagingSenderId: '',
+        firebaseProjectId: '',
+        firebaseStorageBucket: '',
+      ),
+      accountsBox: accountsBox,
+      goalsBox: goalsBox,
+      budgetGroupsBox: budgetGroupsBox,
+      transactionsBox: transactionsBox,
+      pendingSyncQueue: PendingSyncQueue(pendingBox),
+      flushPending: () async {},
+      pullRemote: () async {},
+    );
+
+    expect(prod.debugSignInAvailable, isFalse);
+    await expectLater(prod.debugSignIn(), throwsA(isA<AuthAppException>()));
+    expect(prod.isDebugSignedIn, isFalse);
+  });
 
   test('deleteAccount does not clear Hive when RPC fails', () async {
     await userContext.setActiveUserId('verified-uid');
