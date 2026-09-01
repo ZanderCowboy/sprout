@@ -21,3 +21,12 @@ Never instruct the human to edit source files or apply patches. If something req
 - gcloud must use the personal Google account and `sprout-app-development`, not work. Before any `gcloud` command: `export CLOUDSDK_CONFIG=$HOME/.config/gcloud-personal`.
 - After Dart changes: `cd sprout_app && flutter analyze && flutter test`. If tests fail or hang, finish the work and report — do not loop on them until the human asks.
 - RevenueCat: plugin MCP + `docs/REVENUECAT.md`. Supabase: MCP + `supabase/README.md`.
+
+## Cursor Cloud specific instructions
+
+In Cloud Agents the dev loop is `flutter analyze` + `flutter test` only. Verifying the running app on a device/emulator is human-owned and cannot be done in the Cloud Agent VM — do not burn tokens trying.
+
+- **Do not launch an Android emulator.** Nested virtualization does not work here: the guest vCPU stays halted (~0% CPU, `adb` stuck `offline`) even though `/dev/kvm` exists and `emulator -accel-check` says KVM is usable. Don't install the emulator/system images or retry boots.
+- **Do not build for Android/web/desktop to "run" the app.** Android builds need the gitignored `google-services.json` (Firebase secret) the agent doesn't have; web fails to compile (`firebase_core_web` vs this Dart SDK) and `purchases_ui_flutter` is mobile-only; there are no committed `web/`/`linux/` targets.
+- To exercise real UI logic headlessly, rely on the widget tests in `flutter test` (e.g. `widget_test.dart`, `auth/sign_in_page_test.dart`, `auth/auth_gate_test.dart`).
+- The environment already provides Flutter 3.38.10 / Dart 3.10.9 and the Android SDK; `scripts/cloud-agent-install.sh` writes local-only flavor config placeholders (empty Supabase/Firebase/RevenueCat → offline Hive) and runs `flutter pub get`. Real credentials stay human-owned.
