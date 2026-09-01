@@ -106,10 +106,16 @@ class AccountDetailBloc extends Bloc<AccountDetailEvent, AccountDetailState> {
   Stream<AccountDetailState> _watch(String accountId) {
     return Stream<AccountDetailState>.multi((controller) {
       Account? account;
+      var accountsResolved = false;
       List<Transaction> txs = [];
       Map<String, Goal> goalsById = {};
 
       void tryEmit() {
+        if (!accountsResolved) {
+          controller.add(const AccountDetailLoading());
+          return;
+        }
+
         final currentAccount = account;
         if (currentAccount == null) {
           controller.add(const AccountDetailNotFound());
@@ -143,6 +149,7 @@ class AccountDetailBloc extends Bloc<AccountDetailEvent, AccountDetailState> {
 
       final accountsSub = _accountsService.watchAccounts().listen(
         (accounts) {
+          accountsResolved = true;
           account = accounts.cast<Account?>().firstWhere(
                 (a) => a?.id == accountId,
                 orElse: () => null,
