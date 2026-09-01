@@ -12,7 +12,7 @@ The Firebase CLI has no `GH_CONFIG_DIR` equivalent. Auth lives in the [configsto
 
 If `XDG_CONFIG_HOME` is unset, that is `~/.config/configstore/firebase-tools.json`.
 
-Pointing `XDG_CONFIG_HOME` at a second directory isolates the personal login. Other XDG-aware CLIs in **this workspace’s terminals** also use that directory; `gh` is unaffected because `GH_CONFIG_DIR` is set separately.
+Pointing `XDG_CONFIG_HOME` at a second directory isolates the personal login. Other XDG-aware CLIs in **this workspace’s terminals** also use that directory; `gh` is unaffected because `GH_CONFIG_DIR` is set separately. `gcloud` is unaffected because `CLOUDSDK_CONFIG` is set separately ([GCLOUD_CLI_PERSONAL.md](GCLOUD_CLI_PERSONAL.md)).
 
 ## Isolated config (outside the repo)
 

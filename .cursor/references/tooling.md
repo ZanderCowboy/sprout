@@ -66,3 +66,13 @@ Local CLI (Windows): `C:\Programming\maestro\bin` — `maestro.bat` is on the us
 Use the MCP to inspect devices, run `.maestro/` flows, and author YAML. Call `cheat_sheet` before unfamiliar commands. Flows target the **development** flavor and tap **Debug sign in**. Human docs: `README.md` (Maestro UI Tests).
 
 **After Dart/UI/semantics changes**, rebuild and reinstall before running Maestro (`flutter build apk --flavor development -t lib/main_development.dart` then `flutter install …`, or keep `flutter run --flavor development …` active on the device). Maestro hits the installed binary, not hot-reload state.
+
+## gcloud CLI
+
+gcloud stores auth and ADC under `$CLOUDSDK_CONFIG` (default `~/.config/gcloud`). Agent shells may not inherit workspace `CLOUDSDK_CONFIG`. Before any `gcloud` command:
+
+```bash
+export CLOUDSDK_CONFIG="$HOME/.config/gcloud-personal"
+```
+
+Must be the personal Google account and project `sprout-app-development`, not work. Details: `docs/GCLOUD_CLI_PERSONAL.md`.

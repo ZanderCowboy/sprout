@@ -1,11 +1,13 @@
 {
     "terminal.integrated.env.osx": {
         "GH_CONFIG_DIR": "${env:HOME}/.config/gh-zandercowboy",
-        "XDG_CONFIG_HOME": "${env:HOME}/.config/firebase-personal"
+        "XDG_CONFIG_HOME": "${env:HOME}/.config/firebase-personal",
+        "CLOUDSDK_CONFIG": "${env:HOME}/.config/gcloud-personal"
     },
     "terminal.integrated.env.windows": {
         "GH_CONFIG_DIR": "${env:USERPROFILE}/.config/gh-zandercowboy",
-        "XDG_CONFIG_HOME": "${env:USERPROFILE}/.config/firebase-personal"
+        "XDG_CONFIG_HOME": "${env:USERPROFILE}/.config/firebase-personal",
+        "CLOUDSDK_CONFIG": "${env:USERPROFILE}/.config/gcloud-personal"
     },
     "workbench.colorCustomizations": {
         "activityBar.background": "#4A2215",

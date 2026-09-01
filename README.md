@@ -222,6 +222,7 @@ Maestro `tapOn: id:` maps to Flutter `Semantics.identifier`. All tappable contro
 
 - [GitHub CLI (personal account)](docs/GITHUB_CLI_PERSONAL.md) — `gh` as `ZanderCowboy` in this workspace only
 - [Firebase CLI (personal account)](docs/FIREBASE_CLI_PERSONAL.md) — `firebase` login isolated via `XDG_CONFIG_HOME`
+- [gcloud CLI (personal account)](docs/GCLOUD_CLI_PERSONAL.md) — `gcloud` + ADC isolated via `CLOUDSDK_CONFIG`
 - [Firebase Dev Distribution (Android)](docs/FIREBASE_DEV_DISTRIBUTION.md) — CI APK builds and GitHub secrets
 - [Play Store publish (Android)](docs/PLAY_PUBLISH_PROD_ANDROID.md) — dispatch-only production AAB upload
 - [RevenueCat foundation](docs/REVENUECAT.md) — SDK configure, identity, Test Store catalog

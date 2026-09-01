@@ -11,6 +11,16 @@
         "MAESTRO_CLI_NO_ANALYTICS": "1",
         "MAESTRO_CLI_ANALYSIS_NOTIFICATION_DISABLED": "true"
       }
+    },
+    "stitch": {
+      "command": "/bin/bash",
+      "args": [
+        "/Users/zander.kotze/Workspace/Personal/sprout/scripts/stitch-mcp-proxy.sh"
+      ],
+      "env": {
+        "CLOUDSDK_CONFIG": "/Users/zander.kotze/.config/gcloud-personal",
+        "GOOGLE_CLOUD_PROJECT": "sprout-app-development"
+      }
     }
   }
 }
