@@ -9,7 +9,8 @@ import 'package:sprout/core/user/user_context.dart';
 import 'package:sprout/features/accounts/data/accounts_repository_impl.dart';
 import 'package:sprout/features/accounts/data/local/account_hive_model.dart';
 import 'package:sprout/features/accounts/domain/account.dart';
-import 'package:sprout/features/auth/application/auth_service.dart';
+import 'package:sprout/features/auth/application/auth_service_impl.dart';
+import 'package:sprout/features/sync/application/sync_service_impl.dart';
 import 'package:sprout/features/auth/domain/auth_user.dart';
 import 'package:sprout/features/budget/data/local/models/budget_group_hive_model.dart';
 import 'package:sprout/features/goals/data/local/models/goal_hive_model.dart';
@@ -83,7 +84,7 @@ void main() {
 
   test('AuthService.canSync is false for guests and anonymous users', () {
     final fake = FakeAuthRepository();
-    final service = AuthService(
+    final service = AuthServiceImpl(
       authRepository: fake,
       userContext: UserContext(settingsBox),
       appConfig: config(supabase: true),
@@ -158,7 +159,7 @@ void main() {
       '{"id":"x"}',
     );
     var flushed = false;
-    final sync = SyncService(
+    final sync = SyncServiceImpl(
       queue: queue,
       config: config(supabase: true),
       supabase: null,

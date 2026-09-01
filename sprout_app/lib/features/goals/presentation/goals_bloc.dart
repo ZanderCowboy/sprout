@@ -8,38 +8,8 @@ import '../domain/goal_progress.dart';
 import 'package:sprout/features/accounts/export.dart';
 import 'package:sprout/features/transactions/export.dart';
 
-sealed class GoalsEvent extends Equatable {
-  const GoalsEvent();
-  @override
-  List<Object?> get props => [];
-}
-
-final class GoalsSubscriptionRequested extends GoalsEvent {
-  const GoalsSubscriptionRequested();
-}
-
-sealed class GoalsState extends Equatable {
-  const GoalsState();
-  @override
-  List<Object?> get props => [];
-}
-
-final class GoalsInitial extends GoalsState {
-  const GoalsInitial();
-}
-
-final class GoalsReady extends GoalsState {
-  const GoalsReady({
-    required this.progressList,
-    required this.unallocatedBalanceCents,
-  });
-
-  final List<GoalProgress> progressList;
-  final int unallocatedBalanceCents;
-
-  @override
-  List<Object?> get props => [progressList, unallocatedBalanceCents];
-}
+part 'goals_event.dart';
+part 'goals_state.dart';
 
 class GoalsBloc extends Bloc<GoalsEvent, GoalsState> {
   GoalsBloc({

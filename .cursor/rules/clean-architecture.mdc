@@ -23,6 +23,24 @@ Applies to feature work under `sprout_app/lib/features/**`. Details: `.cursor/re
 - **Domain helper classes** (`FundsCalculator`, `TransactionRules`, `RecurringSchedule`, `BudgetTotals`, `UniqueName`) hold pure rules. No Flutter imports. If a method is pure (inputs → outputs, no Hive/Supabase), it belongs in a domain helper — not a repository, service, or widget.
 - **Data** repositories persist and sync. Portfolio/recurring math in repositories must delegate to domain helpers.
 
+## Application services
+
+- `abstract class *Service` in `application/*_service.dart` with docstrings on the class and every public member.
+- `class *ServiceImpl implements *Service` in `application/*_service_impl.dart` (`@override`, no copied docs).
+- DI registers the abstract type; barrels export `*_service.dart` only.
+
+## Blocs and cubits
+
+- Parent file: `*_bloc.dart` or `*_cubit.dart` (Bloc/Cubit class only).
+- Sibling part files: `*_event.dart`, `*_state.dart` with `part of` the parent.
+- Cubits use `*_state.dart` only (no event file when there are no events).
+
+## Presentation file layout
+
+- One public widget per `*_page.dart` / `*_screen.dart` (State classes stay with their widget).
+- Additional widgets go in `presentation/widgets/` as public classes.
+- Export widgets from `export.dart` only when another feature needs them.
+
 ## UI-only pages
 
 - Files under `sprout_app/lib/features/**/presentation/**_page.dart` (and `*_screen.dart`) must be UI-only.

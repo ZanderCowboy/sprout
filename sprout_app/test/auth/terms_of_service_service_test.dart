@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sprout/core/flags/remote_config_service.dart';
 import 'package:sprout/features/auth/application/terms_of_service_service.dart';
+import 'package:sprout/features/auth/application/terms_of_service_service_impl.dart';
 
 import '../mocks/mocks.dart';
 
@@ -27,7 +28,7 @@ void main() {
   const bundled = '# Bundled Terms\n\nLocal placeholder.';
 
   TermsOfServiceService service({Map<String, String> remote = const {}}) {
-    return TermsOfServiceService(
+    return TermsOfServiceServiceImpl(
       remoteConfig: FakeRemoteConfigService(strings: remote),
       assetBundle: _FakeAssetBundle({
         TermsOfServiceService.bundledAssetPath: bundled,

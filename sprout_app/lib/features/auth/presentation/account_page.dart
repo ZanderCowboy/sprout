@@ -8,6 +8,8 @@ import 'package:sprout/core/router/app_route.dart';
 import 'package:sprout/features/auth/domain/auth_user.dart';
 import 'package:sprout/features/auth/presentation/bloc/auth_cubit.dart';
 import 'package:sprout/features/auth/presentation/utils/account_identity_labels.dart';
+import 'package:sprout/features/auth/presentation/widgets/account_section_card.dart';
+import 'package:sprout/features/auth/presentation/widgets/edit_display_name_dialog.dart';
 import 'package:sprout/ui/export.dart';
 
 class AccountPage extends StatelessWidget {
@@ -17,7 +19,7 @@ class AccountPage extends StatelessWidget {
     final result = await showDialog<String>(
       context: context,
       builder: (dialogContext) =>
-          _EditDisplayNameDialog(initialName: user.displayName ?? ''),
+          EditDisplayNameDialog(initialName: user.displayName ?? ''),
     );
     if (result == null || !context.mounted) return;
     await context.read<AuthCubit>().updateDisplayName(result);
@@ -121,10 +123,10 @@ class AccountPage extends StatelessWidget {
                   ),
                   if (errorMessage != null) ...[
                     const SizedBox(height: 16),
-                    _AccountErrorBanner(message: errorMessage),
+                    AccountErrorBanner(message: errorMessage),
                   ],
                   const SizedBox(height: 24),
-                  _AccountSectionCard(
+                  AccountSectionCard(
                     title: AppStrings.accountSectionProfile,
                     children: [
                       SproutListTile(
@@ -140,7 +142,7 @@ class AccountPage extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 12),
-                  _AccountSectionCard(
+                  AccountSectionCard(
                     title: AppStrings.accountSectionSession,
                     children: [
                       SproutListTile(
@@ -157,7 +159,7 @@ class AccountPage extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 12),
-                  _AccountSectionCard(
+                  AccountSectionCard(
                     title: AppStrings.accountSectionLegal,
                     children: [
                       SproutListTile(
@@ -181,7 +183,7 @@ class AccountPage extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 12),
-                  _AccountSectionCard(
+                  AccountSectionCard(
                     title: AppStrings.accountSectionDanger,
                     children: [
                       SproutListTile(
@@ -206,109 +208,6 @@ class AccountPage extends StatelessWidget {
               ),
           };
         },
-      ),
-    );
-  }
-}
-
-class _AccountSectionCard extends StatelessWidget {
-  const _AccountSectionCard({required this.title, required this.children});
-
-  final String title;
-  final List<Widget> children;
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 14, 16, 4),
-            child: Text(
-              title,
-              style: Theme.of(
-                context,
-              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
-            ),
-          ),
-          ...children,
-        ],
-      ),
-    );
-  }
-}
-
-class _AccountErrorBanner extends StatelessWidget {
-  const _AccountErrorBanner({required this.message});
-
-  final String message;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Material(
-      color: scheme.errorContainer,
-      borderRadius: BorderRadius.circular(12),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Text(
-          message,
-          textAlign: TextAlign.center,
-          style: Theme.of(
-            context,
-          ).textTheme.bodyMedium?.copyWith(color: scheme.onErrorContainer),
-        ),
-      ),
-    );
-  }
-}
-
-class _EditDisplayNameDialog extends StatefulWidget {
-  const _EditDisplayNameDialog({required this.initialName});
-
-  final String initialName;
-
-  @override
-  State<_EditDisplayNameDialog> createState() => _EditDisplayNameDialogState();
-}
-
-class _EditDisplayNameDialogState extends State<_EditDisplayNameDialog> {
-  late final TextEditingController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = TextEditingController(text: widget.initialName);
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  void _submit() {
-    Navigator.pop(context, _controller.text.trim());
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text(AppStrings.editDisplayName),
-      content: SproutTextField(
-        identifier: SemanticsIds.accountEditNameField,
-        controller: _controller,
-        autofocus: true,
-        textCapitalization: TextCapitalization.words,
-        decoration: const InputDecoration(labelText: AppStrings.displayName),
-        onSubmitted: (_) => _submit(),
-      ),
-      actions: SproutDialogActions.cancelSave(
-        onCancel: () => Navigator.pop(context),
-        onSave: _submit,
-        cancelIdentifier: SemanticsIds.accountEditNameCancel,
-        saveIdentifier: SemanticsIds.accountEditNameSave,
       ),
     );
   }

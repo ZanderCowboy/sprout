@@ -10,61 +10,8 @@ import '../domain/goal.dart';
 import '../domain/goal_progress.dart';
 import 'utils/goal_growth_chart.dart';
 
-sealed class GoalDetailEvent extends Equatable {
-  const GoalDetailEvent();
-  @override
-  List<Object?> get props => [];
-}
-
-final class GoalDetailSubscriptionRequested extends GoalDetailEvent {
-  const GoalDetailSubscriptionRequested({required this.goalId});
-
-  final String goalId;
-
-  @override
-  List<Object?> get props => [goalId];
-}
-
-sealed class GoalDetailState extends Equatable {
-  const GoalDetailState();
-  @override
-  List<Object?> get props => [];
-}
-
-final class GoalDetailInitial extends GoalDetailState {
-  const GoalDetailInitial();
-}
-
-final class GoalDetailReady extends GoalDetailState {
-  const GoalDetailReady({
-    required this.progress,
-    required this.transactions,
-    required this.scheduledTransactions,
-    required this.historyTransactions,
-    required this.accountsById,
-    required this.graphPoints,
-    required this.prediction,
-  });
-
-  final GoalProgress progress;
-  final List<Transaction> transactions;
-  final List<Transaction> scheduledTransactions;
-  final List<Transaction> historyTransactions;
-  final Map<String, Account> accountsById;
-  final List<GoalGrowthChartPoint> graphPoints;
-  final GoalGrowthPrediction? prediction;
-
-  @override
-  List<Object?> get props => [
-        progress,
-        transactions,
-        scheduledTransactions,
-        historyTransactions,
-        accountsById,
-        graphPoints,
-        prediction,
-      ];
-}
+part 'goal_detail_event.dart';
+part 'goal_detail_state.dart';
 
 class GoalDetailBloc extends Bloc<GoalDetailEvent, GoalDetailState> {
   GoalDetailBloc({

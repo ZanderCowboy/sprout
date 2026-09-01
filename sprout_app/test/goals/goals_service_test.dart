@@ -2,8 +2,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:sprout/core/constants/app_strings.dart';
 import 'package:sprout/core/error/error.dart';
 import 'package:sprout/features/goals/application/goals_service.dart';
+import 'package:sprout/features/goals/application/goals_service_impl.dart';
 import 'package:sprout/features/goals/domain/goal.dart';
-import 'package:sprout/features/transactions/application/transactions_service.dart';
+import 'package:sprout/features/transactions/application/transactions_service_impl.dart';
 import 'package:sprout/features/transactions/domain/transaction.dart';
 
 import '../mocks/mocks.dart';
@@ -16,7 +17,7 @@ void main() {
   setUp(() {
     goalsRepo = FakeGoalsRepository();
     txRepo = FakeTransactionsRepository();
-    goalsService = GoalsService(goalsRepo, TransactionsService(txRepo));
+    goalsService = GoalsServiceImpl(goalsRepo, TransactionsServiceImpl(txRepo));
   });
 
   tearDown(() async {

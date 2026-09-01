@@ -9,6 +9,7 @@ import 'package:sprout/core/storage/hive_adapters.dart';
 import 'package:sprout/core/user/user_context.dart';
 import 'package:sprout/features/accounts/data/local/account_hive_model.dart';
 import 'package:sprout/features/auth/application/auth_service.dart';
+import 'package:sprout/features/auth/application/auth_service_impl.dart';
 import 'package:sprout/features/auth/domain/auth_user.dart';
 import 'package:sprout/features/auth/presentation/bloc/auth_cubit.dart';
 import 'package:sprout/features/budget/data/local/models/budget_group_hive_model.dart';
@@ -68,7 +69,7 @@ void main() {
     fakeAuth = FakeAuthRepository();
     final config = appConfig();
     cubit = AuthCubit(
-      authService: AuthService(
+      authService: AuthServiceImpl(
         authRepository: fakeAuth,
         userContext: UserContext(settingsBox),
         appConfig: config,

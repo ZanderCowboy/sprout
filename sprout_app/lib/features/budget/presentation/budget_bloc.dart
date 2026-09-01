@@ -9,109 +9,8 @@ import '../domain/budget_group.dart';
 import '../domain/budget_item.dart';
 import '../domain/budget_totals.dart';
 
-sealed class BudgetEvent extends Equatable {
-  const BudgetEvent();
-  @override
-  List<Object?> get props => [];
-}
-
-final class BudgetSubscriptionRequested extends BudgetEvent {
-  const BudgetSubscriptionRequested();
-}
-
-final class BudgetGroupUpsertRequested extends BudgetEvent {
-  const BudgetGroupUpsertRequested(this.group);
-  final BudgetGroup group;
-
-  @override
-  List<Object?> get props => [group];
-}
-
-final class BudgetGroupDeleted extends BudgetEvent {
-  const BudgetGroupDeleted(this.groupId);
-  final String groupId;
-  @override
-  List<Object?> get props => [groupId];
-}
-
-final class BudgetItemUpsertRequested extends BudgetEvent {
-  const BudgetItemUpsertRequested({
-    required this.groupId,
-    required this.item,
-  });
-
-  final String groupId;
-  final BudgetItem item;
-
-  @override
-  List<Object?> get props => [groupId, item];
-}
-
-final class BudgetItemDeleted extends BudgetEvent {
-  const BudgetItemDeleted({
-    required this.groupId,
-    required this.itemId,
-  });
-
-  final String groupId;
-  final String itemId;
-
-  @override
-  List<Object?> get props => [groupId, itemId];
-}
-
-sealed class BudgetState extends Equatable {
-  const BudgetState();
-  @override
-  List<Object?> get props => [];
-}
-
-final class BudgetInitial extends BudgetState {
-  const BudgetInitial();
-}
-
-final class BudgetReady extends BudgetState {
-  const BudgetReady({
-    required this.groups,
-    required this.groupTotals,
-    required this.totalIncome,
-    required this.totalEssentials,
-    required this.totalLifestyle,
-    required this.disposableIncome,
-  });
-
-  final List<BudgetGroup> groups;
-
-  /// Total amount per groupId.
-  final Map<String, double> groupTotals;
-
-  final double totalIncome;
-  final double totalEssentials;
-  final double totalLifestyle;
-  final double disposableIncome;
-
-  factory BudgetReady.fromGroups(List<BudgetGroup> groups) {
-    final totals = BudgetTotals.fromGroups(groups);
-    return BudgetReady(
-      groups: groups,
-      groupTotals: totals.groupTotals,
-      totalIncome: totals.totalIncome,
-      totalEssentials: totals.totalEssentials,
-      totalLifestyle: totals.totalLifestyle,
-      disposableIncome: totals.disposableIncome,
-    );
-  }
-
-  @override
-  List<Object?> get props => [
-        groups,
-        groupTotals,
-        totalIncome,
-        totalEssentials,
-        totalLifestyle,
-        disposableIncome,
-      ];
-}
+part 'budget_event.dart';
+part 'budget_state.dart';
 
 class BudgetBloc extends Bloc<BudgetEvent, BudgetState> {
   BudgetBloc({required BudgetService budgetService})
@@ -199,4 +98,3 @@ extension _FirstOrNull<E> on Iterable<E> {
     return it.current;
   }
 }
-

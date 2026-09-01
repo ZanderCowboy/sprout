@@ -8,16 +8,19 @@ App code lives in `sprout_app/lib`. Features use clean architecture.
 sprout_app/lib/features/<feature>/
   export.dart                 # barrel: domain + application + presentation only
   domain/                     # entities, repository interfaces, pure helper classes
-  application/                # *Service — validation and use-cases
+  application/                # abstract *Service + *ServiceImpl
+    <feature>_service.dart      # abstract class with API docstrings
+    <feature>_service_impl.dart
   data/
     <feature>_repository_impl.dart
     local/models/             # Hive DTOs
     remote/models/            # Supabase row DTOs
     mappers/                  # hive + supabase mappers (no mapping in UI)
   presentation/
-    *_page.dart / *_screen.dart   # UI only
-    *_bloc.dart / bloc/           # cubit or bloc
-    widgets/
+    *_page.dart / *_screen.dart   # UI only — one public widget per file
+    *_bloc.dart / bloc/           # bloc/cubit class only
+    *_event.dart / *_state.dart   # part files for bloc/cubit (part of parent)
+    widgets/                      # extra widgets extracted from pages
     enums/                    # UI-only enums
     utils/                    # sorting, labels, chart helpers (presentation-only)
 ```
@@ -78,4 +81,7 @@ Cross-feature imports go through `package:sprout/features/<other>/export.dart`. 
 - User-facing copy lives in `AppStrings`.
 - Validation throws `ValidationAppException` (see `lib/core/error/app_exception.dart`).
 - Register new repositories/services in `configureDependencies`.
+- **Services:** `abstract class FooService` in `foo_service.dart` (class + public method docstrings); `FooServiceImpl` in `foo_service_impl.dart`. DI registers `FooService` → `FooServiceImpl`. Barrels export the abstract only.
+- **Blocs/cubits:** events and states in sibling `*_event.dart` / `*_state.dart` files using `part of` the parent `*_bloc.dart` or `*_cubit.dart`.
+- **Presentation:** one public widget class per `*_page.dart` / `*_screen.dart`; extract additional widgets to `presentation/widgets/` as public classes.
 - Pages must not contain enums, sort helpers, or business rules.

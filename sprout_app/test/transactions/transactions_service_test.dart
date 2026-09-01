@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:sprout/core/constants/app_strings.dart';
 import 'package:sprout/core/error/error.dart';
 import 'package:sprout/features/transactions/application/deposit_flow.dart';
-import 'package:sprout/features/transactions/application/transactions_service.dart';
+import 'package:sprout/features/transactions/application/transactions_service_impl.dart';
 import 'package:sprout/features/transactions/domain/transaction.dart';
 
 import '../mocks/mocks.dart';
@@ -26,11 +26,11 @@ Transaction _deposit({
 
 void main() {
   late FakeTransactionsRepository repo;
-  late TransactionsService service;
+  late TransactionsServiceImpl service;
 
   setUp(() {
     repo = FakeTransactionsRepository();
-    service = TransactionsService(repo);
+    service = TransactionsServiceImpl(repo);
   });
 
   tearDown(() async {

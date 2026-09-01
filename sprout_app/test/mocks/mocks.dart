@@ -1,6 +1,8 @@
 import 'dart:async';
 
+import 'package:sprout/core/config/app_config.dart';
 import 'package:sprout/core/flags/remote_config_service.dart';
+import 'package:sprout/core/flags/remote_feature_flag.dart';
 import 'package:sprout/features/accounts/domain/account.dart';
 import 'package:sprout/features/accounts/domain/accounts_repository.dart';
 import 'package:sprout/features/auth/domain/auth_repository.dart';
@@ -126,7 +128,7 @@ class FakeAuthRepository implements AuthRepository {
   }
 }
 
-class FakeRemoteConfigService extends RemoteConfigService {
+class FakeRemoteConfigService implements RemoteConfigService {
   FakeRemoteConfigService({Map<String, String> strings = const {}})
     : _strings = Map.of(strings);
 
@@ -134,6 +136,15 @@ class FakeRemoteConfigService extends RemoteConfigService {
 
   @override
   bool get isReady => true;
+
+  @override
+  Future<void> setup(AppConfig config) async {}
+
+  @override
+  Future<bool> fetchFlags() async => true;
+
+  @override
+  bool isEnabled(RemoteFeatureFlag flag) => flag.defaultValue;
 
   @override
   String? getString(String key) {

@@ -10,7 +10,7 @@ Package name is `sprout`. App root is `sprout_app/`.
 
 - Cross-feature and core imports: `package:sprout/...`. Same-feature files may use relative imports.
 - Register new repositories/services in `sprout_app/lib/core/di/service_locator.dart` (`sl`).
-- Blocs/cubits: `sealed` events/states + `Equatable`. Prefer `flutter_bloc` already used in the feature.
+- Blocs/cubits: `sealed` events/states + `Equatable`. Split events/states into `*_event.dart` / `*_state.dart` part files next to the parent bloc/cubit.
 - User-visible copy: `AppStrings` (`lib/core/constants/app_strings.dart`). Do **not** hard-code UI strings.
   - Includes: on-screen `Text`, `AppBar` titles, button/chip labels, tooltips, hints, dialogs, snackbars, Semantics/`label`/`semanticsLabel`, enum **display** labels (sort, frequency, category, kind), and `ValidationAppException` / user-facing `AuthAppException` messages.
   - Add the constant (or reuse an existing one) **before** using it in a widget. Prefer reuse over inventing near-duplicates.

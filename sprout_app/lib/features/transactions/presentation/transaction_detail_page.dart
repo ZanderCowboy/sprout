@@ -9,6 +9,9 @@ import 'package:sprout/features/goals/export.dart';
 import 'package:sprout/features/transactions/export.dart';
 import 'bloc/transaction_detail_bloc.dart';
 import 'utils/transaction_frequency_label.dart';
+import 'widgets/transaction_allocation_row.dart';
+import 'widgets/transaction_info_card.dart';
+import 'widgets/transaction_section_card.dart';
 import 'package:sprout/ui/export.dart';
 
 class TransactionDetailPage extends StatelessWidget {
@@ -129,12 +132,12 @@ class _TransactionDetailBodyState extends State<_TransactionDetailBody> {
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
       children: [
-        _InfoCard(
+        TransactionInfoCard(
           title: formatZarFromCents(t.amountCents),
           subtitle: '$kindLabel · $accountName · $goalName',
         ),
         const SizedBox(height: 10),
-        _SectionCard(
+        TransactionSectionCard(
           title: AppStrings.details,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -167,7 +170,7 @@ class _TransactionDetailBodyState extends State<_TransactionDetailBody> {
         ),
         if (t.isRecurring && t.frequency != TransactionFrequency.none) ...[
           const SizedBox(height: 10),
-          _SectionCard(
+          TransactionSectionCard(
             title: AppStrings.recurringPayment,
             child: Align(
               alignment: Alignment.centerLeft,
@@ -185,7 +188,7 @@ class _TransactionDetailBodyState extends State<_TransactionDetailBody> {
         ],
         if (hasGroup) ...[
           const SizedBox(height: 10),
-          _SectionCard(
+          TransactionSectionCard(
             title: AppStrings.splitGroup,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -208,7 +211,7 @@ class _TransactionDetailBodyState extends State<_TransactionDetailBody> {
                   const Divider(height: 20),
                 ],
                 for (final a in allocationsInGroup) ...[
-                  _AllocationRowView(
+                  TransactionAllocationRow(
                     amount: formatZarFromCents(a.amountCents),
                     goalName: a.goalId == null
                         ? AppStrings.unallocated
@@ -228,7 +231,7 @@ class _TransactionDetailBodyState extends State<_TransactionDetailBody> {
           ),
         ],
         const SizedBox(height: 10),
-        _SectionCard(
+        TransactionSectionCard(
           title: AppStrings.note,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -283,102 +286,6 @@ class _TransactionDetailBodyState extends State<_TransactionDetailBody> {
           ),
         ],
       ),
-    );
-  }
-}
-
-class _InfoCard extends StatelessWidget {
-  const _InfoCard({required this.title, required this.subtitle});
-
-  final String title;
-  final String subtitle;
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              title,
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.w900,
-                  ),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              subtitle,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _SectionCard extends StatelessWidget {
-  const _SectionCard({required this.title, required this.child});
-
-  final String title;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              title,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w800,
-                  ),
-            ),
-            const SizedBox(height: 12),
-            child,
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _AllocationRowView extends StatelessWidget {
-  const _AllocationRowView({
-    required this.amount,
-    required this.goalName,
-    required this.occurredAt,
-  });
-
-  final String amount;
-  final String goalName;
-  final DateTime occurredAt;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: Text(
-            '$goalName · ${formatDate(occurredAt)}',
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
-        ),
-        const SizedBox(width: 10),
-        Text(
-          amount,
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w800,
-              ),
-        ),
-      ],
     );
   }
 }

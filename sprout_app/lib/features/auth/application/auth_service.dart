@@ -1,44 +1,11 @@
-import 'package:hive_flutter/hive_flutter.dart';
-
-import 'package:sprout/core/config/app_config.dart';
-import 'package:sprout/core/config/app_environment.dart';
-import 'package:sprout/core/constants/app_strings.dart';
-import 'package:sprout/core/error/error.dart';
-import 'package:sprout/core/user/user_context.dart';
-import 'package:sprout/features/accounts/data/local/account_hive_model.dart';
-import 'package:sprout/features/budget/data/local/models/budget_group_hive_model.dart';
-import 'package:sprout/features/goals/data/local/models/goal_hive_model.dart';
-import 'package:sprout/features/sync/export.dart';
-import 'package:sprout/features/transactions/data/local/transaction_hive_model.dart';
-import '../domain/auth_repository.dart';
 import '../domain/auth_user.dart';
 
-class AuthService {
-  AuthService({
-    required AuthRepository authRepository,
-    required UserContext userContext,
-    required AppConfig appConfig,
-    required Box<AccountHiveModel> accountsBox,
-    required Box<GoalHiveModel> goalsBox,
-    required Box<BudgetGroupHiveModel> budgetGroupsBox,
-    required Box<TransactionHiveModel> transactionsBox,
-    required PendingSyncQueue pendingSyncQueue,
-    required Future<void> Function() flushPending,
-    required Future<void> Function() pullRemote,
-    Future<void> Function()? logOutPurchases,
-  }) : _authRepository = authRepository,
-       _userContext = userContext,
-       _appConfig = appConfig,
-       _accountsBox = accountsBox,
-       _goalsBox = goalsBox,
-       _budgetGroupsBox = budgetGroupsBox,
-       _transactionsBox = transactionsBox,
-       _pendingSyncQueue = pendingSyncQueue,
-       _flushPending = flushPending,
-       _pullRemote = pullRemote,
-       _logOutPurchases = logOutPurchases;
-
+/// Auth use-cases: sign-in, session binding, sync gating, and account lifecycle.
+abstract class AuthService {
+  /// Stable user id for Maestro / development debug sign-in.
   static const maestroTestUserId = 'maestro-test-user';
+
+  /// Stable [AuthUser] for Maestro / development debug sign-in.
   static const maestroTestUser = AuthUser(
     id: maestroTestUserId,
     email: 'maestro@test.local',
@@ -47,127 +14,49 @@ class AuthService {
     signedInWithGoogle: false,
   );
 
-  final AuthRepository _authRepository;
-  final UserContext _userContext;
-  final AppConfig _appConfig;
-  final Box<AccountHiveModel> _accountsBox;
-  final Box<GoalHiveModel> _goalsBox;
-  final Box<BudgetGroupHiveModel> _budgetGroupsBox;
-  final Box<TransactionHiveModel> _transactionsBox;
-  final PendingSyncQueue _pendingSyncQueue;
-  final Future<void> Function() _flushPending;
-  final Future<void> Function() _pullRemote;
-  final Future<void> Function()? _logOutPurchases;
-  bool _debugSignedIn = false;
+  /// Current Supabase auth user, if any.
+  AuthUser? get currentUser;
 
-  AuthUser? get currentUser => _authRepository.currentUser;
-
-  Stream<AuthUser?> authStateChanges() => _authRepository.authStateChanges();
+  /// Emits auth user changes from the repository.
+  Stream<AuthUser?> authStateChanges();
 
   /// Development flavor only. Production never shows or accepts debug sign-in.
-  bool get debugSignInAvailable =>
-      _appConfig.environment == AppEnvironment.development;
+  bool get debugSignInAvailable;
 
   /// True after [debugSignIn] until [signOut] or [deleteAccount].
-  bool get isDebugSignedIn => _debugSignedIn;
+  bool get isDebugSignedIn;
 
   /// Development-only: skip OTP/Google and bind a stable local test user.
-  Future<void> debugSignIn() async {
-    if (!debugSignInAvailable) {
-      throw const AuthAppException(AppStrings.debugSignInDevOnly);
-    }
-
-    _debugSignedIn = true;
-    await _userContext.setActiveUserId(maestroTestUserId);
-    await _userContext.markIntroCompleted();
-    // Do not mark verified — keep sync disabled for local-only test data.
-  }
+  Future<void> debugSignIn();
 
   /// Sync is allowed only with a verified (non-anonymous) Supabase session.
-  bool get canSync {
-    final user = _authRepository.currentUser;
-    return user != null && user.isVerified;
-  }
+  bool get canSync;
 
-  Future<void> sendEmailOtp(String email) =>
-      _authRepository.sendEmailOtp(email);
+  /// Sends an email OTP to [email].
+  Future<void> sendEmailOtp(String email);
 
+  /// Verifies the OTP and binds the verified session to local storage.
   Future<AuthUser> verifyEmailOtp({
     required String email,
     required String token,
     String? displayName,
-  }) async {
-    var user = await _authRepository.verifyEmailOtp(email: email, token: token);
-    final trimmedName = displayName?.trim() ?? '';
-    if (trimmedName.isNotEmpty) {
-      user = await _authRepository.updateDisplayName(trimmedName);
-    }
-    await bindAfterVerifiedSignIn(user);
-    return user;
-  }
+  });
 
-  Future<AuthUser> signInWithGoogle() async {
-    final user = await _authRepository.signInWithGoogle();
-    await bindAfterVerifiedSignIn(user);
-    return user;
-  }
+  /// Signs in with Google and binds the verified session.
+  Future<AuthUser> signInWithGoogle();
 
-  Future<AuthUser> updateDisplayName(String displayName) =>
-      _authRepository.updateDisplayName(displayName);
+  /// Updates the signed-in user's display name.
+  Future<AuthUser> updateDisplayName(String displayName);
 
   /// Clears the Supabase session and keeps local Hive data / active_user_id.
-  Future<void> signOut() async {
-    _debugSignedIn = false;
-    await _authRepository.signOut();
-  }
+  Future<void> signOut();
 
   /// Deletes the auth user remotely, wipes local entity Hive, then signs out.
   ///
   /// Keeps `intro_completed` in settings. Does not cancel Play billing.
-  Future<void> deleteAccount() async {
-    _debugSignedIn = false;
-    await _authRepository.deleteOwnAccount();
-    await _clearLocalEntityData();
-    final logOutPurchases = _logOutPurchases;
-    if (logOutPurchases != null) {
-      try {
-        await logOutPurchases();
-      } on Object {
-        // Best-effort RevenueCat logout; the auth user is already gone.
-      }
-    }
-    await _authRepository.signOut();
-  }
+  Future<void> deleteAccount();
 
   /// Same-uid re-login keeps the cache and flushes pending, then pulls.
   /// Any other bind discards leftover local Hive and pulls cloud only.
-  Future<void> bindAfterVerifiedSignIn(AuthUser user) async {
-    if (!user.isVerified) {
-      throw const AuthAppException(AppStrings.verifiedSessionRequired);
-    }
-
-    final newUid = user.id;
-    final previousUid = _userContext.cachedUserId;
-
-    if (previousUid == newUid) {
-      await _userContext.setActiveUserId(newUid);
-      await _userContext.markVerifiedUserId(newUid);
-      await _flushPending();
-      await _pullRemote();
-      return;
-    }
-
-    await _clearLocalEntityData();
-    await _userContext.setActiveUserId(newUid);
-    await _userContext.markVerifiedUserId(newUid);
-    await _pullRemote();
-  }
-
-  Future<void> _clearLocalEntityData() async {
-    await _accountsBox.clear();
-    await _goalsBox.clear();
-    await _budgetGroupsBox.clear();
-    await _transactionsBox.clear();
-    await _pendingSyncQueue.clear();
-  }
+  Future<void> bindAfterVerifiedSignIn(AuthUser user);
 }

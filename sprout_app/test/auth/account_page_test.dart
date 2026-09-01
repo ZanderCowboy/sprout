@@ -16,8 +16,9 @@ import 'package:sprout/core/storage/hive_adapters.dart';
 import 'package:sprout/core/theme/app_theme.dart';
 import 'package:sprout/core/user/user_context.dart';
 import 'package:sprout/features/accounts/data/local/account_hive_model.dart';
-import 'package:sprout/features/auth/application/auth_service.dart';
+import 'package:sprout/features/auth/application/auth_service_impl.dart';
 import 'package:sprout/features/auth/application/privacy_policy_service.dart';
+import 'package:sprout/features/auth/application/privacy_policy_service_impl.dart';
 import 'package:sprout/features/auth/domain/auth_user.dart';
 import 'package:sprout/features/auth/presentation/account_page.dart';
 import 'package:sprout/features/auth/presentation/bloc/auth_cubit.dart';
@@ -79,7 +80,7 @@ void main() {
       firebaseStorageBucket: '',
     );
     cubit = AuthCubit(
-      authService: AuthService(
+      authService: AuthServiceImpl(
         authRepository: fakeAuth,
         userContext: UserContext(settingsBox),
         appConfig: config,
@@ -115,7 +116,7 @@ void main() {
 
   testWidgets('Privacy row opens PrivacyPage', (tester) async {
     sl.registerSingleton<PrivacyPolicyService>(
-      PrivacyPolicyService(
+      PrivacyPolicyServiceImpl(
         remoteConfig: FakeRemoteConfigService(),
         assetBundle: _FakeAssetBundle({
           PrivacyPolicyService.bundledAssetPath:

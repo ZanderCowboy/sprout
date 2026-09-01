@@ -7,6 +7,15 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:sprout/core/config/app_config.dart';
 import 'package:sprout/core/flags/remote_config_service.dart';
+import 'package:sprout/core/flags/remote_config_service_impl.dart';
+import 'package:sprout/features/accounts/application/accounts_service_impl.dart';
+import 'package:sprout/features/auth/application/auth_service_impl.dart';
+import 'package:sprout/features/auth/application/privacy_policy_service_impl.dart';
+import 'package:sprout/features/auth/application/terms_of_service_service_impl.dart';
+import 'package:sprout/features/budget/application/budget_service_impl.dart';
+import 'package:sprout/features/goals/application/goals_service_impl.dart';
+import 'package:sprout/features/sync/application/sync_service_impl.dart';
+import 'package:sprout/features/transactions/application/transactions_service_impl.dart';
 import 'package:sprout/core/user/user_context.dart';
 import 'package:sprout/features/accounts/application/accounts_service.dart';
 import 'package:sprout/features/accounts/data/accounts_repository_impl.dart';
@@ -51,13 +60,13 @@ Future<void> configureDependencies({
 }) async {
   sl.registerSingleton<AppConfig>(appConfig);
   sl.registerSingleton<RemoteConfigService>(
-    remoteConfigService ?? RemoteConfigService(),
+    remoteConfigService ?? RemoteConfigServiceImpl(),
   );
   sl.registerLazySingleton<TermsOfServiceService>(
-    () => TermsOfServiceService(remoteConfig: sl()),
+    () => TermsOfServiceServiceImpl(remoteConfig: sl()),
   );
   sl.registerLazySingleton<PrivacyPolicyService>(
-    () => PrivacyPolicyService(remoteConfig: sl()),
+    () => PrivacyPolicyServiceImpl(remoteConfig: sl()),
   );
 
   sl.registerSingleton<Box<AccountHiveModel>>(accountsBox);
@@ -92,7 +101,7 @@ Future<void> configureDependencies({
   );
 
   sl.registerLazySingleton<AuthService>(
-    () => AuthService(
+    () => AuthServiceImpl(
       authRepository: sl(),
       userContext: sl(),
       appConfig: sl(),
@@ -160,15 +169,15 @@ Future<void> configureDependencies({
     ),
   );
 
-  sl.registerLazySingleton<AccountsService>(() => AccountsService(sl()));
-  sl.registerLazySingleton<GoalsService>(() => GoalsService(sl(), sl()));
-  sl.registerLazySingleton<BudgetService>(() => BudgetService(sl()));
+  sl.registerLazySingleton<AccountsService>(() => AccountsServiceImpl(sl()));
+  sl.registerLazySingleton<GoalsService>(() => GoalsServiceImpl(sl(), sl()));
+  sl.registerLazySingleton<BudgetService>(() => BudgetServiceImpl(sl()));
   sl.registerLazySingleton<TransactionsService>(
-    () => TransactionsService(sl()),
+    () => TransactionsServiceImpl(sl()),
   );
 
   sl.registerLazySingleton<SyncService>(
-    () => SyncService(
+    () => SyncServiceImpl(
       queue: sl(),
       config: sl(),
       supabase: supabaseClient,
