@@ -5,9 +5,9 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../application/budget_service.dart';
-import '../domain/budget_category.dart';
 import '../domain/budget_group.dart';
 import '../domain/budget_item.dart';
+import '../domain/budget_totals.dart';
 
 part 'budget_event.dart';
 part 'budget_state.dart';

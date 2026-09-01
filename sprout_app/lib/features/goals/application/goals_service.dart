@@ -16,6 +16,15 @@ abstract class GoalsService {
   /// Deletes the goal with [id] locally and enqueues remote sync.
   Future<void> removeGoal(String id);
 
+  /// Creates [goal] and records opening-balance deposit/allocation when needed.
+  Future<Goal> createGoalWithOpeningBalance({
+    required Goal goal,
+    required int openingBalanceCents,
+    String? openingBalanceAccountId,
+    required String groupId,
+    DateTime? occurredAt,
+  });
+
   /// Pulls goals from Supabase when sync is allowed.
   Future<void> pullRemote();
 }

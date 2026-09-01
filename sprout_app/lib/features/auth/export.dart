@@ -1,7 +1,6 @@
 export 'application/auth_service.dart';
 export 'application/privacy_policy_service.dart';
 export 'application/terms_of_service_service.dart';
-export 'data/auth_repository_impl.dart';
 export 'domain/auth_repository.dart';
 export 'domain/auth_user.dart';
 export 'presentation/account_page.dart';

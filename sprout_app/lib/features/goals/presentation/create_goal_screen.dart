@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sprout/core/core.dart';
 import 'package:sprout/core/di/service_locator.dart';
 import 'package:sprout/features/accounts/export.dart';
-import 'package:sprout/features/transactions/export.dart';
 import 'package:sprout/ui/export.dart';
 
 import '../application/goals_service.dart';
@@ -130,7 +129,6 @@ class _CreateGoalScreenState extends State<CreateGoalScreen> {
       create: (_) => CreateGoalBloc(
         goalsService: sl<GoalsService>(),
         accountsService: sl<AccountsService>(),
-        transactionsService: sl<TransactionsService>(),
         userContext: sl<UserContext>(),
       )..add(const CreateGoalStarted()),
       child: BlocConsumer<CreateGoalBloc, CreateGoalState>(

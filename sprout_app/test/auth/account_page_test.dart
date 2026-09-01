@@ -15,7 +15,7 @@ import 'package:sprout/core/router/app_route.dart';
 import 'package:sprout/core/storage/hive_adapters.dart';
 import 'package:sprout/core/theme/app_theme.dart';
 import 'package:sprout/core/user/user_context.dart';
-import 'package:sprout/features/accounts/export.dart';
+import 'package:sprout/features/accounts/data/local/account_hive_model.dart';
 import 'package:sprout/features/auth/application/auth_service_impl.dart';
 import 'package:sprout/features/auth/application/privacy_policy_service.dart';
 import 'package:sprout/features/auth/application/privacy_policy_service_impl.dart';
@@ -23,10 +23,11 @@ import 'package:sprout/features/auth/domain/auth_user.dart';
 import 'package:sprout/features/auth/presentation/account_page.dart';
 import 'package:sprout/features/auth/presentation/bloc/auth_cubit.dart';
 import 'package:sprout/features/auth/presentation/privacy_page.dart';
-import 'package:sprout/features/budget/export.dart';
-import 'package:sprout/features/goals/export.dart';
+import 'package:sprout/features/budget/data/local/models/budget_group_hive_model.dart';
+import 'package:sprout/features/goals/data/local/models/goal_hive_model.dart';
 import 'package:sprout/features/sync/export.dart';
-import 'package:sprout/features/transactions/export.dart';
+import 'package:sprout/features/transactions/data/local/pending_sync_hive_model.dart';
+import 'package:sprout/features/transactions/data/local/transaction_hive_model.dart';
 
 import '../mocks/mocks.dart';
 

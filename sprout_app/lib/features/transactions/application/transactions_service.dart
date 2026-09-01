@@ -1,6 +1,10 @@
+import 'dart:async';
+
+import '../domain/funds_snapshot.dart';
 import '../domain/portfolio_summary.dart';
 import '../domain/transaction.dart';
 import '../domain/transaction_frequency.dart';
+import 'deposit_flow.dart';
 
 /// Transaction use-cases: deposits, allocations, and portfolio streams.
 abstract class TransactionsService {
@@ -9,6 +13,32 @@ abstract class TransactionsService {
 
   /// Emits portfolio summary derived from transactions.
   Stream<PortfolioSummary> watchPortfolioSummary();
+
+  /// Emits funds snapshot whenever transactions or account ids change.
+  Stream<FundsSnapshot> watchFundsSnapshot({
+    required Stream<List<String>> accountIdsStream,
+  });
+
+  /// Computes a funds snapshot from in-memory inputs.
+  FundsSnapshot computeFundsSnapshot({
+    required List<Transaction> transactions,
+    required List<String> accountIds,
+    DateTime? now,
+  });
+
+  /// Unallocated cents for one account at [now].
+  int unallocatedCentsForAccount(
+    List<Transaction> transactions,
+    String accountId, {
+    DateTime? now,
+  });
+
+  /// Splits transactions into scheduled (future) and history lists.
+  ({List<Transaction> scheduled, List<Transaction> history})
+      splitScheduledAndHistory(
+    List<Transaction> txs, {
+    DateTime? now,
+  });
 
   /// Returns transactions linked to [accountId].
   Future<List<Transaction>> getForAccount(String accountId);
@@ -47,6 +77,20 @@ abstract class TransactionsService {
     required int amountCents,
     DateTime? occurredAt,
     String? note,
+  });
+
+  /// Orchestrates deposit bottom-sheet flows (deposit, allocate, or both).
+  Future<void> submitDepositFlow({
+    required DepositFlowMode mode,
+    required String accountId,
+    String? goalId,
+    required int? depositAmountCents,
+    required List<DepositAllocationInput> allocations,
+    required DateTime occurredAt,
+    required String groupId,
+    bool isRecurring = false,
+    TransactionFrequency frequency = TransactionFrequency.none,
+    int? availableUnallocatedCents,
   });
 
   /// Updates the note on an existing transaction.

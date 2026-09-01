@@ -13,12 +13,12 @@ final class GoalsInitial extends GoalsState {
 final class GoalsReady extends GoalsState {
   const GoalsReady({
     required this.progressList,
-    required this.unallocatedBalance,
+    required this.unallocatedBalanceCents,
   });
 
   final List<GoalProgress> progressList;
-  final double unallocatedBalance;
+  final int unallocatedBalanceCents;
 
   @override
-  List<Object?> get props => [progressList, unallocatedBalance];
+  List<Object?> get props => [progressList, unallocatedBalanceCents];
 }

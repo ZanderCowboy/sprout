@@ -17,13 +17,31 @@ import 'package:sprout/features/goals/application/goals_service_impl.dart';
 import 'package:sprout/features/sync/application/sync_service_impl.dart';
 import 'package:sprout/features/transactions/application/transactions_service_impl.dart';
 import 'package:sprout/core/user/user_context.dart';
-import 'package:sprout/features/accounts/export.dart';
-import 'package:sprout/features/auth/export.dart';
-import 'package:sprout/features/budget/export.dart';
-import 'package:sprout/features/goals/export.dart';
+import 'package:sprout/features/accounts/application/accounts_service.dart';
+import 'package:sprout/features/accounts/data/accounts_repository_impl.dart';
+import 'package:sprout/features/accounts/data/local/account_hive_model.dart';
+import 'package:sprout/features/accounts/domain/accounts_repository.dart';
+import 'package:sprout/features/auth/application/auth_service.dart';
+import 'package:sprout/features/auth/application/privacy_policy_service.dart';
+import 'package:sprout/features/auth/application/terms_of_service_service.dart';
+import 'package:sprout/features/auth/data/auth_repository_impl.dart';
+import 'package:sprout/features/auth/domain/auth_repository.dart';
+import 'package:sprout/features/budget/application/budget_service.dart';
+import 'package:sprout/features/budget/data/budget_repository_impl.dart';
+import 'package:sprout/features/budget/data/local/models/budget_group_hive_model.dart';
+import 'package:sprout/features/budget/domain/budget_repository.dart';
+import 'package:sprout/features/goals/application/goals_service.dart';
+import 'package:sprout/features/goals/data/goals_repository_impl.dart';
+import 'package:sprout/features/goals/data/local/models/goal_hive_model.dart';
+import 'package:sprout/features/goals/domain/goals_repository.dart';
 import 'package:sprout/features/purchases/presentation/premium_paywall_helper.dart';
-import 'package:sprout/features/sync/export.dart';
-import 'package:sprout/features/transactions/export.dart';
+import 'package:sprout/features/sync/application/sync_service.dart';
+import 'package:sprout/features/sync/data/pending_sync_queue.dart';
+import 'package:sprout/features/transactions/application/transactions_service.dart';
+import 'package:sprout/features/transactions/data/local/pending_sync_hive_model.dart';
+import 'package:sprout/features/transactions/data/local/transaction_hive_model.dart';
+import 'package:sprout/features/transactions/data/transactions_repository_impl.dart';
+import 'package:sprout/features/transactions/domain/transactions_repository.dart';
 
 final sl = GetIt.instance;
 
@@ -152,7 +170,7 @@ Future<void> configureDependencies({
   );
 
   sl.registerLazySingleton<AccountsService>(() => AccountsServiceImpl(sl()));
-  sl.registerLazySingleton<GoalsService>(() => GoalsServiceImpl(sl()));
+  sl.registerLazySingleton<GoalsService>(() => GoalsServiceImpl(sl(), sl()));
   sl.registerLazySingleton<BudgetService>(() => BudgetServiceImpl(sl()));
   sl.registerLazySingleton<TransactionsService>(
     () => TransactionsServiceImpl(sl()),

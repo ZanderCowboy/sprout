@@ -39,8 +39,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       List<Account>? accounts;
       PortfolioSummary? portfolio;
       List<Transaction>? recent;
-      Map<String, int> currentTotals = const <String, int>{};
-      Map<String, int> scheduledTotals = const <String, int>{};
+      var currentTotals = const <String, int>{};
+      var scheduledTotals = const <String, int>{};
 
       void tryEmit() {
         if (accounts != null && portfolio != null && recent != null) {
@@ -71,26 +71,24 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         },
         onError: controller.addError,
       );
+      final fundsSub = _transactionsService
+          .watchFundsSnapshot(
+            accountIdsStream: _accountsService
+                .watchAccounts()
+                .map((a) => a.map((account) => account.id).toList()),
+          )
+          .listen(
+        (snapshot) {
+          currentTotals = snapshot.accountCurrentDepositTotalsById;
+          scheduledTotals = snapshot.accountScheduledDepositTotalsById;
+          tryEmit();
+        },
+        onError: controller.addError,
+      );
       final recentSub = _transactionsService.watchTransactions().listen(
         (all) {
-          final now = DateTime.now();
-
-          final recentCandidates = all
-              .where((t) => !TransactionDisplay.isPendingByDate(t, now))
-              .toList()
-            ..sort((a, b) => b.occurredAt.compareTo(a.occurredAt));
-          recent = recentCandidates.take(5).toList(growable: false);
-
-          final current = <String, int>{};
-          final scheduled = <String, int>{};
-          for (final t in all) {
-            if (t.kind != TransactionKind.deposit) continue;
-            final isScheduled = TransactionDisplay.isPendingByDate(t, now);
-            final target = isScheduled ? scheduled : current;
-            target[t.accountId] = (target[t.accountId] ?? 0) + t.amountCents;
-          }
-          currentTotals = current;
-          scheduledTotals = scheduled;
+          final split = _transactionsService.splitScheduledAndHistory(all);
+          recent = split.history.take(5).toList(growable: false);
           tryEmit();
         },
         onError: controller.addError,
@@ -99,6 +97,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       controller.onCancel = () {
         accountsSub.cancel();
         portfolioSub.cancel();
+        fundsSub.cancel();
         recentSub.cancel();
       };
     });

@@ -44,9 +44,12 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
 
       void tryEmit() {
         if (txs == null || goals == null || accounts == null) return;
+        final split = _transactionsService.splitScheduledAndHistory(txs!);
         controller.add(
           TransactionsReady(
             items: txs!,
+            scheduledItems: split.scheduled,
+            historyItems: split.history,
             goalsById: {for (final g in goals!) g.id: g},
             accountsById: {for (final a in accounts!) a.id: a},
           ),

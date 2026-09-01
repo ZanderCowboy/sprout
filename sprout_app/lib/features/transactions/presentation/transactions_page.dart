@@ -53,18 +53,8 @@ class _TransactionsBody extends StatelessWidget {
     }
 
     final now = DateTime.now();
-    final scheduled = <Transaction>[];
-    final history = <Transaction>[];
-    for (final t in state.items) {
-      if (TransactionDisplay.isPendingByDate(t, now)) {
-        scheduled.add(t);
-      } else {
-        history.add(t);
-      }
-    }
-
-    scheduled.sort((a, b) => a.occurredAt.compareTo(b.occurredAt));
-    history.sort((a, b) => b.occurredAt.compareTo(a.occurredAt));
+    final scheduled = state.scheduledItems;
+    final history = state.historyItems;
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),

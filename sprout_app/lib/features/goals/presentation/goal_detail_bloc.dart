@@ -51,23 +51,15 @@ class GoalDetailBloc extends Bloc<GoalDetailEvent, GoalDetailState> {
       void tryEmit() {
         if (goals == null || txs == null || accounts == null) return;
 
-        final now = DateTime.now();
         final goal = goals!.cast<Goal?>().firstWhere(
               (g) => g?.id == goalId,
               orElse: () => null,
             );
         if (goal == null) return;
 
-        var saved = 0;
-        final forGoal = <Transaction>[];
-        for (final t in txs!) {
-          if (t.goalId != goalId) continue;
-          forGoal.add(t);
-          if (!t.occurredAt.isAfter(now)) {
-            saved += t.amountCents;
-          }
-        }
-        forGoal.sort((a, b) => b.occurredAt.compareTo(a.occurredAt));
+        final forGoal = txs!.where((t) => t.goalId == goalId).toList();
+        final split = _transactionsService.splitScheduledAndHistory(forGoal);
+        final saved = FundsCalculator.savedCentsForGoal(forGoal, goalId);
 
         final progress = GoalProgress(goal: goal, savedCents: saved);
         final accountsById = {for (final a in accounts!) a.id: a};
@@ -86,6 +78,8 @@ class GoalDetailBloc extends Bloc<GoalDetailEvent, GoalDetailState> {
           GoalDetailReady(
             progress: progress,
             transactions: forGoal,
+            scheduledTransactions: split.scheduled,
+            historyTransactions: split.history,
             accountsById: accountsById,
             graphPoints: graphPoints,
             prediction: prediction,

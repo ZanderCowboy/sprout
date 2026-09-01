@@ -2,10 +2,13 @@ import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:sprout/core/config/app_config.dart';
-import 'package:sprout/features/accounts/export.dart';
-import 'package:sprout/features/budget/export.dart';
-import 'package:sprout/features/goals/export.dart';
-import 'package:sprout/features/transactions/export.dart';
+import 'package:sprout/features/accounts/data/account_mapper.dart';
+import 'package:sprout/features/budget/data/mappers/budget_supabase_mapper.dart';
+import 'package:sprout/features/goals/data/goal_mapper.dart';
+import 'package:sprout/features/transactions/data/pending_sync_payload.dart';
+import 'package:sprout/features/transactions/data/supabase_tables.dart';
+import 'package:sprout/features/transactions/data/transaction_mapper.dart';
+import 'package:sprout/features/transactions/domain/transactions_repository.dart';
 import '../data/pending_sync_queue.dart';
 import '../domain/pending_sync_operation.dart';
 import 'sync_service.dart';
