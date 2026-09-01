@@ -13,6 +13,10 @@
 # untouched so a machine with real config is not overwritten.
 set -euo pipefail
 
+# Cloud Agent install runs in a non-login shell that does not source
+# /etc/profile.d or ~/.bashrc, so make the toolchain discoverable here.
+export PATH="$PATH:/opt/flutter/bin:$HOME/android-sdk/cmdline-tools/latest/bin:$HOME/android-sdk/platform-tools:$HOME/android-sdk/emulator"
+
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 APP_DIR="$ROOT/sprout_app"
 CONFIG_DIR="$APP_DIR/assets/config"
