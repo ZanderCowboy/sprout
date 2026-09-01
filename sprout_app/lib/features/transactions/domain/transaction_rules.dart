@@ -1,4 +1,5 @@
 import 'transaction.dart';
+import 'transaction_frequency.dart';
 
 class TransactionRules {
   TransactionRules._();
@@ -32,6 +33,11 @@ class TransactionRules {
     history.sort((a, b) => b.occurredAt.compareTo(a.occurredAt));
     return (scheduled: scheduled, history: history);
   }
+
+  static bool isRecurringDeposit(Transaction t) =>
+      t.kind == TransactionKind.deposit &&
+      t.isRecurring &&
+      t.frequency != TransactionFrequency.none;
 
   static void requireGoalIdForAllocation(String? goalId) {
     if (goalId == null || goalId.isEmpty) {

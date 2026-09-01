@@ -35,7 +35,7 @@ class RecurringSchedule {
     required TransactionFrequency effectiveFrequency,
     DateTime? previousNext,
   }) {
-    if (!enabled) return previousNext;
+    if (!enabled) return null;
 
     if (previousNext != null &&
         previousNext.isAfter(now) &&

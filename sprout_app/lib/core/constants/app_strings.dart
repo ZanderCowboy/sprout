@@ -267,6 +267,8 @@ abstract final class AppStrings {
   static const String recurringDepositWontApply =
       'This recurring deposit won’t be applied.';
   static const String cancelRemove = 'Cancel (remove)';
+  static const String stopRecurring = 'Stop recurring';
+  static const String seeAll = 'See all';
   static const String frequencyDaily = 'Daily';
   static const String frequencyWeekly = 'Weekly';
   static const String frequencyMonthly = 'Monthly';

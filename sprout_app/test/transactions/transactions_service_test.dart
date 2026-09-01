@@ -4,6 +4,7 @@ import 'package:sprout/core/error/error.dart';
 import 'package:sprout/features/transactions/application/deposit_flow.dart';
 import 'package:sprout/features/transactions/application/transactions_service_impl.dart';
 import 'package:sprout/features/transactions/domain/transaction.dart';
+import 'package:sprout/features/transactions/domain/transaction_frequency.dart';
 
 import '../mocks/mocks.dart';
 
@@ -114,5 +115,26 @@ void main() {
 
       expect(repo.addTransactionCalls, 3);
     });
+  });
+
+  test('cancelRecurringDeposit keeps the seed and stops future runs', () async {
+    await service.recordAccountDeposit(
+      accountId: 'a1',
+      amountCents: 500,
+      isRecurring: true,
+      frequency: TransactionFrequency.monthly,
+    );
+
+    final seed = repo.lastAdded!;
+    expect(seed.recurringEnabled, isTrue);
+    expect(repo.items, hasLength(1));
+
+    await service.cancelRecurringDeposit(seed.id);
+
+    expect(repo.items, hasLength(1));
+    expect(repo.items.single.id, seed.id);
+    expect(repo.items.single.recurringEnabled, isFalse);
+    expect(repo.items.single.nextScheduledDate, isNull);
+    expect(repo.items.single.amountCents, 500);
   });
 }

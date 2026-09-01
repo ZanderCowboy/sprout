@@ -181,7 +181,22 @@ class OverviewPage extends StatelessWidget {
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(20, 6, 20, 10),
-                    child: Text(AppStrings.recentActivity, style: titleStyle),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            AppStrings.recentActivity,
+                            style: titleStyle,
+                          ),
+                        ),
+                        SproutTextButton(
+                          identifier: SemanticsIds.overviewSeeAllTransactions,
+                          label: AppStrings.seeAll,
+                          onPressed: () =>
+                              context.push(AppRoute.transactions.path),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               if (state.recentTransactions.isNotEmpty)

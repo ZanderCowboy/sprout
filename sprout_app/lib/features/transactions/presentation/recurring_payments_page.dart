@@ -8,7 +8,6 @@ import 'package:sprout/features/goals/export.dart';
 import 'package:sprout/features/transactions/export.dart';
 
 import 'bloc/recurring_payments_bloc.dart';
-import 'utils/transaction_frequency_label.dart';
 import 'widgets/edit_recurring_sheet.dart';
 import 'package:sprout/ui/export.dart';
 

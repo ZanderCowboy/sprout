@@ -164,6 +164,9 @@ class FakeTransactionsRepository implements TransactionsRepository {
 
   int addTransactionCalls = 0;
   Transaction? lastAdded;
+  Transaction? lastUpdatedRecurring;
+
+  List<Transaction> get items => List.unmodifiable(_transactions);
 
   void setTransactions(List<Transaction> txs) {
     _transactions
@@ -243,7 +246,35 @@ class FakeTransactionsRepository implements TransactionsRepository {
     required String transactionId,
     required bool isRecurring,
     required TransactionFrequency frequency,
-  }) async {}
+  }) async {
+    final index = _transactions.indexWhere((t) => t.id == transactionId);
+    if (index < 0) return;
+    final existing = _transactions[index];
+    final enabled = isRecurring && frequency != TransactionFrequency.none;
+    final updated = Transaction(
+      id: existing.id,
+      userId: existing.userId,
+      accountId: existing.accountId,
+      kind: existing.kind,
+      goalId: existing.goalId,
+      groupId: existing.groupId,
+      amountCents: existing.amountCents,
+      occurredAt: existing.occurredAt,
+      note: existing.note,
+      pendingSync: existing.pendingSync,
+      isRecurring: existing.isRecurring || enabled,
+      recurringEnabled: enabled,
+      frequency: enabled
+          ? frequency
+          : (existing.frequency == TransactionFrequency.none
+                ? TransactionFrequency.monthly
+                : existing.frequency),
+      nextScheduledDate: enabled ? existing.nextScheduledDate : null,
+    );
+    _transactions[index] = updated;
+    lastUpdatedRecurring = updated;
+    _notify();
+  }
 
   @override
   Future<void> deleteTransaction(String transactionId) async {

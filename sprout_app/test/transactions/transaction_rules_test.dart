@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sprout/features/transactions/domain/transaction.dart';
+import 'package:sprout/features/transactions/domain/transaction_frequency.dart';
 import 'package:sprout/features/transactions/domain/transaction_rules.dart';
 
 Transaction _tx({required DateTime occurredAt}) => Transaction(
@@ -39,6 +40,41 @@ void main() {
       expect(split.scheduled, hasLength(1));
       expect(split.history.first.occurredAt.day, 14);
       expect(split.scheduled.single.occurredAt.day, 20);
+    });
+  });
+
+  group('TransactionRules.isRecurringDeposit', () {
+    test('true only for recurring deposit templates', () {
+      final recurring = Transaction(
+        id: '1',
+        userId: 'u',
+        accountId: 'a',
+        kind: TransactionKind.deposit,
+        amountCents: 100,
+        occurredAt: DateTime(2026, 3, 1),
+        pendingSync: false,
+        isRecurring: true,
+        frequency: TransactionFrequency.monthly,
+      );
+      final allocation = Transaction(
+        id: '2',
+        userId: 'u',
+        accountId: 'a',
+        kind: TransactionKind.allocation,
+        goalId: 'g',
+        amountCents: 100,
+        occurredAt: DateTime(2026, 3, 1),
+        pendingSync: false,
+        isRecurring: true,
+        frequency: TransactionFrequency.monthly,
+      );
+
+      expect(TransactionRules.isRecurringDeposit(recurring), isTrue);
+      expect(TransactionRules.isRecurringDeposit(allocation), isFalse);
+      expect(
+        TransactionRules.isRecurringDeposit(_tx(occurredAt: DateTime(2026, 3, 1))),
+        isFalse,
+      );
     });
   });
 }

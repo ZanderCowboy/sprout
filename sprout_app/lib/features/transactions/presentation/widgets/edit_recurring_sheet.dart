@@ -54,11 +54,12 @@ class _EditRecurringSheetState extends State<EditRecurringSheet> {
       builder: (ctx) => AlertDialog(
         title: const Text(AppStrings.cancelRecurringPaymentTitle),
         content: const Text(AppStrings.cancelRecurringPaymentBody),
-        actions: SproutDialogActions.cancelDelete(
+        actions: SproutDialogActions.cancelConfirm(
           onCancel: () => Navigator.pop(ctx, false),
-          onDelete: () => Navigator.pop(ctx, true),
+          onConfirm: () => Navigator.pop(ctx, true),
           cancelIdentifier: SemanticsIds.recurringCancel,
-          deleteIdentifier: SemanticsIds.recurringDelete,
+          confirmIdentifier: SemanticsIds.recurringDelete,
+          confirmLabel: AppStrings.stopRecurring,
         ),
       ),
     );
@@ -69,7 +70,9 @@ class _EditRecurringSheetState extends State<EditRecurringSheet> {
       _error = null;
     });
     try {
-      await sl<TransactionsService>().deleteTransaction(widget.transaction.id);
+      await sl<TransactionsService>().cancelRecurringDeposit(
+        widget.transaction.id,
+      );
       if (mounted) Navigator.of(context).pop();
     } on Object catch (e) {
       setState(() => _error = '$e');
@@ -116,23 +119,12 @@ class _EditRecurringSheetState extends State<EditRecurringSheet> {
               decoration: const InputDecoration(
                 labelText: AppStrings.frequency,
               ),
-              items: const [
-                DropdownMenuItem(
-                  value: TransactionFrequency.daily,
-                  child: Text(AppStrings.frequencyDaily),
-                ),
-                DropdownMenuItem(
-                  value: TransactionFrequency.weekly,
-                  child: Text(AppStrings.frequencyWeekly),
-                ),
-                DropdownMenuItem(
-                  value: TransactionFrequency.monthly,
-                  child: Text(AppStrings.frequencyMonthly),
-                ),
-                DropdownMenuItem(
-                  value: TransactionFrequency.yearly,
-                  child: Text(AppStrings.frequencyYearly),
-                ),
+              items: [
+                for (final f in recurringDepositFrequencies)
+                  DropdownMenuItem(
+                    value: f,
+                    child: Text(transactionFrequencyLabel(f)),
+                  ),
               ],
               onChanged: _saving
                   ? null
@@ -155,9 +147,9 @@ class _EditRecurringSheetState extends State<EditRecurringSheet> {
               Expanded(
                 child: SproutOutlinedButton(
                   identifier: SemanticsIds.recurringDelete,
-                  label: AppStrings.cancelRemove,
+                  label: AppStrings.stopRecurring,
                   onPressed: _saving ? null : _cancelRecurring,
-                  child: const Text(AppStrings.cancelRemove),
+                  child: const Text(AppStrings.stopRecurring),
                 ),
               ),
               const SizedBox(width: 12),

@@ -53,6 +53,7 @@ abstract final class SemanticsIds {
   static const overviewNewAccount = 'overview_new_account';
   static const overviewNewGoal = 'overview_new_goal';
   static const overviewTransactionRow = 'overview_transaction_row';
+  static const overviewSeeAllTransactions = 'overview_see_all_transactions';
 
   // --- Account form / list / detail ---
   static const accountNameField = 'account_name_field';
@@ -64,6 +65,7 @@ abstract final class SemanticsIds {
   static const accountDetailDelete = 'account_detail_delete';
   static const accountDetailClearScheduled = 'account_detail_clear_scheduled';
   static const accountDetailTransactionRow = 'account_detail_transaction_row';
+  static const accountDetailRecurring = 'account_detail_recurring';
 
   // --- Goal form / list / detail ---
   static const goalNameField = 'goal_name_field';
@@ -80,6 +82,7 @@ abstract final class SemanticsIds {
   static const goalDetailDelete = 'goal_detail_delete';
   static const goalDetailClearScheduled = 'goal_detail_clear_scheduled';
   static const goalDetailTransactionRow = 'goal_detail_transaction_row';
+  static const goalDetailRecurring = 'goal_detail_recurring';
 
   // --- Deposit sheet ---
   static const depositAmountField = 'deposit_amount_field';

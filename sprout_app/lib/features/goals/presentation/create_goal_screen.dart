@@ -90,8 +90,9 @@ class _CreateGoalScreenState extends State<CreateGoalScreen> {
     if (_alreadySavedError != null) {
       return false;
     }
-    if (_alreadySavedCents > 0 && (_alreadySavedAccountId == null))
+    if (_alreadySavedCents > 0 && (_alreadySavedAccountId == null)) {
       return false;
+    }
     if (s.submitting) return false;
     return true;
   }
@@ -169,7 +170,6 @@ class _CreateGoalScreenState extends State<CreateGoalScreen> {
                     identifier: SemanticsIds.goalNoAccountsNewAccount,
                     label: AppStrings.newAccount,
                     onPressed: () async {
-                      Navigator.of(context).pop();
                       await showModalBottomSheet<void>(
                         context: context,
                         isScrollControlled: true,
@@ -178,6 +178,11 @@ class _CreateGoalScreenState extends State<CreateGoalScreen> {
                           defaultColor: AppColors.cardColorAt(0),
                         ),
                       );
+                      if (context.mounted) {
+                        context.read<CreateGoalBloc>().add(
+                          const CreateGoalStarted(),
+                        );
+                      }
                     },
                     icon: const Icon(Icons.account_balance_wallet_outlined),
                     labelWidget: const Text(AppStrings.newAccount),

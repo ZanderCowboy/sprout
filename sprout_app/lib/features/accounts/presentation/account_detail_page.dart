@@ -81,7 +81,7 @@ class _AccountDetailView extends StatelessWidget {
         initialMode: DepositBottomSheetMode.depositToAccountThenAllocate,
         lockAccountSelection: true,
         forceQuickAccountDepositUi: true,
-        showRecurringToggle: false,
+        showRecurringToggle: true,
       ),
     );
   }
@@ -173,6 +173,12 @@ class _AccountDetailView extends StatelessWidget {
                   accentColor: Color(account.color),
                   caption: AppStrings.addDepositCaptionAccountAmountOnly,
                   onPressed: () => _openDeposit(context, account),
+                ),
+                RecurringDepositsLink(
+                  visible: state.transactions.any(
+                    TransactionRules.isRecurringDeposit,
+                  ),
+                  identifier: SemanticsIds.accountDetailRecurring,
                 ),
                 const SizedBox(height: 12),
                 Card(

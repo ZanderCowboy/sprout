@@ -6,8 +6,6 @@ import 'package:sprout/features/accounts/export.dart';
 import 'package:sprout/features/goals/export.dart';
 import 'package:sprout/features/transactions/export.dart';
 
-import '../utils/transaction_frequency_label.dart';
-
 class TransactionCard extends StatelessWidget {
   const TransactionCard({
     super.key,

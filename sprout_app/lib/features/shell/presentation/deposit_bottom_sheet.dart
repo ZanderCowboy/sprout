@@ -414,19 +414,12 @@ class _DepositBottomSheetBodyState extends State<_DepositBottomSheetBody> {
                     decoration: const InputDecoration(
                       labelText: AppStrings.frequency,
                     ),
-                    items: const [
-                      DropdownMenuItem(
-                        value: TransactionFrequency.daily,
-                        child: Text(AppStrings.frequencyDaily),
-                      ),
-                      DropdownMenuItem(
-                        value: TransactionFrequency.weekly,
-                        child: Text(AppStrings.frequencyWeekly),
-                      ),
-                      DropdownMenuItem(
-                        value: TransactionFrequency.monthly,
-                        child: Text(AppStrings.frequencyMonthly),
-                      ),
+                    items: [
+                      for (final f in recurringDepositFrequencies)
+                        DropdownMenuItem(
+                          value: f,
+                          child: Text(transactionFrequencyLabel(f)),
+                        ),
                     ],
                     onChanged: (v) {
                       if (v == null) return;

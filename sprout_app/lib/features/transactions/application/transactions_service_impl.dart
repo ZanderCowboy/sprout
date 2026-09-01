@@ -286,6 +286,14 @@ class TransactionsServiceImpl implements TransactionsService {
   );
 
   @override
+  Future<void> cancelRecurringDeposit(String transactionId) =>
+      updateRecurringDeposit(
+        transactionId: transactionId,
+        isRecurring: false,
+        frequency: TransactionFrequency.none,
+      );
+
+  @override
   Future<void> deleteTransaction(String transactionId) =>
       _repository.deleteTransaction(transactionId);
 

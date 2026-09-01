@@ -8,7 +8,6 @@ import 'package:sprout/features/accounts/export.dart';
 import 'package:sprout/features/goals/export.dart';
 import 'package:sprout/features/transactions/export.dart';
 import 'bloc/transaction_detail_bloc.dart';
-import 'utils/transaction_frequency_label.dart';
 import 'widgets/transaction_allocation_row.dart';
 import 'widgets/transaction_info_card.dart';
 import 'widgets/transaction_section_card.dart';

@@ -1,5 +1,13 @@
 enum TransactionFrequency { none, daily, weekly, monthly, yearly }
 
+/// Frequencies offered when creating or editing a recurring deposit.
+const List<TransactionFrequency> recurringDepositFrequencies = [
+  TransactionFrequency.daily,
+  TransactionFrequency.weekly,
+  TransactionFrequency.monthly,
+  TransactionFrequency.yearly,
+];
+
 extension TransactionFrequencyCodec on TransactionFrequency {
   String get wireName => switch (this) {
     TransactionFrequency.none => 'none',

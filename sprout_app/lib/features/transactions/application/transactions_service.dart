@@ -106,6 +106,9 @@ abstract class TransactionsService {
     required TransactionFrequency frequency,
   });
 
+  /// Stops future runs for the seed deposit without deleting it.
+  Future<void> cancelRecurringDeposit(String transactionId);
+
   /// Deletes a transaction locally and enqueues remote sync.
   Future<void> deleteTransaction(String transactionId);
 

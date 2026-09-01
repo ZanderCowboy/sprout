@@ -30,13 +30,12 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
   }
 
   Future<void> _edit(Goal goal) async {
-    final updated = await showModalBottomSheet<Goal>(
+    await showModalBottomSheet<Goal>(
       context: context,
       isScrollControlled: true,
       builder: (_) =>
           GoalFormSheet(initial: goal, defaultColor: Color(goal.color)),
     );
-    if (updated != null && mounted) {}
   }
 
   Future<void> _delete() async {
@@ -196,6 +195,12 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                     accentColor: Color(g.color),
                     caption: AppStrings.addDepositCaptionGoal,
                     onPressed: _openDeposit,
+                  ),
+                  RecurringDepositsLink(
+                    visible: state.transactions.any(
+                      TransactionRules.isRecurringDeposit,
+                    ),
+                    identifier: SemanticsIds.goalDetailRecurring,
                   ),
                   const SizedBox(height: 16),
                   GoalGrowthChartView(

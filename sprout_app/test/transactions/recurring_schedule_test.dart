@@ -22,6 +22,18 @@ void main() {
       expect(next.isAfter(after), isTrue);
     });
 
+    test('resolveNextScheduledDate clears next date when disabled', () {
+      final resolved = RecurringSchedule.resolveNextScheduledDate(
+        enabled: false,
+        now: DateTime(2026, 3, 1),
+        occurredAt: DateTime(2026, 1, 27),
+        currentFrequency: TransactionFrequency.monthly,
+        effectiveFrequency: TransactionFrequency.monthly,
+        previousNext: DateTime(2026, 3, 27),
+      );
+      expect(resolved, isNull);
+    });
+
     test('resolveNextScheduledDate keeps future date on re-enable', () {
       final now = DateTime(2026, 3, 1);
       final previousNext = DateTime(2026, 3, 27);
