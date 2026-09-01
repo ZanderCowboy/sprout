@@ -25,11 +25,15 @@ final class TransactionsInitial extends TransactionsState {
 final class TransactionsReady extends TransactionsState {
   const TransactionsReady({
     required this.items,
+    required this.scheduledItems,
+    required this.historyItems,
     required this.goalsById,
     required this.accountsById,
   });
 
   final List<Transaction> items;
+  final List<Transaction> scheduledItems;
+  final List<Transaction> historyItems;
   final Map<String, Goal> goalsById;
   final Map<String, Account> accountsById;
 }
@@ -68,9 +72,12 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
 
       void tryEmit() {
         if (txs == null || goals == null || accounts == null) return;
+        final split = _transactionsService.splitScheduledAndHistory(txs!);
         controller.add(
           TransactionsReady(
             items: txs!,
+            scheduledItems: split.scheduled,
+            historyItems: split.history,
             goalsById: {for (final g in goals!) g.id: g},
             accountsById: {for (final a in accounts!) a.id: a},
           ),
@@ -107,4 +114,3 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
     });
   }
 }
-

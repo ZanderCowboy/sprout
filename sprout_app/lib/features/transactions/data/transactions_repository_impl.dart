@@ -6,9 +6,12 @@ import 'package:uuid/uuid.dart';
 
 import 'package:sprout/core/core.dart';
 import 'package:sprout/features/sync/export.dart';
+import '../domain/funds_calculator.dart';
 import '../domain/portfolio_summary.dart';
+import '../domain/recurring_schedule.dart';
 import '../domain/transaction.dart';
 import '../domain/transaction_frequency.dart';
+import '../domain/transaction_rules.dart';
 import '../domain/transactions_repository.dart';
 import 'local/transaction_hive_model.dart';
 import 'pending_sync_payload.dart';
@@ -50,22 +53,8 @@ class TransactionsRepositoryImpl implements TransactionsRepository {
     if (_box.isEmpty) {
       return const PortfolioSummary(totalCents: 0, lastActivityAt: null);
     }
-    final now = DateTime.now();
-    var total = 0;
-    DateTime? last;
-    for (final t in _box.values) {
-      final dt = DateTime.fromMillisecondsSinceEpoch(t.occurredAtMillis);
-      if (dt.isAfter(now)) continue; // pending by date
-      final kind = TransactionKind.values[(t.kindIndex >= 0 &&
-              t.kindIndex < TransactionKind.values.length)
-          ? t.kindIndex
-          : 0];
-      if (kind == TransactionKind.deposit) {
-        total += t.amountCents;
-      }
-      if (last == null || dt.isAfter(last)) last = dt;
-    }
-    return PortfolioSummary(totalCents: total, lastActivityAt: last);
+    final txs = _box.values.map(transactionFromHive);
+    return FundsCalculator.portfolioSummary(txs);
   }
 
   @override
@@ -124,10 +113,10 @@ class TransactionsRepositoryImpl implements TransactionsRepository {
     final normalizedIsRecurring =
         isRecurring && frequency != TransactionFrequency.none;
     final next = normalizedIsRecurring
-        ? _computeNextScheduledDate(now, frequency)
+        ? RecurringSchedule.next(now, frequency)
         : null;
-    if (kind == TransactionKind.allocation && (goalId == null || goalId.isEmpty)) {
-      throw ArgumentError.value(goalId, 'goalId', 'Required for allocations');
+    if (kind == TransactionKind.allocation) {
+      TransactionRules.requireGoalIdForAllocation(goalId);
     }
     final tx = Transaction(
       id: id,
@@ -217,38 +206,14 @@ class TransactionsRepositoryImpl implements TransactionsRepository {
         ? null
         : DateTime.fromMillisecondsSinceEpoch(existing.nextScheduledAtMillis!);
 
-    DateTime computeNextAfter({
-      required DateTime anchor,
-      required TransactionFrequency frequency,
-      required DateTime after,
-    }) {
-      var next = anchor;
-      var guard = 0;
-      while (!next.isAfter(after) && guard < 5000) {
-        next = _computeNextScheduledDate(next, frequency);
-        guard++;
-      }
-      return next;
-    }
-
-    final next = enabled
-        ? (() {
-            // If we're re-enabling and already have a future next date with the
-            // same frequency, keep it (preserves e.g. "27th of each month").
-            if (previousNext != null &&
-                previousNext.isAfter(now) &&
-                currentFrequency == effectiveFrequency) {
-              return previousNext;
-            }
-            final anchor =
-                previousNext ?? DateTime.fromMillisecondsSinceEpoch(existing.occurredAtMillis);
-            return computeNextAfter(
-              anchor: anchor,
-              frequency: effectiveFrequency,
-              after: now,
-            );
-          })()
-        : previousNext;
+    final next = RecurringSchedule.resolveNextScheduledDate(
+      enabled: enabled,
+      now: now,
+      occurredAt: DateTime.fromMillisecondsSinceEpoch(existing.occurredAtMillis),
+      currentFrequency: currentFrequency,
+      effectiveFrequency: effectiveFrequency,
+      previousNext: previousNext,
+    );
 
     final updatedHive = TransactionHiveModel(
       id: existing.id,
@@ -351,54 +316,4 @@ class TransactionsRepositoryImpl implements TransactionsRepository {
     _notify();
   }
 
-  DateTime _computeNextScheduledDate(
-    DateTime from,
-    TransactionFrequency frequency,
-  ) {
-    return switch (frequency) {
-      TransactionFrequency.daily => from.add(const Duration(days: 1)),
-      TransactionFrequency.weekly => from.add(const Duration(days: 7)),
-      TransactionFrequency.monthly => _addMonthsClamped(from, 1),
-      TransactionFrequency.yearly => _addYearsClamped(from, 1),
-      TransactionFrequency.none => from,
-    };
-  }
-
-  DateTime _addMonthsClamped(DateTime from, int monthsToAdd) {
-    final targetMonthIndex = (from.year * 12 + (from.month - 1)) + monthsToAdd;
-    final year = targetMonthIndex ~/ 12;
-    final month = (targetMonthIndex % 12) + 1;
-    final day = _clampDayOfMonth(year, month, from.day);
-    return DateTime(
-      year,
-      month,
-      day,
-      from.hour,
-      from.minute,
-      from.second,
-      from.millisecond,
-      from.microsecond,
-    );
-  }
-
-  DateTime _addYearsClamped(DateTime from, int yearsToAdd) {
-    final year = from.year + yearsToAdd;
-    final month = from.month;
-    final day = _clampDayOfMonth(year, month, from.day);
-    return DateTime(
-      year,
-      month,
-      day,
-      from.hour,
-      from.minute,
-      from.second,
-      from.millisecond,
-      from.microsecond,
-    );
-  }
-
-  int _clampDayOfMonth(int year, int month, int day) {
-    final lastDay = DateTime(year, month + 1, 0).day;
-    return day > lastDay ? lastDay : day;
-  }
 }

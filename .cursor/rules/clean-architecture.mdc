@@ -12,12 +12,22 @@ Applies to feature work under `sprout_app/lib/features/**`. Details: `.cursor/re
 
 - Feature barrel files must be named `export.dart`.
 - Import from `package:sprout/features/<feature>/export.dart` (not `.../<feature>.dart`).
+- **`export.dart` exports domain, application, and presentation only.** Do not re-export `data/**`, Hive models, mappers, or Supabase tables from barrels.
+- DI (`service_locator.dart`), startup, and Hive adapters import `data/` paths directly.
+
+## Frontend vs logic
+
+- **Presentation** renders state and dispatches commands. No money math, no scheduled/history splits, no multi-entity write orchestration in pages/sheets/widgets.
+- **Blocs/cubits** subscribe to services and map results to UI state. No financial policy in blocs.
+- **Application services** own use-cases (`submitDepositFlow`, `createGoalWithOpeningBalance`, `watchFundsSnapshot`). Services orchestrate; they call helpers rather than inlining calculations.
+- **Domain helper classes** (`FundsCalculator`, `TransactionRules`, `RecurringSchedule`, `BudgetTotals`, `UniqueName`) hold pure rules. No Flutter imports. If a method is pure (inputs → outputs, no Hive/Supabase), it belongs in a domain helper — not a repository, service, or widget.
+- **Data** repositories persist and sync. Portfolio/recurring math in repositories must delegate to domain helpers.
 
 ## UI-only pages
 
 - Files under `sprout_app/lib/features/**/presentation/**_page.dart` (and `*_screen.dart`) must be UI-only.
 - Do not define `enum`s, top-level helper functions, or sorting/business logic in pages.
-- Extract non-UI code to `presentation/utils/**` or a bloc/service.
+- Extract non-UI code to `presentation/utils/**`, a bloc/cubit, or a domain helper.
 
 ## Reusable UI
 
@@ -41,3 +51,7 @@ Applies to feature work under `sprout_app/lib/features/**`. Details: `.cursor/re
 
 - `presentation/**` may depend on `domain/**` and `application/**`.
 - `presentation/**` must not import `data/local/**`, `data/remote/**`, or `data/**/models/**`.
+
+## Money
+
+- Integer **cents** through domain and application. Convert to display strings only in widgets (`formatZarFromCents`).

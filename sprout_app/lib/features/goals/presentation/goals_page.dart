@@ -134,21 +134,19 @@ class _GoalsPageState extends State<GoalsPage> {
                   ),
                 ),
               ),
-              if (state.unallocatedBalance > 0)
+              if (state.unallocatedBalanceCents > 0)
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
                     child: UnallocatedFundsCard(
-                      unallocatedCents: (state.unallocatedBalance * 100)
-                          .round(),
+                      unallocatedCents: state.unallocatedBalanceCents,
                       onTap: () {
                         showModalBottomSheet<void>(
                           context: context,
                           isScrollControlled: true,
                           showDragHandle: true,
                           builder: (_) => DepositBottomSheet(
-                            maxAllocatableCents:
-                                (state.unallocatedBalance * 100).round(),
+                            maxAllocatableCents: state.unallocatedBalanceCents,
                             initialMode: DepositBottomSheetMode
                                 .allocateExistingUnallocated,
                           ),

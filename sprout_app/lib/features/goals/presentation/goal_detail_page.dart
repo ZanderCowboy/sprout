@@ -78,13 +78,8 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
     if (mounted) {}
   }
 
-  Future<void> _clearScheduledForGoal(GoalDetailReady state, {required String goalId}) async {
-    final now = DateTime.now();
-    final scheduledIds = state.transactions
-        .where((t) => t.goalId == goalId)
-        .where((t) => TransactionDisplay.isPendingByDate(t, now))
-        .map((t) => t.id)
-        .toList(growable: false);
+  Future<void> _clearScheduledForGoal(GoalDetailReady state) async {
+    final scheduledIds = state.scheduledTransactions.map((t) => t.id).toList();
     if (scheduledIds.isEmpty) return;
 
     final ok = await showDialog<bool>(
@@ -220,11 +215,11 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                             style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                           ),
                         ),
-                        if (state.transactions.any((t) => TransactionDisplay.isPendingByDate(t, DateTime.now())))
+                        if (state.scheduledTransactions.isNotEmpty)
                           SproutTextButton.icon(
                             identifier: SemanticsIds.goalDetailClearScheduled,
                             label: AppStrings.clearScheduled,
-                            onPressed: () => _clearScheduledForGoal(state, goalId: g.id),
+                            onPressed: () => _clearScheduledForGoal(state),
                             icon: const Icon(Icons.delete_outline_rounded),
                             labelWidget: const Text(AppStrings.clearScheduled),
                           ),
@@ -234,78 +229,88 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                     if (state.transactions.isEmpty)
                       Text(AppStrings.noDepositsTowardGoal, style: Theme.of(context).textTheme.bodyMedium)
                     else
-                      ...(() {
-                        final now = DateTime.now();
-                        final scheduled = <Transaction>[];
-                        final history = <Transaction>[];
-                        for (final t in state.transactions) {
-                          if (TransactionDisplay.isPendingByDate(t, now)) {
-                            scheduled.add(t);
-                          } else {
-                            history.add(t);
-                          }
-                        }
-                        scheduled.sort((a, b) => a.occurredAt.compareTo(b.occurredAt));
-                        history.sort((a, b) => b.occurredAt.compareTo(a.occurredAt));
-
-                        List<Widget> section({required String title, required List<Transaction> items}) {
-                          if (items.isEmpty) return const [];
-                          return [
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 6, top: 4),
-                              child: Text(
-                                title,
-                                style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
-                              ),
-                            ),
-                            ...items.map((t) {
-                              final accName = state.accountsById[t.accountId]?.name ?? AppStrings.unknownAccount;
-                              final style = mapTransactionToListStyle(t: t, now: now);
-                              return Card(
-                                margin: const EdgeInsets.only(bottom: 8),
-                                clipBehavior: Clip.antiAlias,
-                                child: Opacity(
-                                  opacity: style.opacity,
-                                  child: SproutListTile(
-                                    identifier: SemanticsIds.goalDetailTransactionRow,
-                                    label: '${AppStrings.deposit} ${formatZarFromCents(t.amountCents)}',
-                                    leading: style.leadingIcon == null ? null : Icon(style.leadingIcon),
-                                    title: Text(formatZarFromCents(t.amountCents)),
-                                    subtitle: Text(
-                                      [
-                                        accName,
-                                        formatDateTime(t.occurredAt),
-                                        if (style.statusText != null) style.statusText!,
-                                      ].join(' · '),
-                                    ),
-                                    trailing: t.pendingSync
-                                        ? Icon(
-                                            Icons.sync_rounded,
-                                            size: 20,
-                                            color: Theme.of(context).colorScheme.primary,
-                                          )
-                                        : null,
-                                    onTap: () {
-                                      context.push(AppRoute.transactionDetail.location(id: t.id));
-                                    },
-                                  ),
-                                ),
-                              );
-                            }),
-                          ];
-                        }
-
-                        return [
-                          ...section(title: AppStrings.scheduled, items: scheduled),
-                          ...section(title: AppStrings.history, items: history),
-                        ];
-                      })(),
+                      ...[
+                        _GoalTransactionSection(
+                          title: AppStrings.scheduled,
+                          items: state.scheduledTransactions,
+                          accountsById: state.accountsById,
+                        ),
+                        _GoalTransactionSection(
+                          title: AppStrings.history,
+                          items: state.historyTransactions,
+                          accountsById: state.accountsById,
+                        ),
+                      ],
                   ],
                 ),
               ),
           );
         },
       ),
+    );
+  }
+}
+
+class _GoalTransactionSection extends StatelessWidget {
+  const _GoalTransactionSection({
+    required this.title,
+    required this.items,
+    required this.accountsById,
+  });
+
+  final String title;
+  final List<Transaction> items;
+  final Map<String, Account> accountsById;
+
+  @override
+  Widget build(BuildContext context) {
+    if (items.isEmpty) return const SizedBox.shrink();
+    final now = DateTime.now();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: 6, top: 4),
+          child: Text(
+            title,
+            style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
+          ),
+        ),
+        ...items.map((t) {
+          final accName = accountsById[t.accountId]?.name ?? AppStrings.unknownAccount;
+          final style = mapTransactionToListStyle(t: t, now: now);
+          return Card(
+            margin: const EdgeInsets.only(bottom: 8),
+            clipBehavior: Clip.antiAlias,
+            child: Opacity(
+              opacity: style.opacity,
+              child: SproutListTile(
+                identifier: SemanticsIds.goalDetailTransactionRow,
+                label: '${AppStrings.deposit} ${formatZarFromCents(t.amountCents)}',
+                leading: style.leadingIcon == null ? null : Icon(style.leadingIcon),
+                title: Text(formatZarFromCents(t.amountCents)),
+                subtitle: Text(
+                  [
+                    accName,
+                    formatDateTime(t.occurredAt),
+                    if (style.statusText != null) style.statusText!,
+                  ].join(' · '),
+                ),
+                trailing: t.pendingSync
+                    ? Icon(
+                        Icons.sync_rounded,
+                        size: 20,
+                        color: Theme.of(context).colorScheme.primary,
+                      )
+                    : null,
+                onTap: () {
+                  context.push(AppRoute.transactionDetail.location(id: t.id));
+                },
+              ),
+            ),
+          );
+        }),
+      ],
     );
   }
 }

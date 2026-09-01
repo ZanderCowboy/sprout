@@ -3,21 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:sprout/core/constants/app_strings.dart';
 
 import '../../domain/transaction.dart';
+import '../../domain/transaction_rules.dart';
 
 class TransactionDisplay {
-  static bool isPendingByDate(Transaction t, DateTime now) {
-    // Compare by local calendar day, not raw timestamp, to avoid timezone skew
-    // (e.g. UTC stored dates appearing “in the future” vs local now).
-    final occurredLocal = t.occurredAt.toLocal();
-    final nowLocal = now.toLocal();
-    final occurredDay = DateTime(
-      occurredLocal.year,
-      occurredLocal.month,
-      occurredLocal.day,
-    );
-    final today = DateTime(nowLocal.year, nowLocal.month, nowLocal.day);
-    return occurredDay.isAfter(today);
-  }
+  static bool isPendingByDate(Transaction t, DateTime now) =>
+      TransactionRules.isPending(t, now);
 }
 
 class TransactionListStyle {

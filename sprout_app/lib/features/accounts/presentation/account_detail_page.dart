@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:sprout/core/core.dart';
@@ -6,82 +7,48 @@ import 'package:sprout/core/di/service_locator.dart';
 import 'package:sprout/features/goals/export.dart';
 import 'package:sprout/features/shell/shell.dart';
 import 'package:sprout/features/transactions/export.dart';
-import '../application/accounts_service.dart';
-import '../domain/account.dart';
-import 'account_form_sheet.dart';
 import 'package:sprout/ui/export.dart';
 
-class AccountDetailPage extends StatefulWidget {
+import '../application/accounts_service.dart';
+import '../domain/account.dart';
+import 'account_detail_bloc.dart';
+import 'account_form_sheet.dart';
+
+class AccountDetailPage extends StatelessWidget {
   const AccountDetailPage({super.key, required this.accountId});
 
   final String accountId;
 
   @override
-  State<AccountDetailPage> createState() => _AccountDetailPageState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => AccountDetailBloc(
+        accountsService: sl<AccountsService>(),
+        transactionsService: sl<TransactionsService>(),
+        goalsService: sl<GoalsService>(),
+      )..add(AccountDetailSubscriptionRequested(accountId: accountId)),
+      child: _AccountDetailView(accountId: accountId),
+    );
+  }
 }
 
-class _AccountDetailPageState extends State<AccountDetailPage> {
-  Account? _account;
-  List<Transaction> _tx = [];
-  Map<String, Goal> _goals = {};
-  bool _loading = true;
+class _AccountDetailView extends StatelessWidget {
+  const _AccountDetailView({required this.accountId});
 
-  TransactionsService get _txService => sl<TransactionsService>();
-  GoalsService get _goalsService => sl<GoalsService>();
+  final String accountId;
 
-  @override
-  void initState() {
-    super.initState();
-    _load();
-  }
-
-  Future<void> _load() async {
-    setState(() => _loading = true);
-    final accounts = await sl<AccountsService>().getAccounts();
-    Account? account;
-    for (final a in accounts) {
-      if (a.id == widget.accountId) {
-        account = a;
-        break;
-      }
-    }
-    if (account == null) {
-      if (!mounted) return;
-      setState(() {
-        _account = null;
-        _tx = [];
-        _goals = {};
-        _loading = false;
-      });
-      return;
-    }
-    final txs = await _txService.getForAccount(account.id);
-    final goals = await _goalsService.getGoals();
-    if (!mounted) return;
-    setState(() {
-      _account = account;
-      _tx = txs;
-      _goals = {for (final g in goals) g.id: g};
-      _loading = false;
-    });
-  }
-
-  Future<void> _edit() async {
-    final account = _account;
-    if (account == null) return;
+  Future<void> _edit(BuildContext context, Account account) async {
     final updated = await showModalBottomSheet<Account>(
       context: context,
       isScrollControlled: true,
       builder: (_) => AccountFormSheet(initial: account, defaultColor: Color(account.color)),
     );
-    if (updated != null && mounted) {
-      setState(() => _account = updated);
+    if (updated != null && context.mounted) {
+      await sl<AccountsService>().saveAccount(updated);
     }
   }
 
-  Future<void> _delete() async {
-    final account = _account;
-    if (account == null) return;
+  Future<void> _delete(BuildContext context, Account account) async {
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -93,15 +60,13 @@ class _AccountDetailPageState extends State<AccountDetailPage> {
         ),
       ),
     );
-    if (ok == true && mounted) {
+    if (ok == true && context.mounted) {
       await sl<AccountsService>().removeAccount(account.id);
-      if (mounted) Navigator.of(context).pop();
+      if (context.mounted) Navigator.of(context).pop();
     }
   }
 
-  Future<void> _openDeposit() async {
-    final account = _account;
-    if (account == null) return;
+  Future<void> _openDeposit(BuildContext context, Account account) async {
     await showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
@@ -114,15 +79,13 @@ class _AccountDetailPageState extends State<AccountDetailPage> {
         showRecurringToggle: false,
       ),
     );
-    if (mounted) await _load();
   }
 
-  Future<void> _clearScheduled() async {
-    final now = DateTime.now();
-    final scheduledIds = _tx
-        .where((t) => TransactionDisplay.isPendingByDate(t, now))
-        .map((t) => t.id)
-        .toList(growable: false);
+  Future<void> _clearScheduled(
+    BuildContext context,
+    AccountDetailReady state,
+  ) async {
+    final scheduledIds = state.scheduledTransactions.map((t) => t.id).toList();
     if (scheduledIds.isEmpty) return;
 
     final ok = await showDialog<bool>(
@@ -138,170 +101,161 @@ class _AccountDetailPageState extends State<AccountDetailPage> {
         ),
       ),
     );
-    if (ok != true || !mounted) return;
+    if (ok != true || !context.mounted) return;
 
+    final tx = sl<TransactionsService>();
     for (final id in scheduledIds) {
-      await _txService.deleteTransaction(id);
+      await tx.deleteTransaction(id);
     }
-    if (mounted) await _load();
   }
 
   @override
   Widget build(BuildContext context) {
-    final account = _account;
-    if (account == null) {
-      return Scaffold(
-        appBar: AppBar(),
-        body: Center(
-          child: _loading
-              ? const CircularProgressIndicator()
-              : const Text(AppStrings.accountNotFound),
-        ),
-      );
-    }
-
-    final now = DateTime.now();
-
-    int computeAccountDepositTotalCents(Iterable<Transaction> txs) {
-      var totalDeposits = 0;
-      for (final t in txs) {
-        switch (t.kind) {
-          case TransactionKind.deposit:
-            // Account value should include deposits whether they’re unallocated
-            // or assigned directly to a goal.
-            totalDeposits += t.amountCents;
-            break;
-          case TransactionKind.allocation:
-            // Allocation is a movement of funds *within* the same account
-            // (unallocated -> goal), so it should not change the account total.
-            break;
+    return BlocBuilder<AccountDetailBloc, AccountDetailState>(
+      builder: (context, state) {
+        if (state is AccountDetailLoading || state is AccountDetailInitial) {
+          return Scaffold(
+            appBar: AppBar(),
+            body: const Center(child: CircularProgressIndicator()),
+          );
         }
-      }
-      return totalDeposits > 0 ? totalDeposits : 0;
-    }
 
-    final scheduledTxs = _tx.where((t) => TransactionDisplay.isPendingByDate(t, now));
-    final historyTxs = _tx.where((t) => !TransactionDisplay.isPendingByDate(t, now));
+        if (state is AccountDetailNotFound) {
+          return Scaffold(
+            appBar: AppBar(),
+            body: const Center(child: Text(AppStrings.accountNotFound)),
+          );
+        }
 
-    final currentTotalCents = computeAccountDepositTotalCents(historyTxs);
-    final scheduledTotalCents = computeAccountDepositTotalCents(scheduledTxs);
-    final grandTotalCents = currentTotalCents + scheduledTotalCents;
+        if (state is! AccountDetailReady) {
+          return Scaffold(appBar: AppBar());
+        }
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(account.name),
-        actions: [
-          SproutIconButton(
-            identifier: SemanticsIds.accountDetailEdit,
-            label: AppStrings.edit,
-            onPressed: _edit,
-            icon: const Icon(Icons.edit_rounded),
+        final account = state.account;
+        final now = DateTime.now();
+
+        return Scaffold(
+          appBar: AppBar(
+            title: Text(account.name),
+            actions: [
+              SproutIconButton(
+                identifier: SemanticsIds.accountDetailEdit,
+                label: AppStrings.edit,
+                onPressed: () => _edit(context, account),
+                icon: const Icon(Icons.edit_rounded),
+              ),
+              SproutIconButton(
+                identifier: SemanticsIds.accountDetailDelete,
+                label: AppStrings.delete,
+                onPressed: () => _delete(context, account),
+                icon: const Icon(Icons.delete_outline_rounded),
+              ),
+            ],
           ),
-          SproutIconButton(
-            identifier: SemanticsIds.accountDetailDelete,
-            label: AppStrings.delete,
-            onPressed: _delete,
-            icon: const Icon(Icons.delete_outline_rounded),
-          ),
-        ],
-      ),
-      body: _loading
-          ? const Center(child: CircularProgressIndicator())
-          : RefreshIndicator(
-              onRefresh: _load,
-              child: ListView(
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
-                children: [
-                  DetailDepositCallout(
-                    identifier: SemanticsIds.accountDetailDeposit,
-                    accentColor: Color(account.color),
-                    caption: AppStrings.addDepositCaptionAccountAmountOnly,
-                    onPressed: _openDeposit,
-                  ),
-                  const SizedBox(height: 12),
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  AppStrings.accountValue,
-                                  style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
-                                ),
+          body: RefreshIndicator(
+            onRefresh: () async {
+              await sl<AccountsService>().pullRemote();
+              await sl<TransactionsService>().pullRemote();
+            },
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+              children: [
+                DetailDepositCallout(
+                  identifier: SemanticsIds.accountDetailDeposit,
+                  accentColor: Color(account.color),
+                  caption: AppStrings.addDepositCaptionAccountAmountOnly,
+                  onPressed: () => _openDeposit(context, account),
+                ),
+                const SizedBox(height: 12),
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                AppStrings.accountValue,
+                                style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
                               ),
-                              if (scheduledTotalCents > 0)
-                                SproutTextButton.icon(
-                                  identifier: SemanticsIds.accountDetailClearScheduled,
-                                  label: AppStrings.clearScheduled,
-                                  onPressed: _clearScheduled,
-                                  icon: const Icon(Icons.delete_outline_rounded),
-                                  labelWidget: const Text(AppStrings.clearScheduled),
-                                ),
-                            ],
-                          ),
-                          const SizedBox(height: 10),
-                          _ValueRow(label: AppStrings.current, value: formatZarFromCents(currentTotalCents)),
-                          const SizedBox(height: 6),
-                          _ValueRow(label: AppStrings.scheduled, value: formatZarFromCents(scheduledTotalCents)),
-                          const Divider(height: 18),
-                          _ValueRow(label: AppStrings.total, value: formatZarFromCents(grandTotalCents), isEmphasis: true),
-                        ],
-                      ),
+                            ),
+                            if (state.scheduledTotalCents > 0)
+                              SproutTextButton.icon(
+                                identifier: SemanticsIds.accountDetailClearScheduled,
+                                label: AppStrings.clearScheduled,
+                                onPressed: () => _clearScheduled(context, state),
+                                icon: const Icon(Icons.delete_outline_rounded),
+                                labelWidget: const Text(AppStrings.clearScheduled),
+                              ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        _ValueRow(label: AppStrings.current, value: formatZarFromCents(state.currentTotalCents)),
+                        const SizedBox(height: 6),
+                        _ValueRow(label: AppStrings.scheduled, value: formatZarFromCents(state.scheduledTotalCents)),
+                        const Divider(height: 18),
+                        _ValueRow(
+                          label: AppStrings.total,
+                          value: formatZarFromCents(state.grandTotalCents),
+                          isEmphasis: true,
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    AppStrings.transactions,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 12),
-                  if (_tx.isEmpty)
-                    Text(AppStrings.noDepositsForAccount, style: Theme.of(context).textTheme.bodyMedium)
-                  else
-                    ..._tx.map((t) {
-                      final goalName = t.goalId == null || t.goalId!.isEmpty
-                          ? AppStrings.unallocated
-                          : (_goals[t.goalId!]?.name ?? AppStrings.unknownGoal);
-                      final kindLabel = switch (t.kind) {
-                        TransactionKind.deposit => AppStrings.deposit,
-                        TransactionKind.allocation => AppStrings.allocation,
-                      };
-                      final style = mapTransactionToListStyle(t: t, now: now);
-                      return Card(
-                        margin: const EdgeInsets.only(bottom: 8),
-                        clipBehavior: Clip.antiAlias,
-                        child: Opacity(
-                          opacity: style.opacity,
-                          child: SproutListTile(
-                            identifier: SemanticsIds.accountDetailTransactionRow,
-                            label: AppStrings.kindAmountLabel(kindLabel, formatZarFromCents(t.amountCents)),
-                            leading: style.leadingIcon == null ? null : Icon(style.leadingIcon),
-                            title: Text(formatZarFromCents(t.amountCents)),
-                            subtitle: Text(
-                              [
-                                kindLabel,
-                                goalName,
-                                formatDateTime(t.occurredAt),
-                                if (style.statusText != null) style.statusText!,
-                              ].join(' · '),
-                            ),
-                            trailing: t.pendingSync
-                                ? Icon(Icons.sync_rounded, size: 20, color: Theme.of(context).colorScheme.primary)
-                                : null,
-                            onTap: () {
-                              context.push(AppRoute.transactionDetail.location(id: t.id));
-                            },
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  AppStrings.transactions,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 12),
+                if (state.transactions.isEmpty)
+                  Text(AppStrings.noDepositsForAccount, style: Theme.of(context).textTheme.bodyMedium)
+                else
+                  ...state.transactions.map((t) {
+                    final goalName = t.goalId == null || t.goalId!.isEmpty
+                        ? AppStrings.unallocated
+                        : (state.goalsById[t.goalId!]?.name ?? AppStrings.unknownGoal);
+                    final kindLabel = switch (t.kind) {
+                      TransactionKind.deposit => AppStrings.deposit,
+                      TransactionKind.allocation => AppStrings.allocation,
+                    };
+                    final style = mapTransactionToListStyle(t: t, now: now);
+                    return Card(
+                      margin: const EdgeInsets.only(bottom: 8),
+                      clipBehavior: Clip.antiAlias,
+                      child: Opacity(
+                        opacity: style.opacity,
+                        child: SproutListTile(
+                          identifier: SemanticsIds.accountDetailTransactionRow,
+                          label: AppStrings.kindAmountLabel(kindLabel, formatZarFromCents(t.amountCents)),
+                          leading: style.leadingIcon == null ? null : Icon(style.leadingIcon),
+                          title: Text(formatZarFromCents(t.amountCents)),
+                          subtitle: Text(
+                            [
+                              kindLabel,
+                              goalName,
+                              formatDateTime(t.occurredAt),
+                              if (style.statusText != null) style.statusText!,
+                            ].join(' · '),
                           ),
+                          trailing: t.pendingSync
+                              ? Icon(Icons.sync_rounded, size: 20, color: Theme.of(context).colorScheme.primary)
+                              : null,
+                          onTap: () {
+                            context.push(AppRoute.transactionDetail.location(id: t.id));
+                          },
                         ),
-                      );
-                    }),
-                ],
-              ),
+                      ),
+                    );
+                  }),
+              ],
             ),
+          ),
+        );
+      },
     );
   }
 }

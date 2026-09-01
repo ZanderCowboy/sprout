@@ -1,5 +1,6 @@
 import 'package:sprout/core/constants/constants.dart';
 import 'package:sprout/core/error/error.dart';
+import 'package:sprout/core/utils/unique_name.dart';
 
 import '../domain/budget_group.dart';
 import '../domain/budget_repository.dart';
@@ -18,7 +19,6 @@ class BudgetService {
     if (trimmedName.isEmpty) {
       throw ValidationAppException(AppStrings.nameRequired);
     }
-    final normalizedName = trimmedName.toLowerCase();
 
     for (final item in group.items) {
       if (item.amount < 0) {
@@ -27,8 +27,10 @@ class BudgetService {
     }
 
     final existing = await _repository.getBudgetGroups();
-    final duplicate = existing.any(
-      (g) => g.id != group.id && g.name.trim().toLowerCase() == normalizedName,
+    final duplicate = UniqueName.isTaken(
+      existing: existing.map((g) => (id: g.id, name: g.name)),
+      candidateName: trimmedName,
+      excludeId: group.id,
     );
     if (duplicate) {
       throw ValidationAppException(AppStrings.duplicateGroupName);

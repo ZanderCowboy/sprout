@@ -5,7 +5,6 @@ import 'package:uuid/uuid.dart';
 
 import 'package:sprout/core/core.dart';
 import 'package:sprout/features/accounts/export.dart';
-import 'package:sprout/features/transactions/export.dart';
 
 import '../application/goals_service.dart';
 import '../domain/goal.dart';
@@ -94,11 +93,9 @@ class CreateGoalBloc extends Bloc<CreateGoalEvent, CreateGoalState> {
   CreateGoalBloc({
     required GoalsService goalsService,
     required AccountsService accountsService,
-    required TransactionsService transactionsService,
     required UserContext userContext,
   }) : _goalsService = goalsService,
        _accountsService = accountsService,
-       _transactionsService = transactionsService,
        _userContext = userContext,
        super(const CreateGoalInitial()) {
     on<CreateGoalStarted>(_onStarted, transformer: restartable());
@@ -107,7 +104,6 @@ class CreateGoalBloc extends Bloc<CreateGoalEvent, CreateGoalState> {
 
   final GoalsService _goalsService;
   final AccountsService _accountsService;
-  final TransactionsService _transactionsService;
   final UserContext _userContext;
   static const _uuid = Uuid();
 
@@ -148,38 +144,16 @@ class CreateGoalBloc extends Bloc<CreateGoalEvent, CreateGoalState> {
         updatedAt: now,
       );
 
-      // 1) Save goal
-      await _goalsService.saveGoal(goal);
-
-      // 2) If opening balance provided, create deposit + allocation (100%) using a shared groupId.
       final openingCents = event.alreadySavedAmountCents;
       final openingAccountId = event.alreadySavedAccountId;
-      if (openingCents > 0) {
-        if (openingAccountId == null || openingAccountId.isEmpty) {
-          throw ValidationAppException(AppStrings.pickAccountForOpeningBalance);
-        }
 
-        final groupId = _uuid.v4();
-        const note = AppStrings.openingBalance;
-
-        await _transactionsService.recordAccountDeposit(
-          accountId: openingAccountId,
-          groupId: groupId,
-          amountCents: openingCents,
-          occurredAt: now,
-          note: note,
-          isRecurring: false,
-          frequency: TransactionFrequency.none,
-        );
-        await _transactionsService.recordAllocation(
-          accountId: openingAccountId,
-          goalId: goalId,
-          groupId: groupId,
-          amountCents: openingCents,
-          occurredAt: now,
-          note: note,
-        );
-      }
+      await _goalsService.createGoalWithOpeningBalance(
+        goal: goal,
+        openingBalanceCents: openingCents,
+        openingBalanceAccountId: openingAccountId,
+        groupId: _uuid.v4(),
+        occurredAt: now,
+      );
 
       emit(CreateGoalSuccess(goalId: goalId));
     } on ValidationAppException catch (e) {
