@@ -26,20 +26,60 @@ class GoalDetailBloc extends Bloc<GoalDetailEvent, GoalDetailState> {
       _onSubscribe,
       transformer: restartable(),
     );
+    on<GoalDetailDeleteRequested>(_onDelete, transformer: sequential());
+    on<GoalDetailClearScheduledRequested>(
+      _onClearScheduled,
+      transformer: sequential(),
+    );
+    on<GoalDetailRefreshRequested>(_onRefresh, transformer: sequential());
   }
 
   final GoalsService _goalsService;
   final TransactionsService _transactionsService;
   final AccountsService _accountsService;
 
+  String? _goalId;
+  bool _pauseWatch = false;
+
   Future<void> _onSubscribe(
     GoalDetailSubscriptionRequested event,
     Emitter<GoalDetailState> emit,
   ) {
+    _goalId = event.goalId;
     return emit.forEach<GoalDetailReady>(
       _watchReady(goalId: event.goalId),
       onData: (ready) => ready,
     );
+  }
+
+  Future<void> _onDelete(
+    GoalDetailDeleteRequested event,
+    Emitter<GoalDetailState> emit,
+  ) async {
+    final id = _goalId;
+    if (id == null) return;
+    _pauseWatch = true;
+    await _goalsService.removeGoal(id);
+    emit(const GoalDetailDeleted());
+  }
+
+  Future<void> _onClearScheduled(
+    GoalDetailClearScheduledRequested event,
+    Emitter<GoalDetailState> emit,
+  ) async {
+    for (final id in event.transactionIds) {
+      await _transactionsService.deleteTransaction(id);
+    }
+  }
+
+  Future<void> _onRefresh(
+    GoalDetailRefreshRequested event,
+    Emitter<GoalDetailState> emit,
+  ) async {
+    await Future.wait([
+      _goalsService.pullRemote(),
+      _transactionsService.pullRemote(),
+    ]);
   }
 
   Stream<GoalDetailReady> _watchReady({required String goalId}) {
@@ -49,6 +89,7 @@ class GoalDetailBloc extends Bloc<GoalDetailEvent, GoalDetailState> {
       List<Account>? accounts;
 
       void tryEmit() {
+        if (_pauseWatch) return;
         if (goals == null || txs == null || accounts == null) return;
 
         final goal = goals!.cast<Goal?>().firstWhere(

@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:uuid/uuid.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:sprout/core/core.dart';
 import 'package:sprout/core/di/service_locator.dart';
 import 'package:sprout/ui/export.dart';
+
 import '../application/accounts_service.dart';
 import '../domain/account.dart';
+import 'account_form_cubit.dart';
 
-class AccountFormSheet extends StatefulWidget {
+class AccountFormSheet extends StatelessWidget {
   const AccountFormSheet({
     super.key,
     this.initial,
@@ -18,106 +20,83 @@ class AccountFormSheet extends StatefulWidget {
   final Color defaultColor;
 
   @override
-  State<AccountFormSheet> createState() => _AccountFormSheetState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => AccountFormCubit(
+        accountsService: sl<AccountsService>(),
+        userContext: sl<UserContext>(),
+        initial: initial,
+        defaultColorArgb: defaultColor.toARGB32(),
+      )..load(),
+      child: _AccountFormBody(initial: initial),
+    );
+  }
 }
 
-class _AccountFormSheetState extends State<AccountFormSheet> {
-  late final TextEditingController _name;
-  late int _colorArgb;
-  static const _uuid = Uuid();
+class _AccountFormBody extends StatefulWidget {
+  const _AccountFormBody({required this.initial});
 
-  List<Account> _accounts = [];
-  bool _accountsLoaded = false;
+  final Account? initial;
+
+  @override
+  State<_AccountFormBody> createState() => _AccountFormBodyState();
+}
+
+class _AccountFormBodyState extends State<_AccountFormBody> {
+  late final TextEditingController _name;
 
   @override
   void initState() {
     super.initState();
     _name = TextEditingController(text: widget.initial?.name ?? '');
-    _name.addListener(_onFieldChanged);
-    _colorArgb =
-        widget.initial?.color ?? widget.defaultColor.toARGB32();
-    _loadAccounts();
+    _name.addListener(_onNameChanged);
   }
 
-  void _onFieldChanged() {
-    if (mounted) setState(() {});
-  }
-
-  Future<void> _loadAccounts() async {
-    final list = await sl<AccountsService>().getAccounts();
-    if (!mounted) return;
-    setState(() {
-      _accounts = list;
-      _accountsLoaded = true;
-    });
-  }
-
-  String? get _nameError {
-    final name = _name.text.trim();
-    if (name.isEmpty) return null;
-    final key = name.toLowerCase();
-    final taken = _accounts.any(
-      (a) =>
-          a.id != widget.initial?.id &&
-          a.name.trim().toLowerCase() == key,
-    );
-    if (taken) return AppStrings.duplicateAccountName;
-    return null;
-  }
-
-  bool get _canSave {
-    if (!_accountsLoaded) return false;
-    final name = _name.text.trim();
-    if (name.isEmpty) return false;
-    return _nameError == null;
+  void _onNameChanged() {
+    context.read<AccountFormCubit>().nameChanged(_name.text);
   }
 
   @override
   void dispose() {
-    _name.removeListener(_onFieldChanged);
+    _name.removeListener(_onNameChanged);
     _name.dispose();
     super.dispose();
   }
 
-  Future<void> _save() async {
-    if (!_canSave) return;
-    final name = _name.text.trim();
-    final uid = await sl<UserContext>().resolveUserId();
-    final now = DateTime.now();
-    final acc = Account(
-      id: widget.initial?.id ?? _uuid.v4(),
-      userId: uid,
-      name: name,
-      color: _colorArgb,
-      createdAt: widget.initial?.createdAt ?? now,
-      updatedAt: now,
-    );
-    try {
-      await sl<AccountsService>().saveAccount(acc);
-    } on ValidationAppException catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.message)),
-      );
-      return;
-    }
-    if (mounted) Navigator.of(context).pop(acc);
-  }
-
   @override
   Widget build(BuildContext context) {
-    return NameColorFormSheet(
-      title: widget.initial == null ? AppStrings.newAccount : AppStrings.edit,
-      nameLabel: AppStrings.accountName,
-      nameController: _name,
-      nameErrorText: _nameError,
-      colorArgb: _colorArgb,
-      onColorSelected: (argb) => setState(() => _colorArgb = argb),
-      primaryActionLabel: AppStrings.save,
-      onPrimaryAction: _save,
-      primaryActionEnabled: _canSave,
-      nameFieldKey: const Key('account_name_field'),
-      nameFieldIdentifier: SemanticsIds.accountNameField,
+    return BlocConsumer<AccountFormCubit, AccountFormState>(
+      listenWhen: (previous, current) =>
+          current is AccountFormSaved ||
+          (current is AccountFormReady && current.submitError != null),
+      listener: (context, state) {
+        if (state is AccountFormSaved) {
+          Navigator.of(context).pop(state.account);
+          return;
+        }
+        if (state is AccountFormReady && state.submitError != null) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.submitError!)));
+        }
+      },
+      builder: (context, state) {
+        final ready = state is AccountFormReady ? state : null;
+        return NameColorFormSheet(
+          title: widget.initial == null ? AppStrings.newAccount : AppStrings.edit,
+          nameLabel: AppStrings.accountName,
+          nameController: _name,
+          nameErrorText: ready?.nameError,
+          colorArgb: ready?.colorArgb ?? 0,
+          onColorSelected: (argb) =>
+              context.read<AccountFormCubit>().colorChanged(argb),
+          primaryActionLabel: AppStrings.save,
+          onPrimaryAction: () => context.read<AccountFormCubit>().submit(),
+          primaryActionEnabled: ready?.canSave ?? false,
+          nameFieldKey: const Key('account_name_field'),
+          nameFieldIdentifier: SemanticsIds.accountNameField,
+        );
+      },
     );
   }
 }

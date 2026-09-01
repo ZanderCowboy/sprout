@@ -1,7 +1,4 @@
-import 'package:equatable/equatable.dart';
-import 'package:sprout/features/accounts/domain/account.dart';
-import 'package:sprout/features/goals/domain/goal.dart';
-import 'package:sprout/features/transactions/domain/transaction.dart';
+part of 'account_detail_bloc.dart';
 
 sealed class AccountDetailState extends Equatable {
   const AccountDetailState();
@@ -19,6 +16,10 @@ final class AccountDetailLoading extends AccountDetailState {
 
 final class AccountDetailNotFound extends AccountDetailState {
   const AccountDetailNotFound();
+}
+
+final class AccountDetailDeleted extends AccountDetailState {
+  const AccountDetailDeleted();
 }
 
 final class AccountDetailReady extends AccountDetailState {
@@ -41,6 +42,9 @@ final class AccountDetailReady extends AccountDetailState {
   final Map<String, Goal> goalsById;
 
   int get grandTotalCents => currentTotalCents + scheduledTotalCents;
+
+  bool get hasRecurringDeposits =>
+      transactions.any(TransactionRules.isRecurringDeposit);
 
   @override
   List<Object?> get props => [

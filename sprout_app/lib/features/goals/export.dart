@@ -2,6 +2,7 @@ export 'application/goals_service.dart';
 export 'domain/goal.dart';
 export 'domain/goal_progress.dart';
 export 'domain/goals_repository.dart';
+export 'domain/overall_goals_totals.dart';
 export 'presentation/create_goal_bloc.dart';
 export 'presentation/create_goal_screen.dart';
 export 'presentation/goal_detail_page.dart';

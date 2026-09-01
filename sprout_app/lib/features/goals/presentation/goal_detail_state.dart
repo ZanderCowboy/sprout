@@ -10,6 +10,10 @@ final class GoalDetailInitial extends GoalDetailState {
   const GoalDetailInitial();
 }
 
+final class GoalDetailDeleted extends GoalDetailState {
+  const GoalDetailDeleted();
+}
+
 final class GoalDetailReady extends GoalDetailState {
   const GoalDetailReady({
     required this.progress,

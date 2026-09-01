@@ -123,9 +123,12 @@ class _GroupCardState extends State<GroupCard> {
     if (trimmed.isEmpty) {
       return widget.isDraft ? null : AppStrings.nameRequiredShort;
     }
-    final key = trimmed.toLowerCase();
-    final dup = widget.allGroupsForNameValidation.any(
-      (g) => g.id != widget.group.id && g.name.trim().toLowerCase() == key,
+    final dup = UniqueName.isTaken(
+      existing: widget.allGroupsForNameValidation.map(
+        (g) => (id: g.id, name: g.name),
+      ),
+      candidateName: trimmed,
+      excludeId: widget.group.id,
     );
     if (dup) return AppStrings.duplicateGroupName;
     return null;

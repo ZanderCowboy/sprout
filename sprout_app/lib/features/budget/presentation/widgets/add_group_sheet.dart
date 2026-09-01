@@ -1,38 +1,49 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:uuid/uuid.dart';
 
 import 'package:sprout/core/core.dart';
 import 'package:sprout/core/di/service_locator.dart';
+import 'package:sprout/ui/export.dart';
 
 import '../../application/budget_service.dart';
 import '../../domain/budget_category.dart';
 import '../../domain/budget_group.dart';
-import '../budget_bloc.dart';
+import '../budget_group_form_cubit.dart';
 import 'budget_group_icon_picker.dart';
-import 'package:sprout/ui/export.dart';
 
-class AddGroupSheet extends StatefulWidget {
+class AddGroupSheet extends StatelessWidget {
   const AddGroupSheet({super.key, this.initial});
 
   final BudgetGroup? initial;
 
   @override
-  State<AddGroupSheet> createState() => _AddGroupSheetState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => BudgetGroupFormCubit(
+        budgetService: sl<BudgetService>(),
+        userContext: sl<UserContext>(),
+        initial: initial,
+      )..load(),
+      child: _AddGroupBody(initial: initial),
+    );
+  }
 }
 
-class _AddGroupSheetState extends State<AddGroupSheet> {
-  static const _uuid = Uuid();
+class _AddGroupBody extends StatefulWidget {
+  const _AddGroupBody({required this.initial});
 
+  final BudgetGroup? initial;
+
+  @override
+  State<_AddGroupBody> createState() => _AddGroupBodyState();
+}
+
+class _AddGroupBodyState extends State<_AddGroupBody> {
   late final TextEditingController _name;
   late final TextEditingController _description;
 
-  BudgetCategory _category = BudgetCategory.income;
   int _colorArgb = AppColors.cardPalette.first.toARGB32();
   IconData _icon = Icons.category_rounded;
-
-  List<BudgetGroup> _existing = const [];
-  bool _loaded = false;
 
   @override
   void initState() {
@@ -40,10 +51,9 @@ class _AddGroupSheetState extends State<AddGroupSheet> {
     final i = widget.initial;
     _name = TextEditingController(text: i?.name ?? '');
     _description = TextEditingController(text: i?.description ?? '');
-    _name.addListener(_onFieldChanged);
-    _description.addListener(_onFieldChanged);
+    _name.addListener(_onNameChanged);
+    _description.addListener(_onDescriptionChanged);
 
-    _category = i?.category ?? BudgetCategory.income;
     _colorArgb =
         _parseHexColor(i?.colorHex)?.toARGB32() ??
         AppColors.cardColorAt(0).toARGB32();
@@ -51,73 +61,31 @@ class _AddGroupSheetState extends State<AddGroupSheet> {
       codePoint: i?.iconCodePoint,
       fontFamily: i?.iconFontFamily,
     );
-
-    _loadExisting();
   }
 
-  void _onFieldChanged() {
-    if (mounted) setState(() {});
+  void _onNameChanged() {
+    context.read<BudgetGroupFormCubit>().nameChanged(_name.text);
   }
 
-  Future<void> _loadExisting() async {
-    final list = await sl<BudgetService>().getBudgetGroups();
-    if (!mounted) return;
-    setState(() {
-      _existing = list;
-      _loaded = true;
-    });
-  }
-
-  String? get _nameError {
-    final name = _name.text.trim();
-    if (name.isEmpty) return null;
-    final key = name.toLowerCase();
-    final taken = _existing.any(
-      (g) => g.id != widget.initial?.id && g.name.trim().toLowerCase() == key,
-    );
-    if (taken) return AppStrings.duplicateGroupName;
-    return null;
-  }
-
-  bool get _canSave {
-    if (!_loaded) return false;
-    final name = _name.text.trim();
-    if (name.isEmpty) return false;
-    if (_nameError != null) return false;
-    return true;
+  void _onDescriptionChanged() {
+    context.read<BudgetGroupFormCubit>().descriptionChanged(_description.text);
   }
 
   @override
   void dispose() {
-    _name.removeListener(_onFieldChanged);
-    _description.removeListener(_onFieldChanged);
+    _name.removeListener(_onNameChanged);
+    _description.removeListener(_onDescriptionChanged);
     _name.dispose();
     _description.dispose();
     super.dispose();
   }
 
-  Future<void> _save() async {
-    if (!_canSave) return;
-    final uid = await sl<UserContext>().resolveUserId();
-    final now = DateTime.now();
-    final description = _description.text.trim();
-    final group = BudgetGroup(
-      id: widget.initial?.id ?? _uuid.v4(),
-      userId: uid,
-      name: _name.text.trim(),
-      description: description.isEmpty ? null : description,
-      category: _category,
-      colorHex: budgetGroupColorToHex(Color(_colorArgb)),
+  void _save() {
+    context.read<BudgetGroupFormCubit>().submit(
       iconCodePoint: _icon.codePoint,
       iconFontFamily: _icon.fontFamily,
-      items: widget.initial?.items ?? const [],
-      createdAt: widget.initial?.createdAt ?? now,
-      updatedAt: now,
+      colorHex: budgetGroupColorToHex(Color(_colorArgb)),
     );
-
-    if (!mounted) return;
-    context.read<BudgetBloc>().add(BudgetGroupUpsertRequested(group));
-    Navigator.of(context).pop(group);
   }
 
   @override
@@ -125,103 +93,127 @@ class _AddGroupSheetState extends State<AddGroupSheet> {
     final mq = MediaQuery.of(context);
     final bottomPadding = mq.viewInsets.bottom + mq.padding.bottom;
 
-    return SafeArea(
-      child: SingleChildScrollView(
-        padding: EdgeInsets.only(
-          left: 20,
-          right: 20,
-          top: 20,
-          bottom: bottomPadding + 20,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              widget.initial == null
-                  ? AppStrings.newBudgetGroup
-                  : AppStrings.editGroup,
-              style: Theme.of(context).textTheme.titleLarge,
+    return BlocConsumer<BudgetGroupFormCubit, BudgetGroupFormState>(
+      listenWhen: (previous, current) =>
+          current is BudgetGroupFormSaved ||
+          (current is BudgetGroupFormReady && current.submitError != null),
+      listener: (context, state) {
+        if (state is BudgetGroupFormSaved) {
+          Navigator.of(context).pop(state.group);
+          return;
+        }
+        if (state is BudgetGroupFormReady && state.submitError != null) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.submitError!)));
+        }
+      },
+      builder: (context, state) {
+        final ready = state is BudgetGroupFormReady ? state : null;
+        return SafeArea(
+          child: SingleChildScrollView(
+            padding: EdgeInsets.only(
+              left: 20,
+              right: 20,
+              top: 20,
+              bottom: bottomPadding + 20,
             ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _name,
-              decoration: InputDecoration(
-                labelText: AppStrings.groupName,
-                errorText: _nameError,
-              ),
-              textCapitalization: TextCapitalization.words,
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: _description,
-              decoration: const InputDecoration(
-                labelText: AppStrings.descriptionOptional,
-              ),
-              textCapitalization: TextCapitalization.sentences,
-            ),
-            const SizedBox(height: 16),
-            DropdownButtonFormField<BudgetCategory>(
-              initialValue: _category,
-              decoration: const InputDecoration(labelText: AppStrings.category),
-              items: const [
-                DropdownMenuItem(
-                  value: BudgetCategory.income,
-                  child: Text(AppStrings.budgetIncome),
-                ),
-                DropdownMenuItem(
-                  value: BudgetCategory.essentials,
-                  child: Text(AppStrings.budgetEssentials),
-                ),
-                DropdownMenuItem(
-                  value: BudgetCategory.lifestyle,
-                  child: Text(AppStrings.budgetLifestyle),
-                ),
-              ],
-              onChanged: (v) => setState(() => _category = v ?? _category),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              AppStrings.color,
-              style: Theme.of(context).textTheme.labelLarge,
-            ),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                for (final c in AppColors.cardPalette)
-                  GestureDetector(
-                    onTap: () => setState(() => _colorArgb = c.toARGB32()),
-                    child: CircleAvatar(
-                      backgroundColor: c,
-                      child: _colorArgb == c.toARGB32()
-                          ? const Icon(Icons.check, color: Colors.white)
-                          : null,
-                    ),
+                Text(
+                  widget.initial == null
+                      ? AppStrings.newBudgetGroup
+                      : AppStrings.editGroup,
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: _name,
+                  decoration: InputDecoration(
+                    labelText: AppStrings.groupName,
+                    errorText: ready?.nameError,
                   ),
+                  textCapitalization: TextCapitalization.words,
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _description,
+                  decoration: const InputDecoration(
+                    labelText: AppStrings.descriptionOptional,
+                  ),
+                  textCapitalization: TextCapitalization.sentences,
+                ),
+                const SizedBox(height: 16),
+                DropdownButtonFormField<BudgetCategory>(
+                  initialValue: ready?.category ?? BudgetCategory.income,
+                  decoration: const InputDecoration(
+                    labelText: AppStrings.category,
+                  ),
+                  items: const [
+                    DropdownMenuItem(
+                      value: BudgetCategory.income,
+                      child: Text(AppStrings.budgetIncome),
+                    ),
+                    DropdownMenuItem(
+                      value: BudgetCategory.essentials,
+                      child: Text(AppStrings.budgetEssentials),
+                    ),
+                    DropdownMenuItem(
+                      value: BudgetCategory.lifestyle,
+                      child: Text(AppStrings.budgetLifestyle),
+                    ),
+                  ],
+                  onChanged: (v) {
+                    if (v == null) return;
+                    context.read<BudgetGroupFormCubit>().categoryChanged(v);
+                  },
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  AppStrings.color,
+                  style: Theme.of(context).textTheme.labelLarge,
+                ),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    for (final c in AppColors.cardPalette)
+                      GestureDetector(
+                        onTap: () => setState(() => _colorArgb = c.toARGB32()),
+                        child: CircleAvatar(
+                          backgroundColor: c,
+                          child: _colorArgb == c.toARGB32()
+                              ? const Icon(Icons.check, color: Colors.white)
+                              : null,
+                        ),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  AppStrings.icon,
+                  style: Theme.of(context).textTheme.labelLarge,
+                ),
+                const SizedBox(height: 8),
+                BudgetGroupIconPicker(
+                  selected: _icon,
+                  onSelected: (i) => setState(() => _icon = i),
+                  accent: Color(_colorArgb),
+                ),
+                const SizedBox(height: 24),
+                SproutFilledButton(
+                  identifier: SemanticsIds.budgetGroupSave,
+                  label: AppStrings.save,
+                  onPressed: (ready?.canSave ?? false) ? _save : null,
+                ),
               ],
             ),
-            const SizedBox(height: 16),
-            Text(
-              AppStrings.icon,
-              style: Theme.of(context).textTheme.labelLarge,
-            ),
-            const SizedBox(height: 8),
-            BudgetGroupIconPicker(
-              selected: _icon,
-              onSelected: (i) => setState(() => _icon = i),
-              accent: Color(_colorArgb),
-            ),
-            const SizedBox(height: 24),
-            SproutFilledButton(
-              identifier: SemanticsIds.budgetGroupSave,
-              label: AppStrings.save,
-              onPressed: _canSave ? _save : null,
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }

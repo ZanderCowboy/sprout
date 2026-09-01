@@ -1,8 +1,10 @@
 import 'dart:async';
 
+import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:sprout/core/core.dart';
 import 'package:sprout/features/accounts/export.dart';
 import 'package:sprout/features/goals/export.dart';
 import 'package:sprout/features/transactions/export.dart';
@@ -23,6 +25,10 @@ class TransactionDetailBloc
        _accountsService = accountsService,
        super(const TransactionDetailInitial()) {
     on<TransactionDetailSubscriptionRequested>(_onSubscribe);
+    on<TransactionDetailNoteSaveRequested>(
+      _onSaveNote,
+      transformer: sequential(),
+    );
   }
 
   final String _transactionId;
@@ -35,6 +41,43 @@ class TransactionDetailBloc
     Emitter<TransactionDetailState> emit,
   ) {
     return emit.forEach<TransactionDetailState>(_watch(), onData: (s) => s);
+  }
+
+  Future<void> _onSaveNote(
+    TransactionDetailNoteSaveRequested event,
+    Emitter<TransactionDetailState> emit,
+  ) async {
+    final current = state;
+    if (current is! TransactionDetailReady) return;
+
+    emit(current.copyWith(savingNote: true, clearNoteFeedback: true));
+    try {
+      await _transactionsService.updateNote(
+        transactionId: current.transaction.id,
+        note: event.note,
+      );
+      final latest = state;
+      if (latest is TransactionDetailReady) {
+        emit(
+          latest.copyWith(
+            savingNote: false,
+            noteSaveFailed: false,
+            noteFeedback: AppStrings.noteSaved,
+          ),
+        );
+      }
+    } on Object catch (e) {
+      final latest = state;
+      if (latest is TransactionDetailReady) {
+        emit(
+          latest.copyWith(
+            savingNote: false,
+            noteSaveFailed: true,
+            noteFeedback: '${AppStrings.couldNotSaveNotePrefix}$e',
+          ),
+        );
+      }
+    }
   }
 
   Stream<TransactionDetailState> _watch() {

@@ -3,10 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:sprout/core/core.dart';
-import '../../accounts/presentation/account_form_sheet.dart';
-import '../../goals/export.dart';
-import '../../shell/presentation/deposit_bottom_sheet.dart';
-import '../../transactions/domain/transaction.dart';
+import 'package:sprout/features/accounts/export.dart';
+import 'package:sprout/features/goals/export.dart';
+import 'package:sprout/features/shell/shell.dart';
+import 'package:sprout/features/transactions/export.dart';
 import 'package:sprout/ui/export.dart';
 import 'home_bloc.dart';
 import 'widgets/empty_state_guidance.dart';
@@ -98,26 +98,8 @@ class OverviewPage extends StatelessWidget {
                             return const SizedBox.shrink();
                           }
 
-                          final totalTargetCents = goalsState.progressList
-                              .fold<int>(
-                                0,
-                                (sum, p) => sum + p.goal.targetAmountCents,
-                              );
-                          final totalSavedCents = goalsState.progressList
-                              .fold<int>(0, (sum, p) => sum + p.savedCents);
-                          final totalRemainingCents =
-                              (totalTargetCents - totalSavedCents) < 0
-                              ? 0
-                              : (totalTargetCents - totalSavedCents);
-                          final overallPercent = totalTargetCents <= 0
-                              ? 0
-                              : (totalSavedCents * 100) ~/ totalTargetCents;
-
                           return OverallGoalsProgressHeader(
-                            overallPercent: overallPercent,
-                            totalSavedCents: totalSavedCents,
-                            totalTargetCents: totalTargetCents,
-                            totalRemainingCents: totalRemainingCents,
+                            totals: goalsState.overall,
                             title: AppStrings.overallGoalsProgress,
                             onTap: () => context.go(AppRoute.goals.path),
                             semanticsIdentifier:

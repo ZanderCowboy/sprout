@@ -5,6 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 
 import 'package:sprout/core/core.dart';
+import 'package:sprout/features/sync/data/pending_sync_queue.dart';
 import 'package:sprout/features/sync/export.dart';
 import '../domain/funds_calculator.dart';
 import '../domain/portfolio_summary.dart';

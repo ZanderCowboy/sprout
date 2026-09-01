@@ -14,7 +14,7 @@ import 'package:sprout/features/auth/domain/auth_user.dart';
 import 'package:sprout/features/auth/presentation/bloc/auth_cubit.dart';
 import 'package:sprout/features/budget/data/local/models/budget_group_hive_model.dart';
 import 'package:sprout/features/goals/data/local/models/goal_hive_model.dart';
-import 'package:sprout/features/sync/export.dart';
+import 'package:sprout/features/sync/data/pending_sync_queue.dart';
 import 'package:sprout/features/transactions/data/local/pending_sync_hive_model.dart';
 import 'package:sprout/features/transactions/data/local/transaction_hive_model.dart';
 

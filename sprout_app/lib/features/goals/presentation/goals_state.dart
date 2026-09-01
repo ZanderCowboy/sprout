@@ -19,6 +19,8 @@ final class GoalsReady extends GoalsState {
   final List<GoalProgress> progressList;
   final int unallocatedBalanceCents;
 
+  OverallGoalsTotals get overall => OverallGoalsTotals.from(progressList);
+
   @override
   List<Object?> get props => [progressList, unallocatedBalanceCents];
 }

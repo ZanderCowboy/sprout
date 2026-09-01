@@ -2,22 +2,18 @@ import 'package:flutter/material.dart';
 
 import 'package:sprout/core/core.dart';
 
+import '../../domain/overall_goals_totals.dart';
+
 class OverallGoalsProgressHeader extends StatelessWidget {
   const OverallGoalsProgressHeader({
     super.key,
-    required this.overallPercent,
-    required this.totalSavedCents,
-    required this.totalTargetCents,
-    required this.totalRemainingCents,
+    required this.totals,
     required this.title,
     this.onTap,
     this.semanticsIdentifier,
   });
 
-  final int overallPercent;
-  final int totalSavedCents;
-  final int totalTargetCents;
-  final int totalRemainingCents;
+  final OverallGoalsTotals totals;
   final String title;
   final VoidCallback? onTap;
   final String? semanticsIdentifier;
@@ -25,15 +21,15 @@ class OverallGoalsProgressHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final progress = (overallPercent / 100).clamp(0.0, 1.0);
+    final progress = (totals.overallPercent / 100).clamp(0.0, 1.0);
 
     return Semantics(
       identifier: semanticsIdentifier,
       button: onTap != null,
       label: AppStrings.overallGoalsProgressSemantics(
-        percent: overallPercent,
-        saved: formatZarFromCents(totalSavedCents),
-        target: formatZarFromCents(totalTargetCents),
+        percent: totals.overallPercent,
+        saved: formatZarFromCents(totals.totalSavedCents),
+        target: formatZarFromCents(totals.totalTargetCents),
       ),
       child: Card(
         elevation: 0,
@@ -63,7 +59,7 @@ class OverallGoalsProgressHeader extends StatelessWidget {
                 ),
               ),
               Text(
-                '$overallPercent%',
+                '${totals.overallPercent}%',
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.w900,
                 ),
@@ -83,13 +79,15 @@ class OverallGoalsProgressHeader extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  AppStrings.savedAmount(formatZarFromCents(totalSavedCents)),
+                  AppStrings.savedAmount(
+                    formatZarFromCents(totals.totalSavedCents),
+                  ),
                   style: Theme.of(context).textTheme.titleSmall,
                 ),
               ),
               Text(
                 AppStrings.targetAmountLabel(
-                  formatZarFromCents(totalTargetCents),
+                  formatZarFromCents(totals.totalTargetCents),
                 ),
                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
                   color: scheme.onSurfaceVariant,
@@ -103,7 +101,7 @@ class OverallGoalsProgressHeader extends StatelessWidget {
               Expanded(
                 child: Text(
                   AppStrings.toGoCompleteAllGoals(
-                    formatZarFromCents(totalRemainingCents),
+                    formatZarFromCents(totals.totalRemainingCents),
                   ),
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.w600,

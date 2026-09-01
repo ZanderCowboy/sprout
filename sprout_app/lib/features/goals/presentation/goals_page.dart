@@ -63,20 +63,6 @@ class _GoalsPageState extends State<GoalsPage> {
           );
         }
 
-        final totalTargetCents = state.progressList.fold<int>(
-          0,
-          (sum, p) => sum + p.goal.targetAmountCents,
-        );
-        final totalSavedCents = state.progressList.fold<int>(
-          0,
-          (sum, p) => sum + p.savedCents,
-        );
-        final totalRemainingCents = (totalTargetCents - totalSavedCents) < 0
-            ? 0
-            : (totalTargetCents - totalSavedCents);
-        final overallPercent = totalTargetCents <= 0
-            ? 0
-            : (totalSavedCents * 100) ~/ totalTargetCents;
         final sorted = sortGoals(state.progressList, _sort);
         final firstCompletedIndex = sorted.indexWhere(
           (p) => p.percentComplete >= 100,
@@ -127,10 +113,7 @@ class _GoalsPageState extends State<GoalsPage> {
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
                   child: OverallGoalsProgressHeader(
-                    overallPercent: overallPercent,
-                    totalSavedCents: totalSavedCents,
-                    totalTargetCents: totalTargetCents,
-                    totalRemainingCents: totalRemainingCents,
+                    totals: state.overall,
                     title: AppStrings.overallProgress,
                   ),
                 ),
