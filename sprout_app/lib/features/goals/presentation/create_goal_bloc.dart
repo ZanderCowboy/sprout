@@ -10,85 +10,8 @@ import 'package:sprout/features/transactions/export.dart';
 import '../application/goals_service.dart';
 import '../domain/goal.dart';
 
-sealed class CreateGoalEvent extends Equatable {
-  const CreateGoalEvent();
-  @override
-  List<Object?> get props => [];
-}
-
-final class CreateGoalStarted extends CreateGoalEvent {
-  const CreateGoalStarted();
-}
-
-final class CreateGoalSubmitted extends CreateGoalEvent {
-  const CreateGoalSubmitted({
-    required this.name,
-    required this.targetAmountCents,
-    required this.colorArgb,
-    required this.alreadySavedAmountCents,
-    required this.alreadySavedAccountId,
-  });
-
-  final String name;
-  final int targetAmountCents;
-  final int colorArgb;
-  final int alreadySavedAmountCents;
-  final String? alreadySavedAccountId;
-
-  @override
-  List<Object?> get props => [
-    name,
-    targetAmountCents,
-    colorArgb,
-    alreadySavedAmountCents,
-    alreadySavedAccountId,
-  ];
-}
-
-sealed class CreateGoalState extends Equatable {
-  const CreateGoalState();
-  @override
-  List<Object?> get props => [];
-}
-
-final class CreateGoalInitial extends CreateGoalState {
-  const CreateGoalInitial();
-}
-
-final class CreateGoalReady extends CreateGoalState {
-  const CreateGoalReady({
-    required this.accounts,
-    required this.submitting,
-    required this.errorMessage,
-  });
-
-  final List<Account> accounts;
-  final bool submitting;
-  final String? errorMessage;
-
-  @override
-  List<Object?> get props => [accounts, submitting, errorMessage];
-
-  CreateGoalReady copyWith({
-    List<Account>? accounts,
-    bool? submitting,
-    String? errorMessage,
-  }) {
-    return CreateGoalReady(
-      accounts: accounts ?? this.accounts,
-      submitting: submitting ?? this.submitting,
-      errorMessage: errorMessage,
-    );
-  }
-}
-
-final class CreateGoalSuccess extends CreateGoalState {
-  const CreateGoalSuccess({required this.goalId});
-  final String goalId;
-
-  @override
-  List<Object?> get props => [goalId];
-}
+part 'create_goal_event.dart';
+part 'create_goal_state.dart';
 
 class CreateGoalBloc extends Bloc<CreateGoalEvent, CreateGoalState> {
   CreateGoalBloc({
@@ -148,10 +71,8 @@ class CreateGoalBloc extends Bloc<CreateGoalEvent, CreateGoalState> {
         updatedAt: now,
       );
 
-      // 1) Save goal
       await _goalsService.saveGoal(goal);
 
-      // 2) If opening balance provided, create deposit + allocation (100%) using a shared groupId.
       final openingCents = event.alreadySavedAmountCents;
       final openingAccountId = event.alreadySavedAccountId;
       if (openingCents > 0) {

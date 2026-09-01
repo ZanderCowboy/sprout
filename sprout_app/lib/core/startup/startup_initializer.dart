@@ -8,6 +8,7 @@ import 'package:sprout/core/config/app_environment.dart';
 import 'package:sprout/core/constants/hive_boxes.dart';
 import 'package:sprout/core/di/service_locator.dart';
 import 'package:sprout/core/flags/remote_config_service.dart';
+import 'package:sprout/core/flags/remote_config_service_impl.dart';
 import 'package:sprout/core/flags/remote_feature_flag.dart';
 import 'package:sprout/core/storage/hive_adapters.dart';
 import 'package:sprout/core/user/user_context.dart';
@@ -43,7 +44,7 @@ abstract class StartupProgressReporter {
 bool _hiveInitialized = false;
 bool _supabaseInitialized = false;
 bool _purchasesConfigured = false;
-final RemoteConfigService _remoteConfigService = RemoteConfigService();
+final RemoteConfigService _remoteConfigService = RemoteConfigServiceImpl();
 
 Future<void> initializeApp({
   required String configAssetPath,

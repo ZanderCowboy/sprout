@@ -1,25 +1,22 @@
 import '../domain/portfolio_summary.dart';
 import '../domain/transaction.dart';
 import '../domain/transaction_frequency.dart';
-import '../domain/transactions_repository.dart';
 
-class TransactionsService {
-  TransactionsService(this._repository);
+/// Transaction use-cases: deposits, allocations, and portfolio streams.
+abstract class TransactionsService {
+  /// Emits all transactions whenever local data changes.
+  Stream<List<Transaction>> watchTransactions();
 
-  final TransactionsRepository _repository;
+  /// Emits portfolio summary derived from transactions.
+  Stream<PortfolioSummary> watchPortfolioSummary();
 
-  Stream<List<Transaction>> watchTransactions() =>
-      _repository.watchTransactions();
+  /// Returns transactions linked to [accountId].
+  Future<List<Transaction>> getForAccount(String accountId);
 
-  Stream<PortfolioSummary> watchPortfolioSummary() =>
-      _repository.watchPortfolioSummary();
+  /// Returns transactions allocated to [goalId].
+  Future<List<Transaction>> getForGoal(String goalId);
 
-  Future<List<Transaction>> getForAccount(String accountId) =>
-      _repository.getForAccount(accountId);
-
-  Future<List<Transaction>> getForGoal(String goalId) =>
-      _repository.getForGoal(goalId);
-
+  /// Records a deposit allocated to [goalId].
   Future<void> recordDeposit({
     required String accountId,
     required String goalId,
@@ -29,19 +26,9 @@ class TransactionsService {
     String? note,
     bool isRecurring = false,
     TransactionFrequency frequency = TransactionFrequency.none,
-  }) =>
-      _repository.addTransaction(
-        accountId: accountId,
-        kind: TransactionKind.deposit,
-        goalId: goalId,
-        groupId: groupId,
-        amountCents: amountCents,
-        occurredAt: occurredAt,
-        note: note,
-        isRecurring: isRecurring,
-        frequency: frequency,
-      );
+  });
 
+  /// Records a deposit to [accountId] without goal allocation.
   Future<void> recordAccountDeposit({
     required String accountId,
     String? groupId,
@@ -50,19 +37,9 @@ class TransactionsService {
     String? note,
     bool isRecurring = false,
     TransactionFrequency frequency = TransactionFrequency.none,
-  }) =>
-      _repository.addTransaction(
-        accountId: accountId,
-        kind: TransactionKind.deposit,
-        goalId: null,
-        groupId: groupId,
-        amountCents: amountCents,
-        occurredAt: occurredAt,
-        note: note,
-        isRecurring: isRecurring,
-        frequency: frequency,
-      );
+  });
 
+  /// Moves funds from unallocated balance to [goalId].
   Future<void> recordAllocation({
     required String accountId,
     required String goalId,
@@ -70,41 +47,24 @@ class TransactionsService {
     required int amountCents,
     DateTime? occurredAt,
     String? note,
-  }) =>
-      _repository.addTransaction(
-        accountId: accountId,
-        kind: TransactionKind.allocation,
-        goalId: goalId,
-        groupId: groupId,
-        amountCents: amountCents,
-        occurredAt: occurredAt,
-        note: note,
-        isRecurring: false,
-        frequency: TransactionFrequency.none,
-      );
+  });
 
+  /// Updates the note on an existing transaction.
   Future<void> updateNote({
     required String transactionId,
     required String? note,
-  }) =>
-      _repository.updateTransactionNote(
-        transactionId: transactionId,
-        note: note,
-      );
+  });
 
+  /// Updates recurring configuration on a deposit transaction.
   Future<void> updateRecurringDeposit({
     required String transactionId,
     required bool isRecurring,
     required TransactionFrequency frequency,
-  }) =>
-      _repository.updateTransactionRecurringConfig(
-        transactionId: transactionId,
-        isRecurring: isRecurring,
-        frequency: frequency,
-      );
+  });
 
-  Future<void> deleteTransaction(String transactionId) =>
-      _repository.deleteTransaction(transactionId);
+  /// Deletes a transaction locally and enqueues remote sync.
+  Future<void> deleteTransaction(String transactionId);
 
-  Future<void> pullRemote() => _repository.pullRemote();
+  /// Pulls transactions from Supabase when sync is allowed.
+  Future<void> pullRemote();
 }

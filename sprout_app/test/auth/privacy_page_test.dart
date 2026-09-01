@@ -8,6 +8,7 @@ import 'package:sprout/core/constants/app_strings.dart';
 import 'package:sprout/core/flags/remote_config_service.dart';
 import 'package:sprout/core/theme/app_theme.dart';
 import 'package:sprout/features/auth/application/privacy_policy_service.dart';
+import 'package:sprout/features/auth/application/privacy_policy_service_impl.dart';
 import 'package:sprout/features/auth/presentation/privacy_page.dart';
 
 import '../mocks/mocks.dart';
@@ -35,7 +36,7 @@ void main() {
       MaterialApp(
         theme: buildAppTheme(),
         home: PrivacyPage(
-          privacyPolicy: PrivacyPolicyService(
+          privacyPolicy: PrivacyPolicyServiceImpl(
             remoteConfig: FakeRemoteConfigService(
               strings: {
                 RemoteConfigKeys.privacyPolicy:
@@ -61,7 +62,7 @@ void main() {
       MaterialApp(
         theme: buildAppTheme(),
         home: PrivacyPage(
-          privacyPolicy: PrivacyPolicyService(
+          privacyPolicy: PrivacyPolicyServiceImpl(
             remoteConfig: FakeRemoteConfigService(),
             assetBundle: _FakeAssetBundle({
               PrivacyPolicyService.bundledAssetPath:

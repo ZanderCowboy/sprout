@@ -9,6 +9,7 @@ import 'goals_bloc.dart';
 import 'enums/goals_sort.dart';
 import 'utils/goals_sorting.dart';
 import 'widgets/overall_goals_progress_header.dart';
+import 'widgets/goals_section_separator.dart';
 import 'widgets/unallocated_funds_card.dart';
 
 class GoalsPage extends StatefulWidget {
@@ -167,7 +168,7 @@ class _GoalsPageState extends State<GoalsPage> {
                       const SizedBox(height: 10),
                   itemBuilder: (context, i) {
                     if (hasCompleted && i == firstCompletedIndex) {
-                      return _GoalsSectionSeparator(
+                      return GoalsSectionSeparator(
                         title: AppStrings.completed,
                       );
                     }
@@ -223,48 +224,6 @@ class _GoalsPageState extends State<GoalsPage> {
           ),
         );
       },
-    );
-  }
-}
-
-class _GoalsSectionSeparator extends StatelessWidget {
-  const _GoalsSectionSeparator({required this.title});
-
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(4, 8, 4, 6),
-      child: Row(
-        children: [
-          Expanded(
-            child: Divider(
-              height: 1,
-              thickness: 1,
-              color: scheme.onSurfaceVariant.withValues(alpha: 0.35),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: Text(
-              title,
-              style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                fontWeight: FontWeight.w800,
-                color: scheme.onSurfaceVariant,
-              ),
-            ),
-          ),
-          Expanded(
-            child: Divider(
-              height: 1,
-              thickness: 1,
-              color: scheme.onSurfaceVariant.withValues(alpha: 0.35),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

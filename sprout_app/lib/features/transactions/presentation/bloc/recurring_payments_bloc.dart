@@ -1,38 +1,14 @@
 import 'dart:async';
 
+import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:sprout/features/accounts/export.dart';
 import 'package:sprout/features/goals/export.dart';
 import 'package:sprout/features/transactions/export.dart';
 
-sealed class RecurringPaymentsEvent {
-  const RecurringPaymentsEvent();
-}
-
-final class RecurringPaymentsSubscriptionRequested extends RecurringPaymentsEvent {
-  const RecurringPaymentsSubscriptionRequested();
-}
-
-sealed class RecurringPaymentsState {
-  const RecurringPaymentsState();
-}
-
-final class RecurringPaymentsInitial extends RecurringPaymentsState {
-  const RecurringPaymentsInitial();
-}
-
-final class RecurringPaymentsReady extends RecurringPaymentsState {
-  const RecurringPaymentsReady({
-    required this.items,
-    required this.goalsById,
-    required this.accountsById,
-  });
-
-  final List<Transaction> items;
-  final Map<String, Goal> goalsById;
-  final Map<String, Account> accountsById;
-}
+part 'recurring_payments_event.dart';
+part 'recurring_payments_state.dart';
 
 class RecurringPaymentsBloc
     extends Bloc<RecurringPaymentsEvent, RecurringPaymentsState> {
@@ -127,4 +103,3 @@ class RecurringPaymentsBloc
     });
   }
 }
-

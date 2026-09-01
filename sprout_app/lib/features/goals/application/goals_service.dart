@@ -1,33 +1,21 @@
-import 'package:sprout/core/constants/constants.dart';
-import 'package:sprout/core/error/error.dart';
 import '../domain/goal.dart';
-import '../domain/goals_repository.dart';
 
-class GoalsService {
-  GoalsService(this._repository);
+/// Goal use-cases: validation and persist/delete/pull.
+abstract class GoalsService {
+  /// Emits goals whenever local data changes.
+  Stream<List<Goal>> watchGoals();
 
-  final GoalsRepository _repository;
+  /// Returns the current goals from local storage.
+  Future<List<Goal>> getGoals();
 
-  Stream<List<Goal>> watchGoals() => _repository.watchGoals();
+  /// Saves [goal] after validating target amount and unique name.
+  ///
+  /// Throws [ValidationAppException] if target is not positive or name is taken.
+  Future<void> saveGoal(Goal goal);
 
-  Future<List<Goal>> getGoals() => _repository.getGoals();
+  /// Deletes the goal with [id] locally and enqueues remote sync.
+  Future<void> removeGoal(String id);
 
-  Future<void> saveGoal(Goal goal) async {
-    if (goal.targetAmountCents <= 0) {
-      throw ValidationAppException(AppStrings.goalTargetMustBePositive);
-    }
-    final existing = await _repository.getGoals();
-    final normalized = goal.name.trim().toLowerCase();
-    final duplicate = existing.any(
-      (g) => g.id != goal.id && g.name.trim().toLowerCase() == normalized,
-    );
-    if (duplicate) {
-      throw ValidationAppException(AppStrings.duplicateGoalName);
-    }
-    await _repository.upsertGoal(goal);
-  }
-
-  Future<void> removeGoal(String id) => _repository.deleteGoal(id);
-
-  Future<void> pullRemote() => _repository.pullRemote();
+  /// Pulls goals from Supabase when sync is allowed.
+  Future<void> pullRemote();
 }

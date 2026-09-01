@@ -1,44 +1,14 @@
 import 'dart:async';
 
+import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:sprout/features/accounts/export.dart';
 import 'package:sprout/features/goals/export.dart';
 import 'package:sprout/features/transactions/export.dart';
 
-sealed class TransactionDetailEvent {
-  const TransactionDetailEvent();
-}
-
-final class TransactionDetailSubscriptionRequested extends TransactionDetailEvent {
-  const TransactionDetailSubscriptionRequested();
-}
-
-sealed class TransactionDetailState {
-  const TransactionDetailState();
-}
-
-final class TransactionDetailInitial extends TransactionDetailState {
-  const TransactionDetailInitial();
-}
-
-final class TransactionDetailMissing extends TransactionDetailState {
-  const TransactionDetailMissing();
-}
-
-final class TransactionDetailReady extends TransactionDetailState {
-  const TransactionDetailReady({
-    required this.transaction,
-    required this.groupTransactions,
-    required this.goalsById,
-    required this.accountsById,
-  });
-
-  final Transaction transaction;
-  final List<Transaction>? groupTransactions;
-  final Map<String, Goal> goalsById;
-  final Map<String, Account> accountsById;
-}
+part 'transaction_detail_event.dart';
+part 'transaction_detail_state.dart';
 
 class TransactionDetailBloc
     extends Bloc<TransactionDetailEvent, TransactionDetailState> {
@@ -132,4 +102,3 @@ class TransactionDetailBloc
     });
   }
 }
-

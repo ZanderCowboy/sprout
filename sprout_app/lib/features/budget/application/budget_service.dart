@@ -1,46 +1,22 @@
-import 'package:sprout/core/constants/constants.dart';
-import 'package:sprout/core/error/error.dart';
-
 import '../domain/budget_group.dart';
-import '../domain/budget_repository.dart';
 
-class BudgetService {
-  BudgetService(this._repository);
+/// Budget group use-cases: validation and persist/delete/pull.
+abstract class BudgetService {
+  /// Emits budget groups whenever local data changes.
+  Stream<List<BudgetGroup>> watchBudgetGroups();
 
-  final BudgetRepository _repository;
+  /// Returns the current budget groups from local storage.
+  Future<List<BudgetGroup>> getBudgetGroups();
 
-  Stream<List<BudgetGroup>> watchBudgetGroups() => _repository.watchBudgetGroups();
+  /// Saves [group] after validating name and item amounts.
+  ///
+  /// Throws [ValidationAppException] on empty name, negative amounts, or
+  /// duplicate group name.
+  Future<void> saveBudgetGroup(BudgetGroup group);
 
-  Future<List<BudgetGroup>> getBudgetGroups() => _repository.getBudgetGroups();
+  /// Deletes the budget group with [id] locally and enqueues remote sync.
+  Future<void> removeBudgetGroup(String id);
 
-  Future<void> saveBudgetGroup(BudgetGroup group) async {
-    final trimmedName = group.name.trim();
-    if (trimmedName.isEmpty) {
-      throw ValidationAppException(AppStrings.nameRequired);
-    }
-    final normalizedName = trimmedName.toLowerCase();
-
-    for (final item in group.items) {
-      if (item.amount < 0) {
-        throw ValidationAppException(AppStrings.amountCannotBeNegative);
-      }
-    }
-
-    final existing = await _repository.getBudgetGroups();
-    final duplicate = existing.any(
-      (g) => g.id != group.id && g.name.trim().toLowerCase() == normalizedName,
-    );
-    if (duplicate) {
-      throw ValidationAppException(AppStrings.duplicateGroupName);
-    }
-
-    await _repository.upsertBudgetGroup(
-      group.copyWith(name: trimmedName),
-    );
-  }
-
-  Future<void> removeBudgetGroup(String id) => _repository.deleteBudgetGroup(id);
-
-  Future<void> pullRemote() => _repository.pullRemote();
+  /// Pulls budget groups from Supabase when sync is allowed.
+  Future<void> pullRemote();
 }
-

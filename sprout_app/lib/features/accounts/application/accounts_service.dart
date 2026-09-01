@@ -1,30 +1,21 @@
-import 'package:sprout/core/constants/constants.dart';
-import 'package:sprout/core/error/error.dart';
 import '../domain/account.dart';
-import '../domain/accounts_repository.dart';
 
-class AccountsService {
-  AccountsService(this._repository);
+/// Account use-cases: unique-name validation and persist/delete/pull.
+abstract class AccountsService {
+  /// Emits accounts whenever local data changes.
+  Stream<List<Account>> watchAccounts();
 
-  final AccountsRepository _repository;
+  /// Returns the current account list from local storage.
+  Future<List<Account>> getAccounts();
 
-  Stream<List<Account>> watchAccounts() => _repository.watchAccounts();
+  /// Saves [account] after rejecting duplicate names.
+  ///
+  /// Throws [ValidationAppException] if the name is taken.
+  Future<void> saveAccount(Account account);
 
-  Future<List<Account>> getAccounts() => _repository.getAccounts();
+  /// Deletes the account with [id] locally and enqueues remote sync.
+  Future<void> removeAccount(String id);
 
-  Future<void> saveAccount(Account account) async {
-    final existing = await _repository.getAccounts();
-    final normalized = account.name.trim().toLowerCase();
-    final duplicate = existing.any(
-      (a) => a.id != account.id && a.name.trim().toLowerCase() == normalized,
-    );
-    if (duplicate) {
-      throw ValidationAppException(AppStrings.duplicateAccountName);
-    }
-    await _repository.upsertAccount(account);
-  }
-
-  Future<void> removeAccount(String id) => _repository.deleteAccount(id);
-
-  Future<void> pullRemote() => _repository.pullRemote();
+  /// Pulls accounts from Supabase when sync is allowed.
+  Future<void> pullRemote();
 }

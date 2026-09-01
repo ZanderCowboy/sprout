@@ -9,6 +9,7 @@ import 'package:sprout/core/storage/hive_adapters.dart';
 import 'package:sprout/core/user/user_context.dart';
 import 'package:sprout/features/accounts/export.dart';
 import 'package:sprout/features/auth/application/auth_service.dart';
+import 'package:sprout/features/auth/application/auth_service_impl.dart';
 import 'package:sprout/features/auth/domain/auth_user.dart';
 import 'package:sprout/features/budget/export.dart';
 import 'package:sprout/features/goals/export.dart';
@@ -65,7 +66,7 @@ void main() {
     userContext = UserContext(settingsBox);
     flushCalls = 0;
     pullCalls = 0;
-    authService = AuthService(
+    authService = AuthServiceImpl(
       authRepository: fakeAuth,
       userContext: userContext,
       appConfig: _testAppConfig,
@@ -271,7 +272,7 @@ void main() {
       ).enqueue(PendingSyncOperationType.upsertAccount, '{}');
 
       var purchasesLogOutCalls = 0;
-      authService = AuthService(
+      authService = AuthServiceImpl(
         authRepository: fakeAuth,
         userContext: userContext,
         appConfig: _testAppConfig,
@@ -317,7 +318,7 @@ void main() {
   });
 
   test('debugSignIn is rejected in production', () async {
-    final prod = AuthService(
+    final prod = AuthServiceImpl(
       authRepository: fakeAuth,
       userContext: userContext,
       appConfig: const AppConfig(

@@ -5,50 +5,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sprout/features/accounts/export.dart';
 import 'package:sprout/features/transactions/export.dart';
 
-sealed class HomeEvent extends Equatable {
-  const HomeEvent();
-  @override
-  List<Object?> get props => [];
-}
-
-final class HomeSubscriptionRequested extends HomeEvent {
-  const HomeSubscriptionRequested();
-}
-
-sealed class HomeState extends Equatable {
-  const HomeState();
-  @override
-  List<Object?> get props => [];
-}
-
-final class HomeInitial extends HomeState {
-  const HomeInitial();
-}
-
-final class HomeReady extends HomeState {
-  const HomeReady({
-    required this.accounts,
-    required this.portfolio,
-    required this.recentTransactions,
-    this.accountCurrentTotalsById = const <String, int>{},
-    this.accountScheduledTotalsById = const <String, int>{},
-  });
-
-  final List<Account> accounts;
-  final PortfolioSummary portfolio;
-  final List<Transaction> recentTransactions;
-  final Map<String, int> accountCurrentTotalsById;
-  final Map<String, int> accountScheduledTotalsById;
-
-  @override
-  List<Object?> get props => [
-        accounts,
-        portfolio,
-        recentTransactions,
-        accountCurrentTotalsById,
-        accountScheduledTotalsById,
-      ];
-}
+part 'home_event.dart';
+part 'home_state.dart';
 
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
   HomeBloc({

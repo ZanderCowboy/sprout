@@ -8,6 +8,7 @@ import 'package:sprout/core/constants/app_strings.dart';
 import 'package:sprout/core/flags/remote_config_service.dart';
 import 'package:sprout/core/theme/app_theme.dart';
 import 'package:sprout/features/auth/application/terms_of_service_service.dart';
+import 'package:sprout/features/auth/application/terms_of_service_service_impl.dart';
 import 'package:sprout/features/auth/presentation/terms_page.dart';
 
 import '../mocks/mocks.dart';
@@ -33,7 +34,7 @@ void main() {
       MaterialApp(
         theme: buildAppTheme(),
         home: TermsPage(
-          termsOfService: TermsOfServiceService(
+          termsOfService: TermsOfServiceServiceImpl(
             remoteConfig: FakeRemoteConfigService(
               strings: {
                 RemoteConfigKeys.termsOfService:
@@ -59,7 +60,7 @@ void main() {
       MaterialApp(
         theme: buildAppTheme(),
         home: TermsPage(
-          termsOfService: TermsOfServiceService(
+          termsOfService: TermsOfServiceServiceImpl(
             remoteConfig: FakeRemoteConfigService(),
             assetBundle: _FakeAssetBundle({
               TermsOfServiceService.bundledAssetPath:

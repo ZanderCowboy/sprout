@@ -7,7 +7,8 @@ import 'package:sprout/core/config/app_environment.dart';
 import 'package:sprout/core/storage/hive_adapters.dart';
 import 'package:sprout/core/user/user_context.dart';
 import 'package:sprout/features/accounts/export.dart';
-import 'package:sprout/features/auth/application/auth_service.dart';
+import 'package:sprout/features/auth/application/auth_service_impl.dart';
+import 'package:sprout/features/sync/application/sync_service_impl.dart';
 import 'package:sprout/features/auth/domain/auth_user.dart';
 import 'package:sprout/features/budget/export.dart';
 import 'package:sprout/features/goals/export.dart';
@@ -79,7 +80,7 @@ void main() {
 
   test('AuthService.canSync is false for guests and anonymous users', () {
     final fake = FakeAuthRepository();
-    final service = AuthService(
+    final service = AuthServiceImpl(
       authRepository: fake,
       userContext: UserContext(settingsBox),
       appConfig: config(supabase: true),
@@ -154,7 +155,7 @@ void main() {
       '{"id":"x"}',
     );
     var flushed = false;
-    final sync = SyncService(
+    final sync = SyncServiceImpl(
       queue: queue,
       config: config(supabase: true),
       supabase: null,

@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sprout/core/flags/remote_config_service.dart';
 import 'package:sprout/features/auth/application/privacy_policy_service.dart';
+import 'package:sprout/features/auth/application/privacy_policy_service_impl.dart';
 
 import '../mocks/mocks.dart';
 
@@ -27,7 +28,7 @@ void main() {
   const bundled = '# Bundled Privacy\n\nLocal placeholder.';
 
   PrivacyPolicyService service({Map<String, String> remote = const {}}) {
-    return PrivacyPolicyService(
+    return PrivacyPolicyServiceImpl(
       remoteConfig: FakeRemoteConfigService(strings: remote),
       assetBundle: _FakeAssetBundle({
         PrivacyPolicyService.bundledAssetPath: bundled,

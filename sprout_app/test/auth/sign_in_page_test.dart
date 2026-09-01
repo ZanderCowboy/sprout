@@ -16,9 +16,11 @@ import 'package:sprout/core/storage/hive_adapters.dart';
 import 'package:sprout/core/theme/app_theme.dart';
 import 'package:sprout/core/user/user_context.dart';
 import 'package:sprout/features/accounts/export.dart';
-import 'package:sprout/features/auth/application/auth_service.dart';
+import 'package:sprout/features/auth/application/auth_service_impl.dart';
 import 'package:sprout/features/auth/application/privacy_policy_service.dart';
+import 'package:sprout/features/auth/application/privacy_policy_service_impl.dart';
 import 'package:sprout/features/auth/application/terms_of_service_service.dart';
+import 'package:sprout/features/auth/application/terms_of_service_service_impl.dart';
 import 'package:sprout/features/auth/presentation/bloc/auth_cubit.dart';
 import 'package:sprout/features/auth/presentation/privacy_page.dart';
 import 'package:sprout/features/auth/presentation/sign_in_page.dart';
@@ -72,7 +74,7 @@ void main() {
       firebaseStorageBucket: '',
     );
     cubit = AuthCubit(
-      authService: AuthService(
+      authService: AuthServiceImpl(
         authRepository: fakeAuth,
         userContext: UserContext(settingsBox),
         appConfig: config,
@@ -165,7 +167,7 @@ void main() {
 
   testWidgets('Terms hyperlink opens TermsPage', (tester) async {
     sl.registerSingleton<TermsOfServiceService>(
-      TermsOfServiceService(
+      TermsOfServiceServiceImpl(
         remoteConfig: FakeRemoteConfigService(),
         assetBundle: _FakeAssetBundle({
           TermsOfServiceService.bundledAssetPath:
@@ -208,7 +210,7 @@ void main() {
 
   testWidgets('Privacy hyperlink opens PrivacyPage', (tester) async {
     sl.registerSingleton<PrivacyPolicyService>(
-      PrivacyPolicyService(
+      PrivacyPolicyServiceImpl(
         remoteConfig: FakeRemoteConfigService(),
         assetBundle: _FakeAssetBundle({
           PrivacyPolicyService.bundledAssetPath:

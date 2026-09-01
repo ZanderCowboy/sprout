@@ -1,38 +1,14 @@
 import 'dart:async';
 
+import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:sprout/features/accounts/export.dart';
 import 'package:sprout/features/goals/export.dart';
 import 'package:sprout/features/transactions/export.dart';
 
-sealed class TransactionsEvent {
-  const TransactionsEvent();
-}
-
-final class TransactionsSubscriptionRequested extends TransactionsEvent {
-  const TransactionsSubscriptionRequested();
-}
-
-sealed class TransactionsState {
-  const TransactionsState();
-}
-
-final class TransactionsInitial extends TransactionsState {
-  const TransactionsInitial();
-}
-
-final class TransactionsReady extends TransactionsState {
-  const TransactionsReady({
-    required this.items,
-    required this.goalsById,
-    required this.accountsById,
-  });
-
-  final List<Transaction> items;
-  final Map<String, Goal> goalsById;
-  final Map<String, Account> accountsById;
-}
+part 'transactions_event.dart';
+part 'transactions_state.dart';
 
 class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
   TransactionsBloc({
@@ -107,4 +83,3 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
     });
   }
 }
-
