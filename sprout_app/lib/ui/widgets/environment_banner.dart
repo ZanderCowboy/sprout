@@ -22,14 +22,14 @@ class EnvironmentBanner extends StatelessWidget {
       environment == AppEnvironment.production && kReleaseMode;
 
   String get _label => switch (environment) {
-        AppEnvironment.development => AppStrings.environmentDev,
-        AppEnvironment.production => AppStrings.environmentProd,
-      };
+    AppEnvironment.development => AppStrings.environmentDev,
+    AppEnvironment.production => AppStrings.environmentProd,
+  };
 
   Color get _color => switch (environment) {
-        AppEnvironment.development => AppColors.environmentDev,
-        AppEnvironment.production => AppColors.environmentProd,
-      };
+    AppEnvironment.development => AppColors.environmentDev,
+    AppEnvironment.production => AppColors.environmentProd,
+  };
 
   @override
   Widget build(BuildContext context) {

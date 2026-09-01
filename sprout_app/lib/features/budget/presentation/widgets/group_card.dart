@@ -120,7 +120,9 @@ class _GroupCardState extends State<GroupCard> {
 
   String? _validateName(String name) {
     final trimmed = name.trim();
-    if (trimmed.isEmpty) return widget.isDraft ? null : AppStrings.nameRequiredShort;
+    if (trimmed.isEmpty) {
+      return widget.isDraft ? null : AppStrings.nameRequiredShort;
+    }
     final key = trimmed.toLowerCase();
     final dup = widget.allGroupsForNameValidation.any(
       (g) => g.id != widget.group.id && g.name.trim().toLowerCase() == key,
@@ -240,7 +242,10 @@ class _GroupCardState extends State<GroupCard> {
                       ],
                     ),
                     const SizedBox(height: 16),
-                    Text(AppStrings.icon, style: Theme.of(context).textTheme.labelLarge),
+                    Text(
+                      AppStrings.icon,
+                      style: Theme.of(context).textTheme.labelLarge,
+                    ),
                     const SizedBox(height: 8),
                     BudgetGroupIconPicker(
                       selected: icon,
@@ -338,190 +343,191 @@ class _GroupCardState extends State<GroupCard> {
       button: true,
       label: widget.group.name,
       child: GestureDetector(
-      onLongPress: widget.isDraft ? widget.onDiscardDraft : _confirmDeleteGroup,
-      child: Card(
-        clipBehavior: Clip.antiAlias,
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [color.withValues(alpha: 0.20), scheme.surface],
-              stops: const [0.0, 0.72],
+        onLongPress: widget.isDraft
+            ? widget.onDiscardDraft
+            : _confirmDeleteGroup,
+        child: Card(
+          clipBehavior: Clip.antiAlias,
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [color.withValues(alpha: 0.20), scheme.surface],
+                stops: const [0.0, 0.72],
+              ),
             ),
-          ),
-          child: ExpansionTile(
-            initiallyExpanded: _expanded,
-            onExpansionChanged: (v) => setState(() => _expanded = v),
-            tilePadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 4,
-            ),
-            childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
-            shape: const Border(),
-            collapsedShape: const Border(),
-            leading: Tooltip(
-              message: AppStrings.colorAndIcon,
-              child: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  onTap: _showAppearanceSheet,
-                  customBorder: const CircleBorder(),
-                  child: Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: color,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: color.withValues(alpha: 0.35),
-                          blurRadius: 14,
-                          offset: const Offset(0, 8),
-                        ),
-                      ],
+            child: ExpansionTile(
+              initiallyExpanded: _expanded,
+              onExpansionChanged: (v) => setState(() => _expanded = v),
+              tilePadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 4,
+              ),
+              childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
+              shape: const Border(),
+              collapsedShape: const Border(),
+              leading: Tooltip(
+                message: AppStrings.colorAndIcon,
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: _showAppearanceSheet,
+                    customBorder: const CircleBorder(),
+                    child: Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: color,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: color.withValues(alpha: 0.35),
+                            blurRadius: 14,
+                            offset: const Offset(0, 8),
+                          ),
+                        ],
+                      ),
+                      child: Icon(icon, color: Colors.white, size: 22),
                     ),
-                    child: Icon(icon, color: Colors.white, size: 22),
                   ),
                 ),
               ),
-            ),
-            title: _editingName
-                ? TextField(
-                    controller: _name,
-                    focusNode: _nameFocus,
-                    decoration: const InputDecoration(
-                      isDense: true,
-                      border: InputBorder.none,
-                      hintText: AppStrings.groupName,
+              title: _editingName
+                  ? TextField(
+                      controller: _name,
+                      focusNode: _nameFocus,
+                      decoration: const InputDecoration(
+                        isDense: true,
+                        border: InputBorder.none,
+                        hintText: AppStrings.groupName,
+                      ),
+                      textCapitalization: TextCapitalization.words,
+                      autofocus: true,
+                    )
+                  : InkWell(
+                      onTap: () {
+                        setState(() {
+                          _editingName = true;
+                          _expanded = true;
+                        });
+                        _nameFocus.requestFocus();
+                      },
+                      child: Text(
+                        widget.group.name.trim().isEmpty
+                            ? AppStrings.untitledGroup
+                            : widget.group.name,
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(fontWeight: FontWeight.w900),
+                      ),
                     ),
-                    textCapitalization: TextCapitalization.words,
-                    autofocus: true,
-                  )
-                : InkWell(
-                    onTap: () {
-                      setState(() {
-                        _editingName = true;
-                        _expanded = true;
-                      });
-                      _nameFocus.requestFocus();
-                    },
-                    child: Text(
-                      widget.group.name.trim().isEmpty
-                          ? AppStrings.untitledGroup
-                          : widget.group.name,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w900,
+              subtitle: _editingDescription
+                  ? TextField(
+                      controller: _description,
+                      focusNode: _descriptionFocus,
+                      decoration: const InputDecoration(
+                        isDense: true,
+                        border: InputBorder.none,
+                        hintText: AppStrings.descriptionOptional,
+                      ),
+                      textCapitalization: TextCapitalization.sentences,
+                      autofocus: true,
+                    )
+                  : ((widget.group.description == null ||
+                            widget.group.description!.trim().isEmpty)
+                        ? InkWell(
+                            onTap: () {
+                              setState(() {
+                                _editingDescription = true;
+                                _expanded = true;
+                              });
+                              _descriptionFocus.requestFocus();
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.only(top: 6),
+                              child: Text(
+                                AppStrings.tapToAddDescription,
+                                style: Theme.of(context).textTheme.bodyMedium
+                                    ?.copyWith(
+                                      color: scheme.onSurfaceVariant,
+                                      height: 1.2,
+                                    ),
+                              ),
+                            ),
+                          )
+                        : InkWell(
+                            onTap: () {
+                              setState(() {
+                                _editingDescription = true;
+                                _expanded = true;
+                              });
+                              _descriptionFocus.requestFocus();
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.only(top: 6),
+                              child: Text(
+                                widget.group.description!.trim(),
+                                style: Theme.of(context).textTheme.bodyMedium
+                                    ?.copyWith(
+                                      color: scheme.onSurfaceVariant,
+                                      height: 1.2,
+                                    ),
+                              ),
+                            ),
+                          )),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    formatZarFromCents((widget.totalAmount * 100).round()),
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                  const SizedBox(width: 2),
+                  IgnorePointer(
+                    child: Icon(
+                      _expanded
+                          ? Icons.keyboard_arrow_up_rounded
+                          : Icons.keyboard_arrow_down_rounded,
+                      size: 22,
+                      color: scheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+              children: [
+                if (items.isNotEmpty)
+                  ...items.map(
+                    (i) => Padding(
+                      padding: const EdgeInsets.only(top: 2),
+                      child: BudgetItemCard(
+                        key: ValueKey(i.id),
+                        item: i,
+                        isDraft: _draftItems.any((d) => d.id == i.id),
+                        onDiscardDraft: _draftItems.any((d) => d.id == i.id)
+                            ? () => _discardDraftItem(i.id)
+                            : null,
+                        onDraftChanged: _draftItems.any((d) => d.id == i.id)
+                            ? _upsertDraftItem
+                            : null,
+                        onUpsert: (updated) =>
+                            widget.onUpsertItem(widget.group.id, updated),
+                        onDelete: () =>
+                            widget.onDeleteItem(widget.group.id, i.id),
                       ),
                     ),
                   ),
-            subtitle: _editingDescription
-                ? TextField(
-                    controller: _description,
-                    focusNode: _descriptionFocus,
-                    decoration: const InputDecoration(
-                      isDense: true,
-                      border: InputBorder.none,
-                      hintText: AppStrings.descriptionOptional,
-                    ),
-                    textCapitalization: TextCapitalization.sentences,
-                    autofocus: true,
-                  )
-                : ((widget.group.description == null ||
-                          widget.group.description!.trim().isEmpty)
-                      ? InkWell(
-                          onTap: () {
-                            setState(() {
-                              _editingDescription = true;
-                              _expanded = true;
-                            });
-                            _descriptionFocus.requestFocus();
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.only(top: 6),
-                            child: Text(
-                              AppStrings.tapToAddDescription,
-                              style: Theme.of(context).textTheme.bodyMedium
-                                  ?.copyWith(
-                                    color: scheme.onSurfaceVariant,
-                                    height: 1.2,
-                                  ),
-                            ),
-                          ),
-                        )
-                      : InkWell(
-                          onTap: () {
-                            setState(() {
-                              _editingDescription = true;
-                              _expanded = true;
-                            });
-                            _descriptionFocus.requestFocus();
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.only(top: 6),
-                            child: Text(
-                              widget.group.description!.trim(),
-                              style: Theme.of(context).textTheme.bodyMedium
-                                  ?.copyWith(
-                                    color: scheme.onSurfaceVariant,
-                                    height: 1.2,
-                                  ),
-                            ),
-                          ),
-                        )),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text(
-                  formatZarFromCents((widget.totalAmount * 100).round()),
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-                const SizedBox(width: 2),
-                IgnorePointer(
-                  child: Icon(
-                    _expanded
-                        ? Icons.keyboard_arrow_up_rounded
-                        : Icons.keyboard_arrow_down_rounded,
-                    size: 22,
-                    color: scheme.onSurfaceVariant,
-                  ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 6),
+                  child: AddItemCard(onTap: _addDraftItem),
                 ),
               ],
             ),
-            children: [
-              if (items.isNotEmpty)
-                ...items.map(
-                  (i) => Padding(
-                    padding: const EdgeInsets.only(top: 2),
-                    child: BudgetItemCard(
-                      key: ValueKey(i.id),
-                      item: i,
-                      isDraft: _draftItems.any((d) => d.id == i.id),
-                      onDiscardDraft: _draftItems.any((d) => d.id == i.id)
-                          ? () => _discardDraftItem(i.id)
-                          : null,
-                      onDraftChanged: _draftItems.any((d) => d.id == i.id)
-                          ? _upsertDraftItem
-                          : null,
-                      onUpsert: (updated) =>
-                          widget.onUpsertItem(widget.group.id, updated),
-                      onDelete: () =>
-                          widget.onDeleteItem(widget.group.id, i.id),
-                    ),
-                  ),
-                ),
-              Padding(
-                padding: const EdgeInsets.only(top: 6),
-                child: AddItemCard(onTap: _addDraftItem),
-              ),
-            ],
           ),
         ),
       ),
-    ),
     );
   }
 }

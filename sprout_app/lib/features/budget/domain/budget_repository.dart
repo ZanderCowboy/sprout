@@ -11,4 +11,3 @@ abstract class BudgetRepository {
 
   Future<void> pullRemote();
 }
-

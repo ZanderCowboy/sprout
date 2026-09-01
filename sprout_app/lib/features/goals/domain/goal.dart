@@ -20,6 +20,13 @@ class Goal extends Equatable {
   final DateTime updatedAt;
 
   @override
-  List<Object?> get props =>
-      [id, userId, name, targetAmountCents, color, createdAt, updatedAt];
+  List<Object?> get props => [
+    id,
+    userId,
+    name,
+    targetAmountCents,
+    color,
+    createdAt,
+    updatedAt,
+  ];
 }

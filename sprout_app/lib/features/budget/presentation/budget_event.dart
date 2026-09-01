@@ -26,10 +26,7 @@ final class BudgetGroupDeleted extends BudgetEvent {
 }
 
 final class BudgetItemUpsertRequested extends BudgetEvent {
-  const BudgetItemUpsertRequested({
-    required this.groupId,
-    required this.item,
-  });
+  const BudgetItemUpsertRequested({required this.groupId, required this.item});
 
   final String groupId;
   final BudgetItem item;
@@ -39,10 +36,7 @@ final class BudgetItemUpsertRequested extends BudgetEvent {
 }
 
 final class BudgetItemDeleted extends BudgetEvent {
-  const BudgetItemDeleted({
-    required this.groupId,
-    required this.itemId,
-  });
+  const BudgetItemDeleted({required this.groupId, required this.itemId});
 
   final String groupId;
   final String itemId;

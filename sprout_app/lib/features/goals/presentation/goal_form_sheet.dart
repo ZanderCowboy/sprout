@@ -8,11 +8,7 @@ import '../application/goals_service.dart';
 import '../domain/goal.dart';
 
 class GoalFormSheet extends StatefulWidget {
-  const GoalFormSheet({
-    super.key,
-    this.initial,
-    required this.defaultColor,
-  });
+  const GoalFormSheet({super.key, this.initial, required this.defaultColor});
 
   final Goal? initial;
   final Color defaultColor;
@@ -41,8 +37,7 @@ class _GoalFormSheetState extends State<GoalFormSheet> {
     );
     _name.addListener(_onFieldChanged);
     _target.addListener(_onFieldChanged);
-    _colorArgb =
-        widget.initial?.color ?? widget.defaultColor.toARGB32();
+    _colorArgb = widget.initial?.color ?? widget.defaultColor.toARGB32();
     _loadGoals();
   }
 
@@ -64,9 +59,7 @@ class _GoalFormSheetState extends State<GoalFormSheet> {
     if (name.isEmpty) return null;
     final key = name.toLowerCase();
     final taken = _goals.any(
-      (g) =>
-          g.id != widget.initial?.id &&
-          g.name.trim().toLowerCase() == key,
+      (g) => g.id != widget.initial?.id && g.name.trim().toLowerCase() == key,
     );
     if (taken) return AppStrings.duplicateGoalName;
     return null;
@@ -121,9 +114,9 @@ class _GoalFormSheetState extends State<GoalFormSheet> {
       await sl<GoalsService>().saveGoal(goal);
     } on ValidationAppException catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.message)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.message)));
       return;
     }
     if (mounted) Navigator.of(context).pop(goal);

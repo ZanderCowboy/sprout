@@ -19,12 +19,12 @@ class GoalsRepositoryImpl implements GoalsRepository {
     required bool Function() canSync,
     SupabaseClient? supabase,
     PendingSyncQueue? pendingSyncQueue,
-  })  : _box = box,
-        _userContext = userContext,
-        _appConfig = appConfig,
-        _canSync = canSync,
-        _supabase = supabase,
-        _pendingSyncQueue = pendingSyncQueue;
+  }) : _box = box,
+       _userContext = userContext,
+       _appConfig = appConfig,
+       _canSync = canSync,
+       _supabase = supabase,
+       _pendingSyncQueue = pendingSyncQueue;
 
   final Box<GoalHiveModel> _box;
   final UserContext _userContext;
@@ -35,7 +35,9 @@ class GoalsRepositoryImpl implements GoalsRepository {
   final _updates = StreamController<void>.broadcast();
 
   bool get _shouldEnqueue =>
-      _appConfig.isSupabaseConfigured && _pendingSyncQueue != null && _canSync();
+      _appConfig.isSupabaseConfigured &&
+      _pendingSyncQueue != null &&
+      _canSync();
 
   void _notify() {
     if (!_updates.isClosed) _updates.add(null);
@@ -52,10 +54,7 @@ class GoalsRepositoryImpl implements GoalsRepository {
   @override
   Future<List<Goal>> getGoals() async {
     final uid = await _userContext.resolveUserId();
-    return _box.values
-        .map(goalFromHive)
-        .where((g) => g.userId == uid)
-        .toList()
+    return _box.values.map(goalFromHive).where((g) => g.userId == uid).toList()
       ..sort((a, b) => a.name.compareTo(b.name));
   }
 
@@ -78,10 +77,7 @@ class GoalsRepositoryImpl implements GoalsRepository {
     _notify();
     final q = _pendingSyncQueue;
     if (_shouldEnqueue && q != null) {
-      await q.enqueue(
-        PendingSyncOperationType.deleteGoal,
-        encodeIdPayload(id),
-      );
+      await q.enqueue(PendingSyncOperationType.deleteGoal, encodeIdPayload(id));
     }
   }
 

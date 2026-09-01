@@ -26,6 +26,11 @@ final class TransactionsReady extends TransactionsState {
   final Map<String, Account> accountsById;
 
   @override
-  List<Object?> get props =>
-      [items, scheduledItems, historyItems, goalsById, accountsById];
+  List<Object?> get props => [
+    items,
+    scheduledItems,
+    historyItems,
+    goalsById,
+    accountsById,
+  ];
 }

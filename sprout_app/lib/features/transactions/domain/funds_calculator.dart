@@ -47,8 +47,7 @@ class FundsCalculator {
     Iterable<Transaction> transactions,
     String goalId, {
     DateTime? now,
-  }) =>
-      savedCentsByGoalId(transactions, now: now)[goalId] ?? 0;
+  }) => savedCentsByGoalId(transactions, now: now)[goalId] ?? 0;
 
   static int unallocatedCentsForAccount(
     Iterable<Transaction> transactions,

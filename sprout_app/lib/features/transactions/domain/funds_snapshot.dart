@@ -15,9 +15,9 @@ class FundsSnapshot extends Equatable {
 
   @override
   List<Object?> get props => [
-        savedCentsByGoalId,
-        unallocatedCents,
-        accountCurrentDepositTotalsById,
-        accountScheduledDepositTotalsById,
-      ];
+    savedCentsByGoalId,
+    unallocatedCents,
+    accountCurrentDepositTotalsById,
+    accountScheduledDepositTotalsById,
+  ];
 }

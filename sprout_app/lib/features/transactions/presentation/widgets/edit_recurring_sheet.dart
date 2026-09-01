@@ -97,9 +97,9 @@ class _EditRecurringSheetState extends State<EditRecurringSheet> {
             _enabled
                 ? AppStrings.recurringDeposit
                 : AppStrings.recurringDepositDisabled,
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 12),
           SwitchListTile.adaptive(
@@ -115,7 +115,9 @@ class _EditRecurringSheetState extends State<EditRecurringSheet> {
             const SizedBox(height: 8),
             DropdownButtonFormField<TransactionFrequency>(
               value: _frequency, // ignore: deprecated_member_use
-              decoration: const InputDecoration(labelText: AppStrings.frequency),
+              decoration: const InputDecoration(
+                labelText: AppStrings.frequency,
+              ),
               items: const [
                 DropdownMenuItem(
                   value: TransactionFrequency.daily,

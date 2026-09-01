@@ -44,11 +44,11 @@ final class BudgetReady extends BudgetState {
 
   @override
   List<Object?> get props => [
-        groups,
-        groupTotals,
-        totalIncome,
-        totalEssentials,
-        totalLifestyle,
-        disposableIncome,
-      ];
+    groups,
+    groupTotals,
+    totalIncome,
+    totalEssentials,
+    totalLifestyle,
+    disposableIncome,
+  ];
 }

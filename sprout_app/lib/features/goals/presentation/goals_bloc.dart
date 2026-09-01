@@ -16,14 +16,11 @@ class GoalsBloc extends Bloc<GoalsEvent, GoalsState> {
     required GoalsService goalsService,
     required TransactionsService transactionsService,
     required AccountsService accountsService,
-  })  : _goalsService = goalsService,
-        _transactionsService = transactionsService,
-        _accountsService = accountsService,
-        super(const GoalsInitial()) {
-    on<GoalsSubscriptionRequested>(
-      _onSubscribe,
-      transformer: restartable(),
-    );
+  }) : _goalsService = goalsService,
+       _transactionsService = transactionsService,
+       _accountsService = accountsService,
+       super(const GoalsInitial()) {
+    on<GoalsSubscriptionRequested>(_onSubscribe, transformer: restartable());
   }
 
   final GoalsService _goalsService;
@@ -34,10 +31,7 @@ class GoalsBloc extends Bloc<GoalsEvent, GoalsState> {
     GoalsSubscriptionRequested event,
     Emitter<GoalsState> emit,
   ) {
-    return emit.forEach<GoalsReady>(
-      _watchGoalProgress(),
-      onData: (s) => s,
-    );
+    return emit.forEach<GoalsReady>(_watchGoalProgress(), onData: (s) => s);
   }
 
   Stream<GoalsReady> _watchGoalProgress() {
@@ -68,26 +62,20 @@ class GoalsBloc extends Bloc<GoalsEvent, GoalsState> {
         );
       }
 
-      final goalsSub = _goalsService.watchGoals().listen(
-        (g) {
-          goals = g;
-          emitProgress();
-        },
-        onError: controller.addError,
-      );
+      final goalsSub = _goalsService.watchGoals().listen((g) {
+        goals = g;
+        emitProgress();
+      }, onError: controller.addError);
       final fundsSub = _transactionsService
           .watchFundsSnapshot(
-            accountIdsStream: _accountsService
-                .watchAccounts()
-                .map((accounts) => accounts.map((a) => a.id).toList()),
+            accountIdsStream: _accountsService.watchAccounts().map(
+              (accounts) => accounts.map((a) => a.id).toList(),
+            ),
           )
-          .listen(
-        (snapshot) {
-          fundsSnapshot = snapshot;
-          emitProgress();
-        },
-        onError: controller.addError,
-      );
+          .listen((snapshot) {
+            fundsSnapshot = snapshot;
+            emitProgress();
+          }, onError: controller.addError);
 
       controller.onCancel = () {
         goalsSub.cancel();

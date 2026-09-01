@@ -16,10 +16,10 @@ class RecurringPaymentsBloc
     required TransactionsService transactionsService,
     required GoalsService goalsService,
     required AccountsService accountsService,
-  })  : _transactionsService = transactionsService,
-        _goalsService = goalsService,
-        _accountsService = accountsService,
-        super(const RecurringPaymentsInitial()) {
+  }) : _transactionsService = transactionsService,
+       _goalsService = goalsService,
+       _accountsService = accountsService,
+       super(const RecurringPaymentsInitial()) {
     on<RecurringPaymentsSubscriptionRequested>(_onSubscribe);
   }
 
@@ -46,23 +46,24 @@ class RecurringPaymentsBloc
       void tryEmit() {
         if (txs == null || goals == null || accounts == null) return;
 
-        final items = txs!
-            .where(
-              (t) =>
-                  t.isRecurring &&
-                  t.frequency != TransactionFrequency.none &&
-                  t.kind == TransactionKind.deposit,
-            )
-            .toList()
-          ..sort((a, b) {
-            final ad = a.recurringEnabled
-                ? (a.nextScheduledDate ?? DateTime(9999))
-                : DateTime(9999);
-            final bd = b.recurringEnabled
-                ? (b.nextScheduledDate ?? DateTime(9999))
-                : DateTime(9999);
-            return ad.compareTo(bd);
-          });
+        final items =
+            txs!
+                .where(
+                  (t) =>
+                      t.isRecurring &&
+                      t.frequency != TransactionFrequency.none &&
+                      t.kind == TransactionKind.deposit,
+                )
+                .toList()
+              ..sort((a, b) {
+                final ad = a.recurringEnabled
+                    ? (a.nextScheduledDate ?? DateTime(9999))
+                    : DateTime(9999);
+                final bd = b.recurringEnabled
+                    ? (b.nextScheduledDate ?? DateTime(9999))
+                    : DateTime(9999);
+                return ad.compareTo(bd);
+              });
 
         controller.add(
           RecurringPaymentsReady(
@@ -73,27 +74,18 @@ class RecurringPaymentsBloc
         );
       }
 
-      final txSub = _transactionsService.watchTransactions().listen(
-        (t) {
-          txs = t;
-          tryEmit();
-        },
-        onError: controller.addError,
-      );
-      final goalsSub = _goalsService.watchGoals().listen(
-        (g) {
-          goals = g;
-          tryEmit();
-        },
-        onError: controller.addError,
-      );
-      final accountsSub = _accountsService.watchAccounts().listen(
-        (a) {
-          accounts = a;
-          tryEmit();
-        },
-        onError: controller.addError,
-      );
+      final txSub = _transactionsService.watchTransactions().listen((t) {
+        txs = t;
+        tryEmit();
+      }, onError: controller.addError);
+      final goalsSub = _goalsService.watchGoals().listen((g) {
+        goals = g;
+        tryEmit();
+      }, onError: controller.addError);
+      final accountsSub = _accountsService.watchAccounts().listen((a) {
+        accounts = a;
+        tryEmit();
+      }, onError: controller.addError);
 
       controller.onCancel = () {
         txSub.cancel();

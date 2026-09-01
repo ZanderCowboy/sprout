@@ -17,10 +17,7 @@ class TransactionRules {
   }
 
   static ({List<Transaction> scheduled, List<Transaction> history})
-      splitScheduledAndHistory(
-    List<Transaction> txs, {
-    DateTime? now,
-  }) {
+  splitScheduledAndHistory(List<Transaction> txs, {DateTime? now}) {
     final effectiveNow = now ?? DateTime.now();
     final scheduled = <Transaction>[];
     final history = <Transaction>[];

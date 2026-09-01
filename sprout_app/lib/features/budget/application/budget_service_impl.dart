@@ -16,8 +16,7 @@ class BudgetServiceImpl implements BudgetService {
       _repository.watchBudgetGroups();
 
   @override
-  Future<List<BudgetGroup>> getBudgetGroups() =>
-      _repository.getBudgetGroups();
+  Future<List<BudgetGroup>> getBudgetGroups() => _repository.getBudgetGroups();
 
   @override
   Future<void> saveBudgetGroup(BudgetGroup group) async {
@@ -42,9 +41,7 @@ class BudgetServiceImpl implements BudgetService {
       throw ValidationAppException(AppStrings.duplicateGroupName);
     }
 
-    await _repository.upsertBudgetGroup(
-      group.copyWith(name: trimmedName),
-    );
+    await _repository.upsertBudgetGroup(group.copyWith(name: trimmedName));
   }
 
   @override

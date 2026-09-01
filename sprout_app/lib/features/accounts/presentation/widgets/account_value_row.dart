@@ -15,9 +15,11 @@ class AccountValueRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final style = Theme.of(context).textTheme.bodyMedium;
-    final valueStyle = (isEmphasis ? Theme.of(context).textTheme.titleMedium : style)?.copyWith(
-      fontWeight: isEmphasis ? FontWeight.w900 : FontWeight.w700,
-    );
+    final valueStyle =
+        (isEmphasis ? Theme.of(context).textTheme.titleMedium : style)
+            ?.copyWith(
+              fontWeight: isEmphasis ? FontWeight.w900 : FontWeight.w700,
+            );
     return Row(
       children: [
         Expanded(

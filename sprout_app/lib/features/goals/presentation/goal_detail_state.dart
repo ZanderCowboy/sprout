@@ -31,12 +31,12 @@ final class GoalDetailReady extends GoalDetailState {
 
   @override
   List<Object?> get props => [
-        progress,
-        transactions,
-        scheduledTransactions,
-        historyTransactions,
-        accountsById,
-        graphPoints,
-        prediction,
-      ];
+    progress,
+    transactions,
+    scheduledTransactions,
+    historyTransactions,
+    accountsById,
+    graphPoints,
+    prediction,
+  ];
 }

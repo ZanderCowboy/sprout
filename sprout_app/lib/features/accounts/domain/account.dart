@@ -18,6 +18,5 @@ class Account extends Equatable {
   final DateTime updatedAt;
 
   @override
-  List<Object?> get props =>
-      [id, userId, name, color, createdAt, updatedAt];
+  List<Object?> get props => [id, userId, name, color, createdAt, updatedAt];
 }

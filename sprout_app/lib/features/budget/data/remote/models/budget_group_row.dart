@@ -45,17 +45,16 @@ class BudgetGroupRow {
   }
 
   Map<String, dynamic> toMap() => {
-        'id': id,
-        'user_id': userId,
-        'name': name,
-        'description': description,
-        'category': category,
-        'color_hex': colorHex,
-        'icon_code_point': iconCodePoint,
-        'icon_font_family': iconFontFamily,
-        'items_json': itemsJson,
-        'created_at': createdAt.toUtc().toIso8601String(),
-        'updated_at': updatedAt.toUtc().toIso8601String(),
-      };
+    'id': id,
+    'user_id': userId,
+    'name': name,
+    'description': description,
+    'category': category,
+    'color_hex': colorHex,
+    'icon_code_point': iconCodePoint,
+    'icon_font_family': iconFontFamily,
+    'items_json': itemsJson,
+    'created_at': createdAt.toUtc().toIso8601String(),
+    'updated_at': updatedAt.toUtc().toIso8601String(),
+  };
 }
-

@@ -1,10 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 class PortfolioSummary extends Equatable {
-  const PortfolioSummary({
-    required this.totalCents,
-    this.lastActivityAt,
-  });
+  const PortfolioSummary({required this.totalCents, this.lastActivityAt});
 
   final int totalCents;
   final DateTime? lastActivityAt;

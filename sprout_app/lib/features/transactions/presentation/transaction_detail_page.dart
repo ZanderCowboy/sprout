@@ -35,8 +35,8 @@ class TransactionDetailPage extends StatelessWidget {
             body: switch (state) {
               TransactionDetailReady s => _TransactionDetailBody(state: s),
               TransactionDetailMissing _ => const Center(
-                  child: Text(AppStrings.transactionNotFound),
-                ),
+                child: Text(AppStrings.transactionNotFound),
+              ),
               _ => const Center(child: CircularProgressIndicator()),
             },
           );
@@ -88,9 +88,9 @@ class _TransactionDetailBodyState extends State<_TransactionDetailBody> {
         note: _note.text,
       );
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text(AppStrings.noteSaved)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text(AppStrings.noteSaved)));
     } on Object catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -104,7 +104,8 @@ class _TransactionDetailBodyState extends State<_TransactionDetailBody> {
   @override
   Widget build(BuildContext context) {
     final t = widget.state.transaction;
-    final accountName = widget.state.accountsById[t.accountId]?.name ??
+    final accountName =
+        widget.state.accountsById[t.accountId]?.name ??
         AppStrings.unknownAccount;
     final goalName = t.goalId == null
         ? AppStrings.unallocated
@@ -123,10 +124,14 @@ class _TransactionDetailBodyState extends State<_TransactionDetailBody> {
         ? group.where((x) => x.kind == TransactionKind.allocation).toList()
         : const <Transaction>[];
 
-    final groupDepositCents =
-        depositInGroup.fold<int>(0, (sum, x) => sum + x.amountCents);
-    final groupAllocatedCents =
-        allocationsInGroup.fold<int>(0, (sum, x) => sum + x.amountCents);
+    final groupDepositCents = depositInGroup.fold<int>(
+      0,
+      (sum, x) => sum + x.amountCents,
+    );
+    final groupAllocatedCents = allocationsInGroup.fold<int>(
+      0,
+      (sum, x) => sum + x.amountCents,
+    );
     final groupRemainingCents = groupDepositCents - groupAllocatedCents;
 
     return ListView(
@@ -216,7 +221,7 @@ class _TransactionDetailBodyState extends State<_TransactionDetailBody> {
                     goalName: a.goalId == null
                         ? AppStrings.unallocated
                         : (widget.state.goalsById[a.goalId!]?.name ??
-                            AppStrings.unknownGoal),
+                              AppStrings.unknownGoal),
                     occurredAt: a.occurredAt,
                   ),
                   const SizedBox(height: 8),
@@ -250,9 +255,7 @@ class _TransactionDetailBodyState extends State<_TransactionDetailBody> {
                 identifier: SemanticsIds.transactionNoteSave,
                 label: AppStrings.save,
                 onPressed: _savingNote ? null : _saveNote,
-                child: Text(
-                  _savingNote ? AppStrings.saving : AppStrings.save,
-                ),
+                child: Text(_savingNote ? AppStrings.saving : AppStrings.save),
               ),
             ],
           ),
@@ -272,17 +275,14 @@ class _TransactionDetailBodyState extends State<_TransactionDetailBody> {
             child: Text(
               k,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    fontWeight: FontWeight.w600,
-                  ),
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
           const SizedBox(width: 8),
           Expanded(
-            child: Text(
-              v,
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
+            child: Text(v, style: Theme.of(context).textTheme.bodyMedium),
           ),
         ],
       ),

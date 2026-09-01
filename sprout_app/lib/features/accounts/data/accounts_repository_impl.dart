@@ -20,12 +20,12 @@ class AccountsRepositoryImpl implements AccountsRepository {
     required bool Function() canSync,
     SupabaseClient? supabase,
     PendingSyncQueue? pendingSyncQueue,
-  })  : _box = box,
-        _userContext = userContext,
-        _appConfig = appConfig,
-        _canSync = canSync,
-        _supabase = supabase,
-        _pendingSyncQueue = pendingSyncQueue;
+  }) : _box = box,
+       _userContext = userContext,
+       _appConfig = appConfig,
+       _canSync = canSync,
+       _supabase = supabase,
+       _pendingSyncQueue = pendingSyncQueue;
 
   final Box<AccountHiveModel> _box;
   final UserContext _userContext;
@@ -40,7 +40,9 @@ class AccountsRepositoryImpl implements AccountsRepository {
   }
 
   bool get _shouldEnqueue =>
-      _appConfig.isSupabaseConfigured && _pendingSyncQueue != null && _canSync();
+      _appConfig.isSupabaseConfigured &&
+      _pendingSyncQueue != null &&
+      _canSync();
 
   Future<void> _enqueueUpsert(Account a) async {
     final q = _pendingSyncQueue;
@@ -63,11 +65,9 @@ class AccountsRepositoryImpl implements AccountsRepository {
   @override
   Future<List<Account>> getAccounts() async {
     final uid = await _userContext.resolveUserId();
-    final list = _box.values
-        .map(accountFromHive)
-        .where((a) => a.userId == uid)
-        .toList()
-      ..sort((a, b) => a.name.compareTo(b.name));
+    final list =
+        _box.values.map(accountFromHive).where((a) => a.userId == uid).toList()
+          ..sort((a, b) => a.name.compareTo(b.name));
     return list;
   }
 

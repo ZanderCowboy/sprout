@@ -17,11 +17,11 @@ class TransactionDetailBloc
     required TransactionsService transactionsService,
     required GoalsService goalsService,
     required AccountsService accountsService,
-  })  : _transactionId = transactionId,
-        _transactionsService = transactionsService,
-        _goalsService = goalsService,
-        _accountsService = accountsService,
-        super(const TransactionDetailInitial()) {
+  }) : _transactionId = transactionId,
+       _transactionsService = transactionsService,
+       _goalsService = goalsService,
+       _accountsService = accountsService,
+       super(const TransactionDetailInitial()) {
     on<TransactionDetailSubscriptionRequested>(_onSubscribe);
   }
 
@@ -34,10 +34,7 @@ class TransactionDetailBloc
     TransactionDetailSubscriptionRequested event,
     Emitter<TransactionDetailState> emit,
   ) {
-    return emit.forEach<TransactionDetailState>(
-      _watch(),
-      onData: (s) => s,
-    );
+    return emit.forEach<TransactionDetailState>(_watch(), onData: (s) => s);
   }
 
   Stream<TransactionDetailState> _watch() {
@@ -57,9 +54,7 @@ class TransactionDetailBloc
         final gid = tx.groupId;
         List<Transaction>? group;
         if (gid != null) {
-          group = txs!
-              .where((x) => x.groupId == gid)
-              .toList()
+          group = txs!.where((x) => x.groupId == gid).toList()
             ..sort((a, b) => a.occurredAt.compareTo(b.occurredAt));
         }
         controller.add(
@@ -72,27 +67,18 @@ class TransactionDetailBloc
         );
       }
 
-      final txSub = _transactionsService.watchTransactions().listen(
-        (t) {
-          txs = t;
-          tryEmit();
-        },
-        onError: controller.addError,
-      );
-      final goalsSub = _goalsService.watchGoals().listen(
-        (g) {
-          goals = g;
-          tryEmit();
-        },
-        onError: controller.addError,
-      );
-      final accountsSub = _accountsService.watchAccounts().listen(
-        (a) {
-          accounts = a;
-          tryEmit();
-        },
-        onError: controller.addError,
-      );
+      final txSub = _transactionsService.watchTransactions().listen((t) {
+        txs = t;
+        tryEmit();
+      }, onError: controller.addError);
+      final goalsSub = _goalsService.watchGoals().listen((g) {
+        goals = g;
+        tryEmit();
+      }, onError: controller.addError);
+      final accountsSub = _accountsService.watchAccounts().listen((a) {
+        accounts = a;
+        tryEmit();
+      }, onError: controller.addError);
 
       controller.onCancel = () {
         txSub.cancel();

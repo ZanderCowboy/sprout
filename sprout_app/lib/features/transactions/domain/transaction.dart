@@ -13,9 +13,9 @@ enum TransactionKind {
 
 extension TransactionKindCodec on TransactionKind {
   String get wireName => switch (this) {
-        TransactionKind.deposit => 'deposit',
-        TransactionKind.allocation => 'allocation',
-      };
+    TransactionKind.deposit => 'deposit',
+    TransactionKind.allocation => 'allocation',
+  };
 
   static TransactionKind fromWireName(String? wire) {
     if (wire == null || wire.isEmpty) return TransactionKind.deposit;
@@ -62,19 +62,19 @@ class Transaction extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        userId,
-        accountId,
-        kind,
-        goalId,
-        groupId,
-        amountCents,
-        occurredAt,
-        note,
-        pendingSync,
-        isRecurring,
-        recurringEnabled,
-        frequency,
-        nextScheduledDate,
-      ];
+    id,
+    userId,
+    accountId,
+    kind,
+    goalId,
+    groupId,
+    amountCents,
+    occurredAt,
+    note,
+    pendingSync,
+    isRecurring,
+    recurringEnabled,
+    frequency,
+    nextScheduledDate,
+  ];
 }

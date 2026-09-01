@@ -35,26 +35,22 @@ class TransactionsServiceImpl implements TransactionsService {
       List<String> accountIds = [];
 
       void emitSnapshot() {
-        controller.add(computeFundsSnapshot(
-          transactions: transactions,
-          accountIds: accountIds,
-        ));
+        controller.add(
+          computeFundsSnapshot(
+            transactions: transactions,
+            accountIds: accountIds,
+          ),
+        );
       }
 
-      final txSub = watchTransactions().listen(
-        (txs) {
-          transactions = txs;
-          emitSnapshot();
-        },
-        onError: controller.addError,
-      );
-      final accountsSub = accountIdsStream.listen(
-        (ids) {
-          accountIds = ids;
-          emitSnapshot();
-        },
-        onError: controller.addError,
-      );
+      final txSub = watchTransactions().listen((txs) {
+        transactions = txs;
+        emitSnapshot();
+      }, onError: controller.addError);
+      final accountsSub = accountIdsStream.listen((ids) {
+        accountIds = ids;
+        emitSnapshot();
+      }, onError: controller.addError);
 
       controller.onCancel = () {
         txSub.cancel();
@@ -70,8 +66,10 @@ class TransactionsServiceImpl implements TransactionsService {
     DateTime? now,
   }) {
     return FundsSnapshot(
-      savedCentsByGoalId:
-          FundsCalculator.savedCentsByGoalId(transactions, now: now),
+      savedCentsByGoalId: FundsCalculator.savedCentsByGoalId(
+        transactions,
+        now: now,
+      ),
       unallocatedCents: FundsCalculator.totalUnallocatedCents(
         transactions,
         accountIds,
@@ -82,11 +80,12 @@ class TransactionsServiceImpl implements TransactionsService {
         scheduled: false,
         now: now,
       ),
-      accountScheduledDepositTotalsById: FundsCalculator.accountDepositTotalsById(
-        transactions,
-        scheduled: true,
-        now: now,
-      ),
+      accountScheduledDepositTotalsById:
+          FundsCalculator.accountDepositTotalsById(
+            transactions,
+            scheduled: true,
+            now: now,
+          ),
     );
   }
 
@@ -95,19 +94,15 @@ class TransactionsServiceImpl implements TransactionsService {
     List<Transaction> transactions,
     String accountId, {
     DateTime? now,
-  }) =>
-      FundsCalculator.unallocatedCentsForAccount(
-        transactions,
-        accountId,
-        now: now,
-      );
+  }) => FundsCalculator.unallocatedCentsForAccount(
+    transactions,
+    accountId,
+    now: now,
+  );
 
   @override
   ({List<Transaction> scheduled, List<Transaction> history})
-      splitScheduledAndHistory(
-    List<Transaction> txs, {
-    DateTime? now,
-  }) =>
+  splitScheduledAndHistory(List<Transaction> txs, {DateTime? now}) =>
       TransactionRules.splitScheduledAndHistory(txs, now: now);
 
   @override
@@ -128,18 +123,17 @@ class TransactionsServiceImpl implements TransactionsService {
     String? note,
     bool isRecurring = false,
     TransactionFrequency frequency = TransactionFrequency.none,
-  }) =>
-      _repository.addTransaction(
-        accountId: accountId,
-        kind: TransactionKind.deposit,
-        goalId: goalId,
-        groupId: groupId,
-        amountCents: amountCents,
-        occurredAt: occurredAt,
-        note: note,
-        isRecurring: isRecurring,
-        frequency: frequency,
-      );
+  }) => _repository.addTransaction(
+    accountId: accountId,
+    kind: TransactionKind.deposit,
+    goalId: goalId,
+    groupId: groupId,
+    amountCents: amountCents,
+    occurredAt: occurredAt,
+    note: note,
+    isRecurring: isRecurring,
+    frequency: frequency,
+  );
 
   @override
   Future<void> recordAccountDeposit({
@@ -150,18 +144,17 @@ class TransactionsServiceImpl implements TransactionsService {
     String? note,
     bool isRecurring = false,
     TransactionFrequency frequency = TransactionFrequency.none,
-  }) =>
-      _repository.addTransaction(
-        accountId: accountId,
-        kind: TransactionKind.deposit,
-        goalId: null,
-        groupId: groupId,
-        amountCents: amountCents,
-        occurredAt: occurredAt,
-        note: note,
-        isRecurring: isRecurring,
-        frequency: frequency,
-      );
+  }) => _repository.addTransaction(
+    accountId: accountId,
+    kind: TransactionKind.deposit,
+    goalId: null,
+    groupId: groupId,
+    amountCents: amountCents,
+    occurredAt: occurredAt,
+    note: note,
+    isRecurring: isRecurring,
+    frequency: frequency,
+  );
 
   @override
   Future<void> recordAllocation({
@@ -171,18 +164,17 @@ class TransactionsServiceImpl implements TransactionsService {
     required int amountCents,
     DateTime? occurredAt,
     String? note,
-  }) =>
-      _repository.addTransaction(
-        accountId: accountId,
-        kind: TransactionKind.allocation,
-        goalId: goalId,
-        groupId: groupId,
-        amountCents: amountCents,
-        occurredAt: occurredAt,
-        note: note,
-        isRecurring: false,
-        frequency: TransactionFrequency.none,
-      );
+  }) => _repository.addTransaction(
+    accountId: accountId,
+    kind: TransactionKind.allocation,
+    goalId: goalId,
+    groupId: groupId,
+    amountCents: amountCents,
+    occurredAt: occurredAt,
+    note: note,
+    isRecurring: false,
+    frequency: TransactionFrequency.none,
+  );
 
   @override
   Future<void> submitDepositFlow({
@@ -277,23 +269,21 @@ class TransactionsServiceImpl implements TransactionsService {
   Future<void> updateNote({
     required String transactionId,
     required String? note,
-  }) =>
-      _repository.updateTransactionNote(
-        transactionId: transactionId,
-        note: note,
-      );
+  }) => _repository.updateTransactionNote(
+    transactionId: transactionId,
+    note: note,
+  );
 
   @override
   Future<void> updateRecurringDeposit({
     required String transactionId,
     required bool isRecurring,
     required TransactionFrequency frequency,
-  }) =>
-      _repository.updateTransactionRecurringConfig(
-        transactionId: transactionId,
-        isRecurring: isRecurring,
-        frequency: frequency,
-      );
+  }) => _repository.updateTransactionRecurringConfig(
+    transactionId: transactionId,
+    isRecurring: isRecurring,
+    frequency: frequency,
+  );
 
   @override
   Future<void> deleteTransaction(String transactionId) =>

@@ -67,17 +67,16 @@ class BudgetGroup extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        userId,
-        name,
-        description,
-        colorHex,
-        iconCodePoint,
-        iconFontFamily,
-        category,
-        items,
-        createdAt,
-        updatedAt,
-      ];
+    id,
+    userId,
+    name,
+    description,
+    colorHex,
+    iconCodePoint,
+    iconFontFamily,
+    category,
+    items,
+    createdAt,
+    updatedAt,
+  ];
 }
-

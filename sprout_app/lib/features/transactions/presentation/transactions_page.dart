@@ -64,21 +64,22 @@ class _TransactionsBody extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 10),
             child: Text(
               AppStrings.scheduled,
-              style: Theme.of(context)
-                  .textTheme
-                  .titleSmall
-                  ?.copyWith(fontWeight: FontWeight.w800),
+              style: Theme.of(
+                context,
+              ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
             ),
           ),
-          ...scheduled.expand((t) => [
-                TransactionCard(
-                  transaction: t,
-                  goalsById: state.goalsById,
-                  accountsById: state.accountsById,
-                  now: now,
-                ),
-                const SizedBox(height: 10),
-              ]),
+          ...scheduled.expand(
+            (t) => [
+              TransactionCard(
+                transaction: t,
+                goalsById: state.goalsById,
+                accountsById: state.accountsById,
+                now: now,
+              ),
+              const SizedBox(height: 10),
+            ],
+          ),
           const SizedBox(height: 8),
         ],
         if (history.isNotEmpty) ...[
@@ -86,21 +87,22 @@ class _TransactionsBody extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 10),
             child: Text(
               AppStrings.history,
-              style: Theme.of(context)
-                  .textTheme
-                  .titleSmall
-                  ?.copyWith(fontWeight: FontWeight.w800),
+              style: Theme.of(
+                context,
+              ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
             ),
           ),
-          ...history.expand((t) => [
-                TransactionCard(
-                  transaction: t,
-                  goalsById: state.goalsById,
-                  accountsById: state.accountsById,
-                  now: now,
-                ),
-                const SizedBox(height: 10),
-              ]),
+          ...history.expand(
+            (t) => [
+              TransactionCard(
+                transaction: t,
+                goalsById: state.goalsById,
+                accountsById: state.accountsById,
+                now: now,
+              ),
+              const SizedBox(height: 10),
+            ],
+          ),
         ],
       ],
     );

@@ -1,19 +1,13 @@
-enum TransactionFrequency {
-  none,
-  daily,
-  weekly,
-  monthly,
-  yearly;
-}
+enum TransactionFrequency { none, daily, weekly, monthly, yearly }
 
 extension TransactionFrequencyCodec on TransactionFrequency {
   String get wireName => switch (this) {
-        TransactionFrequency.none => 'none',
-        TransactionFrequency.daily => 'daily',
-        TransactionFrequency.weekly => 'weekly',
-        TransactionFrequency.monthly => 'monthly',
-        TransactionFrequency.yearly => 'yearly',
-      };
+    TransactionFrequency.none => 'none',
+    TransactionFrequency.daily => 'daily',
+    TransactionFrequency.weekly => 'weekly',
+    TransactionFrequency.monthly => 'monthly',
+    TransactionFrequency.yearly => 'yearly',
+  };
 
   static TransactionFrequency fromWireName(String? value) {
     return switch ((value ?? 'none').toLowerCase()) {
@@ -25,4 +19,3 @@ extension TransactionFrequencyCodec on TransactionFrequency {
     };
   }
 }
-

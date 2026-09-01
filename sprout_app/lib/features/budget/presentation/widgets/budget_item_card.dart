@@ -220,112 +220,116 @@ class _BudgetItemCardState extends State<BudgetItemCard> {
     return Semantics(
       identifier: SemanticsIds.budgetItemCard,
       button: true,
-      label: widget.item.name.trim().isEmpty ? BudgetItem.defaultDraftName : widget.item.name,
+      label: widget.item.name.trim().isEmpty
+          ? BudgetItem.defaultDraftName
+          : widget.item.name,
       child: Card(
-      elevation: 0,
-      color: surface,
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onLongPress: widget.isDraft ? widget.onDiscardDraft : _confirmDelete,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
-          child: Row(
-            children: [
-              Expanded(
-                child: _editingName
-                    ? TextField(
-                        controller: _name,
-                        focusNode: _nameFocus,
-                        decoration: const InputDecoration(
-                          isDense: true,
-                          border: InputBorder.none,
-                          hintText: AppStrings.itemName,
+        elevation: 0,
+        color: surface,
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onLongPress: widget.isDraft ? widget.onDiscardDraft : _confirmDelete,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
+            child: Row(
+              children: [
+                Expanded(
+                  child: _editingName
+                      ? TextField(
+                          controller: _name,
+                          focusNode: _nameFocus,
+                          decoration: const InputDecoration(
+                            isDense: true,
+                            border: InputBorder.none,
+                            hintText: AppStrings.itemName,
+                          ),
+                          textCapitalization: TextCapitalization.words,
+                          textInputAction: TextInputAction.next,
+                          autofocus: true,
+                          onEditingComplete: _completeNameEditing,
+                        )
+                      : InkWell(
+                          onTap: () {
+                            setState(() => _editingName = true);
+                            _nameFocus.requestFocus();
+                          },
+                          child: Text(
+                            widget.item.name.trim().isEmpty
+                                ? BudgetItem.defaultDraftName
+                                : widget.item.name,
+                            style: Theme.of(context).textTheme.bodyLarge
+                                ?.copyWith(
+                                  fontWeight: FontWeight.w800,
+                                  color: widget.item.name.trim().isEmpty
+                                      ? scheme.onSurfaceVariant.withValues(
+                                          alpha: 0.55,
+                                        )
+                                      : null,
+                                ),
+                          ),
                         ),
-                        textCapitalization: TextCapitalization.words,
-                        textInputAction: TextInputAction.next,
-                        autofocus: true,
-                        onEditingComplete: _completeNameEditing,
+                ),
+                const SizedBox(width: 10),
+                _editingAmount
+                    ? SizedBox(
+                        width: 110,
+                        child: TextField(
+                          controller: _amount,
+                          focusNode: _amountFocus,
+                          decoration: InputDecoration(
+                            isDense: true,
+                            border: InputBorder.none,
+                            hintText: _amountHint,
+                            hintStyle: Theme.of(context).textTheme.bodyLarge
+                                ?.copyWith(
+                                  color: scheme.onSurfaceVariant.withValues(
+                                    alpha: 0.45,
+                                  ),
+                                ),
+                          ),
+                          style: Theme.of(context).textTheme.bodyLarge
+                              ?.copyWith(
+                                fontWeight: FontWeight.w900,
+                                color: scheme.onSurfaceVariant,
+                              ),
+                          textAlign: TextAlign.end,
+                          keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true,
+                            signed: false,
+                          ),
+                          autofocus: true,
+                        ),
                       )
                     : InkWell(
                         onTap: () {
-                          setState(() => _editingName = true);
-                          _nameFocus.requestFocus();
+                          setState(() {
+                            _editingAmount = true;
+                            _amount.text = _amountTextForField(
+                              widget.item.amount,
+                            );
+                          });
+                          _amountFocus.requestFocus();
                         },
                         child: Text(
-                          widget.item.name.trim().isEmpty
-                              ? BudgetItem.defaultDraftName
-                              : widget.item.name,
+                          widget.item.amount == 0.0
+                              ? _amountHint
+                              : formatZarFromCents(
+                                  (widget.item.amount * 100).round(),
+                                ),
                           style: Theme.of(context).textTheme.bodyLarge
                               ?.copyWith(
-                                fontWeight: FontWeight.w800,
-                                color: widget.item.name.trim().isEmpty
-                                    ? scheme.onSurfaceVariant.withValues(
-                                        alpha: 0.55,
-                                      )
-                                    : null,
-                              ),
-                        ),
-                      ),
-              ),
-              const SizedBox(width: 10),
-              _editingAmount
-                  ? SizedBox(
-                      width: 110,
-                      child: TextField(
-                        controller: _amount,
-                        focusNode: _amountFocus,
-                        decoration: InputDecoration(
-                          isDense: true,
-                          border: InputBorder.none,
-                          hintText: _amountHint,
-                          hintStyle: Theme.of(context).textTheme.bodyLarge
-                              ?.copyWith(
+                                fontWeight: FontWeight.w900,
                                 color: scheme.onSurfaceVariant.withValues(
-                                  alpha: 0.45,
+                                  alpha: widget.item.amount == 0.0 ? 0.45 : 1.0,
                                 ),
                               ),
                         ),
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          fontWeight: FontWeight.w900,
-                          color: scheme.onSurfaceVariant,
-                        ),
-                        textAlign: TextAlign.end,
-                        keyboardType: const TextInputType.numberWithOptions(
-                          decimal: true,
-                          signed: false,
-                        ),
-                        autofocus: true,
                       ),
-                    )
-                  : InkWell(
-                      onTap: () {
-                        setState(() {
-                          _editingAmount = true;
-                          _amount.text = _amountTextForField(
-                            widget.item.amount,
-                          );
-                        });
-                        _amountFocus.requestFocus();
-                      },
-                      child: Text(
-                        widget.item.amount == 0.0
-                            ? _amountHint
-                            : formatZarFromCents(
-                                (widget.item.amount * 100).round(),
-                              ),
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          fontWeight: FontWeight.w900,
-                          color: scheme.onSurfaceVariant.withValues(
-                            alpha: widget.item.amount == 0.0 ? 0.45 : 1.0,
-                          ),
-                        ),
-                      ),
-                    ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
-    ),
     );
   }
 }

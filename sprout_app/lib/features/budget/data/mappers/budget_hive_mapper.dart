@@ -15,10 +15,11 @@ BudgetGroup budgetGroupFromHive(BudgetGroupHiveModel m) {
     colorHex: m.colorHex,
     iconCodePoint: m.iconCodePoint,
     iconFontFamily: m.iconFontFamily,
-    category: BudgetCategory.values[(m.categoryIndex >= 0 &&
-            m.categoryIndex < BudgetCategory.values.length)
-        ? m.categoryIndex
-        : 0],
+    category:
+        BudgetCategory.values[(m.categoryIndex >= 0 &&
+                m.categoryIndex < BudgetCategory.values.length)
+            ? m.categoryIndex
+            : 0],
     items: decoded,
     createdAt: DateTime.fromMillisecondsSinceEpoch(m.createdAtMillis),
     updatedAt: DateTime.fromMillisecondsSinceEpoch(m.updatedAtMillis),
@@ -37,13 +38,7 @@ BudgetGroupHiveModel budgetGroupToHive(BudgetGroup g) {
     categoryIndex: g.category.index,
     itemsJson: jsonEncode(
       g.items
-          .map(
-            (i) => {
-              'id': i.id,
-              'name': i.name,
-              'amount': i.amount,
-            },
-          )
+          .map((i) => {'id': i.id, 'name': i.name, 'amount': i.amount})
           .toList(),
     ),
     createdAtMillis: g.createdAt.millisecondsSinceEpoch,
@@ -71,4 +66,3 @@ List<BudgetItem> _decodeItems(String json) {
     return const <BudgetItem>[];
   }
 }
-

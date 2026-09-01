@@ -61,9 +61,8 @@ class AccountDetailView extends StatelessWidget {
                       Expanded(
                         child: Text(
                           AppStrings.accountValue,
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.w800,
-                              ),
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(fontWeight: FontWeight.w800),
                         ),
                       ),
                       if (scheduledTotalCents > 0)
@@ -99,9 +98,9 @@ class AccountDetailView extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             AppStrings.transactions,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 12),
           if (transactions.isEmpty)

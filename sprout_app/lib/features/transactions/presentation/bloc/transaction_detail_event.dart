@@ -6,6 +6,7 @@ sealed class TransactionDetailEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-final class TransactionDetailSubscriptionRequested extends TransactionDetailEvent {
+final class TransactionDetailSubscriptionRequested
+    extends TransactionDetailEvent {
   const TransactionDetailSubscriptionRequested();
 }

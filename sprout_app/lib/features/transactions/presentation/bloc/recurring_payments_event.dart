@@ -6,6 +6,7 @@ sealed class RecurringPaymentsEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-final class RecurringPaymentsSubscriptionRequested extends RecurringPaymentsEvent {
+final class RecurringPaymentsSubscriptionRequested
+    extends RecurringPaymentsEvent {
   const RecurringPaymentsSubscriptionRequested();
 }

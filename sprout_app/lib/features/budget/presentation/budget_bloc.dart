@@ -14,12 +14,9 @@ part 'budget_state.dart';
 
 class BudgetBloc extends Bloc<BudgetEvent, BudgetState> {
   BudgetBloc({required BudgetService budgetService})
-      : _budgetService = budgetService,
-        super(const BudgetInitial()) {
-    on<BudgetSubscriptionRequested>(
-      _onSubscribe,
-      transformer: restartable(),
-    );
+    : _budgetService = budgetService,
+      super(const BudgetInitial()) {
+    on<BudgetSubscriptionRequested>(_onSubscribe, transformer: restartable());
     on<BudgetGroupUpsertRequested>(_onUpsertGroup, transformer: sequential());
     on<BudgetGroupDeleted>(_onDeleteGroup, transformer: sequential());
     on<BudgetItemUpsertRequested>(_onUpsertItem, transformer: sequential());

@@ -1,6 +1,1 @@
-enum GoalsSort {
-  remainingLowToHigh,
-  progressHighToLow,
-  nameAToZ,
-}
-
+enum GoalsSort { remainingLowToHigh, progressHighToLow, nameAToZ }

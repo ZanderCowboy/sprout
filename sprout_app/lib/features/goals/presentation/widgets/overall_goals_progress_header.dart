@@ -40,10 +40,7 @@ class OverallGoalsProgressHeader extends StatelessWidget {
         color: scheme.surfaceContainerHighest,
         clipBehavior: onTap != null ? Clip.antiAlias : Clip.none,
         child: onTap != null
-            ? InkWell(
-                onTap: onTap,
-                child: _content(context, scheme, progress),
-              )
+            ? InkWell(onTap: onTap, child: _content(context, scheme, progress))
             : _content(context, scheme, progress),
       ),
     );
@@ -57,25 +54,21 @@ class OverallGoalsProgressHeader extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(
-                Icons.auto_graph_rounded,
-                size: 18,
-                color: scheme.primary,
-              ),
+              Icon(Icons.auto_graph_rounded, size: 18, color: scheme.primary),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   title,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w800,
-                      ),
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
               ),
               Text(
                 '$overallPercent%',
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.w900,
-                    ),
+                  fontWeight: FontWeight.w900,
+                ),
               ),
             ],
           ),
@@ -85,21 +78,17 @@ class OverallGoalsProgressHeader extends StatelessWidget {
             minHeight: 12,
             borderRadius: BorderRadius.circular(8),
             color: scheme.primary,
-            backgroundColor: scheme.onSurfaceVariant.withValues(
-              alpha: 0.18,
-            ),
+            backgroundColor: scheme.onSurfaceVariant.withValues(alpha: 0.18),
           ),
           const SizedBox(height: 12),
           Row(
             children: [
               Expanded(
                 child: Text(
-                  AppStrings.savedAmount(
-                    formatZarFromCents(totalSavedCents),
-                  ),
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w800,
-                      ),
+                  AppStrings.savedAmount(formatZarFromCents(totalSavedCents)),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
                 ),
               ),
               Text(
@@ -107,9 +96,9 @@ class OverallGoalsProgressHeader extends StatelessWidget {
                   formatZarFromCents(totalTargetCents),
                 ),
                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: scheme.onSurfaceVariant,
-                    ),
+                  fontWeight: FontWeight.w700,
+                  color: scheme.onSurfaceVariant,
+                ),
               ),
             ],
           ),
@@ -122,9 +111,9 @@ class OverallGoalsProgressHeader extends StatelessWidget {
                     formatZarFromCents(totalRemainingCents),
                   ),
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: scheme.onSurfaceVariant,
-                      ),
+                    fontWeight: FontWeight.w600,
+                    color: scheme.onSurfaceVariant,
+                  ),
                 ),
               ),
               if (onTap != null)

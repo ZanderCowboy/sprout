@@ -20,12 +20,12 @@ class BudgetRepositoryImpl implements BudgetRepository {
     required bool Function() canSync,
     SupabaseClient? supabase,
     PendingSyncQueue? pendingSyncQueue,
-  })  : _box = box,
-        _userContext = userContext,
-        _appConfig = appConfig,
-        _canSync = canSync,
-        _supabase = supabase,
-        _pendingSyncQueue = pendingSyncQueue;
+  }) : _box = box,
+       _userContext = userContext,
+       _appConfig = appConfig,
+       _canSync = canSync,
+       _supabase = supabase,
+       _pendingSyncQueue = pendingSyncQueue;
 
   final Box<BudgetGroupHiveModel> _box;
   final UserContext _userContext;
@@ -36,7 +36,9 @@ class BudgetRepositoryImpl implements BudgetRepository {
   final _updates = StreamController<void>.broadcast();
 
   bool get _shouldEnqueue =>
-      _appConfig.isSupabaseConfigured && _pendingSyncQueue != null && _canSync();
+      _appConfig.isSupabaseConfigured &&
+      _pendingSyncQueue != null &&
+      _canSync();
 
   void _notify() {
     if (!_updates.isClosed) _updates.add(null);
@@ -108,8 +110,10 @@ class BudgetRepositoryImpl implements BudgetRepository {
     if ((_pendingSyncQueue?.length ?? 0) > 0) return;
 
     final uid = await _userContext.resolveUserId();
-    final response =
-        await client.from(SupabaseTables.budgetGroups).select().eq('user_id', uid);
+    final response = await client
+        .from(SupabaseTables.budgetGroups)
+        .select()
+        .eq('user_id', uid);
     final rows = response as List<dynamic>;
 
     if (rows.isEmpty) {
@@ -119,11 +123,11 @@ class BudgetRepositoryImpl implements BudgetRepository {
 
     await _box.clear();
     for (final raw in rows) {
-      final g =
-          budgetGroupFromSupabaseRow(Map<String, dynamic>.from(raw as Map));
+      final g = budgetGroupFromSupabaseRow(
+        Map<String, dynamic>.from(raw as Map),
+      );
       await _box.put(g.id, budgetGroupToHive(g));
     }
     _notify();
   }
 }
-

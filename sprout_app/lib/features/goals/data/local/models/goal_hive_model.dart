@@ -17,4 +17,3 @@ class GoalHiveModel {
   final int createdAtMillis;
   final int updatedAtMillis;
 }
-

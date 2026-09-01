@@ -15,10 +15,10 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
     required TransactionsService transactionsService,
     required GoalsService goalsService,
     required AccountsService accountsService,
-  })  : _transactionsService = transactionsService,
-        _goalsService = goalsService,
-        _accountsService = accountsService,
-        super(const TransactionsInitial()) {
+  }) : _transactionsService = transactionsService,
+       _goalsService = goalsService,
+       _accountsService = accountsService,
+       super(const TransactionsInitial()) {
     on<TransactionsSubscriptionRequested>(_onSubscribe);
   }
 
@@ -56,27 +56,18 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
         );
       }
 
-      final txSub = _transactionsService.watchTransactions().listen(
-        (t) {
-          txs = t;
-          tryEmit();
-        },
-        onError: controller.addError,
-      );
-      final goalsSub = _goalsService.watchGoals().listen(
-        (g) {
-          goals = g;
-          tryEmit();
-        },
-        onError: controller.addError,
-      );
-      final accountsSub = _accountsService.watchAccounts().listen(
-        (a) {
-          accounts = a;
-          tryEmit();
-        },
-        onError: controller.addError,
-      );
+      final txSub = _transactionsService.watchTransactions().listen((t) {
+        txs = t;
+        tryEmit();
+      }, onError: controller.addError);
+      final goalsSub = _goalsService.watchGoals().listen((g) {
+        goals = g;
+        tryEmit();
+      }, onError: controller.addError);
+      final accountsSub = _accountsService.watchAccounts().listen((a) {
+        accounts = a;
+        tryEmit();
+      }, onError: controller.addError);
 
       controller.onCancel = () {
         txSub.cancel();

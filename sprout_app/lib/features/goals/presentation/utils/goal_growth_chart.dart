@@ -34,10 +34,9 @@ List<GoalGrowthChartPoint> mapTransactionsToGoalGrowthPoints({
   required List<Transaction> transactions,
 }) {
   final now = DateTime.now();
-  final tx = transactions
-      .where((t) => !TransactionRules.isPending(t, now))
-      .toList()
-    ..sort((a, b) => a.occurredAt.compareTo(b.occurredAt));
+  final tx =
+      transactions.where((t) => !TransactionRules.isPending(t, now)).toList()
+        ..sort((a, b) => a.occurredAt.compareTo(b.occurredAt));
 
   final points = <GoalGrowthChartPoint>[];
 
@@ -60,11 +59,7 @@ List<GoalGrowthChartPoint> mapTransactionsToGoalGrowthPoints({
   }
 
   // Ensure the line always starts at goal creation date with Y=0.
-  addPoint(
-    occurredAt: goalCreatedAt,
-    depositCents: 0,
-    cumulativeCents: 0,
-  );
+  addPoint(occurredAt: goalCreatedAt, depositCents: 0, cumulativeCents: 0);
 
   var running = 0;
   for (final t in tx) {
@@ -150,9 +145,7 @@ GoalGrowthPrediction? predictGoalReach({
       cumulative += nextTx.amountCents;
       final y = (cumulative > goalTargetCents ? goalTargetCents : cumulative)
           .toDouble();
-      spots.add(
-        FlSpot(nextAt.millisecondsSinceEpoch.toDouble(), y),
-      );
+      spots.add(FlSpot(nextAt.millisecondsSinceEpoch.toDouble(), y));
 
       nextDates[nextTx.id] = RecurringSchedule.next(nextAt, nextTx.frequency);
       steps++;
@@ -172,9 +165,10 @@ GoalGrowthPrediction? predictGoalReach({
     if (deposits.length >= 2) {
       final first = deposits.first;
       final last = deposits.last;
-      final days = (last.occurredAt.difference(first.occurredAt).inMilliseconds /
-              const Duration(days: 1).inMilliseconds)
-          .abs();
+      final days =
+          (last.occurredAt.difference(first.occurredAt).inMilliseconds /
+                  const Duration(days: 1).inMilliseconds)
+              .abs();
       if (days > 0) {
         dailyRateCentsPerDay = currentSavedCents / days;
       }
@@ -197,4 +191,3 @@ GoalGrowthPrediction? predictGoalReach({
     predictionLineSpots: [lastActualSpot, targetSpot],
   );
 }
-

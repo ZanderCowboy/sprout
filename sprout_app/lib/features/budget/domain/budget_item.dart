@@ -16,11 +16,7 @@ class BudgetItem extends Equatable {
   /// Major units (ZAR).
   final double amount;
 
-  BudgetItem copyWith({
-    String? id,
-    String? name,
-    double? amount,
-  }) {
+  BudgetItem copyWith({String? id, String? name, double? amount}) {
     return BudgetItem(
       id: id ?? this.id,
       name: name ?? this.name,
@@ -31,4 +27,3 @@ class BudgetItem extends Equatable {
   @override
   List<Object?> get props => [id, name, amount];
 }
-

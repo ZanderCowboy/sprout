@@ -11,9 +11,8 @@ extension BudgetCategoryCodec on BudgetCategory {
   }
 
   String get wireName => switch (this) {
-        BudgetCategory.income => 'income',
-        BudgetCategory.essentials => 'essentials',
-        BudgetCategory.lifestyle => 'lifestyle',
-      };
+    BudgetCategory.income => 'income',
+    BudgetCategory.essentials => 'essentials',
+    BudgetCategory.lifestyle => 'lifestyle',
+  };
 }
-

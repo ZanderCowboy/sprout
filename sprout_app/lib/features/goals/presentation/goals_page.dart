@@ -166,9 +166,7 @@ class _GoalsPageState extends State<GoalsPage> {
                       const SizedBox(height: 10),
                   itemBuilder: (context, i) {
                     if (hasCompleted && i == firstCompletedIndex) {
-                      return GoalsSectionSeparator(
-                        title: AppStrings.completed,
-                      );
+                      return GoalsSectionSeparator(title: AppStrings.completed);
                     }
                     final idx = (hasCompleted && i > firstCompletedIndex)
                         ? i - 1

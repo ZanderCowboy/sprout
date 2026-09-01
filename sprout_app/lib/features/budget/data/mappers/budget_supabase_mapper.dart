@@ -26,26 +26,20 @@ BudgetGroup budgetGroupFromSupabaseDto(BudgetGroupRow row) {
 }
 
 BudgetGroupRow budgetGroupToSupabaseDto(BudgetGroup g) => BudgetGroupRow(
-      id: g.id,
-      userId: g.userId,
-      name: g.name,
-      description: g.description,
-      category: g.category.wireName,
-      colorHex: g.colorHex,
-      iconCodePoint: g.iconCodePoint,
-      iconFontFamily: g.iconFontFamily,
-      itemsJson: g.items
-          .map(
-            (i) => {
-              'id': i.id,
-              'name': i.name,
-              'amount': i.amount,
-            },
-          )
-          .toList(),
-      createdAt: g.createdAt,
-      updatedAt: g.updatedAt,
-    );
+  id: g.id,
+  userId: g.userId,
+  name: g.name,
+  description: g.description,
+  category: g.category.wireName,
+  colorHex: g.colorHex,
+  iconCodePoint: g.iconCodePoint,
+  iconFontFamily: g.iconFontFamily,
+  itemsJson: g.items
+      .map((i) => {'id': i.id, 'name': i.name, 'amount': i.amount})
+      .toList(),
+  createdAt: g.createdAt,
+  updatedAt: g.updatedAt,
+);
 
 List<BudgetItem> _decodeItems(Object itemsJson) {
   try {
@@ -66,4 +60,3 @@ List<BudgetItem> _decodeItems(Object itemsJson) {
     return const <BudgetItem>[];
   }
 }
-

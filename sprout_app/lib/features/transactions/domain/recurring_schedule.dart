@@ -44,11 +44,7 @@ class RecurringSchedule {
     }
 
     final anchor = previousNext ?? occurredAt;
-    return nextAfter(
-      anchor: anchor,
-      frequency: effectiveFrequency,
-      after: now,
-    );
+    return nextAfter(anchor: anchor, frequency: effectiveFrequency, after: now);
   }
 
   static DateTime addMonthsClamped(DateTime from, int monthsToAdd) {
@@ -95,7 +91,9 @@ class RecurringSchedule {
     DateTime? nextScheduledDate,
     required DateTime base,
   }) {
-    var next = nextScheduledDate ?? RecurringSchedule.next(templateOccurredAt, frequency);
+    var next =
+        nextScheduledDate ??
+        RecurringSchedule.next(templateOccurredAt, frequency);
     var guard = 0;
     while (!next.isAfter(base) && guard < 5000) {
       next = RecurringSchedule.next(next, frequency);

@@ -25,4 +25,3 @@ class BudgetGroupHiveModel {
   final int createdAtMillis;
   final int updatedAtMillis;
 }
-

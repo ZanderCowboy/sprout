@@ -63,7 +63,8 @@ class _RecurringPaymentsBody extends StatelessWidget {
             ? AppStrings.unallocated
             : (state.goalsById[item.goalId!]?.name ?? AppStrings.unknownGoal);
         final accountName =
-            state.accountsById[item.accountId]?.name ?? AppStrings.unknownAccount;
+            state.accountsById[item.accountId]?.name ??
+            AppStrings.unknownAccount;
 
         return SproutListTile(
           identifier: SemanticsIds.recurringRow,

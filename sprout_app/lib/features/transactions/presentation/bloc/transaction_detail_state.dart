@@ -28,6 +28,10 @@ final class TransactionDetailReady extends TransactionDetailState {
   final Map<String, Account> accountsById;
 
   @override
-  List<Object?> get props =>
-      [transaction, groupTransactions, goalsById, accountsById];
+  List<Object?> get props => [
+    transaction,
+    groupTransactions,
+    goalsById,
+    accountsById,
+  ];
 }

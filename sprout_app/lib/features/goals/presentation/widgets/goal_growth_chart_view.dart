@@ -42,7 +42,10 @@ class GoalGrowthChartView extends StatelessWidget {
     final gradient = LinearGradient(
       begin: Alignment.topCenter,
       end: Alignment.bottomCenter,
-      colors: [goalColor.withValues(alpha: 0.35), goalColor.withValues(alpha: 0.00)],
+      colors: [
+        goalColor.withValues(alpha: 0.35),
+        goalColor.withValues(alpha: 0.00),
+      ],
     );
 
     return Card(
@@ -61,7 +64,9 @@ class GoalGrowthChartView extends StatelessWidget {
                 horizontalLines: [
                   HorizontalLine(
                     y: targetY,
-                    color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.55),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurfaceVariant.withValues(alpha: 0.55),
                     strokeWidth: 2,
                     dashArray: const [6, 6],
                     label: HorizontalLineLabel(
@@ -71,18 +76,28 @@ class GoalGrowthChartView extends StatelessWidget {
                         fontWeight: FontWeight.w700,
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
-                      labelResolver: (_) => AppStrings.goalChartLabel(formatZarFromCents(goalTargetCents)),
+                      labelResolver: (_) => AppStrings.goalChartLabel(
+                        formatZarFromCents(goalTargetCents),
+                      ),
                     ),
                   ),
                 ],
               ),
               borderData: FlBorderData(
                 show: true,
-                border: Border.all(color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.35)),
+                border: Border.all(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurfaceVariant.withValues(alpha: 0.35),
+                ),
               ),
               titlesData: FlTitlesData(
-                topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                topTitles: const AxisTitles(
+                  sideTitles: SideTitles(showTitles: false),
+                ),
+                rightTitles: const AxisTitles(
+                  sideTitles: SideTitles(showTitles: false),
+                ),
                 leftTitles: AxisTitles(
                   sideTitles: SideTitles(
                     showTitles: true,
@@ -93,7 +108,10 @@ class GoalGrowthChartView extends StatelessWidget {
                       if (value.abs() < eps) {
                         return Padding(
                           padding: const EdgeInsets.only(right: 6),
-                          child: Text('0', style: Theme.of(context).textTheme.bodySmall),
+                          child: Text(
+                            '0',
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
                         );
                       }
                       if ((value - target).abs() < eps) {
@@ -101,7 +119,8 @@ class GoalGrowthChartView extends StatelessWidget {
                           padding: const EdgeInsets.only(right: 6),
                           child: Text(
                             formatZarFromCents(goalTargetCents),
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w700),
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(fontWeight: FontWeight.w700),
                           ),
                         );
                       }
@@ -118,11 +137,16 @@ class GoalGrowthChartView extends StatelessWidget {
                       const Duration(days: 365).inMilliseconds.toDouble(),
                     ),
                     getTitlesWidget: (value, meta) {
-                      final dt = DateTime.fromMillisecondsSinceEpoch(value.toInt());
+                      final dt = DateTime.fromMillisecondsSinceEpoch(
+                        value.toInt(),
+                      );
                       final fmt = DateFormat('MMM yy');
                       return Padding(
                         padding: const EdgeInsets.only(top: 8),
-                        child: Text(fmt.format(dt), style: Theme.of(context).textTheme.bodySmall),
+                        child: Text(
+                          fmt.format(dt),
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
                       );
                     },
                   ),
@@ -131,11 +155,14 @@ class GoalGrowthChartView extends StatelessWidget {
               lineTouchData: LineTouchData(
                 handleBuiltInTouches: true,
                 touchTooltipData: LineTouchTooltipData(
-                  getTooltipColor: (touchedSpot) => Theme.of(context).colorScheme.surfaceContainerHighest,
+                  getTooltipColor: (touchedSpot) =>
+                      Theme.of(context).colorScheme.surfaceContainerHighest,
                   getTooltipItems: (touchedSpots) {
                     return touchedSpots.map((barSpot) {
                       final idx = barSpot.spotIndex;
-                      final p = (idx >= 0 && idx < points.length) ? points[idx] : null;
+                      final p = (idx >= 0 && idx < points.length)
+                          ? points[idx]
+                          : null;
                       if (p == null) return null;
                       final date = formatDateTime(p.occurredAt);
                       final amount = formatZarFromCents(p.depositCents);

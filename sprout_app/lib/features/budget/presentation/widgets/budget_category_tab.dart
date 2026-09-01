@@ -134,16 +134,16 @@ class _BudgetCategoryTabBodyState extends State<BudgetCategoryTabBody> {
           onDraftChanged: isDraft ? _upsertDraft : null,
           allGroupsForNameValidation: widget.groups,
           onUpsertGroup: (updated) => context.read<BudgetBloc>().add(
-                BudgetGroupUpsertRequested(updated),
-              ),
+            BudgetGroupUpsertRequested(updated),
+          ),
           onDeleteGroup: (groupId) =>
               context.read<BudgetBloc>().add(BudgetGroupDeleted(groupId)),
           onUpsertItem: (groupId, item) => context.read<BudgetBloc>().add(
-                BudgetItemUpsertRequested(groupId: groupId, item: item),
-              ),
+            BudgetItemUpsertRequested(groupId: groupId, item: item),
+          ),
           onDeleteItem: (groupId, itemId) => context.read<BudgetBloc>().add(
-                BudgetItemDeleted(groupId: groupId, itemId: itemId),
-              ),
+            BudgetItemDeleted(groupId: groupId, itemId: itemId),
+          ),
         );
       },
     );

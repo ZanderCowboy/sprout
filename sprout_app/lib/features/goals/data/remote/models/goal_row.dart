@@ -30,13 +30,12 @@ class GoalRow {
   }
 
   Map<String, dynamic> toMap() => {
-        'id': id,
-        'user_id': userId,
-        'name': name,
-        'target_amount_cents': targetAmountCents,
-        'color': color,
-        'created_at': createdAt.toUtc().toIso8601String(),
-        'updated_at': updatedAt.toUtc().toIso8601String(),
-      };
+    'id': id,
+    'user_id': userId,
+    'name': name,
+    'target_amount_cents': targetAmountCents,
+    'color': color,
+    'created_at': createdAt.toUtc().toIso8601String(),
+    'updated_at': updatedAt.toUtc().toIso8601String(),
+  };
 }
-

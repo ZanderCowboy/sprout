@@ -3,10 +3,7 @@ import 'package:equatable/equatable.dart';
 import 'goal.dart';
 
 class GoalProgress extends Equatable {
-  const GoalProgress({
-    required this.goal,
-    required this.savedCents,
-  });
+  const GoalProgress({required this.goal, required this.savedCents});
 
   final Goal goal;
   final int savedCents;

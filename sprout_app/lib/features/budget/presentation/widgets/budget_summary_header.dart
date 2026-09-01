@@ -71,9 +71,9 @@ class _BudgetSummaryHeaderState extends State<BudgetSummaryHeader> {
             Text(
               formatZarFromCents(disposableCents),
               style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.w900,
-                    color: valueColor,
-                  ),
+                fontWeight: FontWeight.w900,
+                color: valueColor,
+              ),
             ),
             if (!_showBreakdown) ...[
               const SizedBox(height: 4),
@@ -157,9 +157,9 @@ class _MiniTotalPill extends StatelessWidget {
           Text(
             '$label: ',
             style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: scheme.onSurfaceVariant,
-                ),
+              fontWeight: FontWeight.w700,
+              color: scheme.onSurfaceVariant,
+            ),
           ),
           Text(
             value,

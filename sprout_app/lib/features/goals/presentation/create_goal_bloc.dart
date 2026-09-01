@@ -67,7 +67,6 @@ class CreateGoalBloc extends Bloc<CreateGoalEvent, CreateGoalState> {
         updatedAt: now,
       );
 
-
       final openingCents = event.alreadySavedAmountCents;
       final openingAccountId = event.alreadySavedAccountId;
 

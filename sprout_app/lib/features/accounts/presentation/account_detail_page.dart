@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 
 import 'package:sprout/core/core.dart';
 import 'package:sprout/core/di/service_locator.dart';
+import 'package:sprout/features/accounts/presentation/bloc/account_detail_event.dart';
+import 'package:sprout/features/accounts/presentation/bloc/account_detail_state.dart';
 import 'package:sprout/features/goals/export.dart';
 import 'package:sprout/features/shell/shell.dart';
 import 'package:sprout/features/transactions/export.dart';
@@ -11,7 +13,7 @@ import 'package:sprout/ui/export.dart';
 
 import '../application/accounts_service.dart';
 import '../domain/account.dart';
-import 'account_detail_bloc.dart';
+import 'bloc/account_detail_bloc.dart';
 import 'account_form_sheet.dart';
 
 class AccountDetailPage extends StatelessWidget {
@@ -41,7 +43,10 @@ class _AccountDetailView extends StatelessWidget {
     final updated = await showModalBottomSheet<Account>(
       context: context,
       isScrollControlled: true,
-      builder: (_) => AccountFormSheet(initial: account, defaultColor: Color(account.color)),
+      builder: (_) => AccountFormSheet(
+        initial: account,
+        defaultColor: Color(account.color),
+      ),
     );
     if (updated != null && context.mounted) {
       await sl<AccountsService>().saveAccount(updated);
@@ -93,7 +98,10 @@ class _AccountDetailView extends StatelessWidget {
       builder: (ctx) => AlertDialog(
         title: const Text(AppStrings.clearScheduledTransactions),
         content: Text(
-          AppStrings.clearScheduledBody(count: scheduledIds.length, scope: 'account'),
+          AppStrings.clearScheduledBody(
+            count: scheduledIds.length,
+            scope: 'account',
+          ),
         ),
         actions: SproutDialogActions.cancelDelete(
           onCancel: () => Navigator.pop(ctx, false),
@@ -178,23 +186,34 @@ class _AccountDetailView extends StatelessWidget {
                             Expanded(
                               child: Text(
                                 AppStrings.accountValue,
-                                style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
+                                style: Theme.of(context).textTheme.titleMedium
+                                    ?.copyWith(fontWeight: FontWeight.w800),
                               ),
                             ),
                             if (state.scheduledTotalCents > 0)
                               SproutTextButton.icon(
-                                identifier: SemanticsIds.accountDetailClearScheduled,
+                                identifier:
+                                    SemanticsIds.accountDetailClearScheduled,
                                 label: AppStrings.clearScheduled,
-                                onPressed: () => _clearScheduled(context, state),
+                                onPressed: () =>
+                                    _clearScheduled(context, state),
                                 icon: const Icon(Icons.delete_outline_rounded),
-                                labelWidget: const Text(AppStrings.clearScheduled),
+                                labelWidget: const Text(
+                                  AppStrings.clearScheduled,
+                                ),
                               ),
                           ],
                         ),
                         const SizedBox(height: 10),
-                        _ValueRow(label: AppStrings.current, value: formatZarFromCents(state.currentTotalCents)),
+                        _ValueRow(
+                          label: AppStrings.current,
+                          value: formatZarFromCents(state.currentTotalCents),
+                        ),
                         const SizedBox(height: 6),
-                        _ValueRow(label: AppStrings.scheduled, value: formatZarFromCents(state.scheduledTotalCents)),
+                        _ValueRow(
+                          label: AppStrings.scheduled,
+                          value: formatZarFromCents(state.scheduledTotalCents),
+                        ),
                         const Divider(height: 18),
                         _ValueRow(
                           label: AppStrings.total,
@@ -208,16 +227,22 @@ class _AccountDetailView extends StatelessWidget {
                 const SizedBox(height: 8),
                 Text(
                   AppStrings.transactions,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const SizedBox(height: 12),
                 if (state.transactions.isEmpty)
-                  Text(AppStrings.noDepositsForAccount, style: Theme.of(context).textTheme.bodyMedium)
+                  Text(
+                    AppStrings.noDepositsForAccount,
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  )
                 else
                   ...state.transactions.map((t) {
                     final goalName = t.goalId == null || t.goalId!.isEmpty
                         ? AppStrings.unallocated
-                        : (state.goalsById[t.goalId!]?.name ?? AppStrings.unknownGoal);
+                        : (state.goalsById[t.goalId!]?.name ??
+                              AppStrings.unknownGoal);
                     final kindLabel = switch (t.kind) {
                       TransactionKind.deposit => AppStrings.deposit,
                       TransactionKind.allocation => AppStrings.allocation,
@@ -230,8 +255,13 @@ class _AccountDetailView extends StatelessWidget {
                         opacity: style.opacity,
                         child: SproutListTile(
                           identifier: SemanticsIds.accountDetailTransactionRow,
-                          label: AppStrings.kindAmountLabel(kindLabel, formatZarFromCents(t.amountCents)),
-                          leading: style.leadingIcon == null ? null : Icon(style.leadingIcon),
+                          label: AppStrings.kindAmountLabel(
+                            kindLabel,
+                            formatZarFromCents(t.amountCents),
+                          ),
+                          leading: style.leadingIcon == null
+                              ? null
+                              : Icon(style.leadingIcon),
                           title: Text(formatZarFromCents(t.amountCents)),
                           subtitle: Text(
                             [
@@ -242,10 +272,16 @@ class _AccountDetailView extends StatelessWidget {
                             ].join(' · '),
                           ),
                           trailing: t.pendingSync
-                              ? Icon(Icons.sync_rounded, size: 20, color: Theme.of(context).colorScheme.primary)
+                              ? Icon(
+                                  Icons.sync_rounded,
+                                  size: 20,
+                                  color: Theme.of(context).colorScheme.primary,
+                                )
                               : null,
                           onTap: () {
-                            context.push(AppRoute.transactionDetail.location(id: t.id));
+                            context.push(
+                              AppRoute.transactionDetail.location(id: t.id),
+                            );
                           },
                         ),
                       ),
@@ -261,7 +297,11 @@ class _AccountDetailView extends StatelessWidget {
 }
 
 class _ValueRow extends StatelessWidget {
-  const _ValueRow({required this.label, required this.value, this.isEmphasis = false});
+  const _ValueRow({
+    required this.label,
+    required this.value,
+    this.isEmphasis = false,
+  });
 
   final String label;
   final String value;
@@ -270,15 +310,20 @@ class _ValueRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final style = Theme.of(context).textTheme.bodyMedium;
-    final valueStyle = (isEmphasis ? Theme.of(context).textTheme.titleMedium : style)?.copyWith(
-      fontWeight: isEmphasis ? FontWeight.w900 : FontWeight.w700,
-    );
+    final valueStyle =
+        (isEmphasis ? Theme.of(context).textTheme.titleMedium : style)
+            ?.copyWith(
+              fontWeight: isEmphasis ? FontWeight.w900 : FontWeight.w700,
+            );
     return Row(
       children: [
         Expanded(
           child: Text(
             label,
-            style: style?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant, fontWeight: FontWeight.w600),
+            style: style?.copyWith(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ),
         Text(value, style: valueStyle),
