@@ -12,3 +12,4 @@ export 'presentation/goal_detail_bloc.dart';
 export 'presentation/goal_form_sheet.dart';
 export 'presentation/goals_bloc.dart';
 export 'presentation/goals_page.dart';
+export 'presentation/widgets/overall_goals_progress_header.dart';

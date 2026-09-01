@@ -8,6 +8,7 @@ import 'package:sprout/features/connectivity/export.dart';
 import 'package:sprout/features/goals/export.dart';
 import 'package:sprout/ui/export.dart';
 import 'deposit_bottom_sheet.dart';
+import 'widgets/shell_tab_item.dart';
 
 class ShellPage extends StatelessWidget {
   const ShellPage({super.key, required this.navigationShell});
@@ -140,7 +141,7 @@ class ShellPage extends StatelessWidget {
                 child: Row(
                   children: [
                     Expanded(
-                      child: _ShellTabItem(
+                      child: ShellTabItem(
                         identifier: SemanticsIds.shellTabOverview,
                         selected: pageIndex == 0,
                         icon: Icons.grid_view_outlined,
@@ -150,7 +151,7 @@ class ShellPage extends StatelessWidget {
                       ),
                     ),
                     Expanded(
-                      child: _ShellTabItem(
+                      child: ShellTabItem(
                         identifier: SemanticsIds.shellTabAccounts,
                         selected: pageIndex == 1,
                         icon: Icons.account_balance_wallet_outlined,
@@ -164,7 +165,7 @@ class ShellPage extends StatelessWidget {
                       child: EnticingAddButton(onPressed: () => _openActions(context)),
                     ),
                     Expanded(
-                      child: _ShellTabItem(
+                      child: ShellTabItem(
                         identifier: SemanticsIds.shellTabGoals,
                         selected: pageIndex == 2,
                         icon: Icons.flag_outlined,
@@ -174,7 +175,7 @@ class ShellPage extends StatelessWidget {
                       ),
                     ),
                     Expanded(
-                      child: _ShellTabItem(
+                      child: ShellTabItem(
                         identifier: SemanticsIds.shellTabSettings,
                         selected: pageIndex == 3,
                         icon: Icons.settings_outlined,
@@ -190,54 +191,6 @@ class ShellPage extends StatelessWidget {
           ),
         );
       },
-    );
-  }
-}
-
-class _ShellTabItem extends StatelessWidget {
-  const _ShellTabItem({
-    required this.identifier,
-    required this.selected,
-    required this.icon,
-    required this.selectedIcon,
-    required this.label,
-    required this.onTap,
-  });
-
-  final String identifier;
-  final bool selected;
-  final IconData icon;
-  final IconData selectedIcon;
-  final String label;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final color = selected ? scheme.primary : scheme.onSurfaceVariant;
-    return Semantics(
-      identifier: identifier,
-      button: true,
-      selected: selected,
-      label: label,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(selected ? selectedIcon : icon, color: color, size: 26),
-              const SizedBox(height: 4),
-              Text(
-                label,
-                style: TextStyle(fontSize: 12, fontWeight: selected ? FontWeight.w600 : FontWeight.w500, color: color),
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }

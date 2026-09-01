@@ -5,6 +5,7 @@ import 'package:sprout/ui/export.dart';
 
 import '../../domain/budget_group.dart';
 import '../../domain/budget_item.dart';
+import 'add_item_card.dart';
 import 'budget_group_icon_picker.dart';
 import 'budget_item_card.dart';
 import '../utils/budget_sorting.dart';
@@ -514,47 +515,13 @@ class _GroupCardState extends State<GroupCard> {
                 ),
               Padding(
                 padding: const EdgeInsets.only(top: 6),
-                child: _AddItemCard(onTap: _addDraftItem),
+                child: AddItemCard(onTap: _addDraftItem),
               ),
             ],
           ),
         ),
       ),
     ),
-    );
-  }
-}
-
-class _AddItemCard extends StatelessWidget {
-  const _AddItemCard({required this.onTap});
-
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Card(
-      elevation: 0,
-      color: scheme.surfaceContainerHighest.withValues(alpha: 0.55),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(14, 8, 14, 8),
-          child: Row(
-            children: [
-              Icon(Icons.add_rounded, color: scheme.primary, size: 18),
-              const SizedBox(width: 10),
-              Text(
-                AppStrings.addItem,
-                style: Theme.of(
-                  context,
-                ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w800),
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }

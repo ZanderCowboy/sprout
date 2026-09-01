@@ -8,6 +8,7 @@ import 'package:sprout/ui/export.dart';
 import 'goals_bloc.dart';
 import 'enums/goals_sort.dart';
 import 'utils/goals_sorting.dart';
+import 'widgets/overall_goals_progress_header.dart';
 import 'widgets/unallocated_funds_card.dart';
 
 class GoalsPage extends StatefulWidget {
@@ -126,11 +127,12 @@ class _GoalsPageState extends State<GoalsPage> {
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-                  child: _OverallGoalsProgressHeader(
+                  child: OverallGoalsProgressHeader(
                     overallPercent: overallPercent,
                     totalSavedCents: totalSavedCents,
                     totalTargetCents: totalTargetCents,
                     totalRemainingCents: totalRemainingCents,
+                    title: AppStrings.overallProgress,
                   ),
                 ),
               ),
@@ -262,114 +264,6 @@ class _GoalsSectionSeparator extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _OverallGoalsProgressHeader extends StatelessWidget {
-  const _OverallGoalsProgressHeader({
-    required this.overallPercent,
-    required this.totalSavedCents,
-    required this.totalTargetCents,
-    required this.totalRemainingCents,
-  });
-
-  final int overallPercent;
-  final int totalSavedCents;
-  final int totalTargetCents;
-  final int totalRemainingCents;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final progress = (overallPercent / 100).clamp(0.0, 1.0);
-
-    return Semantics(
-      label: AppStrings.overallGoalsProgressSemantics(
-        percent: overallPercent,
-        saved: formatZarFromCents(totalSavedCents),
-        target: formatZarFromCents(totalTargetCents),
-      ),
-      child: Card(
-        elevation: 0,
-        color: scheme.surfaceContainerHighest,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Icon(
-                    Icons.auto_graph_rounded,
-                    size: 18,
-                    color: scheme.primary,
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      AppStrings.overallProgress,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                  ),
-                  Text(
-                    '$overallPercent%',
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              LinearProgressIndicator(
-                value: progress,
-                minHeight: 12,
-                borderRadius: BorderRadius.circular(8),
-                color: scheme.primary,
-                backgroundColor: scheme.onSurfaceVariant.withValues(
-                  alpha: 0.18,
-                ),
-              ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      AppStrings.savedAmount(
-                        formatZarFromCents(totalSavedCents),
-                      ),
-                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                  ),
-                  Text(
-                    AppStrings.targetAmountLabel(
-                      formatZarFromCents(totalTargetCents),
-                    ),
-                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: scheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 6),
-              Text(
-                AppStrings.toGoCompleteAllGoals(
-                  formatZarFromCents(totalRemainingCents),
-                ),
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: scheme.onSurfaceVariant,
-                ),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }

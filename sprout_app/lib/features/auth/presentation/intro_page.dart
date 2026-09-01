@@ -5,6 +5,8 @@ import 'package:sprout/core/constants/app_strings.dart';
 import 'package:sprout/core/constants/semantics_ids.dart';
 import 'package:sprout/ui/export.dart';
 import 'widgets/debug_sign_in_button.dart';
+import 'widgets/intro_dot.dart';
+import 'widgets/intro_slide.dart';
 
 class IntroPage extends StatefulWidget {
   const IntroPage({super.key, required this.onCompleted, this.initialPage = 0});
@@ -71,19 +73,19 @@ class _IntroPageState extends State<IntroPage> {
                   physics: const ClampingScrollPhysics(),
                   onPageChanged: (index) => setState(() => _index = index),
                   children: const [
-                    _IntroSlide(
+                    IntroSlide(
                       icon: Icons.savings_rounded,
                       accent: AppColors.seed,
                       title: AppStrings.introSlide1Title,
                       body: AppStrings.introSlide1Body,
                     ),
-                    _IntroSlide(
+                    IntroSlide(
                       icon: Icons.flag_rounded,
                       accent: AppColors.accentViolet,
                       title: AppStrings.introSlide2Title,
                       body: AppStrings.introSlide2Body,
                     ),
-                    _IntroSlide(
+                    IntroSlide(
                       icon: Icons.cloud_sync_rounded,
                       accent: AppColors.accentSky,
                       title: AppStrings.introSlide3Title,
@@ -96,7 +98,7 @@ class _IntroPageState extends State<IntroPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   for (var i = 0; i < _slideCount; i++)
-                    _IntroDot(selected: i == _index),
+                    IntroDot(selected: i == _index),
                 ],
               ),
               const SizedBox(height: 24),
@@ -113,81 +115,6 @@ class _IntroPageState extends State<IntroPage> {
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _IntroSlide extends StatelessWidget {
-  const _IntroSlide({
-    required this.icon,
-    required this.accent,
-    required this.title,
-    required this.body,
-  });
-
-  final IconData icon;
-  final Color accent;
-  final String title;
-  final String body;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 24),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            width: 96,
-            height: 96,
-            decoration: BoxDecoration(
-              color: accent.withValues(alpha: 0.16),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(icon, size: 48, color: accent),
-          ),
-          const SizedBox(height: 32),
-          Text(
-            title,
-            textAlign: TextAlign.center,
-            style: theme.textTheme.headlineSmall,
-          ),
-          const SizedBox(height: 12),
-          Text(
-            body,
-            textAlign: TextAlign.center,
-            style: theme.textTheme.bodyLarge?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _IntroDot extends StatelessWidget {
-  const _IntroDot({required this.selected});
-
-  final bool selected;
-
-  @override
-  Widget build(BuildContext context) {
-    final color = selected
-        ? Theme.of(context).colorScheme.primary
-        : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.28);
-
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 200),
-      margin: const EdgeInsets.symmetric(horizontal: 4),
-      width: selected ? 18 : 8,
-      height: 8,
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(8),
       ),
     );
   }
