@@ -56,3 +56,13 @@ export XDG_CONFIG_HOME="$HOME/.config/firebase-personal"
 ```
 
 Must be the personal Google account for Sprout, not work. Details: `docs/FIREBASE_CLI_PERSONAL.md`.
+
+## gcloud CLI
+
+gcloud stores auth and ADC under `$CLOUDSDK_CONFIG` (default `~/.config/gcloud`). Agent shells may not inherit workspace `CLOUDSDK_CONFIG`. Before any `gcloud` command:
+
+```bash
+export CLOUDSDK_CONFIG="$HOME/.config/gcloud-personal"
+```
+
+Must be the personal Google account and project `sprout-app-development`, not work. Details: `docs/GCLOUD_CLI_PERSONAL.md`.

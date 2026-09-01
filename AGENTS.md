@@ -18,5 +18,6 @@ Never instruct the human to edit source files or apply patches. If something req
 - No Melos/`build_runner` today — Hive adapters are checked in at `hive_adapters.dart`. If codegen is added later, run it via Melos.
 - GitHub CLI must use personal account `ZanderCowboy`, not work `Zander-K`. Before any `gh` command: `export GH_CONFIG_DIR=$HOME/.config/gh-zandercowboy`.
 - Firebase CLI must use the personal Google account, not work. Before any `firebase` command: `export XDG_CONFIG_HOME=$HOME/.config/firebase-personal`.
+- gcloud must use the personal Google account and `sprout-app-development`, not work. Before any `gcloud` command: `export CLOUDSDK_CONFIG=$HOME/.config/gcloud-personal`.
 - After Dart changes: `cd sprout_app && flutter analyze && flutter test`. If tests fail or hang, finish the work and report — do not loop on them until the human asks.
 - RevenueCat: plugin MCP + `docs/REVENUECAT.md`. Supabase: MCP + `supabase/README.md`.

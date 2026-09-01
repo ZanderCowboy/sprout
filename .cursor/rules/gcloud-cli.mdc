@@ -1,0 +1,14 @@
+---
+description: gcloud CLI login for this personal repo (isolated CLOUDSDK_CONFIG)
+alwaysApply: false
+---
+
+# gcloud CLI
+
+Before any `gcloud` command:
+
+```bash
+export CLOUDSDK_CONFIG="$HOME/.config/gcloud-personal"
+```
+
+Use the personal Google account and project `sprout-app-development`, not work. Do not run `gcloud auth login` / `gcloud config set project` against the default `~/.config/gcloud`. Details: `docs/GCLOUD_CLI_PERSONAL.md`.
