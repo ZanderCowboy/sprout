@@ -12,7 +12,7 @@ class AddItemCard extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     return Card(
       elevation: 0,
-      color: scheme.surfaceContainerHighest.withValues(alpha: 0.55),
+      color: scheme.surfaceContainerHighest,
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
@@ -24,9 +24,7 @@ class AddItemCard extends StatelessWidget {
               const SizedBox(width: 10),
               Text(
                 AppStrings.addItem,
-                style: Theme.of(
-                  context,
-                ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w800),
+                style: Theme.of(context).textTheme.titleSmall,
               ),
             ],
           ),

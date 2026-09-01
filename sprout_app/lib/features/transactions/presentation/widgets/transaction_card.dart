@@ -77,8 +77,7 @@ class TransactionCard extends StatelessWidget {
                       children: [
                         Text(
                           title,
-                          style: Theme.of(context).textTheme.titleMedium
-                              ?.copyWith(fontWeight: FontWeight.w800),
+                          style: Theme.of(context).textTheme.titleSmall,
                         ),
                         const SizedBox(height: 6),
                         Text(

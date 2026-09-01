@@ -18,12 +18,7 @@ class AccountSectionCard extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 14, 16, 4),
-            child: Text(
-              title,
-              style: Theme.of(
-                context,
-              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
-            ),
+            child: Text(title, style: Theme.of(context).textTheme.titleSmall),
           ),
           ...children,
         ],

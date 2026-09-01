@@ -19,5 +19,5 @@ Package name is `sprout`. App root is `sprout_app/`.
   - No ARB / `gen-l10n` — one `AppStrings` class with section comments.
 - Validation errors: throw `ValidationAppException` with an `AppStrings` message.
 - Money: integer **cents**. Format for display with existing `core/utils` helpers.
-- Theme: `buildAppTheme()`; app is dark (`ThemeMode.dark`). Reuse `lib/ui` widgets before inventing new cards/sheets.
+- Theme: `buildAppTheme()` in `lib/core/theme/app_theme.dart` is the single source for Material defaults (colors, typography weights, component themes). App is dark (`ThemeMode.dark`). Pick a `textTheme` role in widgets; do not `copyWith` weight/color unless the widget is a true exception (error, entity accent, env ribbon, hero w900 amounts, compact chart labels). Reuse `lib/ui` widgets before inventing new cards/sheets.
 - Hive adapters are hand-written — see the hive-storage rule. No `build_runner` unless Melos is added first.

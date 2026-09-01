@@ -101,7 +101,8 @@ class _DepositBottomSheetBody extends StatefulWidget {
   final bool showRecurringToggle;
 
   @override
-  State<_DepositBottomSheetBody> createState() => _DepositBottomSheetBodyState();
+  State<_DepositBottomSheetBody> createState() =>
+      _DepositBottomSheetBodyState();
 }
 
 class _DepositBottomSheetBodyState extends State<_DepositBottomSheetBody> {
@@ -168,7 +169,7 @@ class _DepositBottomSheetBodyState extends State<_DepositBottomSheetBody> {
               children: [
                 Text(
                   AppStrings.createAccountFirstShort,
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                  style: Theme.of(context).textTheme.titleLarge,
                 ),
                 const SizedBox(height: 12),
                 Text(
@@ -185,7 +186,9 @@ class _DepositBottomSheetBodyState extends State<_DepositBottomSheetBody> {
                       context: context,
                       isScrollControlled: true,
                       showDragHandle: true,
-                      builder: (_) => AccountFormSheet(defaultColor: AppColors.cardColorAt(0)),
+                      builder: (_) => AccountFormSheet(
+                        defaultColor: AppColors.cardColorAt(0),
+                      ),
                     );
                   },
                   icon: const Icon(Icons.account_balance_wallet_outlined),
@@ -209,14 +212,19 @@ class _DepositBottomSheetBodyState extends State<_DepositBottomSheetBody> {
         final dateLabel = formatDateTime(state.selectedDate);
 
         return Padding(
-          padding: EdgeInsets.only(left: 20, right: 20, top: 20, bottom: bottomPadding + 20),
+          padding: EdgeInsets.only(
+            left: 20,
+            right: 20,
+            top: 20,
+            bottom: bottomPadding + 20,
+          ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
                 AppStrings.deposit,
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                style: Theme.of(context).textTheme.titleLarge,
               ),
               const SizedBox(height: 16),
               if (quickGoal) ...[
@@ -234,7 +242,8 @@ class _DepositBottomSheetBodyState extends State<_DepositBottomSheetBody> {
                     ),
                     if (widget.allowUseUnallocatedWhenGoalLocked)
                       ButtonSegment(
-                        value: DepositBottomSheetMode.allocateExistingUnallocated,
+                        value:
+                            DepositBottomSheetMode.allocateExistingUnallocated,
                         label: Semantics(
                           identifier: SemanticsIds.depositModeUseUnallocated,
                           button: true,
@@ -263,7 +272,8 @@ class _DepositBottomSheetBodyState extends State<_DepositBottomSheetBody> {
                         icon: const Icon(Icons.flag_outlined),
                       ),
                     ButtonSegment(
-                      value: DepositBottomSheetMode.depositToAccountThenAllocate,
+                      value:
+                          DepositBottomSheetMode.depositToAccountThenAllocate,
                       label: Semantics(
                         identifier: SemanticsIds.depositModeToAccount,
                         button: true,
@@ -276,7 +286,8 @@ class _DepositBottomSheetBodyState extends State<_DepositBottomSheetBody> {
                         (widget.maxAllocatableCents ?? 0) > 0 &&
                         state.goals.isNotEmpty)
                       ButtonSegment(
-                        value: DepositBottomSheetMode.allocateExistingUnallocated,
+                        value:
+                            DepositBottomSheetMode.allocateExistingUnallocated,
                         label: Semantics(
                           identifier: SemanticsIds.depositModeUseUnallocated,
                           button: true,
@@ -295,7 +306,9 @@ class _DepositBottomSheetBodyState extends State<_DepositBottomSheetBody> {
                 identifier: SemanticsIds.depositAccountDropdown,
                 label: AppStrings.selectAccount,
                 value: state.accountId,
-                decoration: const InputDecoration(labelText: AppStrings.selectAccount),
+                decoration: const InputDecoration(
+                  labelText: AppStrings.selectAccount,
+                ),
                 items: [
                   for (final a in state.accounts)
                     DropdownMenuItem(value: a.id, child: Text(a.name)),
@@ -305,7 +318,8 @@ class _DepositBottomSheetBodyState extends State<_DepositBottomSheetBody> {
                     : (v) async {
                         cubit.setAccountId(v);
                         if (state.mode ==
-                            DepositBottomSheetMode.allocateExistingUnallocated) {
+                            DepositBottomSheetMode
+                                .allocateExistingUnallocated) {
                           await cubit.refreshAvailableUnallocated();
                         }
                       },
@@ -313,42 +327,59 @@ class _DepositBottomSheetBodyState extends State<_DepositBottomSheetBody> {
               const SizedBox(height: 12),
               if (state.mode == DepositBottomSheetMode.fullDepositToGoal) ...[
                 if (!canDepositToGoal) ...[
-                  Text(AppStrings.addGoalFirstToDeposit, style: Theme.of(context).textTheme.bodyMedium),
+                  Text(
+                    AppStrings.addGoalFirstToDeposit,
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
                   const SizedBox(height: 12),
                 ] else ...[
                   SproutDropdownField<String>(
                     identifier: SemanticsIds.depositGoalDropdown,
                     label: AppStrings.selectGoal,
                     value: state.goalId,
-                    decoration: const InputDecoration(labelText: AppStrings.selectGoal),
+                    decoration: const InputDecoration(
+                      labelText: AppStrings.selectGoal,
+                    ),
                     items: [
                       for (final g in state.goals)
                         DropdownMenuItem(value: g.id, child: Text(g.name)),
                     ],
-                    onChanged: widget.lockGoalSelection ? null : cubit.setGoalId,
+                    onChanged: widget.lockGoalSelection
+                        ? null
+                        : cubit.setGoalId,
                   ),
                   const SizedBox(height: 12),
                 ],
               ],
-              if (state.mode != DepositBottomSheetMode.allocateExistingUnallocated) ...[
+              if (state.mode !=
+                  DepositBottomSheetMode.allocateExistingUnallocated) ...[
                 SproutTextField(
                   identifier: SemanticsIds.depositAmountField,
                   fieldKey: const Key('deposit_amount_field'),
                   controller: _amount,
-                  decoration: const InputDecoration(labelText: AppStrings.amount),
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  decoration: const InputDecoration(
+                    labelText: AppStrings.amount,
+                  ),
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
                 ),
               ] else ...[
                 InputDecorator(
-                  decoration: const InputDecoration(labelText: AppStrings.availableUnallocated),
+                  decoration: const InputDecoration(
+                    labelText: AppStrings.availableUnallocated,
+                  ),
                   child: Text(
-                    formatZarFromCents(state.availableUnallocatedForAccountCents ?? 0),
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w700),
+                    formatZarFromCents(
+                      state.availableUnallocatedForAccountCents ?? 0,
+                    ),
+                    style: Theme.of(context).textTheme.titleSmall,
                   ),
                 ),
               ],
               if (widget.showRecurringToggle &&
-                  state.mode != DepositBottomSheetMode.allocateExistingUnallocated) ...[
+                  state.mode !=
+                      DepositBottomSheetMode.allocateExistingUnallocated) ...[
                 const SizedBox(height: 12),
                 SproutOutlinedButton.icon(
                   identifier: SemanticsIds.depositDatePicker,
@@ -380,11 +411,22 @@ class _DepositBottomSheetBodyState extends State<_DepositBottomSheetBody> {
                     identifier: SemanticsIds.depositFrequencyDropdown,
                     label: AppStrings.frequency,
                     value: state.frequency,
-                    decoration: const InputDecoration(labelText: AppStrings.frequency),
+                    decoration: const InputDecoration(
+                      labelText: AppStrings.frequency,
+                    ),
                     items: const [
-                      DropdownMenuItem(value: TransactionFrequency.daily, child: Text(AppStrings.frequencyDaily)),
-                      DropdownMenuItem(value: TransactionFrequency.weekly, child: Text(AppStrings.frequencyWeekly)),
-                      DropdownMenuItem(value: TransactionFrequency.monthly, child: Text(AppStrings.frequencyMonthly)),
+                      DropdownMenuItem(
+                        value: TransactionFrequency.daily,
+                        child: Text(AppStrings.frequencyDaily),
+                      ),
+                      DropdownMenuItem(
+                        value: TransactionFrequency.weekly,
+                        child: Text(AppStrings.frequencyWeekly),
+                      ),
+                      DropdownMenuItem(
+                        value: TransactionFrequency.monthly,
+                        child: Text(AppStrings.frequencyMonthly),
+                      ),
                     ],
                     onChanged: (v) {
                       if (v == null) return;
@@ -398,11 +440,14 @@ class _DepositBottomSheetBodyState extends State<_DepositBottomSheetBody> {
                 const SizedBox(height: 16),
                 Text(
                   AppStrings.allocateNowOptional,
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+                  style: Theme.of(context).textTheme.titleSmall,
                 ),
                 const SizedBox(height: 8),
                 if (state.goals.isEmpty) ...[
-                  Text(AppStrings.noGoalsYetUnallocated, style: Theme.of(context).textTheme.bodyMedium),
+                  Text(
+                    AppStrings.noGoalsYetUnallocated,
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
                   const SizedBox(height: 8),
                 ] else ...[
                   for (var i = 0; i < _allocations.length; i++) ...[
@@ -414,12 +459,18 @@ class _DepositBottomSheetBodyState extends State<_DepositBottomSheetBody> {
                             identifier: SemanticsIds.depositGoalDropdown,
                             label: AppStrings.selectGoal,
                             value: _allocations[i].goalId,
-                            decoration: const InputDecoration(labelText: AppStrings.selectGoal),
+                            decoration: const InputDecoration(
+                              labelText: AppStrings.selectGoal,
+                            ),
                             items: [
                               for (final g in state.goals)
-                                DropdownMenuItem(value: g.id, child: Text(g.name)),
+                                DropdownMenuItem(
+                                  value: g.id,
+                                  child: Text(g.name),
+                                ),
                             ],
-                            onChanged: (v) => setState(() => _allocations[i].goalId = v),
+                            onChanged: (v) =>
+                                setState(() => _allocations[i].goalId = v),
                           ),
                         ),
                         const SizedBox(width: 10),
@@ -427,8 +478,12 @@ class _DepositBottomSheetBodyState extends State<_DepositBottomSheetBody> {
                           flex: 2,
                           child: TextField(
                             controller: _allocations[i].amountController,
-                            decoration: const InputDecoration(labelText: AppStrings.amount),
-                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                            decoration: const InputDecoration(
+                              labelText: AppStrings.amount,
+                            ),
+                            keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true,
+                            ),
                           ),
                         ),
                         SproutIconButton(
@@ -481,7 +536,9 @@ class _DepositBottomSheetBodyState extends State<_DepositBottomSheetBody> {
               SproutFilledButton(
                 identifier: SemanticsIds.depositSave,
                 label: AppStrings.save,
-                onPressed: state.submitting ? null : () => _submit(cubit, state),
+                onPressed: state.submitting
+                    ? null
+                    : () => _submit(cubit, state),
               ),
             ],
           ),

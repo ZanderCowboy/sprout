@@ -18,7 +18,7 @@ class AccountsPage extends StatelessWidget {
         }
 
         final scheme = Theme.of(context).colorScheme;
-        final titleStyle = Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold);
+        final titleStyle = Theme.of(context).textTheme.titleMedium;
 
         if (state.accounts.isEmpty) {
           return CustomScrollView(
@@ -64,14 +64,20 @@ class AccountsPage extends StatelessWidget {
                 padding: const EdgeInsets.fromLTRB(16, 0, 16, 96),
                 sliver: SliverList.separated(
                   itemCount: state.accounts.length,
-                  separatorBuilder: (context, index) => const SizedBox(height: 10),
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(height: 10),
                   itemBuilder: (context, i) {
                     final a = state.accounts[i];
-                    final currentCents = state.accountCurrentTotalsById[a.id] ?? 0;
-                    final scheduledCents = state.accountScheduledTotalsById[a.id] ?? 0;
+                    final currentCents =
+                        state.accountCurrentTotalsById[a.id] ?? 0;
+                    final scheduledCents =
+                        state.accountScheduledTotalsById[a.id] ?? 0;
                     final subtitleLines = <String>[
                       AppStrings.currentColon(formatZarFromCents(currentCents)),
-                      if (scheduledCents > 0) AppStrings.scheduledColon(formatZarFromCents(scheduledCents)),
+                      if (scheduledCents > 0)
+                        AppStrings.scheduledColon(
+                          formatZarFromCents(scheduledCents),
+                        ),
                     ];
                     return ColoredEntityCard(
                       identifier: SemanticsIds.accountCard,
@@ -82,7 +88,10 @@ class AccountsPage extends StatelessWidget {
                       onTap: () {
                         context.push(AppRoute.accountDetail.location(id: a.id));
                       },
-                      trailing: Icon(Icons.chevron_right_rounded, color: scheme.onSurfaceVariant),
+                      trailing: Icon(
+                        Icons.chevron_right_rounded,
+                        color: scheme.onSurfaceVariant,
+                      ),
                     );
                   },
                 ),

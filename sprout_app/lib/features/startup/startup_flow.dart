@@ -6,6 +6,7 @@ import 'package:sprout/core/config/app_environment.dart';
 import 'package:sprout/core/constants/app_strings.dart';
 import 'package:sprout/core/flags/remote_feature_flag.dart';
 import 'package:sprout/core/startup/startup_initializer.dart';
+import 'package:sprout/core/theme/app_theme.dart';
 import 'package:sprout/features/startup/startup_error_page.dart';
 import 'package:sprout/features/startup/startup_page.dart';
 import 'package:sprout/features/startup/startup_splash_page.dart';
@@ -124,7 +125,7 @@ class _SproutBootstrapAppState extends State<SproutBootstrapApp>
       title: AppStrings.appTitle,
       debugShowCheckedModeBanner: false,
       themeMode: ThemeMode.dark,
-      theme: ThemeData.dark(),
+      theme: buildAppTheme(),
       builder: (context, child) => EnvironmentBanner(
         environment: widget.environment,
         child: child ?? const SizedBox.shrink(),

@@ -30,9 +30,7 @@ class _GoalsPageState extends State<GoalsPage> {
           return const Center(child: CircularProgressIndicator());
         }
         final scheme = Theme.of(context).colorScheme;
-        final titleStyle = Theme.of(
-          context,
-        ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold);
+        final titleStyle = Theme.of(context).textTheme.titleLarge;
         if (state.progressList.isEmpty) {
           return RefreshIndicator(
             onRefresh: () async {
@@ -206,8 +204,7 @@ class _GoalsPageState extends State<GoalsPage> {
                             ),
                             Text(
                               '${p.percentComplete}%',
-                              style: Theme.of(context).textTheme.labelSmall
-                                  ?.copyWith(fontWeight: FontWeight.bold),
+                              style: Theme.of(context).textTheme.labelLarge,
                             ),
                           ],
                         ),

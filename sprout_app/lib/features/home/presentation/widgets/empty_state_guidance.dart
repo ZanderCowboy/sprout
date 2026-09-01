@@ -20,12 +20,8 @@ class EmptyStateGuidance extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final titleStyle = Theme.of(
-      context,
-    ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800);
-    final stepStyle = Theme.of(
-      context,
-    ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700);
+    final titleStyle = Theme.of(context).textTheme.titleSmall;
+    final stepStyle = Theme.of(context).textTheme.titleMedium;
     final detailStyle = Theme.of(
       context,
     ).textTheme.bodyMedium?.copyWith(color: scheme.onSurfaceVariant);
@@ -183,9 +179,9 @@ class GuidanceStep extends StatelessWidget {
                 Text(
                   disabledCaption!,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: scheme.onSurfaceVariant,
-                        fontStyle: FontStyle.italic,
-                      ),
+                    color: scheme.onSurfaceVariant,
+                    fontStyle: FontStyle.italic,
+                  ),
                 ),
               ],
             ],

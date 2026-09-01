@@ -9,16 +9,8 @@ class BudgetTabHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Material(
-      color: scheme.surfaceContainerHighest.withValues(alpha: 0.55),
+      color: scheme.surfaceContainerHighest,
       child: TabBar(
-        dividerColor: Colors.transparent,
-        indicatorSize: TabBarIndicatorSize.tab,
-        labelStyle: Theme.of(
-          context,
-        ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
-        unselectedLabelStyle: Theme.of(
-          context,
-        ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
         tabs: [
           Tab(
             height: 42,
@@ -26,7 +18,7 @@ class BudgetTabHeader extends StatelessWidget {
               identifier: SemanticsIds.budgetTabIncome,
               button: true,
               label: AppStrings.budgetIncome,
-              child: const Text(AppStrings.budgetIncome),
+              child: Text(AppStrings.budgetIncome),
             ),
           ),
           Tab(
@@ -35,7 +27,7 @@ class BudgetTabHeader extends StatelessWidget {
               identifier: SemanticsIds.budgetTabEssentials,
               button: true,
               label: AppStrings.budgetEssentials,
-              child: const Text(AppStrings.budgetEssentials),
+              child: Text(AppStrings.budgetEssentials),
             ),
           ),
           Tab(
@@ -44,7 +36,7 @@ class BudgetTabHeader extends StatelessWidget {
               identifier: SemanticsIds.budgetTabLifestyle,
               button: true,
               label: AppStrings.budgetLifestyle,
-              child: const Text(AppStrings.budgetLifestyle),
+              child: Text(AppStrings.budgetLifestyle),
             ),
           ),
         ],

@@ -141,9 +141,7 @@ class _AddGroupSheetState extends State<AddGroupSheet> {
               widget.initial == null
                   ? AppStrings.newBudgetGroup
                   : AppStrings.editGroup,
-              style: Theme.of(
-                context,
-              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+              style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 16),
             TextField(

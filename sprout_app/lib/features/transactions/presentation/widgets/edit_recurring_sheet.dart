@@ -97,9 +97,7 @@ class _EditRecurringSheetState extends State<EditRecurringSheet> {
             _enabled
                 ? AppStrings.recurringDeposit
                 : AppStrings.recurringDepositDisabled,
-            style: Theme.of(
-              context,
-            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+            style: Theme.of(context).textTheme.titleLarge,
           ),
           const SizedBox(height: 12),
           SwitchListTile.adaptive(

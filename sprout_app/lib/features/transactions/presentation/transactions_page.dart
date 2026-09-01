@@ -64,9 +64,7 @@ class _TransactionsBody extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 10),
             child: Text(
               AppStrings.scheduled,
-              style: Theme.of(
-                context,
-              ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
+              style: Theme.of(context).textTheme.titleSmall,
             ),
           ),
           ...scheduled.expand(
@@ -87,9 +85,7 @@ class _TransactionsBody extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 10),
             child: Text(
               AppStrings.history,
-              style: Theme.of(
-                context,
-              ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
+              style: Theme.of(context).textTheme.titleSmall,
             ),
           ),
           ...history.expand(

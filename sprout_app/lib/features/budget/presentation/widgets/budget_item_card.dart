@@ -215,7 +215,7 @@ class _BudgetItemCardState extends State<BudgetItemCard> {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final surface = scheme.surfaceContainerHighest.withValues(alpha: 0.45);
+    final surface = scheme.surfaceContainerHighest;
 
     return Semantics(
       identifier: SemanticsIds.budgetItemCard,

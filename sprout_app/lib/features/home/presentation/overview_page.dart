@@ -50,9 +50,7 @@ class OverviewPage extends StatelessWidget {
         }
 
         final scheme = Theme.of(context).colorScheme;
-        final titleStyle = Theme.of(
-          context,
-        ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold);
+        final titleStyle = Theme.of(context).textTheme.titleMedium;
 
         // Check if we need to show empty state guidance
         final hasAccounts = state.accounts.isNotEmpty;

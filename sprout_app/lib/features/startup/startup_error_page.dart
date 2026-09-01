@@ -48,9 +48,9 @@ class StartupErrorPage extends StatelessWidget {
               const SizedBox(height: 8),
               Text(
                 '${AppStrings.configPrefix}$configAssetPath',
-                style: Theme.of(
-                  context,
-                ).textTheme.bodySmall?.copyWith(color: Colors.white70),
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
               ),
               const SizedBox(height: 12),
               SizedBox(
@@ -72,9 +72,9 @@ class StartupErrorPage extends StatelessWidget {
                       title: AppStrings.details,
                       child: Text(
                         '$error',
-                        style: Theme.of(
-                          context,
-                        ).textTheme.bodyMedium?.copyWith(color: Colors.white70),
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
                       ),
                     ),
                     if (kDebugMode && stackTrace != null)
@@ -188,9 +188,9 @@ class _StepRow extends StatelessWidget {
                       detail!,
                       maxLines: 4,
                       overflow: TextOverflow.ellipsis,
-                      style: Theme.of(
-                        context,
-                      ).textTheme.bodySmall?.copyWith(color: Colors.white70),
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
                     ),
                   ),
               ],

@@ -57,9 +57,9 @@ class StartupPage extends StatelessWidget {
               const SizedBox(height: 16),
               Text(
                 '${AppStrings.configPrefix}$configAssetPath',
-                style: Theme.of(
-                  context,
-                ).textTheme.bodySmall?.copyWith(color: Colors.white70),
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
               ),
               const SizedBox(height: 16),
               Expanded(
@@ -129,9 +129,9 @@ class _StepTile extends StatelessWidget {
               detail!,
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
-              style: Theme.of(
-                context,
-              ).textTheme.bodySmall?.copyWith(color: Colors.white70),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
             ),
     );
   }

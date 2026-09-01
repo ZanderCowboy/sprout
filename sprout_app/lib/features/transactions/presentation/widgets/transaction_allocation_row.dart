@@ -25,12 +25,7 @@ class TransactionAllocationRow extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 10),
-        Text(
-          amount,
-          style: Theme.of(
-            context,
-          ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w800),
-        ),
+        Text(amount, style: Theme.of(context).textTheme.titleSmall),
       ],
     );
   }

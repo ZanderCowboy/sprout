@@ -33,7 +33,8 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
     final updated = await showModalBottomSheet<Goal>(
       context: context,
       isScrollControlled: true,
-      builder: (_) => GoalFormSheet(initial: goal, defaultColor: Color(goal.color)),
+      builder: (_) =>
+          GoalFormSheet(initial: goal, defaultColor: Color(goal.color)),
     );
     if (updated != null && mounted) {}
   }
@@ -151,97 +152,99 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
               ],
             ),
             body: RefreshIndicator(
-                onRefresh: () async {
-                  await sl<GoalsService>().pullRemote();
-                  await sl<TransactionsService>().pullRemote();
-                },
-                child: ListView(
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
-                  children: [
-                    LinearProgressIndicator(
-                      value: (progress.percentComplete / 100).clamp(0.0, 1.0),
-                      minHeight: 10,
-                      borderRadius: BorderRadius.circular(8),
-                      color: Color(g.color),
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            '${AppStrings.progress}: ${progress.percentComplete}%',
-                            style: Theme.of(context).textTheme.bodyMedium,
-                          ),
+              onRefresh: () async {
+                await sl<GoalsService>().pullRemote();
+                await sl<TransactionsService>().pullRemote();
+              },
+              child: ListView(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+                children: [
+                  LinearProgressIndicator(
+                    value: (progress.percentComplete / 100).clamp(0.0, 1.0),
+                    minHeight: 10,
+                    borderRadius: BorderRadius.circular(8),
+                    color: Color(g.color),
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          '${AppStrings.progress}: ${progress.percentComplete}%',
+                          style: Theme.of(context).textTheme.bodyMedium,
                         ),
-                        Text(
-                          AppStrings.savedSlashTarget(
-                            formatZarFromCents(progress.savedCents),
-                            formatZarFromCents(g.targetAmountCents),
-                          ),
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      AppStrings.remainingColon(
-                        formatZarFromCents(progress.remainingCents),
                       ),
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                    const SizedBox(height: 22),
-                    DetailDepositCallout(
-                      identifier: SemanticsIds.goalDetailDeposit,
-                      accentColor: Color(g.color),
-                      caption: AppStrings.addDepositCaptionGoal,
-                      onPressed: _openDeposit,
-                    ),
-                    const SizedBox(height: 16),
-                    GoalGrowthChartView(
-                      goalColor: Color(g.color),
-                      goalCreatedAt: g.createdAt,
-                      goalTargetCents: g.targetAmountCents,
-                      points: state.graphPoints,
-                      prediction: state.prediction,
-                    ),
-                    const SizedBox(height: 18),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            AppStrings.transactions,
-                            style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-                          ),
+                      Text(
+                        AppStrings.savedSlashTarget(
+                          formatZarFromCents(progress.savedCents),
+                          formatZarFromCents(g.targetAmountCents),
                         ),
-                        if (state.scheduledTransactions.isNotEmpty)
-                          SproutTextButton.icon(
-                            identifier: SemanticsIds.goalDetailClearScheduled,
-                            label: AppStrings.clearScheduled,
-                            onPressed: () => _clearScheduledForGoal(state),
-                            icon: const Icon(Icons.delete_outline_rounded),
-                            labelWidget: const Text(AppStrings.clearScheduled),
-                          ),
-                      ],
+                        style: Theme.of(context).textTheme.titleSmall,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    AppStrings.remainingColon(
+                      formatZarFromCents(progress.remainingCents),
                     ),
-                    const SizedBox(height: 12),
-                    if (state.transactions.isEmpty)
-                      Text(AppStrings.noDepositsTowardGoal, style: Theme.of(context).textTheme.bodyMedium)
-                    else
-                      ...[
-                        _GoalTransactionSection(
-                          title: AppStrings.scheduled,
-                          items: state.scheduledTransactions,
-                          accountsById: state.accountsById,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                  const SizedBox(height: 22),
+                  DetailDepositCallout(
+                    identifier: SemanticsIds.goalDetailDeposit,
+                    accentColor: Color(g.color),
+                    caption: AppStrings.addDepositCaptionGoal,
+                    onPressed: _openDeposit,
+                  ),
+                  const SizedBox(height: 16),
+                  GoalGrowthChartView(
+                    goalColor: Color(g.color),
+                    goalCreatedAt: g.createdAt,
+                    goalTargetCents: g.targetAmountCents,
+                    points: state.graphPoints,
+                    prediction: state.prediction,
+                  ),
+                  const SizedBox(height: 18),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          AppStrings.transactions,
+                          style: Theme.of(context).textTheme.titleMedium,
                         ),
-                        _GoalTransactionSection(
-                          title: AppStrings.history,
-                          items: state.historyTransactions,
-                          accountsById: state.accountsById,
+                      ),
+                      if (state.scheduledTransactions.isNotEmpty)
+                        SproutTextButton.icon(
+                          identifier: SemanticsIds.goalDetailClearScheduled,
+                          label: AppStrings.clearScheduled,
+                          onPressed: () => _clearScheduledForGoal(state),
+                          icon: const Icon(Icons.delete_outline_rounded),
+                          labelWidget: const Text(AppStrings.clearScheduled),
                         ),
-                      ],
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  if (state.transactions.isEmpty)
+                    Text(
+                      AppStrings.noDepositsTowardGoal,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    )
+                  else ...[
+                    _GoalTransactionSection(
+                      title: AppStrings.scheduled,
+                      items: state.scheduledTransactions,
+                      accountsById: state.accountsById,
+                    ),
+                    _GoalTransactionSection(
+                      title: AppStrings.history,
+                      items: state.historyTransactions,
+                      accountsById: state.accountsById,
+                    ),
                   ],
-                ),
+                ],
               ),
+            ),
           );
         },
       ),
@@ -269,13 +272,11 @@ class _GoalTransactionSection extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.only(bottom: 6, top: 4),
-          child: Text(
-            title,
-            style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
-          ),
+          child: Text(title, style: Theme.of(context).textTheme.titleSmall),
         ),
         ...items.map((t) {
-          final accName = accountsById[t.accountId]?.name ?? AppStrings.unknownAccount;
+          final accName =
+              accountsById[t.accountId]?.name ?? AppStrings.unknownAccount;
           final style = mapTransactionToListStyle(t: t, now: now);
           return Card(
             margin: const EdgeInsets.only(bottom: 8),
@@ -284,8 +285,11 @@ class _GoalTransactionSection extends StatelessWidget {
               opacity: style.opacity,
               child: SproutListTile(
                 identifier: SemanticsIds.goalDetailTransactionRow,
-                label: '${AppStrings.deposit} ${formatZarFromCents(t.amountCents)}',
-                leading: style.leadingIcon == null ? null : Icon(style.leadingIcon),
+                label:
+                    '${AppStrings.deposit} ${formatZarFromCents(t.amountCents)}',
+                leading: style.leadingIcon == null
+                    ? null
+                    : Icon(style.leadingIcon),
                 title: Text(formatZarFromCents(t.amountCents)),
                 subtitle: Text(
                   [

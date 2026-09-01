@@ -90,7 +90,8 @@ class _CreateGoalScreenState extends State<CreateGoalScreen> {
     if (_alreadySavedError != null) {
       return false;
     }
-    if (_alreadySavedCents > 0 && (_alreadySavedAccountId == null)) return false;
+    if (_alreadySavedCents > 0 && (_alreadySavedAccountId == null))
+      return false;
     if (s.submitting) return false;
     return true;
   }
@@ -102,14 +103,14 @@ class _CreateGoalScreenState extends State<CreateGoalScreen> {
     if (targetCents == null || targetCents <= 0) return;
 
     blocContext.read<CreateGoalBloc>().add(
-          CreateGoalSubmitted(
-            name: name,
-            targetAmountCents: targetCents,
-            colorArgb: _colorArgb,
-            alreadySavedAmountCents: _alreadySavedCents,
-            alreadySavedAccountId: _alreadySavedAccountId,
-          ),
-        );
+      CreateGoalSubmitted(
+        name: name,
+        targetAmountCents: targetCents,
+        colorArgb: _colorArgb,
+        alreadySavedAmountCents: _alreadySavedCents,
+        alreadySavedAccountId: _alreadySavedAccountId,
+      ),
+    );
   }
 
   @override
@@ -156,7 +157,7 @@ class _CreateGoalScreenState extends State<CreateGoalScreen> {
                 children: [
                   Text(
                     AppStrings.newGoal,
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                    style: Theme.of(context).textTheme.titleLarge,
                   ),
                   const SizedBox(height: 16),
                   Text(
@@ -164,27 +165,29 @@ class _CreateGoalScreenState extends State<CreateGoalScreen> {
                     style: Theme.of(context).textTheme.bodyLarge,
                   ),
                   const SizedBox(height: 20),
-                    SproutFilledButton.icon(
-                      identifier: SemanticsIds.goalNoAccountsNewAccount,
-                      label: AppStrings.newAccount,
-                      onPressed: () async {
-                        Navigator.of(context).pop();
-                        await showModalBottomSheet<void>(
-                          context: context,
-                          isScrollControlled: true,
-                          showDragHandle: true,
-                          builder: (_) => AccountFormSheet(defaultColor: AppColors.cardColorAt(0)),
-                        );
-                      },
-                      icon: const Icon(Icons.account_balance_wallet_outlined),
-                      labelWidget: const Text(AppStrings.newAccount),
-                    ),
-                    const SizedBox(height: 12),
-                    SproutOutlinedButton(
-                      identifier: SemanticsIds.goalNoAccountsCancel,
-                      label: AppStrings.cancel,
-                      onPressed: () => Navigator.of(context).pop(),
-                    ),
+                  SproutFilledButton.icon(
+                    identifier: SemanticsIds.goalNoAccountsNewAccount,
+                    label: AppStrings.newAccount,
+                    onPressed: () async {
+                      Navigator.of(context).pop();
+                      await showModalBottomSheet<void>(
+                        context: context,
+                        isScrollControlled: true,
+                        showDragHandle: true,
+                        builder: (_) => AccountFormSheet(
+                          defaultColor: AppColors.cardColorAt(0),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.account_balance_wallet_outlined),
+                    labelWidget: const Text(AppStrings.newAccount),
+                  ),
+                  const SizedBox(height: 12),
+                  SproutOutlinedButton(
+                    identifier: SemanticsIds.goalNoAccountsCancel,
+                    label: AppStrings.cancel,
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
                 ],
               ),
             );
@@ -267,4 +270,3 @@ class _CreateGoalScreenState extends State<CreateGoalScreen> {
     );
   }
 }
-

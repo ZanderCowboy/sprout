@@ -59,9 +59,7 @@ class OverallGoalsProgressHeader extends StatelessWidget {
               Expanded(
                 child: Text(
                   title,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w800,
-                  ),
+                  style: Theme.of(context).textTheme.titleSmall,
                 ),
               ),
               Text(
@@ -86,9 +84,7 @@ class OverallGoalsProgressHeader extends StatelessWidget {
               Expanded(
                 child: Text(
                   AppStrings.savedAmount(formatZarFromCents(totalSavedCents)),
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
+                  style: Theme.of(context).textTheme.titleSmall,
                 ),
               ),
               Text(
@@ -96,7 +92,6 @@ class OverallGoalsProgressHeader extends StatelessWidget {
                   formatZarFromCents(totalTargetCents),
                 ),
                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.w700,
                   color: scheme.onSurfaceVariant,
                 ),
               ),

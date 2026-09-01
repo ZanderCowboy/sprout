@@ -40,7 +40,7 @@ class EnvironmentBanner extends StatelessWidget {
       location: BannerLocation.topEnd,
       color: _color,
       textStyle: const TextStyle(
-        color: Color(0xFF0F172A),
+        color: AppColors.surfaceDeep,
         fontSize: 10,
         fontWeight: FontWeight.w800,
         letterSpacing: 0.8,

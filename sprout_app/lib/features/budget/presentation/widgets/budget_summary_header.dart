@@ -51,8 +51,7 @@ class _BudgetSummaryHeaderState extends State<BudgetSummaryHeader> {
                       Expanded(
                         child: Text(
                           AppStrings.theoreticalDisposableIncome,
-                          style: Theme.of(context).textTheme.titleSmall
-                              ?.copyWith(fontWeight: FontWeight.w800),
+                          style: Theme.of(context).textTheme.titleSmall,
                         ),
                       ),
                       Icon(

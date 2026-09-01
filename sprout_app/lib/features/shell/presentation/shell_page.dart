@@ -28,7 +28,7 @@ class ShellPage extends StatelessWidget {
               children: [
                 Text(
                   AppStrings.sheetTitle,
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                  style: Theme.of(context).textTheme.titleLarge,
                 ),
                 const SizedBox(height: 16),
                 SproutListTile(
@@ -42,7 +42,9 @@ class ShellPage extends StatelessWidget {
                       context: context,
                       isScrollControlled: true,
                       showDragHandle: true,
-                      builder: (_) => AccountFormSheet(defaultColor: AppColors.cardColorAt(0)),
+                      builder: (_) => AccountFormSheet(
+                        defaultColor: AppColors.cardColorAt(0),
+                      ),
                     );
                   },
                 ),
@@ -57,7 +59,9 @@ class ShellPage extends StatelessWidget {
                       context: context,
                       isScrollControlled: true,
                       showDragHandle: true,
-                      builder: (_) => CreateGoalScreen(defaultColor: AppColors.cardColorAt(1)),
+                      builder: (_) => CreateGoalScreen(
+                        defaultColor: AppColors.cardColorAt(1),
+                      ),
                     );
                   },
                 ),
@@ -99,22 +103,30 @@ class ShellPage extends StatelessWidget {
                   child: SafeArea(
                     bottom: false,
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
                       child: Row(
                         children: [
                           Icon(
                             Icons.cloud_off_rounded,
                             size: 20,
-                            color: Theme.of(context).colorScheme.onErrorContainer,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onErrorContainer,
                           ),
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
                               AppStrings.offline,
-                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: Theme.of(context).colorScheme.onErrorContainer,
-                                fontWeight: FontWeight.w600,
-                              ),
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onErrorContainer,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                             ),
                           ),
                         ],
@@ -122,12 +134,7 @@ class ShellPage extends StatelessWidget {
                     ),
                   ),
                 ),
-              Expanded(
-                child: SafeArea(
-                  bottom: false,
-                  child: navigationShell,
-                ),
-              ),
+              Expanded(child: SafeArea(bottom: false, child: navigationShell)),
             ],
           ),
           bottomNavigationBar: Material(
@@ -162,7 +169,9 @@ class ShellPage extends StatelessWidget {
                     ),
                     Padding(
                       padding: const EdgeInsets.only(bottom: 20),
-                      child: EnticingAddButton(onPressed: () => _openActions(context)),
+                      child: EnticingAddButton(
+                        onPressed: () => _openActions(context),
+                      ),
                     ),
                     Expanded(
                       child: ShellTabItem(
