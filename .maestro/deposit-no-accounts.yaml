@@ -1,4 +1,6 @@
 appId: app.stackmint.sprout.dev
+tags:
+  - edge
 ---
 # Deposit with 0 accounts shows "create an account first" CTA
 # Run: maestro test .maestro/deposit-no-accounts.yaml
@@ -9,7 +11,8 @@ appId: app.stackmint.sprout.dev
 
 - runFlow: shared/debug-signin-intro.yaml
 
-- assertVisible: "1. Add an account"
+- assertVisible:
+    id: "overview_empty_new_account"
 
 - runFlow: shared/open-center-sheet.yaml
 

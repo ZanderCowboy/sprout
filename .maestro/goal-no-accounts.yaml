@@ -1,4 +1,6 @@
 appId: app.stackmint.sprout.dev
+tags:
+  - edge
 ---
 # Creating a goal with 0 accounts shows guidance CTA
 # Run: maestro test .maestro/goal-no-accounts.yaml
@@ -9,7 +11,8 @@ appId: app.stackmint.sprout.dev
 
 - runFlow: shared/debug-signin-intro.yaml
 
-- assertVisible: "1. Add an account"
+- assertVisible:
+    id: "overview_empty_new_account"
 
 - tapOn:
     id: "overview_empty_new_goal"

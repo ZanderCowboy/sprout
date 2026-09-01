@@ -1,0 +1,41 @@
+appId: app.stackmint.sprout.dev
+---
+# Requires: signed in on empty Overview (no accounts).
+# Covers empty CTAs and no-account goal / deposit sheets.
+# Note: overview_empty_deposit is disabled until goals exist — assert only, do not tap.
+- assertVisible:
+    id: "overview_empty_new_account"
+
+- assertVisible:
+    id: "overview_empty_new_goal"
+
+- assertVisible:
+    id: "overview_empty_deposit"
+
+- tapOn:
+    id: "overview_empty_new_goal"
+
+- extendedWaitUntil:
+    visible:
+      text: "New goal"
+    timeout: 5000
+
+- assertVisible: "Create an account first to hold money for this goal."
+
+- tapOn:
+    id: "goal_no_accounts_cancel"
+
+- runFlow: open-center-sheet.yaml
+
+- tapOn:
+    id: "shell_action_deposit"
+
+- extendedWaitUntil:
+    visible:
+      text: "Create an account first"
+    timeout: 5000
+
+- back
+
+- assertVisible:
+    id: "overview_empty_new_account"

@@ -1,0 +1,12 @@
+appId: app.stackmint.sprout.dev
+tags:
+  - page
+---
+# Sign-in surface: legal links, fields, debug sign-in (no OTP / Google).
+# Run: maestro test .maestro/sign-in.yaml
+
+- launchApp:
+    clearState: true
+    clearKeychain: true
+
+- runFlow: shared/chapter-sign-in.yaml

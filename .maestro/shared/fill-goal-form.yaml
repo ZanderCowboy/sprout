@@ -16,6 +16,8 @@ appId: app.stackmint.sprout.dev
 
 - inputText: ${TARGET}
 
+- hideKeyboard
+
 - runFlow:
     when:
       true: ${ALREADY_SAVED}

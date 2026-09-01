@@ -1,0 +1,99 @@
+appId: app.stackmint.sprout.dev
+---
+# Requires: empty Overview after debug sign-in.
+# Always creates Everyday account. Optional env flags (set to "true"):
+#   SEED_GOAL — Everyday Fund goal (target 10000)
+#   SEED_DEPOSIT — immediate deposit Everyday → Everyday Fund (2500)
+#   SEED_RECURRING — recurring monthly deposit (requires goal)
+
+- assertVisible:
+    id: "overview_empty_new_account"
+
+- tapOn:
+    id: "overview_empty_new_account"
+
+- extendedWaitUntil:
+    visible:
+      text: "New account"
+    timeout: 5000
+
+- runFlow:
+    file: fill-account-form.yaml
+    env:
+      ACCOUNT_NAME: "Everyday"
+      COLOR_INDEX: "2"
+
+- runFlow: wait-overview.yaml
+
+- runFlow:
+    when:
+      true: ${SEED_GOAL}
+    commands:
+      - tapOn:
+          id: "overview_new_goal"
+      - extendedWaitUntil:
+          visible:
+            text: "New goal"
+          timeout: 5000
+      - runFlow:
+          file: fill-goal-form.yaml
+          env:
+            GOAL_NAME: "Everyday Fund"
+            TARGET: "10000"
+      - runFlow: wait-overview.yaml
+
+- runFlow:
+    when:
+      true: ${SEED_DEPOSIT}
+    commands:
+      - tapOn:
+          id: "overview_deposit"
+      - extendedWaitUntil:
+          visible:
+            text: "Deposit"
+          timeout: 5000
+      - runFlow:
+          file: deposit-to-goal.yaml
+          env:
+            ACCOUNT_NAME: "Everyday"
+            GOAL_NAME: "Everyday Fund"
+            AMOUNT: "2500"
+      - runFlow: wait-overview.yaml
+
+- runFlow:
+    when:
+      true: ${SEED_RECURRING}
+    commands:
+      - tapOn:
+          id: "overview_deposit"
+      - extendedWaitUntil:
+          visible:
+            text: "Deposit"
+          timeout: 5000
+      - tapOn:
+          id: "deposit_account_dropdown"
+      - tapOn:
+          text: "Everyday"
+      - tapOn:
+          id: "deposit_goal_dropdown"
+      - tapOn:
+          text: "Everyday Fund"
+      - tapOn:
+          id: "deposit_amount_field"
+      - eraseText
+      - inputText: "200"
+      - hideKeyboard
+      - tapOn:
+          id: "deposit_recurring_toggle"
+      - tapOn:
+          id: "deposit_frequency_dropdown"
+      - tapOn:
+          text: "Monthly"
+      - scrollUntilVisible:
+          element:
+            id: "deposit_save"
+          direction: DOWN
+          timeout: 5000
+      - tapOn:
+          id: "deposit_save"
+      - runFlow: wait-overview.yaml

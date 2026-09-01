@@ -1,0 +1,22 @@
+appId: app.stackmint.sprout.dev
+tags:
+  - page
+---
+# Overview empty CTAs, then seed and walk populated controls.
+# Run: maestro test .maestro/overview.yaml
+
+- launchApp:
+    clearState: true
+    clearKeychain: true
+
+- runFlow: shared/debug-signin-intro.yaml
+
+- runFlow: shared/chapter-overview-empty.yaml
+
+- runFlow:
+    file: shared/seed-core.yaml
+    env:
+      SEED_GOAL: "true"
+      SEED_DEPOSIT: "true"
+
+- runFlow: shared/chapter-overview-populated.yaml

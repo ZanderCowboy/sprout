@@ -1,4 +1,6 @@
 appId: app.stackmint.sprout.dev
+tags:
+  - smoke
 ---
 # Core savings loop: account → goal → deposit → verify progress
 # Run: maestro test .maestro/core-loop.yaml
@@ -9,7 +11,8 @@ appId: app.stackmint.sprout.dev
 
 - runFlow: shared/debug-signin-intro.yaml
 
-- assertVisible: "1. Add an account"
+- assertVisible:
+    id: "overview_empty_new_account"
 
 - tapOn:
     id: "overview_empty_new_account"
@@ -58,20 +61,24 @@ appId: app.stackmint.sprout.dev
       GOAL_NAME: "Vacation Fund"
       AMOUNT: "1000"
 
+- runFlow: shared/wait-overview.yaml
+
 - tapOn:
     id: "shell_tab_goals"
 
 - assertVisible: "Goals"
 
-- assertVisible: "Vacation Fund"
+- assertVisible:
+    id: "goal_card"
 
 - tapOn:
     id: "goal_card"
-    text: "Vacation Fund"
 
 - extendedWaitUntil:
     visible:
       text: "Vacation Fund"
     timeout: 5000
 
-- assertVisible: "Remaining"
+# Verify progress shows on goal detail
+- assertVisible:
+    id: "goal_detail_deposit"

@@ -1,0 +1,47 @@
+appId: app.stackmint.sprout.dev
+---
+# Requires: signed in with at least one transaction.
+- tapOn:
+    id: "shell_tab_settings"
+
+- tapOn:
+    id: "settings_transactions"
+
+- extendedWaitUntil:
+    visible:
+      text: "Transactions"
+    timeout: 5000
+
+- tapOn:
+    id: "transaction_row"
+    optional: true
+
+- extendedWaitUntil:
+    visible:
+      text: "Transaction"
+    timeout: 5000
+    optional: true
+
+- tapOn:
+    id: "transaction_note_field"
+    optional: true
+
+- inputText:
+    text: "Tx note"
+    optional: true
+
+- tapOn:
+    id: "transaction_note_save"
+    optional: true
+
+- tapOn:
+    id: "transaction_manage_recurring"
+    optional: true
+
+- back:
+    optional: true
+
+- back:
+    optional: true
+
+- back

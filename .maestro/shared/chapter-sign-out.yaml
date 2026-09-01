@@ -1,0 +1,21 @@
+appId: app.stackmint.sprout.dev
+---
+# Tour-only. Requires: signed in. Leaves app on intro after sign-out.
+- tapOn:
+    id: "shell_tab_settings"
+
+- tapOn:
+    id: "settings_account"
+
+- extendedWaitUntil:
+    visible:
+      text: "Account"
+    timeout: 5000
+
+- tapOn:
+    id: "account_sign_out"
+
+- extendedWaitUntil:
+    visible:
+      id: "intro_next"
+    timeout: 15000

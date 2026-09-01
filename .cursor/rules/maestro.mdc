@@ -26,6 +26,8 @@ For day-to-day iteration, `flutter run --flavor development -t lib/main_developm
 - App id: `app.stackmint.sprout.dev`. Use a development build. Flows tap **Debug sign in** via `id: intro_debug_sign_in` (or `sign_in_debug_sign_in` on the sign-in screen), then wait for Overview.
 - Tap controls by **`Semantics.identifier`** (`tapOn: id: …`), not visible text. IDs are defined in `sprout_app/lib/core/constants/semantics_ids.dart` (`SemanticsIds`). Use `text:` only for dropdown menu items and assertions.
 - New tappable UI in presentation must use **`Sprout*` widgets** from `sprout_app/lib/ui/` (exported via `lib/ui/export.dart`) with a `SemanticsIds` value — not raw `FilledButton` / inline `Semantics` wrappers.
-- **Root journeys** (`.maestro/*.yaml`) are the only runnable flows; `config.yaml` uses `flows: ["*"]`. **Shared helpers** (`.maestro/shared/*.yaml`) are `runFlow` subflows — no `launchApp`, parameterized via `env`. Reuse helpers instead of duplicating sign-in or form-fill in new journeys.
+- **Root journeys** (`.maestro/*.yaml`) are the only runnable flows; `config.yaml` uses `flows: ["*"]`. **Shared helpers** (`.maestro/shared/*.yaml`) are `runFlow` subflows — no `launchApp`, parameterized via `env`. Reuse helpers instead of duplicating debug sign-in, seed, or form-fill in a new root journey.
+- **Tags**: new page journeys at `.maestro/` root use `tags: [page]`; smoke (`core-loop`, `full-app-tour`) use `[smoke]`; no-accounts edges use `[edge]`. Filter with `--include-tags`.
+- New reusable steps go in `.maestro/shared/` (`seed-core`, `chapter-*`, fill helpers) and are called with `runFlow` + `env`.
 - CLI fallback: `maestro test .maestro/` or `maestro test .maestro/<flow>.yaml`.
 - Do not point Maestro at production. Debug sign-in is hidden outside the development flavor.

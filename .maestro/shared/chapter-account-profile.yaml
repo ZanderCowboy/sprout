@@ -1,0 +1,54 @@
+appId: app.stackmint.sprout.dev
+---
+# Requires: signed in. Does NOT sign out.
+- tapOn:
+    id: "shell_tab_settings"
+
+- tapOn:
+    id: "settings_account"
+
+- extendedWaitUntil:
+    visible:
+      text: "Account"
+    timeout: 5000
+
+- tapOn:
+    id: "account_edit_display_name"
+
+- tapOn:
+    id: "account_edit_name_field"
+
+- eraseText
+
+- inputText: "Tour User"
+
+- tapOn:
+    id: "account_edit_name_save"
+
+- tapOn:
+    id: "account_terms"
+
+- extendedWaitUntil:
+    visible:
+      text: "Terms of Service"
+    timeout: 10000
+
+- back
+
+- tapOn:
+    id: "account_privacy"
+
+- extendedWaitUntil:
+    visible:
+      text: "Privacy Policy"
+    timeout: 10000
+
+- back
+
+- tapOn:
+    id: "account_delete"
+
+- tapOn:
+    id: "account_delete_cancel"
+
+- back

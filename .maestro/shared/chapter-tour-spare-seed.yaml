@@ -1,0 +1,38 @@
+appId: app.stackmint.sprout.dev
+---
+# Tour-only: create Spare account + Spare Goal for confirm-delete later.
+# Requires: Everyday account already exists (after seed-core account step or full seed).
+- tapOn:
+    id: "shell_tab_overview"
+
+- tapOn:
+    id: "overview_new_account"
+
+- extendedWaitUntil:
+    visible:
+      text: "New account"
+    timeout: 5000
+
+- runFlow:
+    file: fill-account-form.yaml
+    env:
+      ACCOUNT_NAME: "Spare"
+      COLOR_INDEX: "3"
+
+- runFlow: wait-overview.yaml
+
+- tapOn:
+    id: "overview_new_goal"
+
+- extendedWaitUntil:
+    visible:
+      text: "New goal"
+    timeout: 5000
+
+- runFlow:
+    file: fill-goal-form.yaml
+    env:
+      GOAL_NAME: "Spare Goal"
+      TARGET: "5000"
+
+- runFlow: wait-overview.yaml
