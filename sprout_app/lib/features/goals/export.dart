@@ -1,7 +1,4 @@
 export 'application/goals_service.dart';
-export 'data/goal_mapper.dart';
-export 'data/goals_repository_impl.dart';
-export 'data/local/models/goal_hive_model.dart';
 export 'domain/goal.dart';
 export 'domain/goal_progress.dart';
 export 'domain/goals_repository.dart';

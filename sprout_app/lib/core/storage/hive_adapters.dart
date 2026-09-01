@@ -1,9 +1,10 @@
 import 'package:hive/hive.dart';
 
-import 'package:sprout/features/accounts/export.dart';
-import 'package:sprout/features/budget/export.dart';
-import 'package:sprout/features/goals/export.dart';
-import 'package:sprout/features/transactions/export.dart';
+import 'package:sprout/features/accounts/data/local/account_hive_model.dart';
+import 'package:sprout/features/budget/data/local/models/budget_group_hive_model.dart';
+import 'package:sprout/features/goals/data/local/models/goal_hive_model.dart';
+import 'package:sprout/features/transactions/data/local/pending_sync_hive_model.dart';
+import 'package:sprout/features/transactions/data/local/transaction_hive_model.dart';
 
 const int _typeAccount = 0;
 const int _typeGoal = 1;

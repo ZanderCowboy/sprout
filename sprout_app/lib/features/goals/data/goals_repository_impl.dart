@@ -5,7 +5,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:sprout/core/core.dart';
 import 'package:sprout/features/sync/export.dart';
-import 'package:sprout/features/transactions/export.dart';
+import 'package:sprout/features/transactions/data/pending_sync_payload.dart';
+import 'package:sprout/features/transactions/data/supabase_tables.dart';
 import '../domain/goal.dart';
 import '../domain/goals_repository.dart';
 import 'goal_mapper.dart';

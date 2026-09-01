@@ -1,8 +1,11 @@
 import 'dart:convert';
 
-import 'package:sprout/features/accounts/export.dart';
-import 'package:sprout/features/budget/export.dart';
-import 'package:sprout/features/goals/export.dart';
+import 'package:sprout/features/accounts/data/account_mapper.dart';
+import 'package:sprout/features/accounts/domain/account.dart';
+import 'package:sprout/features/budget/data/mappers/budget_supabase_mapper.dart';
+import 'package:sprout/features/budget/domain/budget_group.dart';
+import 'package:sprout/features/goals/data/goal_mapper.dart';
+import 'package:sprout/features/goals/domain/goal.dart';
 
 import '../domain/transaction.dart';
 import '../domain/transaction_frequency.dart';

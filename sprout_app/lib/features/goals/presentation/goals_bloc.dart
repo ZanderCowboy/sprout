@@ -5,8 +5,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../application/goals_service.dart';
 import '../domain/goal.dart';
 import '../domain/goal_progress.dart';
-import 'package:sprout/features/transactions/export.dart';
 import 'package:sprout/features/accounts/export.dart';
+import 'package:sprout/features/transactions/export.dart';
 
 sealed class GoalsEvent extends Equatable {
   const GoalsEvent();
@@ -31,14 +31,14 @@ final class GoalsInitial extends GoalsState {
 final class GoalsReady extends GoalsState {
   const GoalsReady({
     required this.progressList,
-    required this.unallocatedBalance,
+    required this.unallocatedBalanceCents,
   });
 
   final List<GoalProgress> progressList;
-  final double unallocatedBalance;
+  final int unallocatedBalanceCents;
 
   @override
-  List<Object?> get props => [progressList, unallocatedBalance];
+  List<Object?> get props => [progressList, unallocatedBalanceCents];
 }
 
 class GoalsBloc extends Bloc<GoalsEvent, GoalsState> {
@@ -72,71 +72,32 @@ class GoalsBloc extends Bloc<GoalsEvent, GoalsState> {
 
   Stream<GoalsReady> _watchGoalProgress() {
     return Stream<GoalsReady>.multi((controller) {
-      var accounts = <Account>[];
       var goals = <Goal>[];
-      var transactions = <Transaction>[];
+      var fundsSnapshot = const FundsSnapshot(
+        savedCentsByGoalId: {},
+        unallocatedCents: 0,
+        accountCurrentDepositTotalsById: {},
+        accountScheduledDepositTotalsById: {},
+      );
 
       void emitProgress() {
-        final now = DateTime.now();
-        final allocationSavedByGoalId = <String, int>{};
-        final depositUnallocatedByAccountId = <String, int>{};
-        final allocationByAccountId = <String, int>{};
-        for (final t in transactions) {
-          if (t.occurredAt.isAfter(now)) continue; // pending by date
-          switch (t.kind) {
-            case TransactionKind.deposit:
-              final gid = t.goalId;
-              if (gid == null || gid.isEmpty) {
-                depositUnallocatedByAccountId[t.accountId] =
-                    (depositUnallocatedByAccountId[t.accountId] ?? 0) +
-                        t.amountCents;
-              } else {
-                allocationSavedByGoalId[gid] =
-                    (allocationSavedByGoalId[gid] ?? 0) + t.amountCents;
-              }
-              break;
-            case TransactionKind.allocation:
-              final gid = t.goalId;
-              if (gid == null || gid.isEmpty) break;
-              allocationSavedByGoalId[gid] =
-                  (allocationSavedByGoalId[gid] ?? 0) + t.amountCents;
-              allocationByAccountId[t.accountId] =
-                  (allocationByAccountId[t.accountId] ?? 0) + t.amountCents;
-              break;
-          }
-        }
         final list = goals
             .map(
               (g) => GoalProgress(
                 goal: g,
-                savedCents: allocationSavedByGoalId[g.id] ?? 0,
+                savedCents: fundsSnapshot.savedCentsByGoalId[g.id] ?? 0,
               ),
             )
             .toList();
 
-        var unallocatedCents = 0;
-        for (final a in accounts) {
-          final deposited = depositUnallocatedByAccountId[a.id] ?? 0;
-          final allocated = allocationByAccountId[a.id] ?? 0;
-          final available = deposited - allocated;
-          if (available > 0) unallocatedCents += available;
-        }
-
         controller.add(
           GoalsReady(
             progressList: list,
-            unallocatedBalance: unallocatedCents / 100.0,
+            unallocatedBalanceCents: fundsSnapshot.unallocatedCents,
           ),
         );
       }
 
-      final accountsSub = _accountsService.watchAccounts().listen(
-        (a) {
-          accounts = a;
-          emitProgress();
-        },
-        onError: controller.addError,
-      );
       final goalsSub = _goalsService.watchGoals().listen(
         (g) {
           goals = g;
@@ -144,18 +105,23 @@ class GoalsBloc extends Bloc<GoalsEvent, GoalsState> {
         },
         onError: controller.addError,
       );
-      final txSub = _transactionsService.watchTransactions().listen(
-        (t) {
-          transactions = t;
+      final fundsSub = _transactionsService
+          .watchFundsSnapshot(
+            accountIdsStream: _accountsService
+                .watchAccounts()
+                .map((accounts) => accounts.map((a) => a.id).toList()),
+          )
+          .listen(
+        (snapshot) {
+          fundsSnapshot = snapshot;
           emitProgress();
         },
         onError: controller.addError,
       );
 
       controller.onCancel = () {
-        accountsSub.cancel();
         goalsSub.cancel();
-        txSub.cancel();
+        fundsSub.cancel();
       };
     });
   }

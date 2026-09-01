@@ -5,9 +5,9 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../application/budget_service.dart';
-import '../domain/budget_category.dart';
 import '../domain/budget_group.dart';
 import '../domain/budget_item.dart';
+import '../domain/budget_totals.dart';
 
 sealed class BudgetEvent extends Equatable {
   const BudgetEvent();
@@ -91,34 +91,14 @@ final class BudgetReady extends BudgetState {
   final double disposableIncome;
 
   factory BudgetReady.fromGroups(List<BudgetGroup> groups) {
-    final totals = <String, double>{};
-    var income = 0.0;
-    var essentials = 0.0;
-    var lifestyle = 0.0;
-
-    for (final g in groups) {
-      final total = g.items.fold<double>(0.0, (sum, i) => sum + i.amount);
-      totals[g.id] = total;
-      switch (g.category) {
-        case BudgetCategory.income:
-          income += total;
-          break;
-        case BudgetCategory.essentials:
-          essentials += total;
-          break;
-        case BudgetCategory.lifestyle:
-          lifestyle += total;
-          break;
-      }
-    }
-
+    final totals = BudgetTotals.fromGroups(groups);
     return BudgetReady(
       groups: groups,
-      groupTotals: totals,
-      totalIncome: income,
-      totalEssentials: essentials,
-      totalLifestyle: lifestyle,
-      disposableIncome: income - essentials - lifestyle,
+      groupTotals: totals.groupTotals,
+      totalIncome: totals.totalIncome,
+      totalEssentials: totals.totalEssentials,
+      totalLifestyle: totals.totalLifestyle,
+      disposableIncome: totals.disposableIncome,
     );
   }
 
