@@ -6,4 +6,7 @@ abstract class GoalsRepository {
   Future<void> upsertGoal(Goal goal);
   Future<void> deleteGoal(String id);
   Future<void> pullRemote();
+
+  /// Wipes all locally persisted goals.
+  Future<void> clearLocal();
 }

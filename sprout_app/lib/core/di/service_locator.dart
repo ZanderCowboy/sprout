@@ -69,12 +69,8 @@ Future<void> configureDependencies({
     () => PrivacyPolicyServiceImpl(remoteConfig: sl()),
   );
 
-  sl.registerSingleton<Box<AccountHiveModel>>(accountsBox);
-  sl.registerSingleton<Box<GoalHiveModel>>(goalsBox);
-  sl.registerSingleton<Box<BudgetGroupHiveModel>>(budgetGroupsBox);
-  sl.registerSingleton<Box<TransactionHiveModel>>(transactionsBox);
-  sl.registerSingleton<Box<PendingSyncHiveModel>>(pendingSyncBox);
-
+  // Entity boxes are owned by repositories, not registered on GetIt.
+  // Settings is held by UserContext only.
   final pendingQueue = PendingSyncQueue(pendingSyncBox);
   sl.registerSingleton<PendingSyncQueue>(pendingQueue);
 
@@ -105,11 +101,13 @@ Future<void> configureDependencies({
       authRepository: sl(),
       userContext: sl(),
       appConfig: sl(),
-      accountsBox: sl(),
-      goalsBox: sl(),
-      budgetGroupsBox: sl(),
-      transactionsBox: sl(),
-      pendingSyncQueue: sl(),
+      clearLocalData: () async {
+        await sl<AccountsRepository>().clearLocal();
+        await sl<GoalsRepository>().clearLocal();
+        await sl<BudgetRepository>().clearLocal();
+        await sl<TransactionsRepository>().clearLocal();
+        await sl<PendingSyncQueue>().clear();
+      },
       flushPending: () => sl<SyncService>().flushPending(),
       pullRemote: () async {
         await sl<AccountsRepository>().pullRemote();
@@ -127,7 +125,7 @@ Future<void> configureDependencies({
 
   sl.registerLazySingleton<AccountsRepository>(
     () => AccountsRepositoryImpl(
-      box: sl(),
+      box: accountsBox,
       userContext: sl(),
       appConfig: sl(),
       supabase: supabaseClient,
@@ -138,7 +136,7 @@ Future<void> configureDependencies({
 
   sl.registerLazySingleton<GoalsRepository>(
     () => GoalsRepositoryImpl(
-      box: sl(),
+      box: goalsBox,
       userContext: sl(),
       appConfig: sl(),
       supabase: supabaseClient,
@@ -149,7 +147,7 @@ Future<void> configureDependencies({
 
   sl.registerLazySingleton<BudgetRepository>(
     () => BudgetRepositoryImpl(
-      box: sl(),
+      box: budgetGroupsBox,
       userContext: sl(),
       appConfig: sl(),
       supabase: supabaseClient,
@@ -160,7 +158,7 @@ Future<void> configureDependencies({
 
   sl.registerLazySingleton<TransactionsRepository>(
     () => TransactionsRepositoryImpl(
-      box: sl(),
+      box: transactionsBox,
       userContext: sl(),
       appConfig: sl(),
       supabase: supabaseClient,

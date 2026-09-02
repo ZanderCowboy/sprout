@@ -1,27 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:sprout/core/di/service_locator.dart';
 import 'package:sprout/core/router/app_redirect.dart';
 import 'package:sprout/core/router/app_route.dart';
 import 'package:sprout/core/router/go_router_refresh_stream.dart';
 import 'package:sprout/core/user/user_context.dart';
 import 'package:sprout/features/accounts/export.dart';
-import 'package:sprout/features/auth/presentation/account_page.dart';
-import 'package:sprout/features/auth/presentation/bloc/auth_cubit.dart';
-import 'package:sprout/features/auth/presentation/intro_page.dart';
-import 'package:sprout/features/auth/presentation/privacy_page.dart';
-import 'package:sprout/features/auth/presentation/sign_in_page.dart';
-import 'package:sprout/features/auth/presentation/terms_page.dart';
-import 'package:sprout/features/budget/presentation/budget_planner_screen.dart';
+import 'package:sprout/features/auth/export.dart';
+import 'package:sprout/features/budget/export.dart';
 import 'package:sprout/features/goals/export.dart';
 import 'package:sprout/features/home/export.dart';
-import 'package:sprout/features/settings/presentation/settings_page.dart';
-import 'package:sprout/features/shell/shell.dart';
-import 'package:sprout/features/transactions/presentation/recurring_payments_page.dart';
-import 'package:sprout/features/transactions/presentation/transaction_detail_page.dart';
-import 'package:sprout/features/transactions/presentation/transactions_page.dart';
+import 'package:sprout/features/settings/export.dart';
+import 'package:sprout/features/shell/export.dart';
+import 'package:sprout/features/transactions/export.dart';
 
 GoRouter createAppRouter({
   required AuthCubit authCubit,
@@ -78,22 +69,7 @@ GoRouter createAppRouter({
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
-          return MultiBlocProvider(
-            providers: [
-              BlocProvider(
-                create: (_) => HomeBloc(
-                  accountsService: sl(),
-                  transactionsService: sl(),
-                )..add(const HomeSubscriptionRequested()),
-              ),
-              BlocProvider(
-                create: (_) => GoalsBloc(
-                  goalsService: sl(),
-                  transactionsService: sl(),
-                  accountsService: sl(),
-                )..add(const GoalsSubscriptionRequested()),
-              ),
-            ],
+          return ShellBlocScope(
             child: ShellPage(navigationShell: navigationShell),
           );
         },

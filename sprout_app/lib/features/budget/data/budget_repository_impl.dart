@@ -131,4 +131,10 @@ class BudgetRepositoryImpl implements BudgetRepository {
     }
     _notify();
   }
+
+  @override
+  Future<void> clearLocal() async {
+    await _box.clear();
+    _notify();
+  }
 }

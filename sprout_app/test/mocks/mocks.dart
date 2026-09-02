@@ -311,6 +311,12 @@ class FakeTransactionsRepository implements TransactionsRepository {
   @override
   Future<void> pullRemote() async {}
 
+  @override
+  Future<void> clearLocal() async {
+    _transactions.clear();
+    _notify();
+  }
+
   Future<void> dispose() async {
     await _controller.close();
   }
@@ -370,6 +376,12 @@ class FakeGoalsRepository implements GoalsRepository {
   Future<void> pullRemote() async {
     final hold = pullRemoteHold;
     if (hold != null) await hold.future;
+  }
+
+  @override
+  Future<void> clearLocal() async {
+    _goals.clear();
+    _notify();
   }
 
   Future<void> dispose() async {
@@ -433,6 +445,12 @@ class FakeAccountsRepository implements AccountsRepository {
     if (hold != null) await hold.future;
   }
 
+  @override
+  Future<void> clearLocal() async {
+    _accounts.clear();
+    _notify();
+  }
+
   Future<void> dispose() async {
     await _controller.close();
   }
@@ -487,6 +505,12 @@ class FakeBudgetRepository implements BudgetRepository {
 
   @override
   Future<void> pullRemote() async {}
+
+  @override
+  Future<void> clearLocal() async {
+    _groups.clear();
+    _notify();
+  }
 
   Future<void> dispose() async {
     await _controller.close();

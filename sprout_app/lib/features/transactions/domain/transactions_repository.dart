@@ -37,4 +37,7 @@ abstract class TransactionsRepository {
   Future<void> markTransactionSynced(String id);
 
   Future<void> pullRemote();
+
+  /// Wipes all locally persisted transactions.
+  Future<void> clearLocal();
 }

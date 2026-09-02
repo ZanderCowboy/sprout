@@ -108,4 +108,10 @@ class GoalsRepositoryImpl implements GoalsRepository {
     }
     _notify();
   }
+
+  @override
+  Future<void> clearLocal() async {
+    await _box.clear();
+    _notify();
+  }
 }
