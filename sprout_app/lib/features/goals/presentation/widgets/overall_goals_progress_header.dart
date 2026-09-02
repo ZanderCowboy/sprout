@@ -23,13 +23,12 @@ class OverallGoalsProgressHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return SproutProgressCard(
       title: title,
+      subtitle: AppStrings.acrossAllActiveGoals,
       percent: totals.overallPercent,
-      savedLabel: AppStrings.savedAmount(
-        formatZarFromCents(totals.totalSavedCents),
-      ),
-      targetLabel: AppStrings.targetAmountLabel(
-        formatZarFromCents(totals.totalTargetCents),
-      ),
+      savedCaption: AppStrings.saved,
+      savedValue: formatZarFromCents(totals.totalSavedCents),
+      targetCaption: AppStrings.target,
+      targetValue: formatZarFromCents(totals.totalTargetCents),
       detail: AppStrings.toGoCompleteAllGoals(
         formatZarFromCents(totals.totalRemainingCents),
       ),

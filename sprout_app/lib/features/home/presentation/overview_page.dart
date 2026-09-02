@@ -87,7 +87,7 @@ class OverviewPage extends StatelessWidget {
                             padding: const EdgeInsets.only(top: 16),
                             child: OverallGoalsProgressHeader(
                               totals: goalsState.overall,
-                              title: AppStrings.overallGoalsProgress,
+                              title: AppStrings.overallProgress,
                               onTap: () => context.go(AppRoute.goals.path),
                               semanticsIdentifier:
                                   SemanticsIds.overviewProgressHeader,

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:sprout/core/theme/app_radii.dart';
 
 import '_semantic.dart';
+import 'sprout_glow_icon.dart';
 
 /// Icon + label on a rounded surface (Overview quick-action row).
 class SproutQuickActionTile extends StatelessWidget {
@@ -13,6 +14,7 @@ class SproutQuickActionTile extends StatelessWidget {
     required this.icon,
     required this.onTap,
     this.enabled = true,
+    this.iconColor,
   });
 
   final String identifier;
@@ -20,11 +22,14 @@ class SproutQuickActionTile extends StatelessWidget {
   final IconData icon;
   final VoidCallback onTap;
   final bool enabled;
+  final Color? iconColor;
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final iconColor = enabled ? scheme.primary : scheme.onSurfaceVariant;
+    final accent = enabled
+        ? (iconColor ?? scheme.primary)
+        : scheme.onSurfaceVariant;
     final labelStyle = enabled
         ? Theme.of(context).textTheme.titleSmall
         : Theme.of(
@@ -47,8 +52,8 @@ class SproutQuickActionTile extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(icon, color: iconColor, size: 26),
-                  const SizedBox(height: 8),
+                  SproutGlowIcon(icon: icon, color: accent),
+                  const SizedBox(height: 10),
                   Text(
                     label,
                     textAlign: TextAlign.center,

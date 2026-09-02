@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:sprout/core/core.dart';
 import 'package:sprout/core/theme/app_radii.dart';
 import 'package:sprout/features/transactions/export.dart';
+import 'package:sprout/ui/export.dart';
 
 class OverviewActivityRow extends StatelessWidget {
   const OverviewActivityRow({super.key, required this.transaction});
@@ -37,21 +38,14 @@ class OverviewActivityRow extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             child: Row(
               children: [
-                DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: scheme.surface,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: Icon(
-                      t.kind == TransactionKind.deposit
-                          ? Icons.payments_outlined
-                          : Icons.swap_horiz_rounded,
-                      color: scheme.primary,
-                      size: 20,
-                    ),
-                  ),
+                SproutGlowIcon(
+                  icon: t.kind == TransactionKind.deposit
+                      ? Icons.arrow_downward_rounded
+                      : Icons.sync_alt_rounded,
+                  color: t.kind == TransactionKind.deposit
+                      ? AppColors.seed
+                      : scheme.onSurfaceVariant,
+                  iconSize: 20,
                 ),
                 const SizedBox(width: 12),
                 Expanded(

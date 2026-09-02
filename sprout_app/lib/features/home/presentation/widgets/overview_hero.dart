@@ -20,34 +20,40 @@ class OverviewHero extends StatelessWidget {
         ? formatDateTime(lastActivityAt!)
         : AppStrings.neverUpdated;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          AppStrings.portfolioTotal.toUpperCase(),
-          style: textTheme.labelLarge?.copyWith(
-            color: scheme.onSurfaceVariant,
-            letterSpacing: 1.4,
-          ),
-        ),
-        const SizedBox(height: 6),
-        FittedBox(
-          fit: BoxFit.scaleDown,
-          alignment: Alignment.centerLeft,
-          child: Text(
-            formatZarFromCents(totalCents),
-            style: textTheme.displayMedium?.copyWith(
-              fontWeight: FontWeight.w900,
-              letterSpacing: -1.5,
+    return SizedBox(
+      width: double.infinity,
+      child: Column(
+        children: [
+          Text(
+            AppStrings.portfolioTotal.toUpperCase(),
+            textAlign: TextAlign.center,
+            style: textTheme.labelLarge?.copyWith(
+              color: scheme.onSurfaceVariant,
+              letterSpacing: 1.4,
             ),
           ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          '${AppStrings.lastUpdated}: $updated',
-          style: textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
-        ),
-      ],
+          const SizedBox(height: 6),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              formatZarFromCents(totalCents),
+              style: textTheme.displayMedium?.copyWith(
+                fontWeight: FontWeight.w900,
+                letterSpacing: -1.5,
+                color: scheme.primary,
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            '${AppStrings.lastUpdated}: $updated',
+            textAlign: TextAlign.center,
+            style: textTheme.bodySmall?.copyWith(
+              color: scheme.onSurfaceVariant,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
