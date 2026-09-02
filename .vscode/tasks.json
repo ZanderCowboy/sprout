@@ -2,7 +2,74 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Sprout · Firebase · distribute dev APK",
+      "label": "Sprout · Build · Development Debug",
+      "detail": "Debug Development APK",
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}/sprout_app"
+      },
+      "command": "flutter build apk --debug --flavor development -t lib/main_development.dart",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "focus": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Sprout · Install · Development Debug",
+      "detail": "Build then install the development debug APK",
+      "dependsOn": ["Sprout · Build · Development Debug"],
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}/sprout_app"
+      },
+      "command": "flutter install --debug --flavor development",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "focus": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Sprout · Build · Production Debug",
+      "detail": "Debug Production APK",
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}/sprout_app"
+      },
+      "command": "flutter build apk --debug --flavor production -t lib/main_production.dart",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "focus": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Sprout · Install · Production Debug",
+      "detail": "Build then install the production debug APK",
+      "dependsOn": ["Sprout · Build · Production Debug"],
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}/sprout_app"
+      },
+      "command": "flutter install --debug --flavor production",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "focus": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Sprout · Firebase · Distribute Development APK",
       "detail": "Build development APK and upload to Firebase App Distribution",
       "type": "shell",
       "options": {

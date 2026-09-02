@@ -14,8 +14,8 @@ Maestro exercises the **installed** app on the device/emulator, not hot-reload o
 
 ```bash
 cd sprout_app
-flutter build apk --flavor development -t lib/main_development.dart
-flutter install --flavor development -t lib/main_development.dart
+flutter build apk --debug --flavor development -t lib/main_development.dart
+flutter install --debug --flavor development
 ```
 
 For day-to-day iteration, `flutter run --flavor development -t lib/main_development.dart` on the target device is enough — then run Maestro in another terminal. Do **not** run Maestro against a stale APK after semantics or presentation edits.
