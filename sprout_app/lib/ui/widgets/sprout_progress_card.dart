@@ -5,35 +5,57 @@ class SproutProgressCard extends StatelessWidget {
     super.key,
     required this.title,
     required this.percent,
-    required this.savedLabel,
-    required this.targetLabel,
+    required this.savedCaption,
+    required this.savedValue,
+    required this.targetCaption,
+    required this.targetValue,
+    this.subtitle,
     this.detail,
     this.onTap,
     this.identifier,
     this.semanticsLabel,
+    this.accentColor,
   });
 
   final String title;
   final int percent;
-  final String savedLabel;
-  final String targetLabel;
+  final String savedCaption;
+  final String savedValue;
+  final String targetCaption;
+  final String targetValue;
+  final String? subtitle;
   final String? detail;
   final VoidCallback? onTap;
   final String? identifier;
   final String? semanticsLabel;
+  final Color? accentColor;
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final accent = accentColor ?? scheme.primary;
     final progress = (percent / 100).clamp(0.0, 1.0);
 
     final card = Card(
       elevation: 0,
       color: scheme.surfaceContainerHighest,
-      clipBehavior: onTap != null ? Clip.antiAlias : Clip.none,
+      clipBehavior: Clip.antiAlias,
       child: onTap != null
-          ? InkWell(onTap: onTap, child: _content(context, scheme, progress))
-          : _content(context, scheme, progress),
+          ? InkWell(
+              onTap: onTap,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  border: Border(left: BorderSide(color: accent, width: 6)),
+                ),
+                child: _content(context, scheme, accent, progress),
+              ),
+            )
+          : DecoratedBox(
+              decoration: BoxDecoration(
+                border: Border(left: BorderSide(color: accent, width: 6)),
+              ),
+              child: _content(context, scheme, accent, progress),
+            ),
     );
 
     return Semantics(
@@ -44,8 +66,14 @@ class SproutProgressCard extends StatelessWidget {
     );
   }
 
-  Widget _content(BuildContext context, ColorScheme scheme, double progress) {
+  Widget _content(
+    BuildContext context,
+    ColorScheme scheme,
+    Color accent,
+    double progress,
+  ) {
     final textTheme = Theme.of(context).textTheme;
+    final muted = textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant);
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
@@ -53,12 +81,25 @@ class SproutProgressCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Expanded(child: Text(title, style: textTheme.titleSmall)),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(title, style: textTheme.titleMedium),
+                    if (subtitle != null) ...[
+                      const SizedBox(height: 4),
+                      Text(subtitle!, style: muted),
+                    ],
+                  ],
+                ),
+              ),
               Text(
                 '$percent%',
                 style: textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.w900,
+                  color: accent,
                 ),
               ),
             ],
@@ -68,18 +109,29 @@ class SproutProgressCard extends StatelessWidget {
             value: progress,
             minHeight: 10,
             borderRadius: BorderRadius.circular(8),
-            color: scheme.primary,
+            color: accent,
             backgroundColor: scheme.onSurfaceVariant.withValues(alpha: 0.18),
           ),
           const SizedBox(height: 12),
           Row(
             children: [
-              Expanded(child: Text(savedLabel, style: textTheme.titleSmall)),
-              Text(
-                targetLabel,
-                style: textTheme.titleSmall?.copyWith(
-                  color: scheme.onSurfaceVariant,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(savedCaption, style: muted),
+                    const SizedBox(height: 4),
+                    Text(savedValue, style: textTheme.titleSmall),
+                  ],
                 ),
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(targetCaption, style: muted),
+                  const SizedBox(height: 4),
+                  Text(targetValue, style: textTheme.titleSmall),
+                ],
               ),
             ],
           ),

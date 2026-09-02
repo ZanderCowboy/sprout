@@ -71,6 +71,7 @@ abstract final class AppStrings {
   static const String recentActivity = 'Recent activity';
   static const String overallProgress = 'Overall progress';
   static const String overallGoalsProgress = 'Overall goals progress';
+  static const String acrossAllActiveGoals = 'Across all active goals';
   static const String saved = 'Saved';
   static const String target = 'Target';
   static const String disabledStatus = 'disabled';
