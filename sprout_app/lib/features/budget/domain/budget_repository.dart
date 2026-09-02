@@ -10,4 +10,7 @@ abstract class BudgetRepository {
   Future<void> deleteBudgetGroup(String id);
 
   Future<void> pullRemote();
+
+  /// Wipes all locally persisted budget groups.
+  Future<void> clearLocal();
 }

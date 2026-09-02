@@ -89,11 +89,7 @@ void main() {
       authRepository: fake,
       userContext: UserContext(settingsBox),
       appConfig: config(supabase: true),
-      accountsBox: accountsBox,
-      goalsBox: goalsBox,
-      budgetGroupsBox: budgetGroupsBox,
-      transactionsBox: transactionsBox,
-      pendingSyncQueue: PendingSyncQueue(pendingBox),
+      clearLocalData: () async {},
       flushPending: () async {},
       pullRemote: () async {},
     );

@@ -6,4 +6,7 @@ abstract class AccountsRepository {
   Future<void> upsertAccount(Account account);
   Future<void> deleteAccount(String id);
   Future<void> pullRemote();
+
+  /// Wipes all locally persisted accounts.
+  Future<void> clearLocal();
 }

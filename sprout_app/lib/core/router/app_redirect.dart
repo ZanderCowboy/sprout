@@ -1,5 +1,5 @@
 import 'package:sprout/core/router/app_route.dart';
-import 'package:sprout/features/auth/presentation/bloc/auth_cubit.dart';
+import 'package:sprout/features/auth/export.dart';
 
 /// Auth + intro gate for go_router. Returns a new location or null to stay.
 String? resolveAuthRedirect({

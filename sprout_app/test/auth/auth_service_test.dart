@@ -50,6 +50,31 @@ void main() {
   var flushCalls = 0;
   var pullCalls = 0;
 
+  AuthServiceImpl buildAuthService({
+    AppConfig? appConfig,
+    Future<void> Function()? logOutPurchases,
+  }) {
+    return AuthServiceImpl(
+      authRepository: fakeAuth,
+      userContext: userContext,
+      appConfig: appConfig ?? _testAppConfig,
+      clearLocalData: () async {
+        await accountsBox.clear();
+        await goalsBox.clear();
+        await budgetGroupsBox.clear();
+        await transactionsBox.clear();
+        await pendingBox.clear();
+      },
+      flushPending: () async {
+        flushCalls++;
+      },
+      pullRemote: () async {
+        pullCalls++;
+      },
+      logOutPurchases: logOutPurchases,
+    );
+  }
+
   setUpAll(() {
     tempDir = Directory.systemTemp.createTempSync('sprout_auth_service_');
     Hive.init(tempDir.path);
@@ -68,22 +93,7 @@ void main() {
     userContext = UserContext(settingsBox);
     flushCalls = 0;
     pullCalls = 0;
-    authService = AuthServiceImpl(
-      authRepository: fakeAuth,
-      userContext: userContext,
-      appConfig: _testAppConfig,
-      accountsBox: accountsBox,
-      goalsBox: goalsBox,
-      budgetGroupsBox: budgetGroupsBox,
-      transactionsBox: transactionsBox,
-      pendingSyncQueue: PendingSyncQueue(pendingBox),
-      flushPending: () async {
-        flushCalls++;
-      },
-      pullRemote: () async {
-        pullCalls++;
-      },
-    );
+    authService = buildAuthService();
   });
 
   tearDown(() async {
@@ -274,21 +284,7 @@ void main() {
       ).enqueue(PendingSyncOperationType.upsertAccount, '{}');
 
       var purchasesLogOutCalls = 0;
-      authService = AuthServiceImpl(
-        authRepository: fakeAuth,
-        userContext: userContext,
-        appConfig: _testAppConfig,
-        accountsBox: accountsBox,
-        goalsBox: goalsBox,
-        budgetGroupsBox: budgetGroupsBox,
-        transactionsBox: transactionsBox,
-        pendingSyncQueue: PendingSyncQueue(pendingBox),
-        flushPending: () async {
-          flushCalls++;
-        },
-        pullRemote: () async {
-          pullCalls++;
-        },
+      authService = buildAuthService(
         logOutPurchases: () async {
           purchasesLogOutCalls++;
         },
@@ -320,9 +316,7 @@ void main() {
   });
 
   test('debugSignIn is rejected in production', () async {
-    final prod = AuthServiceImpl(
-      authRepository: fakeAuth,
-      userContext: userContext,
+    final prod = buildAuthService(
       appConfig: const AppConfig(
         environment: AppEnvironment.production,
         supabaseUrl: '',
@@ -336,13 +330,6 @@ void main() {
         firebaseProjectId: '',
         firebaseStorageBucket: '',
       ),
-      accountsBox: accountsBox,
-      goalsBox: goalsBox,
-      budgetGroupsBox: budgetGroupsBox,
-      transactionsBox: transactionsBox,
-      pendingSyncQueue: PendingSyncQueue(pendingBox),
-      flushPending: () async {},
-      pullRemote: () async {},
     );
 
     expect(prod.debugSignInAvailable, isFalse);

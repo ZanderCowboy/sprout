@@ -11,5 +11,6 @@ export 'domain/transactions_repository.dart';
 export 'presentation/utils/transaction_display.dart';
 export 'presentation/utils/transaction_frequency_label.dart';
 export 'presentation/widgets/recurring_deposits_link.dart';
+export 'presentation/recurring_payments_page.dart';
 export 'presentation/transaction_detail_page.dart';
 export 'presentation/transactions_page.dart';

@@ -1,15 +1,8 @@
-import 'package:hive_flutter/hive_flutter.dart';
-
 import 'package:sprout/core/config/app_config.dart';
 import 'package:sprout/core/config/app_environment.dart';
 import 'package:sprout/core/constants/app_strings.dart';
 import 'package:sprout/core/error/error.dart';
 import 'package:sprout/core/user/user_context.dart';
-import 'package:sprout/features/accounts/data/local/account_hive_model.dart';
-import 'package:sprout/features/budget/data/local/models/budget_group_hive_model.dart';
-import 'package:sprout/features/goals/data/local/models/goal_hive_model.dart';
-import 'package:sprout/features/sync/data/pending_sync_queue.dart';
-import 'package:sprout/features/transactions/data/local/transaction_hive_model.dart';
 import '../domain/auth_repository.dart';
 import '../domain/auth_user.dart';
 import 'auth_service.dart';
@@ -19,22 +12,14 @@ class AuthServiceImpl implements AuthService {
     required AuthRepository authRepository,
     required UserContext userContext,
     required AppConfig appConfig,
-    required Box<AccountHiveModel> accountsBox,
-    required Box<GoalHiveModel> goalsBox,
-    required Box<BudgetGroupHiveModel> budgetGroupsBox,
-    required Box<TransactionHiveModel> transactionsBox,
-    required PendingSyncQueue pendingSyncQueue,
+    required Future<void> Function() clearLocalData,
     required Future<void> Function() flushPending,
     required Future<void> Function() pullRemote,
     Future<void> Function()? logOutPurchases,
   }) : _authRepository = authRepository,
        _userContext = userContext,
        _appConfig = appConfig,
-       _accountsBox = accountsBox,
-       _goalsBox = goalsBox,
-       _budgetGroupsBox = budgetGroupsBox,
-       _transactionsBox = transactionsBox,
-       _pendingSyncQueue = pendingSyncQueue,
+       _clearLocalData = clearLocalData,
        _flushPending = flushPending,
        _pullRemote = pullRemote,
        _logOutPurchases = logOutPurchases;
@@ -42,11 +27,7 @@ class AuthServiceImpl implements AuthService {
   final AuthRepository _authRepository;
   final UserContext _userContext;
   final AppConfig _appConfig;
-  final Box<AccountHiveModel> _accountsBox;
-  final Box<GoalHiveModel> _goalsBox;
-  final Box<BudgetGroupHiveModel> _budgetGroupsBox;
-  final Box<TransactionHiveModel> _transactionsBox;
-  final PendingSyncQueue _pendingSyncQueue;
+  final Future<void> Function() _clearLocalData;
   final Future<void> Function() _flushPending;
   final Future<void> Function() _pullRemote;
   final Future<void> Function()? _logOutPurchases;
@@ -158,11 +139,5 @@ class AuthServiceImpl implements AuthService {
     await _pullRemote();
   }
 
-  Future<void> _clearLocalEntityData() async {
-    await _accountsBox.clear();
-    await _goalsBox.clear();
-    await _budgetGroupsBox.clear();
-    await _transactionsBox.clear();
-    await _pendingSyncQueue.clear();
-  }
+  Future<void> _clearLocalEntityData() => _clearLocalData();
 }

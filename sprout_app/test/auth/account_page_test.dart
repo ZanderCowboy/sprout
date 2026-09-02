@@ -12,10 +12,8 @@ import 'package:sprout/core/config/app_environment.dart';
 import 'package:sprout/core/constants/app_strings.dart';
 import 'package:sprout/core/di/service_locator.dart';
 import 'package:sprout/core/router/app_route.dart';
-import 'package:sprout/core/storage/hive_adapters.dart';
 import 'package:sprout/core/theme/app_theme.dart';
 import 'package:sprout/core/user/user_context.dart';
-import 'package:sprout/features/accounts/data/local/account_hive_model.dart';
 import 'package:sprout/features/auth/application/auth_service_impl.dart';
 import 'package:sprout/features/auth/application/privacy_policy_service.dart';
 import 'package:sprout/features/auth/application/privacy_policy_service_impl.dart';
@@ -23,11 +21,6 @@ import 'package:sprout/features/auth/domain/auth_user.dart';
 import 'package:sprout/features/auth/presentation/account_page.dart';
 import 'package:sprout/features/auth/presentation/bloc/auth_cubit.dart';
 import 'package:sprout/features/auth/presentation/privacy_page.dart';
-import 'package:sprout/features/budget/data/local/models/budget_group_hive_model.dart';
-import 'package:sprout/features/goals/data/local/models/goal_hive_model.dart';
-import 'package:sprout/features/sync/data/pending_sync_queue.dart';
-import 'package:sprout/features/transactions/data/local/pending_sync_hive_model.dart';
-import 'package:sprout/features/transactions/data/local/transaction_hive_model.dart';
 
 import '../mocks/mocks.dart';
 
@@ -35,11 +28,6 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   late Directory tempDir;
-  late Box<AccountHiveModel> accountsBox;
-  late Box<GoalHiveModel> goalsBox;
-  late Box<BudgetGroupHiveModel> budgetGroupsBox;
-  late Box<TransactionHiveModel> transactionsBox;
-  late Box<PendingSyncHiveModel> pendingBox;
   late Box<dynamic> settingsBox;
   late FakeAuthRepository fakeAuth;
   late AuthCubit cubit;
@@ -47,16 +35,10 @@ void main() {
   setUpAll(() {
     tempDir = Directory.systemTemp.createTempSync('sprout_account_');
     Hive.init(tempDir.path);
-    registerHiveAdapters();
   });
 
   setUp(() async {
     final stamp = DateTime.now().microsecondsSinceEpoch;
-    accountsBox = await Hive.openBox<AccountHiveModel>('accounts_$stamp');
-    goalsBox = await Hive.openBox<GoalHiveModel>('goals_$stamp');
-    budgetGroupsBox = await Hive.openBox<BudgetGroupHiveModel>('budget_$stamp');
-    transactionsBox = await Hive.openBox<TransactionHiveModel>('tx_$stamp');
-    pendingBox = await Hive.openBox<PendingSyncHiveModel>('pending_$stamp');
     settingsBox = await Hive.openBox<dynamic>('settings_$stamp');
     fakeAuth = FakeAuthRepository(
       initialUser: const AuthUser(
@@ -84,11 +66,7 @@ void main() {
         authRepository: fakeAuth,
         userContext: UserContext(settingsBox),
         appConfig: config,
-        accountsBox: accountsBox,
-        goalsBox: goalsBox,
-        budgetGroupsBox: budgetGroupsBox,
-        transactionsBox: transactionsBox,
-        pendingSyncQueue: PendingSyncQueue(pendingBox),
+        clearLocalData: () async {},
         flushPending: () async {},
         pullRemote: () async {},
       ),
@@ -99,11 +77,6 @@ void main() {
   tearDown(() async {
     await cubit.close();
     await fakeAuth.dispose();
-    await accountsBox.deleteFromDisk();
-    await goalsBox.deleteFromDisk();
-    await budgetGroupsBox.deleteFromDisk();
-    await transactionsBox.deleteFromDisk();
-    await pendingBox.deleteFromDisk();
     await settingsBox.deleteFromDisk();
   });
 
