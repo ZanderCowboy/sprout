@@ -325,6 +325,9 @@ class FakeGoalsRepository implements GoalsRepository {
   final List<Goal> _goals = [];
 
   Goal? lastUpserted;
+  Object? upsertError;
+  Object? deleteError;
+  Completer<void>? pullRemoteHold;
 
   void _notify() {
     if (!_controller.isClosed) _controller.add(null);
@@ -343,6 +346,8 @@ class FakeGoalsRepository implements GoalsRepository {
 
   @override
   Future<void> upsertGoal(Goal goal) async {
+    final error = upsertError;
+    if (error != null) throw error;
     lastUpserted = goal;
     final idx = _goals.indexWhere((g) => g.id == goal.id);
     if (idx == -1) {
@@ -355,12 +360,17 @@ class FakeGoalsRepository implements GoalsRepository {
 
   @override
   Future<void> deleteGoal(String id) async {
+    final error = deleteError;
+    if (error != null) throw error;
     _goals.removeWhere((g) => g.id == id);
     _notify();
   }
 
   @override
-  Future<void> pullRemote() async {}
+  Future<void> pullRemote() async {
+    final hold = pullRemoteHold;
+    if (hold != null) await hold.future;
+  }
 
   Future<void> dispose() async {
     await _controller.close();
@@ -376,6 +386,9 @@ class FakeAccountsRepository implements AccountsRepository {
   final List<Account> _accounts = [];
 
   Account? lastUpserted;
+  Object? upsertError;
+  Object? deleteError;
+  Completer<void>? pullRemoteHold;
 
   void _notify() {
     if (!_controller.isClosed) _controller.add(null);
@@ -394,6 +407,8 @@ class FakeAccountsRepository implements AccountsRepository {
 
   @override
   Future<void> upsertAccount(Account account) async {
+    final error = upsertError;
+    if (error != null) throw error;
     lastUpserted = account;
     final idx = _accounts.indexWhere((a) => a.id == account.id);
     if (idx == -1) {
@@ -406,12 +421,17 @@ class FakeAccountsRepository implements AccountsRepository {
 
   @override
   Future<void> deleteAccount(String id) async {
+    final error = deleteError;
+    if (error != null) throw error;
     _accounts.removeWhere((a) => a.id == id);
     _notify();
   }
 
   @override
-  Future<void> pullRemote() async {}
+  Future<void> pullRemote() async {
+    final hold = pullRemoteHold;
+    if (hold != null) await hold.future;
+  }
 
   Future<void> dispose() async {
     await _controller.close();
@@ -427,6 +447,7 @@ class FakeBudgetRepository implements BudgetRepository {
   final List<BudgetGroup> _groups = [];
 
   BudgetGroup? lastUpserted;
+  Object? upsertError;
 
   void _notify() {
     if (!_controller.isClosed) _controller.add(null);
@@ -446,6 +467,8 @@ class FakeBudgetRepository implements BudgetRepository {
 
   @override
   Future<void> upsertBudgetGroup(BudgetGroup group) async {
+    final error = upsertError;
+    if (error != null) throw error;
     lastUpserted = group;
     final idx = _groups.indexWhere((g) => g.id == group.id);
     if (idx == -1) {

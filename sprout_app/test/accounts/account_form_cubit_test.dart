@@ -73,4 +73,16 @@ void main() {
     expect(cubit.state, isA<AccountFormSaved>());
     expect(repo.lastUpserted?.name, 'Savings');
   });
+
+  test('submit recovers from a non-validation failure', () async {
+    repo.upsertError = StateError('hive down');
+    await cubit.load();
+    cubit.nameChanged('Savings');
+    await cubit.submit();
+    final state = cubit.state;
+    expect(state, isA<AccountFormReady>());
+    expect((state as AccountFormReady).submitting, isFalse);
+    expect(state.submitError, AppStrings.couldNotSave);
+    expect(state.canSave, isTrue);
+  });
 }

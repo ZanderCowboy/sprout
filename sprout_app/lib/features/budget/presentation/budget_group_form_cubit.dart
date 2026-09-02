@@ -93,28 +93,35 @@ class BudgetGroupFormCubit extends Cubit<BudgetGroupFormState> {
 
     emit(current.copyWith(submitting: true, clearSubmitError: true));
 
-    final now = DateTime.now();
-    final uid = await _userContext.resolveUserId();
-    final description = current.description.trim();
-    final group = BudgetGroup(
-      id: _initial?.id ?? _uuid.v4(),
-      userId: uid,
-      name: current.name.trim(),
-      description: description.isEmpty ? null : description,
-      category: current.category,
-      colorHex: colorHex,
-      iconCodePoint: iconCodePoint,
-      iconFontFamily: iconFontFamily,
-      items: _initial?.items ?? const <BudgetItem>[],
-      createdAt: _initial?.createdAt ?? now,
-      updatedAt: now,
-    );
-
     try {
+      final now = DateTime.now();
+      final uid = await _userContext.resolveUserId();
+      final description = current.description.trim();
+      final group = BudgetGroup(
+        id: _initial?.id ?? _uuid.v4(),
+        userId: uid,
+        name: current.name.trim(),
+        description: description.isEmpty ? null : description,
+        category: current.category,
+        colorHex: colorHex,
+        iconCodePoint: iconCodePoint,
+        iconFontFamily: iconFontFamily,
+        items: _initial?.items ?? const <BudgetItem>[],
+        createdAt: _initial?.createdAt ?? now,
+        updatedAt: now,
+      );
+
       await _budgetService.saveBudgetGroup(group);
       emit(BudgetGroupFormSaved(group: group));
-    } on ValidationAppException catch (e) {
+    } on AppException catch (e) {
       emit(current.copyWith(submitting: false, submitError: e.message));
+    } catch (_) {
+      emit(
+        current.copyWith(
+          submitting: false,
+          submitError: AppStrings.couldNotSave,
+        ),
+      );
     }
   }
 }

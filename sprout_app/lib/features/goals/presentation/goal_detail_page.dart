@@ -113,9 +113,19 @@ class _GoalDetailView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<GoalDetailBloc, GoalDetailState>(
-      listenWhen: (previous, current) => current is GoalDetailDeleted,
+      listenWhen: (previous, current) =>
+          current is GoalDetailDeleted ||
+          (current is GoalDetailReady && current.actionError != null),
       listener: (context, state) {
-        Navigator.of(context).pop();
+        if (state is GoalDetailDeleted) {
+          Navigator.of(context).pop();
+          return;
+        }
+        if (state is GoalDetailReady && state.actionError != null) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.actionError!)));
+        }
       },
       builder: (context, state) {
         if (state is! GoalDetailReady) {
@@ -155,10 +165,10 @@ class _GoalDetailView extends StatelessWidget {
             ],
           ),
           body: RefreshIndicator(
-            onRefresh: () async {
-              context.read<GoalDetailBloc>().add(
-                const GoalDetailRefreshRequested(),
-              );
+            onRefresh: () {
+              final event = GoalDetailRefreshRequested();
+              context.read<GoalDetailBloc>().add(event);
+              return event.onComplete.future;
             },
             child: ListView(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),

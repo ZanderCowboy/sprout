@@ -29,5 +29,8 @@ final class AccountDetailClearScheduledRequested extends AccountDetailEvent {
 }
 
 final class AccountDetailRefreshRequested extends AccountDetailEvent {
-  const AccountDetailRefreshRequested();
+  AccountDetailRefreshRequested({Completer<void>? onComplete})
+    : onComplete = onComplete ?? Completer<void>();
+
+  final Completer<void> onComplete;
 }

@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:sprout/core/core.dart';
 import 'package:sprout/features/accounts/export.dart';
 import 'package:sprout/features/transactions/export.dart';
 
@@ -59,8 +62,23 @@ class GoalDetailBloc extends Bloc<GoalDetailEvent, GoalDetailState> {
     final id = _goalId;
     if (id == null) return;
     _pauseWatch = true;
-    await _goalsService.removeGoal(id);
-    emit(const GoalDetailDeleted());
+    try {
+      await _goalsService.removeGoal(id);
+      emit(const GoalDetailDeleted());
+    } on AppException catch (e) {
+      _pauseWatch = false;
+      _emitDeleteFailure(emit, e.message);
+    } catch (_) {
+      _pauseWatch = false;
+      _emitDeleteFailure(emit, AppStrings.couldNotDelete);
+    }
+  }
+
+  void _emitDeleteFailure(Emitter<GoalDetailState> emit, String message) {
+    final current = state;
+    if (current is GoalDetailReady) {
+      emit(current.copyWith(actionError: message));
+    }
   }
 
   Future<void> _onClearScheduled(
@@ -76,10 +94,16 @@ class GoalDetailBloc extends Bloc<GoalDetailEvent, GoalDetailState> {
     GoalDetailRefreshRequested event,
     Emitter<GoalDetailState> emit,
   ) async {
-    await Future.wait([
-      _goalsService.pullRemote(),
-      _transactionsService.pullRemote(),
-    ]);
+    try {
+      await Future.wait([
+        _goalsService.pullRemote(),
+        _transactionsService.pullRemote(),
+      ]);
+    } finally {
+      if (!event.onComplete.isCompleted) {
+        event.onComplete.complete();
+      }
+    }
   }
 
   Stream<GoalDetailReady> _watchReady({required String goalId}) {

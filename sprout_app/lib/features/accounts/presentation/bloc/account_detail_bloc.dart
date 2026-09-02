@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:sprout/core/core.dart';
 import 'package:sprout/features/goals/export.dart';
 import 'package:sprout/features/transactions/export.dart';
 
@@ -57,8 +60,23 @@ class AccountDetailBloc extends Bloc<AccountDetailEvent, AccountDetailState> {
     final id = _accountId;
     if (id == null) return;
     _pauseWatch = true;
-    await _accountsService.removeAccount(id);
-    emit(const AccountDetailDeleted());
+    try {
+      await _accountsService.removeAccount(id);
+      emit(const AccountDetailDeleted());
+    } on AppException catch (e) {
+      _pauseWatch = false;
+      _emitDeleteFailure(emit, e.message);
+    } catch (_) {
+      _pauseWatch = false;
+      _emitDeleteFailure(emit, AppStrings.couldNotDelete);
+    }
+  }
+
+  void _emitDeleteFailure(Emitter<AccountDetailState> emit, String message) {
+    final current = state;
+    if (current is AccountDetailReady) {
+      emit(current.copyWith(actionError: message));
+    }
   }
 
   Future<void> _onClearScheduled(
@@ -74,10 +92,16 @@ class AccountDetailBloc extends Bloc<AccountDetailEvent, AccountDetailState> {
     AccountDetailRefreshRequested event,
     Emitter<AccountDetailState> emit,
   ) async {
-    await Future.wait([
-      _accountsService.pullRemote(),
-      _transactionsService.pullRemote(),
-    ]);
+    try {
+      await Future.wait([
+        _accountsService.pullRemote(),
+        _transactionsService.pullRemote(),
+      ]);
+    } finally {
+      if (!event.onComplete.isCompleted) {
+        event.onComplete.complete();
+      }
+    }
   }
 
   Stream<AccountDetailState> _watch(String accountId) {

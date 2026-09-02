@@ -29,5 +29,8 @@ final class GoalDetailClearScheduledRequested extends GoalDetailEvent {
 }
 
 final class GoalDetailRefreshRequested extends GoalDetailEvent {
-  const GoalDetailRefreshRequested();
+  GoalDetailRefreshRequested({Completer<void>? onComplete})
+    : onComplete = onComplete ?? Completer<void>();
+
+  final Completer<void> onComplete;
 }

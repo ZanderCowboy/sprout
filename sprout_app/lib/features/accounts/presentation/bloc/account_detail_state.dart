@@ -31,6 +31,7 @@ final class AccountDetailReady extends AccountDetailState {
     required this.currentTotalCents,
     required this.scheduledTotalCents,
     required this.goalsById,
+    this.actionError,
   });
 
   final Account account;
@@ -40,11 +41,35 @@ final class AccountDetailReady extends AccountDetailState {
   final int currentTotalCents;
   final int scheduledTotalCents;
   final Map<String, Goal> goalsById;
+  final String? actionError;
 
   int get grandTotalCents => currentTotalCents + scheduledTotalCents;
 
   bool get hasRecurringDeposits =>
       transactions.any(TransactionRules.isRecurringDeposit);
+
+  AccountDetailReady copyWith({
+    Account? account,
+    List<Transaction>? transactions,
+    List<Transaction>? scheduledTransactions,
+    List<Transaction>? historyTransactions,
+    int? currentTotalCents,
+    int? scheduledTotalCents,
+    Map<String, Goal>? goalsById,
+    String? actionError,
+    bool clearActionError = false,
+  }) {
+    return AccountDetailReady(
+      account: account ?? this.account,
+      transactions: transactions ?? this.transactions,
+      scheduledTransactions: scheduledTransactions ?? this.scheduledTransactions,
+      historyTransactions: historyTransactions ?? this.historyTransactions,
+      currentTotalCents: currentTotalCents ?? this.currentTotalCents,
+      scheduledTotalCents: scheduledTotalCents ?? this.scheduledTotalCents,
+      goalsById: goalsById ?? this.goalsById,
+      actionError: clearActionError ? null : (actionError ?? this.actionError),
+    );
+  }
 
   @override
   List<Object?> get props => [
@@ -55,5 +80,6 @@ final class AccountDetailReady extends AccountDetailState {
     currentTotalCents,
     scheduledTotalCents,
     goalsById,
+    actionError,
   ];
 }

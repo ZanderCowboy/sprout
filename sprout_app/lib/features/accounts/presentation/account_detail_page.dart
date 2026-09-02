@@ -111,9 +111,19 @@ class _AccountDetailListener extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<AccountDetailBloc, AccountDetailState>(
-      listenWhen: (previous, current) => current is AccountDetailDeleted,
+      listenWhen: (previous, current) =>
+          current is AccountDetailDeleted ||
+          (current is AccountDetailReady && current.actionError != null),
       listener: (context, state) {
-        Navigator.of(context).pop();
+        if (state is AccountDetailDeleted) {
+          Navigator.of(context).pop();
+          return;
+        }
+        if (state is AccountDetailReady && state.actionError != null) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.actionError!)));
+        }
       },
       builder: (context, state) {
         if (state is AccountDetailLoading || state is AccountDetailInitial) {
@@ -162,10 +172,10 @@ class _AccountDetailListener extends StatelessWidget {
             scheduledTotalCents: state.scheduledTotalCents,
             grandTotalCents: state.grandTotalCents,
             showRecurringLink: state.hasRecurringDeposits,
-            onRefresh: () async {
-              context.read<AccountDetailBloc>().add(
-                const AccountDetailRefreshRequested(),
-              );
+            onRefresh: () {
+              final event = AccountDetailRefreshRequested();
+              context.read<AccountDetailBloc>().add(event);
+              return event.onComplete.future;
             },
             onDeposit: () => _openDeposit(context, account),
             onClearScheduled: () => _clearScheduled(context, state),

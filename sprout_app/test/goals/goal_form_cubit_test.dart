@@ -81,4 +81,17 @@ void main() {
     expect(goalsRepo.lastUpserted?.name, 'Car');
     expect(goalsRepo.lastUpserted?.targetAmountCents, 25000);
   });
+
+  test('submit recovers from a non-validation failure', () async {
+    goalsRepo.upsertError = StateError('hive down');
+    await cubit.load();
+    cubit.nameChanged('Car');
+    cubit.targetChanged('250.00');
+    await cubit.submit();
+    final state = cubit.state;
+    expect(state, isA<GoalFormReady>());
+    expect((state as GoalFormReady).submitting, isFalse);
+    expect(state.submitError, AppStrings.couldNotSave);
+    expect(state.canSave, isTrue);
+  });
 }

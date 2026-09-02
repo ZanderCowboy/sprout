@@ -112,23 +112,30 @@ class GoalFormCubit extends Cubit<GoalFormState> {
 
     emit(current.copyWith(submitting: true, clearSubmitError: true));
 
-    final now = DateTime.now();
-    final uid = await _userContext.resolveUserId();
-    final goal = Goal(
-      id: _initial?.id ?? _uuid.v4(),
-      userId: uid,
-      name: current.name.trim(),
-      targetAmountCents: cents,
-      color: current.colorArgb,
-      createdAt: _initial?.createdAt ?? now,
-      updatedAt: now,
-    );
-
     try {
+      final now = DateTime.now();
+      final uid = await _userContext.resolveUserId();
+      final goal = Goal(
+        id: _initial?.id ?? _uuid.v4(),
+        userId: uid,
+        name: current.name.trim(),
+        targetAmountCents: cents,
+        color: current.colorArgb,
+        createdAt: _initial?.createdAt ?? now,
+        updatedAt: now,
+      );
+
       await _goalsService.saveGoal(goal);
       emit(GoalFormSaved(goal: goal));
-    } on ValidationAppException catch (e) {
+    } on AppException catch (e) {
       emit(current.copyWith(submitting: false, submitError: e.message));
+    } catch (_) {
+      emit(
+        current.copyWith(
+          submitting: false,
+          submitError: AppStrings.couldNotSave,
+        ),
+      );
     }
   }
 }
