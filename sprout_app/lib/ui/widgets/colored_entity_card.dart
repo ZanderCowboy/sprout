@@ -4,6 +4,7 @@ import 'package:sprout/core/constants/app_colors.dart';
 import 'package:sprout/core/theme/app_radii.dart';
 
 import '_semantic.dart';
+import 'sprout_glow_icon.dart';
 
 enum _EntityCardVariant { account, goal }
 
@@ -18,6 +19,7 @@ class ColoredEntityCard extends StatelessWidget {
     this.amount,
     this.changeLabel,
     this.onTap,
+    this.leadingIcon,
     this.trailing,
     this.progress,
     this.progressLabel,
@@ -53,12 +55,13 @@ class ColoredEntityCard extends StatelessWidget {
     );
   }
 
-  /// Goal card: 6px stripe, title + subtitle, trailing ring or [progress].
+  /// Goal card: glow + 6px stripe, leading icon, name, saved/target, trailing ring.
   factory ColoredEntityCard.goal({
     Key? key,
     required String title,
     required String subtitle,
     required Color color,
+    IconData? leadingIcon,
     Widget? trailing,
     double? progress,
     String? progressLabel,
@@ -72,6 +75,7 @@ class ColoredEntityCard extends StatelessWidget {
       title: title,
       subtitle: subtitle,
       color: color,
+      leadingIcon: leadingIcon,
       trailing: trailing,
       progress: progress,
       progressLabel: progressLabel,
@@ -89,6 +93,7 @@ class ColoredEntityCard extends StatelessWidget {
   final String? changeLabel;
   final Color color;
   final VoidCallback? onTap;
+  final IconData? leadingIcon;
   final Widget? trailing;
   final double? progress;
   final String? progressLabel;
@@ -111,6 +116,7 @@ class ColoredEntityCard extends StatelessWidget {
             title: title,
             subtitle: subtitle,
             color: color,
+            leadingIcon: leadingIcon,
             trailing: trailing,
             progress: progress,
             progressLabel: progressLabel,
@@ -283,6 +289,7 @@ class _GoalCardBody extends StatelessWidget {
     required this.color,
     required this.onTap,
     this.subtitle,
+    this.leadingIcon,
     this.trailing,
     this.progress,
     this.progressLabel,
@@ -291,6 +298,7 @@ class _GoalCardBody extends StatelessWidget {
   final String title;
   final String? subtitle;
   final Color color;
+  final IconData? leadingIcon;
   final Widget? trailing;
   final double? progress;
   final String? progressLabel;
@@ -299,6 +307,7 @@ class _GoalCardBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
     final clamped = progress?.clamp(0.0, 1.0);
     final Widget? end =
         trailing ??
@@ -309,42 +318,93 @@ class _GoalCardBody extends StatelessWidget {
                 color: color,
               )
             : null);
+    final tileBase = Color.alphaBlend(
+      color.withValues(alpha: 0.06),
+      Color.alphaBlend(
+        AppColors.surfaceMuted.withValues(alpha: 0.42),
+        AppColors.surfaceDeep,
+      ),
+    );
+    final radius = BorderRadius.circular(AppRadii.card);
 
-    return Card(
-      elevation: 0,
-      shadowColor: Colors.transparent,
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            border: Border(left: BorderSide(color: color, width: 6)),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(title, style: Theme.of(context).textTheme.titleMedium),
-                      if (subtitle != null && subtitle!.isNotEmpty) ...[
-                        const SizedBox(height: 8),
-                        Text(
-                          subtitle!,
-                          style: Theme.of(context).textTheme.bodyMedium
-                              ?.copyWith(
-                                color: scheme.onSurfaceVariant,
-                                height: 1.2,
-                              ),
-                        ),
-                      ],
-                    ],
+    return ClipRRect(
+      borderRadius: radius,
+      child: Material(
+        color: tileBase,
+        elevation: 0,
+        child: InkWell(
+          onTap: onTap,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              borderRadius: radius,
+              border: Border.all(color: color.withValues(alpha: 0.16)),
+              gradient: RadialGradient(
+                center: const Alignment(0.92, -1.05),
+                radius: 1.2,
+                colors: [
+                  color.withValues(alpha: 0.22),
+                  color.withValues(alpha: 0.07),
+                  Colors.transparent,
+                ],
+                stops: const [0.0, 0.48, 1.0],
+              ),
+            ),
+            child: IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Container(
+                    width: 6,
+                    decoration: BoxDecoration(
+                      color: color,
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(4),
+                        bottomLeft: Radius.circular(4),
+                      ),
+                    ),
                   ),
-                ),
-                if (end != null) ...[const SizedBox(width: 12), end],
-              ],
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(14, 16, 16, 16),
+                      child: Row(
+                        children: [
+                          if (leadingIcon != null) ...[
+                            SproutGlowIcon(icon: leadingIcon!, color: color),
+                            const SizedBox(width: 12),
+                          ],
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(title, style: textTheme.titleLarge),
+                                if (subtitle != null &&
+                                    subtitle!.isNotEmpty) ...[
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    subtitle!,
+                                    style: textTheme.bodyMedium?.copyWith(
+                                      color: scheme.onSurfaceVariant,
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            ),
+                          ),
+                          if (end != null) ...[const SizedBox(width: 12), end],
+                          if (onTap != null) ...[
+                            const SizedBox(width: 4),
+                            Icon(
+                              Icons.chevron_right_rounded,
+                              color: scheme.onSurfaceVariant,
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -364,24 +424,44 @@ class _ProgressRing extends StatelessWidget {
   final String label;
   final Color color;
 
+  static const double _size = 56;
+  static const double _strokeWidth = 4;
+  static const double _labelInset = 4;
+
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+
     return SizedBox(
-      width: 56,
-      height: 56,
+      width: _size,
+      height: _size,
       child: Stack(
         alignment: Alignment.center,
         children: [
-          CircularProgressIndicator(
-            value: value,
-            strokeWidth: 5,
-            backgroundColor: scheme.surfaceContainerHighest.withValues(
-              alpha: 0.8,
+          Positioned.fill(
+            child: CircularProgressIndicator(
+              value: value,
+              strokeWidth: _strokeWidth,
+              strokeAlign: CircularProgressIndicator.strokeAlignInside,
+              constraints: const BoxConstraints.tightFor(
+                width: _size,
+                height: _size,
+              ),
+              backgroundColor: scheme.surfaceContainerHighest.withValues(
+                alpha: 0.9,
+              ),
+              color: color,
             ),
-            color: color,
           ),
-          Text(label, style: Theme.of(context).textTheme.labelLarge),
+          Padding(
+            padding: const EdgeInsets.all(_strokeWidth + _labelInset),
+            child: FittedBox(
+              child: Text(
+                label,
+                style: Theme.of(context).textTheme.labelLarge,
+              ),
+            ),
+          ),
         ],
       ),
     );

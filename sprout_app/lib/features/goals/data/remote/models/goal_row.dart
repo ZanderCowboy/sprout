@@ -7,6 +7,7 @@ class GoalRow {
     required this.color,
     required this.createdAt,
     required this.updatedAt,
+    this.iconCodePoint,
   });
 
   final String id;
@@ -16,6 +17,7 @@ class GoalRow {
   final int color;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final int? iconCodePoint;
 
   factory GoalRow.fromMap(Map<String, dynamic> row) {
     return GoalRow(
@@ -26,6 +28,7 @@ class GoalRow {
       color: (row['color'] as num).toInt(),
       createdAt: DateTime.parse(row['created_at'] as String),
       updatedAt: DateTime.parse(row['updated_at'] as String),
+      iconCodePoint: (row['icon_code_point'] as num?)?.toInt(),
     );
   }
 
@@ -37,5 +40,6 @@ class GoalRow {
     'color': color,
     'created_at': createdAt.toUtc().toIso8601String(),
     'updated_at': updatedAt.toUtc().toIso8601String(),
+    'icon_code_point': iconCodePoint,
   };
 }

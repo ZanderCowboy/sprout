@@ -55,6 +55,9 @@ class GoalHiveAdapter extends TypeAdapter<GoalHiveModel> {
 
   @override
   GoalHiveModel read(BinaryReader reader) {
+    // Older rows: id, userId, name, target, color, created, updated.
+    // Newer rows append optional iconCodePoint (bool + int).
+    int? iconCodePoint;
     return GoalHiveModel(
       id: reader.readString(),
       userId: reader.readString(),
@@ -63,6 +66,14 @@ class GoalHiveAdapter extends TypeAdapter<GoalHiveModel> {
       color: reader.readInt(),
       createdAtMillis: reader.readInt(),
       updatedAtMillis: reader.readInt(),
+      iconCodePoint: (() {
+        try {
+          iconCodePoint = reader.readBool() ? reader.readInt() : null;
+        } on Object {
+          // ignore: no-op
+        }
+        return iconCodePoint;
+      })(),
     );
   }
 
@@ -76,6 +87,14 @@ class GoalHiveAdapter extends TypeAdapter<GoalHiveModel> {
       ..writeInt(obj.color)
       ..writeInt(obj.createdAtMillis)
       ..writeInt(obj.updatedAtMillis);
+    final cp = obj.iconCodePoint;
+    if (cp != null) {
+      writer
+        ..writeBool(true)
+        ..writeInt(cp);
+    } else {
+      writer.writeBool(false);
+    }
   }
 }
 

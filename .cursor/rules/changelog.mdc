@@ -1,0 +1,27 @@
+---
+description: Prepend dated feature/fix entries to CHANGELOG.md for work going into main
+alwaysApply: true
+---
+
+# Changelog
+
+Update [`CHANGELOG.md`](../../CHANGELOG.md) whenever a feature or bugfix is ready for `main` (PR, merge, or a commit meant to land there). Do not wait to be asked.
+
+## Format
+
+Newest entries at the **top**, directly under the intro. Date is `YYYY-MM-DD`. Title is the feature or bug name.
+
+```markdown
+## YYYY-MM-DD — Short feature or bug title
+
+- User-visible or notable change
+- Another concrete bullet
+```
+
+## Rules
+
+- Prepend. Never append to the bottom. Never rewrite older entries.
+- One heading per feature or fix. Same-day items stay separate; the newest still goes first.
+- Bullets are short and concrete (what changed / how it behaves). No PR numbers, file dumps, or commit hashes.
+- Skip chore-only work (rules, comments, lockfile noise) unless the human asks.
+- If several small fixes ship together as one change, use one title and several bullets.

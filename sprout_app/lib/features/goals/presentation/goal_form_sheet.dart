@@ -8,6 +8,7 @@ import 'package:sprout/ui/export.dart';
 import '../application/goals_service.dart';
 import '../domain/goal.dart';
 import 'goal_form_cubit.dart';
+import 'widgets/goal_icon_picker.dart';
 
 class GoalFormSheet extends StatelessWidget {
   const GoalFormSheet({super.key, this.initial, required this.defaultColor});
@@ -117,6 +118,18 @@ class _GoalFormBodyState extends State<_GoalFormBody> {
                 decimal: true,
                 signed: true,
               ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              AppStrings.icon,
+              style: Theme.of(context).textTheme.labelLarge,
+            ),
+            const SizedBox(height: 8),
+            GoalIconPicker(
+              selected: goalIconFromStored(codePoint: ready?.iconCodePoint),
+              accent: Color(ready?.colorArgb ?? widget.initial?.color ?? 0),
+              onSelected: (icon) =>
+                  context.read<GoalFormCubit>().iconChanged(icon.codePoint),
             ),
           ],
         );

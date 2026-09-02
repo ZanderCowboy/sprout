@@ -17,6 +17,7 @@ class SproutTextField extends StatelessWidget {
     this.inputFormatters,
     this.onChanged,
     this.onSubmitted,
+    this.focusNode,
     this.autofocus = false,
     this.minLines,
     this.maxLines = 1,
@@ -33,6 +34,7 @@ class SproutTextField extends StatelessWidget {
   final List<TextInputFormatter>? inputFormatters;
   final ValueChanged<String>? onChanged;
   final ValueChanged<String>? onSubmitted;
+  final FocusNode? focusNode;
   final bool autofocus;
   final int? minLines;
   final int? maxLines;
@@ -52,6 +54,7 @@ class SproutTextField extends StatelessWidget {
         inputFormatters: inputFormatters,
         onChanged: onChanged,
         onSubmitted: onSubmitted,
+        focusNode: focusNode,
         autofocus: autofocus,
         minLines: minLines,
         maxLines: maxLines,

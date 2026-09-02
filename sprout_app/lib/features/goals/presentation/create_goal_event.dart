@@ -15,6 +15,7 @@ final class CreateGoalSubmitted extends CreateGoalEvent {
     required this.name,
     required this.targetAmountCents,
     required this.colorArgb,
+    required this.iconCodePoint,
     required this.alreadySavedAmountCents,
     required this.alreadySavedAccountId,
   });
@@ -22,6 +23,7 @@ final class CreateGoalSubmitted extends CreateGoalEvent {
   final String name;
   final int targetAmountCents;
   final int colorArgb;
+  final int iconCodePoint;
   final int alreadySavedAmountCents;
   final String? alreadySavedAccountId;
 
@@ -30,6 +32,7 @@ final class CreateGoalSubmitted extends CreateGoalEvent {
     name,
     targetAmountCents,
     colorArgb,
+    iconCodePoint,
     alreadySavedAmountCents,
     alreadySavedAccountId,
   ];

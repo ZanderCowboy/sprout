@@ -6,6 +6,7 @@ import 'package:sprout/core/core.dart';
 
 import '../application/goals_service.dart';
 import '../domain/goal.dart';
+import 'widgets/goal_icon_picker.dart';
 
 part 'goal_form_state.dart';
 
@@ -25,6 +26,8 @@ class GoalFormCubit extends Cubit<GoalFormState> {
                ? (initial.targetAmountCents / 100).toStringAsFixed(2)
                : '',
            colorArgb: initial?.color ?? defaultColorArgb,
+           iconCodePoint:
+               initial?.iconCodePoint ?? GoalIconPicker.defaultIcon.codePoint,
          ),
        );
 
@@ -82,6 +85,12 @@ class GoalFormCubit extends Cubit<GoalFormState> {
     emit(current.copyWith(colorArgb: colorArgb));
   }
 
+  void iconChanged(int iconCodePoint) {
+    final current = state;
+    if (current is! GoalFormReady) return;
+    emit(current.copyWith(iconCodePoint: iconCodePoint));
+  }
+
   String? _nameError(String name) {
     if (name.trim().isEmpty) return null;
     final taken = UniqueName.isTaken(
@@ -123,6 +132,7 @@ class GoalFormCubit extends Cubit<GoalFormState> {
         color: current.colorArgb,
         createdAt: _initial?.createdAt ?? now,
         updatedAt: now,
+        iconCodePoint: current.iconCodePoint,
       );
 
       await _goalsService.saveGoal(goal);

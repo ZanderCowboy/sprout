@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'package:sprout/core/core.dart';
+import 'package:sprout/core/theme/app_radii.dart';
+import 'package:sprout/ui/export.dart';
 
 class UnallocatedFundsCard extends StatelessWidget {
   const UnallocatedFundsCard({
@@ -15,41 +17,58 @@ class UnallocatedFundsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final bg = scheme.surfaceContainerHighest;
-    final border = scheme.tertiary;
+    final textTheme = Theme.of(context).textTheme;
+    final radius = BorderRadius.circular(AppRadii.card);
+    final fill = Color.alphaBlend(
+      scheme.primary.withValues(alpha: 0.15),
+      scheme.surfaceContainerHighest,
+    );
 
     return Semantics(
       identifier: SemanticsIds.goalUnallocatedCard,
       button: true,
       label: AppStrings.unallocatedFunds,
       child: Material(
-        color: bg,
-        borderRadius: BorderRadius.circular(16),
+        color: fill,
+        borderRadius: radius,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: radius,
           child: CustomPaint(
             painter: _DashedRoundedRectPainter(
-              color: border,
+              color: scheme.primary,
               strokeWidth: 2,
               dashLength: 7,
               gapLength: 5,
-              radius: 16,
+              radius: AppRadii.card,
             ),
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Row(
                 children: [
-                  Icon(Icons.tips_and_updates_outlined, color: border),
+                  SproutGlowIcon(
+                    icon: Icons.water_drop_rounded,
+                    color: scheme.primary,
+                  ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: Text(
-                      AppStrings.readyToSproutUnallocated(
-                        formatZarFromCents(unallocatedCents),
-                      ),
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          AppStrings.readyToSprout,
+                          style: textTheme.titleMedium,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          AppStrings.unallocatedFundsAmount(
+                            formatZarFromCents(unallocatedCents),
+                          ),
+                          style: textTheme.bodyMedium?.copyWith(
+                            color: scheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -89,8 +108,9 @@ class _DashedRoundedRectPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = strokeWidth;
 
+    final inset = strokeWidth / 2;
     final rrect = RRect.fromRectAndRadius(
-      Offset.zero & size,
+      Rect.fromLTWH(inset, inset, size.width - strokeWidth, size.height - strokeWidth),
       Radius.circular(radius),
     );
     final path = Path()..addRRect(rrect);

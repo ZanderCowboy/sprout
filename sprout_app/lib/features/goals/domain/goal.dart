@@ -9,6 +9,7 @@ class Goal extends Equatable {
     required this.color,
     required this.createdAt,
     required this.updatedAt,
+    this.iconCodePoint,
   });
 
   final String id;
@@ -19,6 +20,9 @@ class Goal extends Equatable {
   final DateTime createdAt;
   final DateTime updatedAt;
 
+  /// Material icon code point. Null means the UI default (savings).
+  final int? iconCodePoint;
+
   @override
   List<Object?> get props => [
     id,
@@ -28,5 +32,6 @@ class Goal extends Equatable {
     color,
     createdAt,
     updatedAt,
+    iconCodePoint,
   ];
 }

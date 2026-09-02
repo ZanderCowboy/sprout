@@ -8,6 +8,7 @@ import 'package:sprout/ui/export.dart';
 
 import '../application/goals_service.dart';
 import 'create_goal_bloc.dart';
+import 'widgets/goal_icon_picker.dart';
 
 class CreateGoalScreen extends StatefulWidget {
   const CreateGoalScreen({super.key, required this.defaultColor});
@@ -24,6 +25,9 @@ class _CreateGoalScreenState extends State<CreateGoalScreen> {
   late final TextEditingController _alreadySaved;
 
   late int _colorArgb;
+  late IconData _icon;
+  late final FocusNode _targetFocus;
+  late final FocusNode _alreadySavedFocus;
   int _alreadySavedCents = 0;
   String? _alreadySavedAccountId;
 
@@ -37,6 +41,9 @@ class _CreateGoalScreenState extends State<CreateGoalScreen> {
     _target.addListener(_onFieldChanged);
     _alreadySaved.addListener(_onAlreadySavedChanged);
     _colorArgb = widget.defaultColor.toARGB32();
+    _icon = GoalIconPicker.defaultIcon;
+    _targetFocus = FocusNode()..addListener(_onFieldChanged);
+    _alreadySavedFocus = FocusNode()..addListener(_onFieldChanged);
   }
 
   void _onFieldChanged() {
@@ -108,6 +115,7 @@ class _CreateGoalScreenState extends State<CreateGoalScreen> {
         name: name,
         targetAmountCents: targetCents,
         colorArgb: _colorArgb,
+        iconCodePoint: _icon.codePoint,
         alreadySavedAmountCents: _alreadySavedCents,
         alreadySavedAccountId: _alreadySavedAccountId,
       ),
@@ -119,6 +127,10 @@ class _CreateGoalScreenState extends State<CreateGoalScreen> {
     _name.removeListener(_onFieldChanged);
     _target.removeListener(_onFieldChanged);
     _alreadySaved.removeListener(_onAlreadySavedChanged);
+    _targetFocus.removeListener(_onFieldChanged);
+    _alreadySavedFocus.removeListener(_onFieldChanged);
+    _targetFocus.dispose();
+    _alreadySavedFocus.dispose();
     _name.dispose();
     _target.dispose();
     _alreadySaved.dispose();
@@ -206,6 +218,7 @@ class _CreateGoalScreenState extends State<CreateGoalScreen> {
             nameLabel: AppStrings.goalName,
             nameController: _name,
             nameErrorText: null,
+            nameHelperText: AppStrings.required,
             colorArgb: _colorArgb,
             onColorSelected: (argb) => setState(() => _colorArgb = argb),
             primaryActionLabel: AppStrings.save,
@@ -219,9 +232,14 @@ class _CreateGoalScreenState extends State<CreateGoalScreen> {
                 identifier: SemanticsIds.goalTargetField,
                 fieldKey: const Key('goal_target_field'),
                 controller: _target,
+                focusNode: _targetFocus,
                 decoration: InputDecoration(
-                  labelText: AppStrings.targetAmount,
+                  labelText: AppStrings.targetAmountShort,
                   errorText: _targetError,
+                  helperText: _targetError == null ? AppStrings.required : null,
+                  prefixText: _targetFocus.hasFocus || _target.text.isNotEmpty
+                      ? AppStrings.currencyPrefix
+                      : null,
                 ),
                 keyboardType: const TextInputType.numberWithOptions(
                   decimal: true,
@@ -232,9 +250,15 @@ class _CreateGoalScreenState extends State<CreateGoalScreen> {
               SproutTextField(
                 identifier: SemanticsIds.goalAlreadySavedField,
                 controller: _alreadySaved,
+                focusNode: _alreadySavedFocus,
                 decoration: InputDecoration(
-                  labelText: AppStrings.alreadySavedAmount,
+                  labelText: AppStrings.alreadySavedAmountShort,
                   errorText: _alreadySavedError,
+                  prefixText:
+                      _alreadySavedFocus.hasFocus ||
+                          _alreadySaved.text.isNotEmpty
+                      ? AppStrings.currencyPrefix
+                      : null,
                 ),
                 keyboardType: const TextInputType.numberWithOptions(
                   decimal: true,
@@ -257,6 +281,17 @@ class _CreateGoalScreenState extends State<CreateGoalScreen> {
                   onChanged: (v) => setState(() => _alreadySavedAccountId = v),
                 ),
               ],
+              const SizedBox(height: 16),
+              Text(
+                AppStrings.icon,
+                style: Theme.of(context).textTheme.labelLarge,
+              ),
+              const SizedBox(height: 8),
+              GoalIconPicker(
+                selected: _icon,
+                accent: Color(_colorArgb),
+                onSelected: (icon) => setState(() => _icon = icon),
+              ),
               if (state.errorMessage != null) ...[
                 const SizedBox(height: 10),
                 Text(

@@ -11,6 +11,7 @@ final class GoalFormReady extends GoalFormState {
     required this.name,
     required this.targetText,
     required this.colorArgb,
+    required this.iconCodePoint,
     this.nameError,
     this.targetError,
     this.submitError,
@@ -21,6 +22,7 @@ final class GoalFormReady extends GoalFormState {
   final String name;
   final String targetText;
   final int colorArgb;
+  final int iconCodePoint;
   final String? nameError;
   final String? targetError;
   final String? submitError;
@@ -38,6 +40,7 @@ final class GoalFormReady extends GoalFormState {
     String? name,
     String? targetText,
     int? colorArgb,
+    int? iconCodePoint,
     String? nameError,
     String? targetError,
     String? submitError,
@@ -51,6 +54,7 @@ final class GoalFormReady extends GoalFormState {
       name: name ?? this.name,
       targetText: targetText ?? this.targetText,
       colorArgb: colorArgb ?? this.colorArgb,
+      iconCodePoint: iconCodePoint ?? this.iconCodePoint,
       nameError: updateNameError ? nameError : this.nameError,
       targetError: updateTargetError ? targetError : this.targetError,
       submitError: clearSubmitError ? null : (submitError ?? this.submitError),
@@ -64,6 +68,7 @@ final class GoalFormReady extends GoalFormState {
     name,
     targetText,
     colorArgb,
+    iconCodePoint,
     nameError,
     targetError,
     submitError,

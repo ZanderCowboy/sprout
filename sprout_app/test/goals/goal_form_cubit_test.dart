@@ -80,6 +80,17 @@ void main() {
     expect(cubit.state, isA<GoalFormSaved>());
     expect(goalsRepo.lastUpserted?.name, 'Car');
     expect(goalsRepo.lastUpserted?.targetAmountCents, 25000);
+    expect(goalsRepo.lastUpserted?.iconCodePoint, isNotNull);
+  });
+
+  test('iconChanged is persisted on submit', () async {
+    await cubit.load();
+    cubit.nameChanged('Car');
+    cubit.targetChanged('250.00');
+    cubit.iconChanged(0xE52F);
+    await cubit.submit();
+    expect(cubit.state, isA<GoalFormSaved>());
+    expect(goalsRepo.lastUpserted?.iconCodePoint, 0xE52F);
   });
 
   test('submit recovers from a non-validation failure', () async {

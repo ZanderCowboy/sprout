@@ -25,6 +25,7 @@ abstract final class AppStrings {
       'Manage your balances and growth paths.';
   static const String accountKindSavings = 'Primary savings';
   static const String goals = 'Goals';
+  static const String goalsSubtitle = "You're making steady progress.";
   static const String offline = 'Offline';
   static const String save = 'Save';
   static const String cancel = 'Cancel';
@@ -65,6 +66,9 @@ abstract final class AppStrings {
   static const String accountName = 'Account name';
   static const String goalName = 'Goal name';
   static const String targetAmount = 'Target amount (ZAR)';
+  static const String targetAmountShort = 'Target amount';
+  static const String required = 'Required';
+  static const String currencyPrefix = 'R ';
   static const String syncError = 'Could not sync with the server';
   static const String couldNotSave = 'Could not save. Try again.';
   static const String couldNotDelete = 'Could not delete. Try again.';
@@ -239,9 +243,11 @@ abstract final class AppStrings {
       'Clear scheduled transactions?';
   static const String clearScheduled = 'Clear scheduled';
   static const String alreadySavedAmount = 'Already Saved Amount (ZAR)';
+  static const String alreadySavedAmountShort = 'Already saved amount';
   static const String whichAccountHoldsMoney =
       'Which Account holds this money?';
   static const String unallocatedFunds = 'Unallocated funds';
+  static const String readyToSprout = 'Ready to Sprout!';
   static const String accountValue = 'Account value';
 
   // --- Accounts ---
@@ -348,6 +354,8 @@ abstract final class AppStrings {
 
   static String colorNumber(int n) => 'Color $n';
 
+  static String iconNumber(int n) => 'Icon $n';
+
   // --- Interpolated helpers (fragments stay stable for Maestro) ---
   static String dateWithLabel(String dateLabel) => 'Date · $dateLabel';
 
@@ -362,8 +370,8 @@ abstract final class AppStrings {
 
   static String removeNamedConfirm(String name) => 'This will remove “$name”.';
 
-  static String readyToSproutUnallocated(String amount) =>
-      'Ready to Sprout! You have $amount waiting to be assigned.';
+  static String unallocatedFundsAmount(String amount) =>
+      '$amount unallocated funds';
 
   static String scheduledColon(String amount) => 'Scheduled: $amount';
 
@@ -377,6 +385,9 @@ abstract final class AppStrings {
 
   static String savedSlashTarget(String saved, String target) =>
       'Saved: $saved / $target';
+
+  static String amountSlashAmount(String saved, String target) =>
+      '$saved / $target';
 
   static String remainingColon(String amount) => 'Remaining: $amount';
 

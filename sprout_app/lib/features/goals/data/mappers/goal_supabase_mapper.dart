@@ -15,6 +15,7 @@ Goal goalFromSupabaseDto(GoalRow row) {
     color: row.color,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
+    iconCodePoint: row.iconCodePoint,
   );
 }
 
@@ -26,4 +27,5 @@ GoalRow goalToSupabaseDto(Goal g) => GoalRow(
   color: g.color,
   createdAt: g.createdAt,
   updatedAt: g.updatedAt,
+  iconCodePoint: g.iconCodePoint,
 );

@@ -7,6 +7,7 @@ class GoalHiveModel {
     required this.color,
     required this.createdAtMillis,
     required this.updatedAtMillis,
+    this.iconCodePoint,
   });
 
   final String id;
@@ -16,4 +17,5 @@ class GoalHiveModel {
   final int color;
   final int createdAtMillis;
   final int updatedAtMillis;
+  final int? iconCodePoint;
 }

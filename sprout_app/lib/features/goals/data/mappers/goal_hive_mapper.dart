@@ -9,6 +9,7 @@ Goal goalFromHive(GoalHiveModel m) => Goal(
   color: m.color,
   createdAt: DateTime.fromMillisecondsSinceEpoch(m.createdAtMillis),
   updatedAt: DateTime.fromMillisecondsSinceEpoch(m.updatedAtMillis),
+  iconCodePoint: m.iconCodePoint,
 );
 
 GoalHiveModel goalToHive(Goal g) => GoalHiveModel(
@@ -19,4 +20,5 @@ GoalHiveModel goalToHive(Goal g) => GoalHiveModel(
   color: g.color,
   createdAtMillis: g.createdAt.millisecondsSinceEpoch,
   updatedAtMillis: g.updatedAt.millisecondsSinceEpoch,
+  iconCodePoint: g.iconCodePoint,
 );

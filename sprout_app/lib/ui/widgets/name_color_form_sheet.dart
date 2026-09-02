@@ -16,6 +16,7 @@ class NameColorFormSheet extends StatelessWidget {
     required this.onPrimaryAction,
     required this.primaryActionEnabled,
     this.body,
+    this.nameHelperText,
     this.nameFieldKey,
     this.nameFieldIdentifier,
     this.primaryActionIdentifier,
@@ -35,6 +36,9 @@ class NameColorFormSheet extends StatelessWidget {
 
   /// Optional extra UI between name field and color picker (e.g. goal target).
   final List<Widget>? body;
+
+  /// Shown under the name field when [nameErrorText] is null.
+  final String? nameHelperText;
 
   /// Optional key for the name text field (for testing).
   final Key? nameFieldKey;
@@ -56,6 +60,7 @@ class NameColorFormSheet extends StatelessWidget {
             decoration: InputDecoration(
               labelText: nameLabel,
               errorText: nameErrorText,
+              helperText: nameErrorText == null ? nameHelperText : null,
             ),
             textCapitalization: TextCapitalization.words,
           )
@@ -66,6 +71,7 @@ class NameColorFormSheet extends StatelessWidget {
             decoration: InputDecoration(
               labelText: nameLabel,
               errorText: nameErrorText,
+              helperText: nameErrorText == null ? nameHelperText : null,
             ),
             textCapitalization: TextCapitalization.words,
           );
@@ -77,10 +83,11 @@ class NameColorFormSheet extends StatelessWidget {
         top: 20,
         bottom: bottomPadding + 20,
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
           Text(title, style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 16),
           nameField,
@@ -118,6 +125,7 @@ class NameColorFormSheet extends StatelessWidget {
             onPressed: primaryActionEnabled ? onPrimaryAction : null,
           ),
         ],
+        ),
       ),
     );
   }

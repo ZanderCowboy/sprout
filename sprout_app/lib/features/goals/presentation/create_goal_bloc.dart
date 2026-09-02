@@ -65,6 +65,7 @@ class CreateGoalBloc extends Bloc<CreateGoalEvent, CreateGoalState> {
         color: event.colorArgb,
         createdAt: now,
         updatedAt: now,
+        iconCodePoint: event.iconCodePoint,
       );
 
       final openingCents = event.alreadySavedAmountCents;

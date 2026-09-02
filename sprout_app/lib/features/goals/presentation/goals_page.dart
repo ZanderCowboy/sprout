@@ -8,6 +8,7 @@ import 'package:sprout/ui/export.dart';
 import 'goals_bloc.dart';
 import 'enums/goals_sort.dart';
 import 'utils/goals_sorting.dart';
+import 'widgets/goal_icon_picker.dart';
 import 'widgets/overall_goals_progress_header.dart';
 import 'widgets/goals_section_separator.dart';
 import 'widgets/unallocated_funds_card.dart';
@@ -22,6 +23,62 @@ class GoalsPage extends StatefulWidget {
 class _GoalsPageState extends State<GoalsPage> {
   GoalsSort _sort = GoalsSort.remainingLowToHigh;
 
+  Widget _sortButton() {
+    return Semantics(
+      identifier: SemanticsIds.goalSortMenu,
+      button: true,
+      label: AppStrings.sortGoals,
+      child: PopupMenuButton<GoalsSort>(
+        tooltip: AppStrings.sortGoals,
+        initialValue: _sort,
+        onSelected: (s) => setState(() => _sort = s),
+        itemBuilder: (context) {
+          return GoalsSort.values
+              .map(
+                (s) => PopupMenuItem<GoalsSort>(
+                  value: s,
+                  child: Text(goalsSortLabel(s)),
+                ),
+              )
+              .toList();
+        },
+        icon: const Icon(Icons.sort_rounded),
+      ),
+    );
+  }
+
+  Widget _header() {
+    final scheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SproutShellHeader(trailing: _sortButton()),
+          const SizedBox(height: 8),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(AppStrings.goals, style: textTheme.titleLarge),
+                const SizedBox(height: 4),
+                Text(
+                  AppStrings.goalsSubtitle,
+                  style: textTheme.bodyMedium?.copyWith(
+                    color: scheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<GoalsBloc, GoalsState>(
@@ -29,7 +86,6 @@ class _GoalsPageState extends State<GoalsPage> {
         if (state is! GoalsReady) {
           return const Center(child: CircularProgressIndicator());
         }
-        final titleStyle = Theme.of(context).textTheme.titleLarge;
         if (state.progressList.isEmpty) {
           return RefreshIndicator(
             onRefresh: () async {
@@ -38,17 +94,12 @@ class _GoalsPageState extends State<GoalsPage> {
             child: CustomScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
               slivers: [
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
-                    child: Text(AppStrings.goals, style: titleStyle),
-                  ),
-                ),
+                SliverToBoxAdapter(child: _header()),
                 SliverFillRemaining(
                   hasScrollBody: false,
                   child: Center(
                     child: Padding(
-                      padding: const EdgeInsets.all(24),
+                      padding: const EdgeInsets.fromLTRB(24, 24, 24, 96),
                       child: Text(
                         AppStrings.goalsEmptyGuidance,
                         style: Theme.of(context).textTheme.bodyLarge,
@@ -75,39 +126,7 @@ class _GoalsPageState extends State<GoalsPage> {
           child: CustomScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
             slivers: [
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Text(AppStrings.goals, style: titleStyle),
-                      ),
-                      Semantics(
-                        identifier: SemanticsIds.goalSortMenu,
-                        button: true,
-                        label: AppStrings.sortGoals,
-                        child: PopupMenuButton<GoalsSort>(
-                          tooltip: AppStrings.sortGoals,
-                          initialValue: _sort,
-                          onSelected: (s) => setState(() => _sort = s),
-                          itemBuilder: (context) {
-                            return GoalsSort.values
-                                .map(
-                                  (s) => PopupMenuItem<GoalsSort>(
-                                    value: s,
-                                    child: Text(goalsSortLabel(s)),
-                                  ),
-                                )
-                                .toList();
-                          },
-                          icon: const Icon(Icons.sort_rounded),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+              SliverToBoxAdapter(child: _header()),
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
@@ -143,7 +162,7 @@ class _GoalsPageState extends State<GoalsPage> {
                 sliver: SliverList.separated(
                   itemCount: sorted.length + (hasCompleted ? 1 : 0),
                   separatorBuilder: (context, index) =>
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 12),
                   itemBuilder: (context, i) {
                     if (hasCompleted && i == firstCompletedIndex) {
                       return GoalsSectionSeparator(title: AppStrings.completed);
@@ -162,12 +181,15 @@ class _GoalsPageState extends State<GoalsPage> {
                         target: formatZarFromCents(g.targetAmountCents),
                         percent: p.percentComplete,
                       ),
-                      title: AppStrings.remainingColon(
-                        formatZarFromCents(p.remainingCents),
+                      title: g.name,
+                      subtitle: AppStrings.amountSlashAmount(
+                        formatZarFromCents(p.savedCents),
+                        formatZarFromCents(g.targetAmountCents),
                       ),
-                      subtitle:
-                          '${g.name}\n${AppStrings.savedSlashTarget(formatZarFromCents(p.savedCents), formatZarFromCents(g.targetAmountCents))}',
                       color: Color(g.color),
+                      leadingIcon: goalIconFromStored(
+                        codePoint: g.iconCodePoint,
+                      ),
                       progress: (p.percentComplete / 100).clamp(0.0, 1.0),
                       progressLabel: '${p.percentComplete}%',
                       onTap: () {

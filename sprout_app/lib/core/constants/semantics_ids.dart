@@ -80,6 +80,7 @@ abstract final class SemanticsIds {
   static const goalCard = 'goal_card';
   static const goalSortMenu = 'goal_sort_menu';
   static const goalUnallocatedCard = 'goal_unallocated_card';
+  static const goalIcon = 'goal_icon';
   static const goalDetailDeposit = 'goal_detail_deposit';
   static const goalDetailEdit = 'goal_detail_edit';
   static const goalDetailDelete = 'goal_detail_delete';
@@ -143,4 +144,8 @@ abstract final class SemanticsIds {
   /// Color swatch id for palette index [1-based].
   static String colorSwatchAt(int oneBasedIndex) =>
       '${colorSwatch}_$oneBasedIndex';
+
+  /// Goal icon picker id for palette index [1-based].
+  static String goalIconAt(int oneBasedIndex) =>
+      '${goalIcon}_$oneBasedIndex';
 }
