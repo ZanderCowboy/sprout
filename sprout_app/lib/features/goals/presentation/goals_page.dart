@@ -29,7 +29,6 @@ class _GoalsPageState extends State<GoalsPage> {
         if (state is! GoalsReady) {
           return const Center(child: CircularProgressIndicator());
         }
-        final scheme = Theme.of(context).colorScheme;
         final titleStyle = Theme.of(context).textTheme.titleLarge;
         if (state.progressList.isEmpty) {
           return RefreshIndicator(
@@ -154,7 +153,7 @@ class _GoalsPageState extends State<GoalsPage> {
                         : i;
                     final p = sorted[idx];
                     final g = p.goal;
-                    return ColoredEntityCard(
+                    return ColoredEntityCard.goal(
                       identifier: SemanticsIds.goalCard,
                       semanticsLabel: AppStrings.goalCardSemantics(
                         name: g.name,
@@ -169,29 +168,11 @@ class _GoalsPageState extends State<GoalsPage> {
                       subtitle:
                           '${g.name}\n${AppStrings.savedSlashTarget(formatZarFromCents(p.savedCents), formatZarFromCents(g.targetAmountCents))}',
                       color: Color(g.color),
+                      progress: (p.percentComplete / 100).clamp(0.0, 1.0),
+                      progressLabel: '${p.percentComplete}%',
                       onTap: () {
                         context.push(AppRoute.goalDetail.location(id: g.id));
                       },
-                      trailing: SizedBox(
-                        width: 56,
-                        height: 56,
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            CircularProgressIndicator(
-                              value: (p.percentComplete / 100).clamp(0.0, 1.0),
-                              strokeWidth: 5,
-                              backgroundColor: scheme.surfaceContainerHighest
-                                  .withValues(alpha: 0.8),
-                              color: Color(g.color),
-                            ),
-                            Text(
-                              '${p.percentComplete}%',
-                              style: Theme.of(context).textTheme.labelLarge,
-                            ),
-                          ],
-                        ),
-                      ),
                     );
                   },
                 ),

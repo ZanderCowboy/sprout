@@ -75,6 +75,34 @@ void main() {
       expect(FundsCalculator.unallocatedCentsForAccount(txs, 'a', now: now), 0);
     });
 
+    test('accountMonthChangePercentById is this-month deposits over start', () {
+      final txs = [
+        _deposit(
+          accountId: 'a',
+          cents: 1840000,
+          occurredAt: DateTime(2026, 2, 10),
+        ),
+        _deposit(
+          accountId: 'a',
+          cents: 44200,
+          occurredAt: DateTime(2026, 3, 4),
+        ),
+        _deposit(
+          accountId: 'b',
+          cents: 50000,
+          occurredAt: DateTime(2026, 3, 1),
+        ),
+      ];
+
+      final change = FundsCalculator.accountMonthChangePercentById(
+        txs,
+        now: now,
+      );
+
+      expect(change['a'], closeTo(2.4, 0.05));
+      expect(change.containsKey('b'), isFalse);
+    });
+
     test('portfolioSummary sums non-pending deposits', () {
       final txs = [
         _deposit(accountId: 'a', goalId: 'g', cents: 500, occurredAt: now),

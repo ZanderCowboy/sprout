@@ -21,6 +21,9 @@ abstract final class AppStrings {
   static const String lastUpdated = 'Last updated';
   static const String neverUpdated = 'No activity yet';
   static const String accounts = 'Accounts';
+  static const String accountsSubtitle =
+      'Manage your balances and growth paths.';
+  static const String accountKindSavings = 'Primary savings';
   static const String goals = 'Goals';
   static const String offline = 'Offline';
   static const String save = 'Save';
@@ -362,9 +365,12 @@ abstract final class AppStrings {
   static String readyToSproutUnallocated(String amount) =>
       'Ready to Sprout! You have $amount waiting to be assigned.';
 
-  static String currentColon(String amount) => 'Current: $amount';
-
   static String scheduledColon(String amount) => 'Scheduled: $amount';
+
+  static String percentThisMonth(double percent) {
+    final sign = percent >= 0 ? '+' : '';
+    return '$sign${percent.toStringAsFixed(1)}% this month';
+  }
 
   static String savedOfTarget(String saved, String target) =>
       'Saved $saved of $target.';

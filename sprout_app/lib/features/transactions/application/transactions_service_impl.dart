@@ -86,6 +86,11 @@ class TransactionsServiceImpl implements TransactionsService {
             scheduled: true,
             now: now,
           ),
+      accountMonthChangePercentById:
+          FundsCalculator.accountMonthChangePercentById(
+            transactions,
+            now: now,
+          ),
     );
   }
 
