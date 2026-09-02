@@ -199,6 +199,7 @@ class _GoalsPageState extends State<GoalsPage> {
                   },
                 ),
               ),
+              const SliverToBoxAdapter(child: SizedBox(height: 24)),
             ],
           ),
         );

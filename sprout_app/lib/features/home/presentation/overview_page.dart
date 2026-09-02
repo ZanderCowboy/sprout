@@ -159,6 +159,7 @@ class OverviewPage extends StatelessWidget {
                 )
               else
                 const SliverToBoxAdapter(child: SizedBox(height: 96)),
+            const SliverToBoxAdapter(child: SizedBox(height: 24)),
             ],
           ),
         );

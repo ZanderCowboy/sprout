@@ -13,8 +13,10 @@ void main() {
     expect(theme.useMaterial3, isTrue);
     expect(theme.colorScheme.primary, AppColors.seed);
     expect(theme.colorScheme.surface, AppColors.surfaceDeep);
+    expect(theme.colorScheme.surfaceContainerHigh, AppColors.surfaceMuted);
     expect(theme.colorScheme.surfaceContainerHighest, AppColors.surfaceMuted);
     expect(theme.scaffoldBackgroundColor, AppColors.surfaceDeep);
+    expect(theme.bottomNavigationBarTheme.backgroundColor, AppColors.surfaceBar);
   });
 
   test('buildAppTheme sets typography weights', () {
@@ -43,10 +45,11 @@ void main() {
       (theme.cardTheme.shape as RoundedRectangleBorder).borderRadius,
       BorderRadius.circular(AppRadii.card),
     );
+    expect(theme.cardTheme.color, AppColors.surfaceMuted);
     expect(theme.inputDecorationTheme.fillColor, AppColors.surfaceMuted);
     expect(
       theme.floatingActionButtonTheme.backgroundColor,
-      AppColors.accentLime,
+      AppColors.seed,
     );
   });
 }

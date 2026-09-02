@@ -8,7 +8,6 @@ import 'package:sprout/features/connectivity/export.dart';
 import 'package:sprout/features/goals/export.dart';
 import 'package:sprout/ui/export.dart';
 import 'deposit_bottom_sheet.dart';
-import 'widgets/shell_tab_item.dart';
 
 class ShellPage extends StatelessWidget {
   const ShellPage({super.key, required this.navigationShell});
@@ -95,6 +94,12 @@ class ShellPage extends StatelessWidget {
     return BlocBuilder<ConnectivityCubit, bool>(
       builder: (context, online) {
         return Scaffold(
+          extendBody: true,
+          floatingActionButtonLocation:
+              FloatingActionButtonLocation.centerDocked,
+          floatingActionButton: EnticingAddButton(
+            onPressed: () => _openActions(context),
+          ),
           body: Column(
             children: [
               if (!online)
@@ -137,77 +142,41 @@ class ShellPage extends StatelessWidget {
               Expanded(child: SafeArea(bottom: false, child: navigationShell)),
             ],
           ),
-          bottomNavigationBar: Material(
-            elevation: 8,
-            shadowColor: Colors.black54,
-            color: Theme.of(context).colorScheme.surface,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                border: Border(
-                  top: BorderSide(
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.outlineVariant.withValues(alpha: 0.45),
-                  ),
-                ),
+          bottomNavigationBar: SproutBottomBar(
+            destinations: [
+              SproutBottomBarDestination(
+                identifier: SemanticsIds.shellTabOverview,
+                selected: pageIndex == 0,
+                icon: Icons.grid_view_outlined,
+                selectedIcon: Icons.grid_view_rounded,
+                label: AppStrings.tabOverview,
+                onTap: () => navigationShell.goBranch(0),
               ),
-              child: SafeArea(
-                top: false,
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(8, 6, 8, 8),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: ShellTabItem(
-                          identifier: SemanticsIds.shellTabOverview,
-                          selected: pageIndex == 0,
-                          icon: Icons.grid_view_outlined,
-                          selectedIcon: Icons.grid_view_rounded,
-                          label: AppStrings.tabOverview,
-                          onTap: () => navigationShell.goBranch(0),
-                        ),
-                      ),
-                      Expanded(
-                        child: ShellTabItem(
-                          identifier: SemanticsIds.shellTabAccounts,
-                          selected: pageIndex == 1,
-                          icon: Icons.account_balance_wallet_outlined,
-                          selectedIcon: Icons.account_balance_wallet_rounded,
-                          label: AppStrings.tabAccounts,
-                          onTap: () => navigationShell.goBranch(1),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 20),
-                        child: EnticingAddButton(
-                          onPressed: () => _openActions(context),
-                        ),
-                      ),
-                      Expanded(
-                        child: ShellTabItem(
-                          identifier: SemanticsIds.shellTabGoals,
-                          selected: pageIndex == 2,
-                          icon: Icons.flag_outlined,
-                          selectedIcon: Icons.flag_rounded,
-                          label: AppStrings.tabGoals,
-                          onTap: () => navigationShell.goBranch(2),
-                        ),
-                      ),
-                      Expanded(
-                        child: ShellTabItem(
-                          identifier: SemanticsIds.shellTabSettings,
-                          selected: pageIndex == 3,
-                          icon: Icons.settings_outlined,
-                          selectedIcon: Icons.settings_rounded,
-                          label: AppStrings.tabSettings,
-                          onTap: () => navigationShell.goBranch(3),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+              SproutBottomBarDestination(
+                identifier: SemanticsIds.shellTabAccounts,
+                selected: pageIndex == 1,
+                icon: Icons.account_balance_wallet_outlined,
+                selectedIcon: Icons.account_balance_wallet_rounded,
+                label: AppStrings.tabAccounts,
+                onTap: () => navigationShell.goBranch(1),
               ),
-            ),
+              SproutBottomBarDestination(
+                identifier: SemanticsIds.shellTabGoals,
+                selected: pageIndex == 2,
+                icon: Icons.flag_outlined,
+                selectedIcon: Icons.flag_rounded,
+                label: AppStrings.tabGoals,
+                onTap: () => navigationShell.goBranch(2),
+              ),
+              SproutBottomBarDestination(
+                identifier: SemanticsIds.shellTabSettings,
+                selected: pageIndex == 3,
+                icon: Icons.settings_outlined,
+                selectedIcon: Icons.settings_rounded,
+                label: AppStrings.tabSettings,
+                onTap: () => navigationShell.goBranch(3),
+              ),
+            ],
           ),
         );
       },

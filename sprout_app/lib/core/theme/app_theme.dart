@@ -11,6 +11,7 @@ ThemeData buildAppTheme() {
     surface: AppColors.surfaceDeep,
   );
   final colorScheme = baseScheme.copyWith(
+    surfaceContainerHigh: AppColors.surfaceMuted,
     surfaceContainerHighest: AppColors.surfaceMuted,
   );
 
@@ -45,7 +46,7 @@ ThemeData buildAppTheme() {
     brightness: Brightness.dark,
     colorScheme: colorScheme,
     textTheme: textTheme,
-    scaffoldBackgroundColor: colorScheme.surface,
+    scaffoldBackgroundColor: AppColors.surfaceDeep,
     visualDensity: VisualDensity.standard,
     splashFactory: InkRipple.splashFactory,
     iconTheme: IconThemeData(color: colorScheme.onSurface),
@@ -68,13 +69,13 @@ ThemeData buildAppTheme() {
       surfaceTintColor: Colors.transparent,
     ),
     floatingActionButtonTheme: FloatingActionButtonThemeData(
-      backgroundColor: AppColors.accentLime,
+      backgroundColor: AppColors.seed,
       foregroundColor: AppColors.surfaceDeep,
       elevation: 6,
       shape: const CircleBorder(),
     ),
     bottomNavigationBarTheme: BottomNavigationBarThemeData(
-      backgroundColor: colorScheme.surface,
+      backgroundColor: AppColors.surfaceBar,
       selectedItemColor: colorScheme.primary,
       unselectedItemColor: colorScheme.onSurfaceVariant,
       type: BottomNavigationBarType.fixed,

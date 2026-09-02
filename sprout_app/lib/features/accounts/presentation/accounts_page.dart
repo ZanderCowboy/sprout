@@ -79,6 +79,7 @@ class AccountsPage extends StatelessWidget {
                     },
                   ),
                 ),
+              const SliverToBoxAdapter(child: SizedBox(height: 24)),
             ],
           ),
         );

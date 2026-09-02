@@ -3,6 +3,7 @@ export 'widgets/enticing_add_button.dart';
 export 'widgets/environment_banner.dart';
 export 'widgets/name_color_form_sheet.dart';
 export 'widgets/sprout_back_button.dart';
+export 'widgets/sprout_bottom_bar.dart';
 export 'widgets/sprout_dialog_actions.dart';
 export 'widgets/sprout_dropdown_field.dart';
 export 'widgets/sprout_filled_button.dart';

@@ -2,6 +2,13 @@
 
 Changes heading to `main`. Newest entries at the top.
 
+## 2026-09-02 — Shell bottom bar
+
+- Signed-in tabs live in a shared bottom bar widget instead of layout inside the shell
+- Page canvas and the bar use distinct Lush Growth fills
+- Cards, quick-action tiles, and progress panels use the same olive muted fill
+- Selected tab is a terracotta disc with a dark icon; Add sits on top of the bar without a strip above it
+
 ## 2026-09-02 — Goal icons
 
 - Create and edit goal include a curated icon picker
