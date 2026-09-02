@@ -105,6 +105,34 @@ class _SettingsPageState extends State<SettingsPage> {
     }
   }
 
+  Future<void> _presentCustomerCenter() async {
+    final hadPremium = _hasPremium;
+    final outcome = await PremiumPaywall.presentCustomerCenter();
+    if (!mounted) return;
+
+    final hasPremium = await PremiumPaywall.hasPremium();
+    if (!mounted) return;
+    setState(() => _hasPremium = hasPremium);
+
+    final messenger = ScaffoldMessenger.of(context);
+    switch (outcome) {
+      case CustomerCenterOutcome.restored:
+        messenger.showSnackBar(
+          const SnackBar(content: Text(AppStrings.premiumUnlocked)),
+        );
+      case CustomerCenterOutcome.restoreFailed:
+        messenger.showSnackBar(
+          const SnackBar(content: Text(AppStrings.subscriptionUpdateFailed)),
+        );
+      case CustomerCenterOutcome.dismissed:
+        if (hadPremium && !hasPremium) {
+          messenger.showSnackBar(
+            const SnackBar(content: Text(AppStrings.premiumNoLongerActive)),
+          );
+        }
+    }
+  }
+
   void _openAccount() {
     context.push(AppRoute.account.path);
   }
@@ -137,7 +165,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 SettingsPremiumCard(
                   loading: _loadingPremiumStatus,
                   hasPremium: _hasPremium,
-                  onTap: _presentPaywall,
+                  onTap: _hasPremium ? _presentCustomerCenter : _presentPaywall,
                 ),
               ],
               const SizedBox(height: 28),

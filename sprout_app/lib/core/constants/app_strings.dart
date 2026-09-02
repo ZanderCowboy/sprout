@@ -320,6 +320,7 @@ abstract final class AppStrings {
 
   // --- Settings ---
   static const String premiumUnlocked = 'Premium unlocked.';
+  static const String premiumNoLongerActive = 'Premium is no longer active.';
   static const String subscriptionUpdateFailed = 'Subscription update failed.';
   static const String checkingSubscription = 'Checking subscription...';
   static const String premiumActive = 'Premium active';

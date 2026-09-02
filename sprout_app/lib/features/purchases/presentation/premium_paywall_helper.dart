@@ -1,7 +1,14 @@
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:purchases_ui_flutter/purchases_ui_flutter.dart';
 
-/// Small presentation helper for RevenueCat paywall flows.
+/// Outcome of a Customer Center session after the sheet is dismissed.
+enum CustomerCenterOutcome {
+  dismissed,
+  restored,
+  restoreFailed,
+}
+
+/// Small presentation helper for RevenueCat paywall and Customer Center flows.
 ///
 /// Keep this intentionally thin so the rest of the app doesn't need to know
 /// about RevenueCat SDK types.
@@ -39,5 +46,18 @@ abstract final class PremiumPaywall {
       kPremiumEntitlementId,
       displayCloseButton: displayCloseButton,
     );
+  }
+
+  /// Presents the RevenueCat Customer Center for an active subscriber.
+  ///
+  /// RevenueCatUI owns restore, cancel, and store manage flows; do not call
+  /// `Purchases.restorePurchases()` while the sheet is on screen.
+  static Future<CustomerCenterOutcome> presentCustomerCenter() async {
+    var outcome = CustomerCenterOutcome.dismissed;
+    await RevenueCatUI.presentCustomerCenter(
+      onRestoreCompleted: (_) => outcome = CustomerCenterOutcome.restored,
+      onRestoreFailed: (_) => outcome = CustomerCenterOutcome.restoreFailed,
+    );
+    return outcome;
   }
 }

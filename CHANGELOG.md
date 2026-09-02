@@ -2,6 +2,11 @@
 
 Changes heading to `main`. Newest entries at the top.
 
+## 2026-09-02 — Manage opens Customer Center
+
+- Settings Premium Manage opens RevenueCat Customer Center instead of the paywall
+- The tile refreshes after restore, or if Premium is no longer active
+
 ## 2026-09-02 — Profile label
 
 - Settings and the account screen say Profile instead of Edit Profile

@@ -4,7 +4,8 @@ Sprout uses [RevenueCat](https://www.revenuecat.com/) for subscriptions.
 
 This pass wires:
 - **SDK configure + identity** (after `revenuecat_enabled` kill switch)
-- **Paywall UI** via `purchases_ui_flutter` launched from **Settings → Sprout Premium**
+- **Paywall UI** via `purchases_ui_flutter` launched from **Settings → Sprout Premium** when the user is not subscribed
+- **Customer Center** via `RevenueCatUI.presentCustomerCenter` when the tile shows **Manage** (active `premium`)
 
 No premium feature gating is added yet (premium is opt-in via the paywall tile only).
 
@@ -119,6 +120,18 @@ In-app defaults also set `revenuecat_enabled: false` before fetch, so an unpubli
    - The paywall should dismiss.
    - The app should show `Premium active` on the tile after returning to Settings.
 5. Close/dismiss the paywall without purchasing and confirm the app remains usable.
+
+## Customer Center verify (Settings → Manage)
+
+1. After a sandbox purchase, the tile should show **ACTIVE** and **Manage**.
+2. Tap **Manage**. The RevenueCat Customer Center should open and list the Test Store subscription (restore + cancel survey).
+3. Dismiss the sheet. The tile should still show **ACTIVE** if the entitlement is unchanged.
+4. Tap **Restore purchases** inside Customer Center, dismiss, and confirm the app shows `Premium unlocked.`
+5. If the entitlement is gone after dismiss (cancelled / expired), the tile should switch back to **Upgrade** and show `Premium is no longer active.`
+
+On Test Store, store-native cancel/manage will not open Google Play. That needs a Play Store app and a `goog_…` key later. Customer Center should still open and show the Test Store entitlement.
+
+Dashboard: [RevenueCat](https://app.revenuecat.com/) → **Sprout** → **Customer Center**. Defaults are enough; optional later: support email, Sprout teal accent.
 
 ## Later (not done yet)
 
