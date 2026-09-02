@@ -17,36 +17,6 @@ class AccountsPage extends StatelessWidget {
           return const Center(child: CircularProgressIndicator());
         }
 
-        final scheme = Theme.of(context).colorScheme;
-        final titleStyle = Theme.of(context).textTheme.titleMedium;
-
-        if (state.accounts.isEmpty) {
-          return CustomScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            slivers: [
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
-                  child: Text(AppStrings.accounts, style: titleStyle),
-                ),
-              ),
-              SliverFillRemaining(
-                hasScrollBody: false,
-                child: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(24),
-                    child: Text(
-                      AppStrings.accountsEmptyGuidance,
-                      style: Theme.of(context).textTheme.bodyLarge,
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          );
-        }
-
         return RefreshIndicator(
           onRefresh: () async {
             context.read<HomeBloc>().add(const HomeSubscriptionRequested());
@@ -54,52 +24,102 @@ class AccountsPage extends StatelessWidget {
           child: CustomScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
             slivers: [
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
-                  child: Text(AppStrings.accounts, style: titleStyle),
-                ),
-              ),
-              SliverPadding(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 96),
-                sliver: SliverList.separated(
-                  itemCount: state.accounts.length,
-                  separatorBuilder: (context, index) =>
-                      const SizedBox(height: 10),
-                  itemBuilder: (context, i) {
-                    final a = state.accounts[i];
-                    final currentCents =
-                        state.accountCurrentTotalsById[a.id] ?? 0;
-                    final scheduledCents =
-                        state.accountScheduledTotalsById[a.id] ?? 0;
-                    final subtitleLines = <String>[
-                      AppStrings.currentColon(formatZarFromCents(currentCents)),
-                      if (scheduledCents > 0)
-                        AppStrings.scheduledColon(
-                          formatZarFromCents(scheduledCents),
-                        ),
-                    ];
-                    return ColoredEntityCard(
-                      identifier: SemanticsIds.accountCard,
-                      semanticsLabel: a.name,
-                      title: a.name,
-                      subtitle: subtitleLines.join('\n'),
-                      color: Color(a.color),
-                      onTap: () {
-                        context.push(AppRoute.accountDetail.location(id: a.id));
-                      },
-                      trailing: Icon(
-                        Icons.chevron_right_rounded,
-                        color: scheme.onSurfaceVariant,
+              const SliverToBoxAdapter(child: _AccountsHeader()),
+              if (state.accounts.isEmpty)
+                SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: Center(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(24, 24, 24, 96),
+                      child: Text(
+                        AppStrings.accountsEmptyGuidance,
+                        style: Theme.of(context).textTheme.bodyLarge,
+                        textAlign: TextAlign.center,
                       ),
-                    );
-                  },
+                    ),
+                  ),
+                )
+              else
+                SliverPadding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 96),
+                  sliver: SliverList.separated(
+                    itemCount: state.accounts.length,
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(height: 12),
+                    itemBuilder: (context, i) {
+                      final account = state.accounts[i];
+                      final currentCents =
+                          state.accountCurrentTotalsById[account.id] ?? 0;
+                      final scheduledCents =
+                          state.accountScheduledTotalsById[account.id] ?? 0;
+                      final monthChange =
+                          state.accountMonthChangePercentById[account.id];
+
+                      return ColoredEntityCard.account(
+                        identifier: SemanticsIds.accountCard,
+                        semanticsLabel: account.name,
+                        name: account.name,
+                        kind: AppStrings.accountKindSavings,
+                        amount: formatZarFromCents(currentCents),
+                        changeLabel: monthChange == null
+                            ? null
+                            : AppStrings.percentThisMonth(monthChange),
+                        footer: scheduledCents > 0
+                            ? AppStrings.scheduledColon(
+                                formatZarFromCents(scheduledCents),
+                              )
+                            : null,
+                        color: Color(account.color),
+                        onTap: () {
+                          context.push(
+                            AppRoute.accountDetail.location(id: account.id),
+                          );
+                        },
+                      );
+                    },
+                  ),
                 ),
-              ),
             ],
           ),
         );
       },
+    );
+  }
+}
+
+class _AccountsHeader extends StatelessWidget {
+  const _AccountsHeader();
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SproutShellHeader(),
+          const SizedBox(height: 8),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(AppStrings.accounts, style: textTheme.titleLarge),
+                const SizedBox(height: 4),
+                Text(
+                  AppStrings.accountsSubtitle,
+                  style: textTheme.bodyMedium?.copyWith(
+                    color: scheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

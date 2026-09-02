@@ -41,6 +41,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       List<Transaction>? recent;
       var currentTotals = const <String, int>{};
       var scheduledTotals = const <String, int>{};
+      var monthChangePercents = const <String, double>{};
 
       void tryEmit() {
         if (accounts != null && portfolio != null && recent != null) {
@@ -51,6 +52,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
               recentTransactions: recent!,
               accountCurrentTotalsById: currentTotals,
               accountScheduledTotalsById: scheduledTotals,
+              accountMonthChangePercentById: monthChangePercents,
             ),
           );
         }
@@ -81,6 +83,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         (snapshot) {
           currentTotals = snapshot.accountCurrentDepositTotalsById;
           scheduledTotals = snapshot.accountScheduledDepositTotalsById;
+          monthChangePercents = snapshot.accountMonthChangePercentById;
           tryEmit();
         },
         onError: controller.addError,

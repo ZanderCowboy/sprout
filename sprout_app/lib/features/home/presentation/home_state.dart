@@ -17,6 +17,7 @@ final class HomeReady extends HomeState {
     required this.recentTransactions,
     this.accountCurrentTotalsById = const <String, int>{},
     this.accountScheduledTotalsById = const <String, int>{},
+    this.accountMonthChangePercentById = const <String, double>{},
   });
 
   final List<Account> accounts;
@@ -24,6 +25,7 @@ final class HomeReady extends HomeState {
   final List<Transaction> recentTransactions;
   final Map<String, int> accountCurrentTotalsById;
   final Map<String, int> accountScheduledTotalsById;
+  final Map<String, double> accountMonthChangePercentById;
 
   @override
   List<Object?> get props => [
@@ -32,5 +34,6 @@ final class HomeReady extends HomeState {
         recentTransactions,
         accountCurrentTotalsById,
         accountScheduledTotalsById,
+        accountMonthChangePercentById,
       ];
 }

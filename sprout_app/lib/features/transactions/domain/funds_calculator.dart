@@ -119,4 +119,38 @@ class FundsCalculator {
     }
     return result;
   }
+
+  /// Percent change this calendar month vs the account balance at month start.
+  ///
+  /// Omitted when the start-of-month balance is 0 (undefined %) or there were
+  /// no settled deposits this month.
+  static Map<String, double> accountMonthChangePercentById(
+    Iterable<Transaction> txs, {
+    DateTime? now,
+  }) {
+    final effectiveNow = now ?? DateTime.now();
+    final local = effectiveNow.toLocal();
+    final monthStart = DateTime(local.year, local.month);
+    final current = <String, int>{};
+    final thisMonth = <String, int>{};
+
+    for (final t in txs) {
+      if (t.kind != TransactionKind.deposit) continue;
+      if (TransactionRules.isPending(t, effectiveNow)) continue;
+      current[t.accountId] = (current[t.accountId] ?? 0) + t.amountCents;
+      final occurred = t.occurredAt.toLocal();
+      if (!occurred.isBefore(monthStart)) {
+        thisMonth[t.accountId] = (thisMonth[t.accountId] ?? 0) + t.amountCents;
+      }
+    }
+
+    final result = <String, double>{};
+    for (final entry in current.entries) {
+      final monthCents = thisMonth[entry.key] ?? 0;
+      final startCents = entry.value - monthCents;
+      if (startCents <= 0 || monthCents == 0) continue;
+      result[entry.key] = (monthCents / startCents) * 100;
+    }
+    return result;
+  }
 }

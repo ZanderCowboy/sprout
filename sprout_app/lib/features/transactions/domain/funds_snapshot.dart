@@ -6,12 +6,14 @@ class FundsSnapshot extends Equatable {
     required this.unallocatedCents,
     required this.accountCurrentDepositTotalsById,
     required this.accountScheduledDepositTotalsById,
+    this.accountMonthChangePercentById = const <String, double>{},
   });
 
   final Map<String, int> savedCentsByGoalId;
   final int unallocatedCents;
   final Map<String, int> accountCurrentDepositTotalsById;
   final Map<String, int> accountScheduledDepositTotalsById;
+  final Map<String, double> accountMonthChangePercentById;
 
   @override
   List<Object?> get props => [
@@ -19,5 +21,6 @@ class FundsSnapshot extends Equatable {
     unallocatedCents,
     accountCurrentDepositTotalsById,
     accountScheduledDepositTotalsById,
+    accountMonthChangePercentById,
   ];
 }

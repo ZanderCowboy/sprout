@@ -13,7 +13,7 @@ export PATH := C:/Program Files/Git/usr/bin;C:/Program Files/Git/bin;$(PATH)
 endif
 
 .PHONY: help get run run-dev run-prod run-dev-release run-prod-release \
-	analyze test check clean devices config \
+	build-dev install-dev build-prod install-prod analyze test check clean devices config \
 	config-export config-import config-status config-set-onedrive
 
 help: ## Show available targets
@@ -36,6 +36,18 @@ run-dev-release: ## Run development flavor (release)
 
 run-prod-release: ## Run production flavor (release)
 	cd $(APP_DIR) && flutter run --release --flavor $(FLAVOR_PROD) -t $(TARGET_PROD)
+
+build-dev: ## Build development APK (debug)
+	cd $(APP_DIR) && flutter build apk --debug --flavor $(FLAVOR_DEV) -t $(TARGET_DEV)
+
+install-dev: build-dev ## Install development debug APK on a connected device
+	cd $(APP_DIR) && flutter install --debug --flavor $(FLAVOR_DEV)
+
+build-prod: ## Build production APK (debug)
+	cd $(APP_DIR) && flutter build apk --debug --flavor $(FLAVOR_PROD) -t $(TARGET_PROD)
+
+install-prod: build-prod ## Install production debug APK on a connected device
+	cd $(APP_DIR) && flutter install --debug --flavor $(FLAVOR_PROD)
 
 analyze: ## flutter analyze
 	cd $(APP_DIR) && flutter analyze
