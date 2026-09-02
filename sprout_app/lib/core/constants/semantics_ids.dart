@@ -23,6 +23,7 @@ abstract final class SemanticsIds {
 
   // --- Account profile ---
   static const accountEditDisplayName = 'account_edit_display_name';
+  static const accountChangeEmail = 'account_change_email';
   static const accountSignOut = 'account_sign_out';
   static const accountTerms = 'account_terms';
   static const accountPrivacy = 'account_privacy';
@@ -106,6 +107,7 @@ abstract final class SemanticsIds {
 
   // --- Settings ---
   static const settingsAccount = 'settings_account';
+  static const settingsAccountAvatar = 'settings_account_avatar';
   static const settingsPremium = 'settings_premium';
   static const settingsTransactions = 'settings_transactions';
   static const settingsRecurring = 'settings_recurring';

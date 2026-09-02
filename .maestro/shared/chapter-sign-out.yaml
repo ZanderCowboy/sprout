@@ -5,14 +5,6 @@ appId: app.stackmint.sprout.dev
     id: "shell_tab_settings"
 
 - tapOn:
-    id: "settings_account"
-
-- extendedWaitUntil:
-    visible:
-      text: "Account"
-    timeout: 5000
-
-- tapOn:
     id: "account_sign_out"
 
 - extendedWaitUntil:

@@ -2,6 +2,25 @@
 
 Changes heading to `main`. Newest entries at the top.
 
+## 2026-09-02 — Profile label
+
+- Settings and the account screen say Profile instead of Edit Profile
+
+## 2026-09-02 — Delete account on Edit Profile
+
+- Delete account is a danger tile on Edit Profile, not a Settings footer link
+
+## 2026-09-02 — Add button sits lower
+
+- The center Add disc sits slightly lower on the bottom bar
+
+## 2026-09-02 — Settings hub restyle
+
+- Settings is a profile hub: avatar, name, email, and an Edit Profile button
+- Premium shows an ACTIVE / Upgrade card; Finance lists Transactions, Recurring, and Master Budget as separate rows
+- Sign out, version, Privacy, Terms, and Delete account live on Settings
+- Edit Profile opens a slimmer Account page with display name editing and a coming-soon change-email row
+
 ## 2026-09-02 — Shell bottom bar
 
 - Signed-in tabs live in a shared bottom bar widget instead of layout inside the shell

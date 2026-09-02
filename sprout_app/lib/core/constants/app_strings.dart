@@ -110,6 +110,9 @@ abstract final class AppStrings {
       'Leave blank if you already have an account.';
   static const String displayName = 'Display name';
   static const String editDisplayName = 'Edit display name';
+  static const String changeEmail = 'Change email';
+  static const String changeEmailComingSoon =
+      'Changing your email address will be available in a later update.';
   static const String account = 'Account';
   static const String accountSectionProfile = 'Profile';
   static const String accountSectionSession = 'Session';
@@ -320,8 +323,15 @@ abstract final class AppStrings {
   static const String subscriptionUpdateFailed = 'Subscription update failed.';
   static const String checkingSubscription = 'Checking subscription...';
   static const String premiumActive = 'Premium active';
+  static const String premiumStatusActive = 'ACTIVE';
   static const String unlockPremium = 'Unlock premium with Monthly or Annual';
   static const String sproutPremium = 'Sprout Premium';
+  static const String manage = 'Manage';
+  static const String upgrade = 'Upgrade';
+  static const String finance = 'Finance';
+
+  static String appVersionLabel(String version, String buildNumber) =>
+      'Version $version (Build $buildNumber)';
   static const String viewAllDeposits = 'View all deposits and allocations';
   static const String viewEditCancelRecurring =
       'View, edit, or cancel recurring deposits';

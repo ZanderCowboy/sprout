@@ -13,7 +13,8 @@ class EnticingAddButton extends StatelessWidget {
     this.identifier = SemanticsIds.shellAdd,
   });
 
-  static const double size = 56;
+  static const double size = 64;
+  static const double dockOffsetY = 10;
 
   final VoidCallback onPressed;
   final String identifier;
@@ -30,26 +31,29 @@ class EnticingAddButton extends StatelessWidget {
       child: semanticButton(
         identifier: identifier,
         label: AppStrings.actionAdd,
-        child: GestureDetector(
-          onTap: _onTap,
-          child: Container(
-            width: size,
-            height: size,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: AppColors.seed,
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.seed.withValues(alpha: 0.35),
-                  blurRadius: 16,
-                  offset: const Offset(0, 6),
-                ),
-              ],
-            ),
-            child: const Icon(
-              Icons.add_rounded,
-              color: AppColors.surfaceDeep,
-              size: 30,
+        child: Transform.translate(
+          offset: const Offset(0, dockOffsetY),
+          child: GestureDetector(
+            onTap: _onTap,
+            child: Container(
+              width: size,
+              height: size,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.seed,
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.seed.withValues(alpha: 0.35),
+                    blurRadius: 16,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
+              ),
+              child: const Icon(
+                Icons.add_rounded,
+                color: AppColors.surfaceDeep,
+                size: 38,
+              ),
             ),
           ),
         ),

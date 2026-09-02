@@ -6,6 +6,7 @@ export 'domain/auth_user.dart';
 export 'domain/local_session_cleaner.dart';
 export 'presentation/account_page.dart';
 export 'presentation/bloc/auth_cubit.dart';
+export 'presentation/widgets/delete_account_sheet.dart';
 export 'presentation/intro_page.dart';
 export 'presentation/privacy_page.dart';
 export 'presentation/sign_in_page.dart';

@@ -5,8 +5,6 @@ appId: app.stackmint.sprout.dev
 - tapOn:
     id: "shell_tab_settings"
 
-- assertVisible: "Settings"
-
 - runFlow:
     when:
       visible:
@@ -51,7 +49,7 @@ appId: app.stackmint.sprout.dev
 
 - extendedWaitUntil:
     visible:
-      text: "Account"
+      text: "Edit display name"
     timeout: 5000
 
 - back

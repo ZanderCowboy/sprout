@@ -1,8 +1,6 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
@@ -10,17 +8,13 @@ import 'package:hive/hive.dart';
 import 'package:sprout/core/config/app_config.dart';
 import 'package:sprout/core/config/app_environment.dart';
 import 'package:sprout/core/constants/app_strings.dart';
-import 'package:sprout/core/di/service_locator.dart';
 import 'package:sprout/core/router/app_route.dart';
 import 'package:sprout/core/theme/app_theme.dart';
 import 'package:sprout/core/user/user_context.dart';
 import 'package:sprout/features/auth/application/auth_service_impl.dart';
-import 'package:sprout/features/auth/application/privacy_policy_service.dart';
-import 'package:sprout/features/auth/application/privacy_policy_service_impl.dart';
 import 'package:sprout/features/auth/domain/auth_user.dart';
 import 'package:sprout/features/auth/presentation/account_page.dart';
 import 'package:sprout/features/auth/presentation/bloc/auth_cubit.dart';
-import 'package:sprout/features/auth/presentation/privacy_page.dart';
 
 import '../mocks/mocks.dart';
 
@@ -87,20 +81,7 @@ void main() {
     }
   });
 
-  testWidgets('Privacy row opens PrivacyPage', (tester) async {
-    sl.registerSingleton<PrivacyPolicyService>(
-      PrivacyPolicyServiceImpl(
-        remoteConfig: FakeRemoteConfigService(),
-        assetBundle: _FakeAssetBundle({
-          PrivacyPolicyService.bundledAssetPath:
-              '# Bundled Privacy\n\nLocal privacy placeholder.',
-        }),
-      ),
-    );
-    addTearDown(() async {
-      await sl.reset(dispose: false);
-    });
-
+  testWidgets('shows edit profile and change-email coming soon', (tester) async {
     await tester.pumpWidget(
       BlocProvider.value(
         value: cubit,
@@ -113,10 +94,6 @@ void main() {
                 path: AppRoute.account.path,
                 builder: (context, _) => const AccountPage(),
               ),
-              GoRoute(
-                path: AppRoute.privacy.path,
-                builder: (context, _) => const PrivacyPage(),
-              ),
             ],
           ),
         ),
@@ -124,28 +101,11 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    final privacy = find.text(AppStrings.privacyPolicy);
-    await tester.ensureVisible(privacy);
-    await tester.pumpAndSettle();
-    await tester.tap(privacy);
-    await tester.pumpAndSettle();
-
-    expect(find.byType(PrivacyPage), findsOneWidget);
-    expect(find.textContaining('Local privacy placeholder.'), findsOneWidget);
+    expect(find.text(AppStrings.accountSectionProfile), findsWidgets);
+    expect(find.text(AppStrings.editDisplayName), findsOneWidget);
+    expect(find.text(AppStrings.changeEmail), findsOneWidget);
+    expect(find.text('ada@example.com'), findsWidgets);
+    expect(find.text(AppStrings.changeEmailComingSoon), findsOneWidget);
+    expect(find.text(AppStrings.deleteAccount), findsOneWidget);
   });
-}
-
-class _FakeAssetBundle extends CachingAssetBundle {
-  _FakeAssetBundle(this._strings);
-
-  final Map<String, String> _strings;
-
-  @override
-  Future<ByteData> load(String key) async {
-    final value = _strings[key];
-    if (value == null) {
-      throw FlutterError('Unable to load asset: $key');
-    }
-    return ByteData.sublistView(Uint8List.fromList(utf8.encode(value)));
-  }
 }

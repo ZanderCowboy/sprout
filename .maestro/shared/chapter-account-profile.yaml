@@ -9,7 +9,7 @@ appId: app.stackmint.sprout.dev
 
 - extendedWaitUntil:
     visible:
-      text: "Account"
+      text: "Edit display name"
     timeout: 5000
 
 - tapOn:
@@ -24,6 +24,14 @@ appId: app.stackmint.sprout.dev
 
 - tapOn:
     id: "account_edit_name_save"
+
+- tapOn:
+    id: "account_delete"
+
+- tapOn:
+    id: "account_delete_cancel"
+
+- back
 
 - tapOn:
     id: "account_terms"
@@ -42,13 +50,5 @@ appId: app.stackmint.sprout.dev
     visible:
       text: "Privacy Policy"
     timeout: 10000
-
-- back
-
-- tapOn:
-    id: "account_delete"
-
-- tapOn:
-    id: "account_delete_cancel"
 
 - back
