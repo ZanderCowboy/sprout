@@ -1,13 +1,18 @@
-import 'package:bloc_concurrency/bloc_concurrency.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sprout/features/accounts/presentation/bloc/account_detail_event.dart';
-import 'package:sprout/features/accounts/presentation/bloc/account_detail_state.dart';
+import 'dart:async';
 
+import 'package:bloc_concurrency/bloc_concurrency.dart';
+import 'package:equatable/equatable.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'package:sprout/core/core.dart';
 import 'package:sprout/features/goals/export.dart';
 import 'package:sprout/features/transactions/export.dart';
 
 import '../../application/accounts_service.dart';
 import '../../domain/account.dart';
+
+part 'account_detail_event.dart';
+part 'account_detail_state.dart';
 
 class AccountDetailBloc extends Bloc<AccountDetailEvent, AccountDetailState> {
   AccountDetailBloc({
@@ -22,20 +27,81 @@ class AccountDetailBloc extends Bloc<AccountDetailEvent, AccountDetailState> {
       _onSubscribe,
       transformer: restartable(),
     );
+    on<AccountDetailDeleteRequested>(_onDelete, transformer: sequential());
+    on<AccountDetailClearScheduledRequested>(
+      _onClearScheduled,
+      transformer: sequential(),
+    );
+    on<AccountDetailRefreshRequested>(_onRefresh, transformer: sequential());
   }
 
   final AccountsService _accountsService;
   final TransactionsService _transactionsService;
   final GoalsService _goalsService;
 
+  String? _accountId;
+  bool _pauseWatch = false;
+
   Future<void> _onSubscribe(
     AccountDetailSubscriptionRequested event,
     Emitter<AccountDetailState> emit,
   ) {
+    _accountId = event.accountId;
     return emit.forEach<AccountDetailState>(
       _watch(event.accountId),
       onData: (s) => s,
     );
+  }
+
+  Future<void> _onDelete(
+    AccountDetailDeleteRequested event,
+    Emitter<AccountDetailState> emit,
+  ) async {
+    final id = _accountId;
+    if (id == null) return;
+    _pauseWatch = true;
+    try {
+      await _accountsService.removeAccount(id);
+      emit(const AccountDetailDeleted());
+    } on AppException catch (e) {
+      _pauseWatch = false;
+      _emitDeleteFailure(emit, e.message);
+    } catch (_) {
+      _pauseWatch = false;
+      _emitDeleteFailure(emit, AppStrings.couldNotDelete);
+    }
+  }
+
+  void _emitDeleteFailure(Emitter<AccountDetailState> emit, String message) {
+    final current = state;
+    if (current is AccountDetailReady) {
+      emit(current.copyWith(actionError: message));
+    }
+  }
+
+  Future<void> _onClearScheduled(
+    AccountDetailClearScheduledRequested event,
+    Emitter<AccountDetailState> emit,
+  ) async {
+    for (final id in event.transactionIds) {
+      await _transactionsService.deleteTransaction(id);
+    }
+  }
+
+  Future<void> _onRefresh(
+    AccountDetailRefreshRequested event,
+    Emitter<AccountDetailState> emit,
+  ) async {
+    try {
+      await Future.wait([
+        _accountsService.pullRemote(),
+        _transactionsService.pullRemote(),
+      ]);
+    } finally {
+      if (!event.onComplete.isCompleted) {
+        event.onComplete.complete();
+      }
+    }
   }
 
   Stream<AccountDetailState> _watch(String accountId) {
@@ -46,6 +112,7 @@ class AccountDetailBloc extends Bloc<AccountDetailEvent, AccountDetailState> {
       Map<String, Goal> goalsById = {};
 
       void tryEmit() {
+        if (_pauseWatch) return;
         if (!accountsResolved) {
           controller.add(const AccountDetailLoading());
           return;

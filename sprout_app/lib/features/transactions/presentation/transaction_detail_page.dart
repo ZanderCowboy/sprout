@@ -56,7 +56,6 @@ class _TransactionDetailBody extends StatefulWidget {
 
 class _TransactionDetailBodyState extends State<_TransactionDetailBody> {
   late final TextEditingController _note;
-  bool _savingNote = false;
 
   @override
   void initState() {
@@ -79,25 +78,10 @@ class _TransactionDetailBodyState extends State<_TransactionDetailBody> {
     super.dispose();
   }
 
-  Future<void> _saveNote() async {
-    setState(() => _savingNote = true);
-    try {
-      await sl<TransactionsService>().updateNote(
-        transactionId: widget.state.transaction.id,
-        note: _note.text,
-      );
-      if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text(AppStrings.noteSaved)));
-    } on Object catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('${AppStrings.couldNotSaveNotePrefix}$e')),
-      );
-    } finally {
-      if (mounted) setState(() => _savingNote = false);
-    }
+  void _saveNote() {
+    context.read<TransactionDetailBloc>().add(
+      TransactionDetailNoteSaveRequested(note: _note.text),
+    );
   }
 
   @override
@@ -133,7 +117,25 @@ class _TransactionDetailBodyState extends State<_TransactionDetailBody> {
     );
     final groupRemainingCents = groupDepositCents - groupAllocatedCents;
 
-    return ListView(
+    return BlocListener<TransactionDetailBloc, TransactionDetailState>(
+      listenWhen: (previous, current) {
+        if (current is! TransactionDetailReady || current.noteFeedback == null) {
+          return false;
+        }
+        final prev = previous is TransactionDetailReady
+            ? previous.noteFeedback
+            : null;
+        return prev != current.noteFeedback;
+      },
+      listener: (context, state) {
+        if (state is! TransactionDetailReady || state.noteFeedback == null) {
+          return;
+        }
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(state.noteFeedback!)));
+      },
+      child: ListView(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
       children: [
         TransactionInfoCard(
@@ -253,13 +255,16 @@ class _TransactionDetailBodyState extends State<_TransactionDetailBody> {
               SproutFilledButton(
                 identifier: SemanticsIds.transactionNoteSave,
                 label: AppStrings.save,
-                onPressed: _savingNote ? null : _saveNote,
-                child: Text(_savingNote ? AppStrings.saving : AppStrings.save),
+                onPressed: widget.state.savingNote ? null : _saveNote,
+                child: Text(
+                  widget.state.savingNote ? AppStrings.saving : AppStrings.save,
+                ),
               ),
             ],
           ),
         ),
       ],
+      ),
     );
   }
 

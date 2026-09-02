@@ -61,6 +61,8 @@ abstract final class AppStrings {
   static const String goalName = 'Goal name';
   static const String targetAmount = 'Target amount (ZAR)';
   static const String syncError = 'Could not sync with the server';
+  static const String couldNotSave = 'Could not save. Try again.';
+  static const String couldNotDelete = 'Could not delete. Try again.';
   static const String unallocated = 'Unallocated';
   static const String unknownAccount = 'Unknown account';
   static const String unknownGoal = 'Unknown goal';

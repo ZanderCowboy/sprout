@@ -22,6 +22,7 @@ class AccountDetailView extends StatelessWidget {
     required this.onRefresh,
     required this.onDeposit,
     required this.onClearScheduled,
+    this.showRecurringLink = false,
   });
 
   final Account account;
@@ -33,6 +34,7 @@ class AccountDetailView extends StatelessWidget {
   final Future<void> Function() onRefresh;
   final VoidCallback onDeposit;
   final VoidCallback onClearScheduled;
+  final bool showRecurringLink;
 
   @override
   Widget build(BuildContext context) {
@@ -48,6 +50,10 @@ class AccountDetailView extends StatelessWidget {
             accentColor: Color(account.color),
             caption: AppStrings.addDepositCaptionAccountAmountOnly,
             onPressed: onDeposit,
+          ),
+          RecurringDepositsLink(
+            visible: showRecurringLink,
+            identifier: SemanticsIds.accountDetailRecurring,
           ),
           const SizedBox(height: 12),
           Card(

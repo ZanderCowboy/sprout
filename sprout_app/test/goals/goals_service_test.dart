@@ -49,6 +49,38 @@ void main() {
     expect(txRepo.lastAdded?.kind, TransactionKind.allocation);
   });
 
+  test('saveGoal rejects a duplicate name', () async {
+    final existing = Goal(
+      id: 'g1',
+      userId: 'u',
+      name: 'House',
+      targetAmountCents: 100000,
+      color: 0xFF0000,
+      createdAt: DateTime(2026, 3, 1),
+      updatedAt: DateTime(2026, 3, 1),
+    );
+    await goalsRepo.upsertGoal(existing);
+
+    expect(
+      () => goalsService.saveGoal(
+        Goal(
+          id: 'g2',
+          userId: 'u',
+          name: 'house',
+          targetAmountCents: 5000,
+          color: 0xFF0000,
+          createdAt: DateTime(2026, 3, 1),
+          updatedAt: DateTime(2026, 3, 1),
+        ),
+      ),
+      throwsA(isA<ValidationAppException>().having(
+        (e) => e.message,
+        'message',
+        AppStrings.duplicateGoalName,
+      )),
+    );
+  });
+
   test('createGoalWithOpeningBalance requires account when balance positive', () async {
     final goal = Goal(
       id: 'g1',

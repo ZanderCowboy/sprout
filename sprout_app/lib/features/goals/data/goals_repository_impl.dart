@@ -4,6 +4,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:sprout/core/core.dart';
+import 'package:sprout/features/sync/data/pending_sync_queue.dart';
 import 'package:sprout/features/sync/export.dart';
 import 'package:sprout/features/transactions/data/pending_sync_payload.dart';
 import 'package:sprout/features/transactions/data/supabase_tables.dart';

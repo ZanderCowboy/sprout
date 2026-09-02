@@ -7,6 +7,8 @@ import 'package:sprout/features/accounts/domain/account.dart';
 import 'package:sprout/features/accounts/domain/accounts_repository.dart';
 import 'package:sprout/features/auth/domain/auth_repository.dart';
 import 'package:sprout/features/auth/domain/auth_user.dart';
+import 'package:sprout/features/budget/domain/budget_group.dart';
+import 'package:sprout/features/budget/domain/budget_repository.dart';
 import 'package:sprout/features/goals/domain/goal.dart';
 import 'package:sprout/features/goals/domain/goals_repository.dart';
 import 'package:sprout/features/transactions/domain/portfolio_summary.dart';
@@ -239,7 +241,28 @@ class FakeTransactionsRepository implements TransactionsRepository {
   Future<void> updateTransactionNote({
     required String transactionId,
     required String? note,
-  }) async {}
+  }) async {
+    final index = _transactions.indexWhere((t) => t.id == transactionId);
+    if (index < 0) return;
+    final existing = _transactions[index];
+    _transactions[index] = Transaction(
+      id: existing.id,
+      userId: existing.userId,
+      accountId: existing.accountId,
+      kind: existing.kind,
+      goalId: existing.goalId,
+      groupId: existing.groupId,
+      amountCents: existing.amountCents,
+      occurredAt: existing.occurredAt,
+      note: note,
+      pendingSync: existing.pendingSync,
+      isRecurring: existing.isRecurring,
+      recurringEnabled: existing.recurringEnabled,
+      frequency: existing.frequency,
+      nextScheduledDate: existing.nextScheduledDate,
+    );
+    _notify();
+  }
 
   @override
   Future<void> updateTransactionRecurringConfig({
@@ -302,6 +325,9 @@ class FakeGoalsRepository implements GoalsRepository {
   final List<Goal> _goals = [];
 
   Goal? lastUpserted;
+  Object? upsertError;
+  Object? deleteError;
+  Completer<void>? pullRemoteHold;
 
   void _notify() {
     if (!_controller.isClosed) _controller.add(null);
@@ -320,6 +346,8 @@ class FakeGoalsRepository implements GoalsRepository {
 
   @override
   Future<void> upsertGoal(Goal goal) async {
+    final error = upsertError;
+    if (error != null) throw error;
     lastUpserted = goal;
     final idx = _goals.indexWhere((g) => g.id == goal.id);
     if (idx == -1) {
@@ -332,12 +360,17 @@ class FakeGoalsRepository implements GoalsRepository {
 
   @override
   Future<void> deleteGoal(String id) async {
+    final error = deleteError;
+    if (error != null) throw error;
     _goals.removeWhere((g) => g.id == id);
     _notify();
   }
 
   @override
-  Future<void> pullRemote() async {}
+  Future<void> pullRemote() async {
+    final hold = pullRemoteHold;
+    if (hold != null) await hold.future;
+  }
 
   Future<void> dispose() async {
     await _controller.close();
@@ -351,6 +384,11 @@ class FakeAccountsRepository implements AccountsRepository {
 
   final _controller = StreamController<void>.broadcast();
   final List<Account> _accounts = [];
+
+  Account? lastUpserted;
+  Object? upsertError;
+  Object? deleteError;
+  Completer<void>? pullRemoteHold;
 
   void _notify() {
     if (!_controller.isClosed) _controller.add(null);
@@ -369,6 +407,9 @@ class FakeAccountsRepository implements AccountsRepository {
 
   @override
   Future<void> upsertAccount(Account account) async {
+    final error = upsertError;
+    if (error != null) throw error;
+    lastUpserted = account;
     final idx = _accounts.indexWhere((a) => a.id == account.id);
     if (idx == -1) {
       _accounts.add(account);
@@ -380,7 +421,67 @@ class FakeAccountsRepository implements AccountsRepository {
 
   @override
   Future<void> deleteAccount(String id) async {
+    final error = deleteError;
+    if (error != null) throw error;
     _accounts.removeWhere((a) => a.id == id);
+    _notify();
+  }
+
+  @override
+  Future<void> pullRemote() async {
+    final hold = pullRemoteHold;
+    if (hold != null) await hold.future;
+  }
+
+  Future<void> dispose() async {
+    await _controller.close();
+  }
+}
+
+class FakeBudgetRepository implements BudgetRepository {
+  FakeBudgetRepository({List<BudgetGroup>? initial}) {
+    if (initial != null) _groups.addAll(initial);
+  }
+
+  final _controller = StreamController<void>.broadcast();
+  final List<BudgetGroup> _groups = [];
+
+  BudgetGroup? lastUpserted;
+  Object? upsertError;
+
+  void _notify() {
+    if (!_controller.isClosed) _controller.add(null);
+  }
+
+  @override
+  Stream<List<BudgetGroup>> watchBudgetGroups() async* {
+    yield List.unmodifiable(_groups);
+    await for (final _ in _controller.stream) {
+      yield List.unmodifiable(_groups);
+    }
+  }
+
+  @override
+  Future<List<BudgetGroup>> getBudgetGroups() async =>
+      List.unmodifiable(_groups);
+
+  @override
+  Future<void> upsertBudgetGroup(BudgetGroup group) async {
+    final error = upsertError;
+    if (error != null) throw error;
+    lastUpserted = group;
+    final idx = _groups.indexWhere((g) => g.id == group.id);
+    if (idx == -1) {
+      _groups.add(group);
+    } else {
+      _groups[idx] = group;
+    }
+    _notify();
+  }
+
+  @override
+  Future<void> deleteBudgetGroup(String id) async {
+    _groups.removeWhere((g) => g.id == id);
     _notify();
   }
 

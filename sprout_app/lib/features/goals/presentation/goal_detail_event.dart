@@ -14,3 +14,23 @@ final class GoalDetailSubscriptionRequested extends GoalDetailEvent {
   @override
   List<Object?> get props => [goalId];
 }
+
+final class GoalDetailDeleteRequested extends GoalDetailEvent {
+  const GoalDetailDeleteRequested();
+}
+
+final class GoalDetailClearScheduledRequested extends GoalDetailEvent {
+  const GoalDetailClearScheduledRequested({required this.transactionIds});
+
+  final List<String> transactionIds;
+
+  @override
+  List<Object?> get props => [transactionIds];
+}
+
+final class GoalDetailRefreshRequested extends GoalDetailEvent {
+  GoalDetailRefreshRequested({Completer<void>? onComplete})
+    : onComplete = onComplete ?? Completer<void>();
+
+  final Completer<void> onComplete;
+}

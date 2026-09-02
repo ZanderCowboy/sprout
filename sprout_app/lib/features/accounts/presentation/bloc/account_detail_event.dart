@@ -1,4 +1,4 @@
-import 'package:equatable/equatable.dart';
+part of 'account_detail_bloc.dart';
 
 sealed class AccountDetailEvent extends Equatable {
   const AccountDetailEvent();
@@ -13,4 +13,24 @@ final class AccountDetailSubscriptionRequested extends AccountDetailEvent {
 
   @override
   List<Object?> get props => [accountId];
+}
+
+final class AccountDetailDeleteRequested extends AccountDetailEvent {
+  const AccountDetailDeleteRequested();
+}
+
+final class AccountDetailClearScheduledRequested extends AccountDetailEvent {
+  const AccountDetailClearScheduledRequested({required this.transactionIds});
+
+  final List<String> transactionIds;
+
+  @override
+  List<Object?> get props => [transactionIds];
+}
+
+final class AccountDetailRefreshRequested extends AccountDetailEvent {
+  AccountDetailRefreshRequested({Completer<void>? onComplete})
+    : onComplete = onComplete ?? Completer<void>();
+
+  final Completer<void> onComplete;
 }

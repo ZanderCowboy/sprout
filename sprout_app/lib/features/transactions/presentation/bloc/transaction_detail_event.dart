@@ -10,3 +10,12 @@ final class TransactionDetailSubscriptionRequested
     extends TransactionDetailEvent {
   const TransactionDetailSubscriptionRequested();
 }
+
+final class TransactionDetailNoteSaveRequested extends TransactionDetailEvent {
+  const TransactionDetailNoteSaveRequested({required this.note});
+
+  final String note;
+
+  @override
+  List<Object?> get props => [note];
+}
