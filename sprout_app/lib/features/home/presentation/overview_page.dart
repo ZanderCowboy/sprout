@@ -6,10 +6,12 @@ import 'package:sprout/core/core.dart';
 import 'package:sprout/features/accounts/export.dart';
 import 'package:sprout/features/goals/export.dart';
 import 'package:sprout/features/shell/shell.dart';
-import 'package:sprout/features/transactions/export.dart';
 import 'package:sprout/ui/export.dart';
 import 'home_bloc.dart';
 import 'widgets/empty_state_guidance.dart';
+import 'widgets/overview_activity_row.dart';
+import 'widgets/overview_hero.dart';
+import 'widgets/overview_quick_actions.dart';
 
 class OverviewPage extends StatelessWidget {
   const OverviewPage({super.key});
@@ -50,9 +52,6 @@ class OverviewPage extends StatelessWidget {
         }
 
         final scheme = Theme.of(context).colorScheme;
-        final titleStyle = Theme.of(context).textTheme.titleMedium;
-
-        // Check if we need to show empty state guidance
         final hasAccounts = state.accounts.isNotEmpty;
 
         return RefreshIndicator(
@@ -64,33 +63,19 @@ class OverviewPage extends StatelessWidget {
             slivers: [
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
+                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        AppStrings.portfolioTotal,
-                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                          color: scheme.onSurfaceVariant,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        formatZarFromCents(state.portfolio.totalCents),
-                        style: Theme.of(context).textTheme.displaySmall
-                            ?.copyWith(
-                              fontWeight: FontWeight.w800,
-                              color: scheme.primary,
-                            ),
-                      ),
+                      const SproutShellHeader(),
                       const SizedBox(height: 8),
-                      Text(
-                        '${AppStrings.lastUpdated}: ${state.portfolio.lastActivityAt != null ? formatDateTime(state.portfolio.lastActivityAt!) : AppStrings.neverUpdated}',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: scheme.onSurfaceVariant,
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        child: OverviewHero(
+                          totalCents: state.portfolio.totalCents,
+                          lastActivityAt: state.portfolio.lastActivityAt,
                         ),
                       ),
-                      const SizedBox(height: 14),
                       BlocBuilder<GoalsBloc, GoalsState>(
                         builder: (context, goalsState) {
                           if (goalsState is! GoalsReady ||
@@ -98,61 +83,34 @@ class OverviewPage extends StatelessWidget {
                             return const SizedBox.shrink();
                           }
 
-                          return OverallGoalsProgressHeader(
-                            totals: goalsState.overall,
-                            title: AppStrings.overallGoalsProgress,
-                            onTap: () => context.go(AppRoute.goals.path),
-                            semanticsIdentifier:
-                                SemanticsIds.overviewProgressHeader,
+                          return Padding(
+                            padding: const EdgeInsets.only(top: 16),
+                            child: OverallGoalsProgressHeader(
+                              totals: goalsState.overall,
+                              title: AppStrings.overallGoalsProgress,
+                              onTap: () => context.go(AppRoute.goals.path),
+                              semanticsIdentifier:
+                                  SemanticsIds.overviewProgressHeader,
+                            ),
                           );
                         },
                       ),
                       if (!hasAccounts) ...[
-                        const SizedBox(height: 18),
+                        const SizedBox(height: 16),
                         EmptyStateGuidance(
                           onOpenAccount: () => _openNewAccount(context),
                           onOpenGoal: () => _openNewGoal(context),
                           onOpenDeposit: () => _openDeposit(context),
                         ),
                       ] else ...[
-                        const SizedBox(height: 18),
-                        Text(AppStrings.actionAdd, style: titleStyle),
-                        const SizedBox(height: 10),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: SproutFilledButton.tonalIcon(
-                                identifier: SemanticsIds.overviewDeposit,
-                                label: AppStrings.deposit,
-                                onPressed: () => _openDeposit(context),
-                                icon: const Icon(Icons.payments_outlined),
-                                labelWidget: const Text(AppStrings.deposit),
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: SproutOutlinedButton.icon(
-                                identifier: SemanticsIds.overviewNewAccount,
-                                label: AppStrings.newAccount,
-                                onPressed: () => _openNewAccount(context),
-                                icon: const Icon(
-                                  Icons.account_balance_wallet_outlined,
-                                ),
-                                labelWidget: const Text(AppStrings.newAccount),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 10),
-                        SizedBox(
-                          width: double.infinity,
-                          child: SproutOutlinedButton.icon(
-                            identifier: SemanticsIds.overviewNewGoal,
-                            label: AppStrings.newGoal,
-                            onPressed: () => _openNewGoal(context),
-                            icon: const Icon(Icons.flag_outlined),
-                            labelWidget: const Text(AppStrings.newGoal),
-                          ),
+                        const SizedBox(height: 16),
+                        OverviewQuickActions(
+                          depositIdentifier: SemanticsIds.overviewDeposit,
+                          accountIdentifier: SemanticsIds.overviewNewAccount,
+                          goalIdentifier: SemanticsIds.overviewNewGoal,
+                          onDeposit: () => _openDeposit(context),
+                          onNewAccount: () => _openNewAccount(context),
+                          onNewGoal: () => _openNewGoal(context),
                         ),
                       ],
                     ],
@@ -162,13 +120,17 @@ class OverviewPage extends StatelessWidget {
               if (state.recentTransactions.isNotEmpty)
                 SliverToBoxAdapter(
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 6, 20, 10),
+                    padding: const EdgeInsets.fromLTRB(20, 18, 20, 10),
                     child: Row(
                       children: [
                         Expanded(
                           child: Text(
-                            AppStrings.recentActivity,
-                            style: titleStyle,
+                            AppStrings.recentActivity.toUpperCase(),
+                            style: Theme.of(context).textTheme.labelLarge
+                                ?.copyWith(
+                                  color: scheme.onSurfaceVariant,
+                                  letterSpacing: 1.4,
+                                ),
                           ),
                         ),
                         SproutTextButton(
@@ -187,46 +149,10 @@ class OverviewPage extends StatelessWidget {
                   sliver: SliverList.separated(
                     itemCount: state.recentTransactions.length,
                     separatorBuilder: (context, index) =>
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 8),
                     itemBuilder: (context, i) {
-                      final t = state.recentTransactions[i];
-                      final kindLabel = switch (t.kind) {
-                        TransactionKind.deposit => AppStrings.deposit,
-                        TransactionKind.allocation => AppStrings.allocation,
-                      };
-                      return Card(
-                        clipBehavior: Clip.antiAlias,
-                        child: SproutListTile(
-                          identifier: SemanticsIds.overviewTransactionRow,
-                          label: AppStrings.kindAmountLabel(
-                            kindLabel,
-                            formatZarFromCents(t.amountCents),
-                          ),
-                          leading: Icon(
-                            t.kind == TransactionKind.deposit
-                                ? Icons.payments_outlined
-                                : Icons.swap_horiz_rounded,
-                          ),
-                          title: Text(formatZarFromCents(t.amountCents)),
-                          subtitle: Text(
-                            AppStrings.kindSubtitle(
-                              kindLabel,
-                              formatDateTime(t.occurredAt),
-                            ),
-                          ),
-                          trailing: t.pendingSync
-                              ? Icon(
-                                  Icons.sync_rounded,
-                                  size: 20,
-                                  color: Theme.of(context).colorScheme.primary,
-                                )
-                              : null,
-                          onTap: () {
-                            context.push(
-                              AppRoute.transactionDetail.location(id: t.id),
-                            );
-                          },
-                        ),
+                      return OverviewActivityRow(
+                        transaction: state.recentTransactions[i],
                       );
                     },
                   ),
