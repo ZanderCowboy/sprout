@@ -21,6 +21,9 @@
         "CLOUDSDK_CONFIG": "/Users/zander.kotze/.config/gcloud-personal",
         "GOOGLE_CLOUD_PROJECT": "sprout-app-development"
       }
+    },
+    "Figma": {
+      "url": "https://mcp.figma.com/mcp"
     }
   }
 }
