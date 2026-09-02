@@ -3,6 +3,7 @@ export 'application/privacy_policy_service.dart';
 export 'application/terms_of_service_service.dart';
 export 'domain/auth_repository.dart';
 export 'domain/auth_user.dart';
+export 'domain/local_session_cleaner.dart';
 export 'presentation/account_page.dart';
 export 'presentation/bloc/auth_cubit.dart';
 export 'presentation/intro_page.dart';

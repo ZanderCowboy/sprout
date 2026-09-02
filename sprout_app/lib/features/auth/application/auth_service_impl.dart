@@ -5,6 +5,7 @@ import 'package:sprout/core/error/error.dart';
 import 'package:sprout/core/user/user_context.dart';
 import '../domain/auth_repository.dart';
 import '../domain/auth_user.dart';
+import '../domain/local_session_cleaner.dart';
 import 'auth_service.dart';
 
 class AuthServiceImpl implements AuthService {
@@ -12,14 +13,14 @@ class AuthServiceImpl implements AuthService {
     required AuthRepository authRepository,
     required UserContext userContext,
     required AppConfig appConfig,
-    required Future<void> Function() clearLocalData,
+    required LocalSessionCleaner localSessionCleaner,
     required Future<void> Function() flushPending,
     required Future<void> Function() pullRemote,
     Future<void> Function()? logOutPurchases,
   }) : _authRepository = authRepository,
        _userContext = userContext,
        _appConfig = appConfig,
-       _clearLocalData = clearLocalData,
+       _localSessionCleaner = localSessionCleaner,
        _flushPending = flushPending,
        _pullRemote = pullRemote,
        _logOutPurchases = logOutPurchases;
@@ -27,7 +28,7 @@ class AuthServiceImpl implements AuthService {
   final AuthRepository _authRepository;
   final UserContext _userContext;
   final AppConfig _appConfig;
-  final Future<void> Function() _clearLocalData;
+  final LocalSessionCleaner _localSessionCleaner;
   final Future<void> Function() _flushPending;
   final Future<void> Function() _pullRemote;
   final Future<void> Function()? _logOutPurchases;
@@ -104,7 +105,7 @@ class AuthServiceImpl implements AuthService {
   Future<void> deleteAccount() async {
     _debugSignedIn = false;
     await _authRepository.deleteOwnAccount();
-    await _clearLocalEntityData();
+    await _localSessionCleaner.clearLocalEntityData();
     final logOutPurchases = _logOutPurchases;
     if (logOutPurchases != null) {
       try {
@@ -133,11 +134,9 @@ class AuthServiceImpl implements AuthService {
       return;
     }
 
-    await _clearLocalEntityData();
+    await _localSessionCleaner.clearLocalEntityData();
     await _userContext.setActiveUserId(newUid);
     await _userContext.markVerifiedUserId(newUid);
     await _pullRemote();
   }
-
-  Future<void> _clearLocalEntityData() => _clearLocalData();
 }

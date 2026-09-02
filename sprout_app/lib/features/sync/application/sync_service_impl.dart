@@ -1,35 +1,29 @@
 import 'package:flutter/foundation.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:sprout/core/config/app_config.dart';
-import 'package:sprout/features/accounts/data/account_mapper.dart';
-import 'package:sprout/features/budget/data/mappers/budget_supabase_mapper.dart';
-import 'package:sprout/features/goals/data/goal_mapper.dart';
-import 'package:sprout/features/transactions/data/pending_sync_payload.dart';
-import 'package:sprout/features/transactions/data/supabase_tables.dart';
-import 'package:sprout/features/transactions/data/transaction_mapper.dart';
 import 'package:sprout/features/transactions/domain/transactions_repository.dart';
 import '../data/pending_sync_queue.dart';
 import '../domain/pending_sync_operation.dart';
+import '../domain/sync_remote_datasource.dart';
 import 'sync_service.dart';
 
 class SyncServiceImpl implements SyncService {
   SyncServiceImpl({
     required PendingSyncQueue queue,
     required AppConfig config,
-    required SupabaseClient? supabase,
+    required SyncRemoteDatasource remote,
     required TransactionsRepository transactionsRepository,
     required bool Function() canSync,
     this.onAfterFlush,
   })  : _queue = queue,
         _config = config,
-        _supabase = supabase,
+        _remote = remote,
         _transactionsRepository = transactionsRepository,
         _canSync = canSync;
 
   final PendingSyncQueue _queue;
   final AppConfig _config;
-  final SupabaseClient? _supabase;
+  final SyncRemoteDatasource _remote;
   final TransactionsRepository _transactionsRepository;
   final bool Function() _canSync;
 
@@ -50,10 +44,7 @@ class SyncServiceImpl implements SyncService {
       return;
     }
 
-    final client = _supabase;
-    if (client == null) return;
-
-    final authUid = client.auth.currentUser?.id;
+    final authUid = _remote.authUserId;
     if (authUid == null || authUid.isEmpty) {
       if (kDebugMode) {
         debugPrint(
@@ -73,60 +64,14 @@ class SyncServiceImpl implements SyncService {
       }
       final type = PendingSyncOperationType.values[item.operationTypeIndex];
       try {
-        switch (type) {
-          case PendingSyncOperationType.insertTransaction:
-            final t = decodeTransactionPayload(item.payloadJson);
-            final txRow = transactionToSupabaseRow(t);
-            txRow['user_id'] = authUid;
-            await client.from(SupabaseTables.transactions).upsert(
-                  txRow,
-                  onConflict: 'id',
-                );
-            await _transactionsRepository.markTransactionSynced(t.id);
-            break;
-          case PendingSyncOperationType.upsertAccount:
-            final a = decodeAccountPayload(item.payloadJson);
-            final accountRow = accountToSupabaseRow(a);
-            accountRow['user_id'] = authUid;
-            await client.from(SupabaseTables.accounts).upsert(
-                  accountRow,
-                  onConflict: 'id',
-                );
-            break;
-          case PendingSyncOperationType.deleteAccount:
-            final id = decodeIdPayload(item.payloadJson);
-            await client.from(SupabaseTables.accounts).delete().eq('id', id);
-            break;
-          case PendingSyncOperationType.upsertGoal:
-            final g = decodeGoalPayload(item.payloadJson);
-            final goalRow = goalToSupabaseRow(g);
-            goalRow['user_id'] = authUid;
-            await client.from(SupabaseTables.goals).upsert(
-                  goalRow,
-                  onConflict: 'id',
-                );
-            break;
-          case PendingSyncOperationType.deleteGoal:
-            final id = decodeIdPayload(item.payloadJson);
-            await client.from(SupabaseTables.goals).delete().eq('id', id);
-            break;
-          case PendingSyncOperationType.deleteTransaction:
-            final id = decodeIdPayload(item.payloadJson);
-            await client.from(SupabaseTables.transactions).delete().eq('id', id);
-            break;
-          case PendingSyncOperationType.upsertBudgetGroup:
-            final bg = decodeBudgetGroupPayload(item.payloadJson);
-            final row = budgetGroupToSupabaseRow(bg);
-            row['user_id'] = authUid;
-            await client.from(SupabaseTables.budgetGroups).upsert(
-                  row,
-                  onConflict: 'id',
-                );
-            break;
-          case PendingSyncOperationType.deleteBudgetGroup:
-            final id = decodeIdPayload(item.payloadJson);
-            await client.from(SupabaseTables.budgetGroups).delete().eq('id', id);
-            break;
+        final syncedTransactionId = await _remote.apply(
+          type: type,
+          payloadJson: item.payloadJson,
+        );
+        if (syncedTransactionId != null) {
+          await _transactionsRepository.markTransactionSynced(
+            syncedTransactionId,
+          );
         }
         await _queue.remove(item.queueId);
       } on Object catch (e, st) {
