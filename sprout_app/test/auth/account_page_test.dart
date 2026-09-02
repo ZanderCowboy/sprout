@@ -66,7 +66,7 @@ void main() {
         authRepository: fakeAuth,
         userContext: UserContext(settingsBox),
         appConfig: config,
-        clearLocalData: () async {},
+        localSessionCleaner: FakeLocalSessionCleaner(),
         flushPending: () async {},
         pullRemote: () async {},
       ),

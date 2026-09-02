@@ -25,7 +25,9 @@ import 'package:sprout/features/auth/application/auth_service.dart';
 import 'package:sprout/features/auth/application/privacy_policy_service.dart';
 import 'package:sprout/features/auth/application/terms_of_service_service.dart';
 import 'package:sprout/features/auth/data/auth_repository_impl.dart';
+import 'package:sprout/features/auth/data/local_session_cleaner_impl.dart';
 import 'package:sprout/features/auth/domain/auth_repository.dart';
+import 'package:sprout/features/auth/domain/local_session_cleaner.dart';
 import 'package:sprout/features/budget/application/budget_service.dart';
 import 'package:sprout/features/budget/data/budget_repository_impl.dart';
 import 'package:sprout/features/budget/data/local/models/budget_group_hive_model.dart';
@@ -37,6 +39,8 @@ import 'package:sprout/features/goals/domain/goals_repository.dart';
 import 'package:sprout/features/purchases/presentation/premium_paywall_helper.dart';
 import 'package:sprout/features/sync/application/sync_service.dart';
 import 'package:sprout/features/sync/data/pending_sync_queue.dart';
+import 'package:sprout/features/sync/data/supabase_sync_remote_datasource.dart';
+import 'package:sprout/features/sync/domain/sync_remote_datasource.dart';
 import 'package:sprout/features/transactions/application/transactions_service.dart';
 import 'package:sprout/features/transactions/data/local/pending_sync_hive_model.dart';
 import 'package:sprout/features/transactions/data/local/transaction_hive_model.dart';
@@ -96,29 +100,6 @@ Future<void> configureDependencies({
     ),
   );
 
-  sl.registerLazySingleton<AuthService>(
-    () => AuthServiceImpl(
-      authRepository: sl(),
-      userContext: sl(),
-      appConfig: sl(),
-      clearLocalData: () async {
-        await sl<AccountsRepository>().clearLocal();
-        await sl<GoalsRepository>().clearLocal();
-        await sl<BudgetRepository>().clearLocal();
-        await sl<TransactionsRepository>().clearLocal();
-        await sl<PendingSyncQueue>().clear();
-      },
-      flushPending: () => sl<SyncService>().flushPending(),
-      pullRemote: () async {
-        await sl<AccountsRepository>().pullRemote();
-        await sl<GoalsRepository>().pullRemote();
-        await sl<BudgetRepository>().pullRemote();
-        await sl<TransactionsRepository>().pullRemote();
-      },
-      logOutPurchases: PremiumPaywall.logOutIfConfigured,
-    ),
-  );
-
   bool canSync() => sl<AuthService>().canSync;
 
   final pendingForRepos = appConfig.isSupabaseConfigured ? pendingQueue : null;
@@ -174,11 +155,42 @@ Future<void> configureDependencies({
     () => TransactionsServiceImpl(sl()),
   );
 
+  sl.registerLazySingleton<LocalSessionCleaner>(
+    () => LocalSessionCleanerImpl(
+      accountsRepository: sl(),
+      goalsRepository: sl(),
+      budgetRepository: sl(),
+      transactionsRepository: sl(),
+      pendingQueue: sl(),
+    ),
+  );
+
+  sl.registerLazySingleton<AuthService>(
+    () => AuthServiceImpl(
+      authRepository: sl(),
+      userContext: sl(),
+      appConfig: sl(),
+      localSessionCleaner: sl(),
+      flushPending: () => sl<SyncService>().flushPending(),
+      pullRemote: () async {
+        await sl<AccountsRepository>().pullRemote();
+        await sl<GoalsRepository>().pullRemote();
+        await sl<BudgetRepository>().pullRemote();
+        await sl<TransactionsRepository>().pullRemote();
+      },
+      logOutPurchases: PremiumPaywall.logOutIfConfigured,
+    ),
+  );
+
+  sl.registerLazySingleton<SyncRemoteDatasource>(
+    () => SupabaseSyncRemoteDatasource(supabaseClient),
+  );
+
   sl.registerLazySingleton<SyncService>(
     () => SyncServiceImpl(
       queue: sl(),
       config: sl(),
-      supabase: supabaseClient,
+      remote: sl(),
       transactionsRepository: sl(),
       canSync: canSync,
     ),

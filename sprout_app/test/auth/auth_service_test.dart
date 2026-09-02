@@ -45,6 +45,7 @@ void main() {
   late Box<PendingSyncHiveModel> pendingBox;
   late Box<dynamic> settingsBox;
   late FakeAuthRepository fakeAuth;
+  late FakeLocalSessionCleaner sessionCleaner;
   late UserContext userContext;
   late AuthService authService;
   var flushCalls = 0;
@@ -58,13 +59,7 @@ void main() {
       authRepository: fakeAuth,
       userContext: userContext,
       appConfig: appConfig ?? _testAppConfig,
-      clearLocalData: () async {
-        await accountsBox.clear();
-        await goalsBox.clear();
-        await budgetGroupsBox.clear();
-        await transactionsBox.clear();
-        await pendingBox.clear();
-      },
+      localSessionCleaner: sessionCleaner,
       flushPending: () async {
         flushCalls++;
       },
@@ -90,6 +85,15 @@ void main() {
     pendingBox = await Hive.openBox<PendingSyncHiveModel>('pending_$stamp');
     settingsBox = await Hive.openBox<dynamic>('settings_$stamp');
     fakeAuth = FakeAuthRepository();
+    sessionCleaner = FakeLocalSessionCleaner(
+      onClear: () async {
+        await accountsBox.clear();
+        await goalsBox.clear();
+        await budgetGroupsBox.clear();
+        await transactionsBox.clear();
+        await pendingBox.clear();
+      },
+    );
     userContext = UserContext(settingsBox);
     flushCalls = 0;
     pullCalls = 0;

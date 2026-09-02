@@ -18,7 +18,6 @@ import 'package:sprout/features/sync/data/pending_sync_queue.dart';
 import 'package:sprout/features/sync/export.dart';
 import 'package:sprout/features/transactions/data/local/pending_sync_hive_model.dart';
 import 'package:sprout/features/transactions/data/local/transaction_hive_model.dart';
-import 'package:sprout/features/transactions/domain/transactions_repository.dart';
 
 import '../mocks/mocks.dart';
 
@@ -89,7 +88,7 @@ void main() {
       authRepository: fake,
       userContext: UserContext(settingsBox),
       appConfig: config(supabase: true),
-      clearLocalData: () async {},
+      localSessionCleaner: FakeLocalSessionCleaner(),
       flushPending: () async {},
       pullRemote: () async {},
     );
@@ -156,22 +155,121 @@ void main() {
       '{"id":"x"}',
     );
     var flushed = false;
+    final remote = FakeSyncRemoteDatasource();
     final sync = SyncServiceImpl(
       queue: queue,
       config: config(supabase: true),
-      supabase: null,
-      transactionsRepository: _UnusedTransactionsRepository(),
+      remote: remote,
+      transactionsRepository: FakeTransactionsRepository(),
       canSync: () => false,
       onAfterFlush: () => flushed = true,
     );
 
     await sync.flushPending();
     expect(queue.length, 1);
+    expect(remote.appliedTypes, isEmpty);
     expect(flushed, isTrue);
   });
-}
 
-class _UnusedTransactionsRepository implements TransactionsRepository {
-  @override
-  noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+  test('SyncService.flushPending no-ops when remote has no session', () async {
+    final queue = PendingSyncQueue(pendingBox);
+    await queue.enqueue(
+      PendingSyncOperationType.upsertAccount,
+      '{"id":"x"}',
+    );
+    final remote = FakeSyncRemoteDatasource(authUserId: null);
+    final sync = SyncServiceImpl(
+      queue: queue,
+      config: config(supabase: true),
+      remote: remote,
+      transactionsRepository: FakeTransactionsRepository(),
+      canSync: () => true,
+    );
+
+    await sync.flushPending();
+    expect(queue.length, 1);
+    expect(remote.appliedTypes, isEmpty);
+  });
+
+  test('SyncService.flushPending applies ops then dequeues', () async {
+    final queue = PendingSyncQueue(pendingBox);
+    await queue.enqueue(
+      PendingSyncOperationType.upsertAccount,
+      '{"id":"a1"}',
+    );
+    await queue.enqueue(
+      PendingSyncOperationType.deleteGoal,
+      '{"id":"g1"}',
+    );
+    final remote = FakeSyncRemoteDatasource();
+    final transactions = FakeTransactionsRepository();
+    final sync = SyncServiceImpl(
+      queue: queue,
+      config: config(supabase: true),
+      remote: remote,
+      transactionsRepository: transactions,
+      canSync: () => true,
+    );
+
+    await sync.flushPending();
+
+    expect(
+      remote.appliedTypes,
+      unorderedEquals([
+        PendingSyncOperationType.upsertAccount,
+        PendingSyncOperationType.deleteGoal,
+      ]),
+    );
+    expect(queue.length, 0);
+    expect(transactions.markedSyncedIds, isEmpty);
+  });
+
+  test('SyncService.flushPending marks insertTransaction synced', () async {
+    final queue = PendingSyncQueue(pendingBox);
+    await queue.enqueue(
+      PendingSyncOperationType.insertTransaction,
+      '{"id":"tx-9"}',
+    );
+    final remote = FakeSyncRemoteDatasource(syncedTransactionId: 'tx-9');
+    final transactions = FakeTransactionsRepository();
+    final sync = SyncServiceImpl(
+      queue: queue,
+      config: config(supabase: true),
+      remote: remote,
+      transactionsRepository: transactions,
+      canSync: () => true,
+    );
+
+    await sync.flushPending();
+
+    expect(remote.appliedTypes, [PendingSyncOperationType.insertTransaction]);
+    expect(transactions.markedSyncedIds, ['tx-9']);
+    expect(queue.length, 0);
+  });
+
+  test('SyncService.flushPending stops on first remote failure', () async {
+    final queue = PendingSyncQueue(pendingBox);
+    await queue.enqueue(
+      PendingSyncOperationType.upsertAccount,
+      '{"id":"a1"}',
+    );
+    await queue.enqueue(
+      PendingSyncOperationType.upsertGoal,
+      '{"id":"g1"}',
+    );
+    final remote = FakeSyncRemoteDatasource()
+      ..applyError = StateError('remote down');
+    final sync = SyncServiceImpl(
+      queue: queue,
+      config: config(supabase: true),
+      remote: remote,
+      transactionsRepository: FakeTransactionsRepository(),
+      canSync: () => true,
+    );
+
+    await sync.flushPending();
+
+    expect(remote.appliedTypes, isEmpty);
+    expect(queue.length, 2);
+  });
 }

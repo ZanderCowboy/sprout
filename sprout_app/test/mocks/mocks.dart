@@ -7,6 +7,9 @@ import 'package:sprout/features/accounts/domain/account.dart';
 import 'package:sprout/features/accounts/domain/accounts_repository.dart';
 import 'package:sprout/features/auth/domain/auth_repository.dart';
 import 'package:sprout/features/auth/domain/auth_user.dart';
+import 'package:sprout/features/auth/domain/local_session_cleaner.dart';
+import 'package:sprout/features/sync/domain/pending_sync_operation.dart';
+import 'package:sprout/features/sync/domain/sync_remote_datasource.dart';
 import 'package:sprout/features/budget/domain/budget_group.dart';
 import 'package:sprout/features/budget/domain/budget_repository.dart';
 import 'package:sprout/features/goals/domain/goal.dart';
@@ -130,6 +133,49 @@ class FakeAuthRepository implements AuthRepository {
   }
 }
 
+class FakeLocalSessionCleaner implements LocalSessionCleaner {
+  FakeLocalSessionCleaner({this.onClear});
+
+  final Future<void> Function()? onClear;
+  int clearCalls = 0;
+
+  @override
+  Future<void> clearLocalEntityData() async {
+    clearCalls++;
+    await onClear?.call();
+  }
+}
+
+class FakeSyncRemoteDatasource implements SyncRemoteDatasource {
+  FakeSyncRemoteDatasource({
+    this.authUserId = 'auth-uid',
+    this.syncedTransactionId,
+  });
+
+  @override
+  String? authUserId;
+
+  final List<PendingSyncOperationType> appliedTypes = [];
+  final List<String> appliedPayloads = [];
+  Object? applyError;
+  String? syncedTransactionId;
+
+  @override
+  Future<String?> apply({
+    required PendingSyncOperationType type,
+    required String payloadJson,
+  }) async {
+    final error = applyError;
+    if (error != null) throw error;
+    appliedTypes.add(type);
+    appliedPayloads.add(payloadJson);
+    if (type == PendingSyncOperationType.insertTransaction) {
+      return syncedTransactionId ?? 'tx-1';
+    }
+    return null;
+  }
+}
+
 class FakeRemoteConfigService implements RemoteConfigService {
   FakeRemoteConfigService({Map<String, String> strings = const {}})
     : _strings = Map.of(strings);
@@ -167,6 +213,7 @@ class FakeTransactionsRepository implements TransactionsRepository {
   int addTransactionCalls = 0;
   Transaction? lastAdded;
   Transaction? lastUpdatedRecurring;
+  final List<String> markedSyncedIds = [];
 
   List<Transaction> get items => List.unmodifiable(_transactions);
 
@@ -306,7 +353,9 @@ class FakeTransactionsRepository implements TransactionsRepository {
   }
 
   @override
-  Future<void> markTransactionSynced(String id) async {}
+  Future<void> markTransactionSynced(String id) async {
+    markedSyncedIds.add(id);
+  }
 
   @override
   Future<void> pullRemote() async {}
