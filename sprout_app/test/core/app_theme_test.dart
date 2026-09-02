@@ -8,6 +8,7 @@ void main() {
   test('buildAppTheme is dark with Sprout palette', () {
     final theme = buildAppTheme();
 
+    expect(AppRadii.card, 18);
     expect(theme.brightness, Brightness.dark);
     expect(theme.useMaterial3, isTrue);
     expect(theme.colorScheme.primary, AppColors.seed);

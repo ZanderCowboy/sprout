@@ -34,6 +34,9 @@ abstract final class SemanticsIds {
   static const accountDeleteCancel = 'account_delete_cancel';
 
   // --- Shell ---
+  static const shellHeader = 'shell_header';
+  static const shellHeaderMenu = 'shell_header_menu';
+  static const shellHeaderMore = 'shell_header_more';
   static const shellTabOverview = 'shell_tab_overview';
   static const shellTabAccounts = 'shell_tab_accounts';
   static const shellAdd = 'shell_add';

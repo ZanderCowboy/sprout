@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:sprout/core/core.dart';
+
 class ShellTabItem extends StatelessWidget {
   const ShellTabItem({
     super.key,
@@ -21,7 +23,7 @@ class ShellTabItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final color = selected ? scheme.primary : scheme.onSurfaceVariant;
+    final color = selected ? AppColors.seed : scheme.onSurfaceVariant;
     return Semantics(
       identifier: identifier,
       button: true,
@@ -31,7 +33,7 @@ class ShellTabItem extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(16),
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -39,9 +41,11 @@ class ShellTabItem extends StatelessWidget {
               const SizedBox(height: 4),
               Text(
                 label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+                  fontSize: 11,
+                  fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
                   color: color,
                 ),
               ),
