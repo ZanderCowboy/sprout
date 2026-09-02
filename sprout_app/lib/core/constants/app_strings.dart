@@ -1,6 +1,8 @@
 abstract final class AppStrings {
   // --- App chrome ---
   static const String appTitle = 'Sprout';
+  static const String openMenu = 'Open menu';
+  static const String moreOptions = 'More options';
   static const String tabOverview = 'Overview';
   static const String tabAccounts = 'Accounts';
   static const String tabGoals = 'Goals';
@@ -188,7 +190,8 @@ abstract final class AppStrings {
       'Available after you add a goal.';
   static const String noTransactionsYet = 'No transactions yet.';
   static const String noRecurringDepositsYet = 'No recurring deposits yet.';
-  static const String noDepositsForAccount = 'No deposits yet for this account.';
+  static const String noDepositsForAccount =
+      'No deposits yet for this account.';
   static const String noDepositsTowardGoal =
       'No deposits toward this goal yet.';
   static const String noAllocationsInGroup = 'No allocations in this group.';
@@ -259,13 +262,11 @@ abstract final class AppStrings {
   static const String allocatedTotal = 'Allocated total';
   static const String recurringPayments = 'Recurring payments';
   static const String editRecurringPayment = 'Edit recurring payment';
-  static const String cancelRecurringPaymentTitle =
-      'Cancel recurring payment?';
+  static const String cancelRecurringPaymentTitle = 'Cancel recurring payment?';
   static const String cancelRecurringPaymentBody =
       'This will remove the recurring payment. Existing transactions already in your history will remain.';
   static const String recurringDeposit = 'Recurring deposit';
-  static const String recurringDepositDisabled =
-      'Recurring deposit (Disabled)';
+  static const String recurringDepositDisabled = 'Recurring deposit (Disabled)';
   static const String recurringDepositWontApply =
       'This recurring deposit won’t be applied.';
   static const String cancelRemove = 'Cancel (remove)';
@@ -306,15 +307,12 @@ abstract final class AppStrings {
 
   // --- Settings ---
   static const String premiumUnlocked = 'Premium unlocked.';
-  static const String subscriptionUpdateFailed =
-      'Subscription update failed.';
+  static const String subscriptionUpdateFailed = 'Subscription update failed.';
   static const String checkingSubscription = 'Checking subscription...';
   static const String premiumActive = 'Premium active';
-  static const String unlockPremium =
-      'Unlock premium with Monthly or Annual';
+  static const String unlockPremium = 'Unlock premium with Monthly or Annual';
   static const String sproutPremium = 'Sprout Premium';
-  static const String viewAllDeposits =
-      'View all deposits and allocations';
+  static const String viewAllDeposits = 'View all deposits and allocations';
   static const String viewEditCancelRecurring =
       'View, edit, or cancel recurring deposits';
   static const String planIncomeExpenses =
@@ -358,8 +356,7 @@ abstract final class AppStrings {
       'This will remove $count future-dated '
       'transaction${count == 1 ? '' : 's'} from this $scope.';
 
-  static String removeNamedConfirm(String name) =>
-      'This will remove “$name”.';
+  static String removeNamedConfirm(String name) => 'This will remove “$name”.';
 
   static String readyToSproutUnallocated(String amount) =>
       'Ready to Sprout! You have $amount waiting to be assigned.';
@@ -387,8 +384,7 @@ abstract final class AppStrings {
     required int percent,
     required String saved,
     required String target,
-  }) =>
-      'Overall goals progress. $percent percent. Saved $saved of $target.';
+  }) => 'Overall goals progress. $percent percent. Saved $saved of $target.';
 
   static String goalCardSemantics({
     required String name,
@@ -403,11 +399,9 @@ abstract final class AppStrings {
 
   static String goalChartLabel(String amount) => 'Goal: $amount';
 
-  static String kindAmountLabel(String kind, String amount) =>
-      '$kind $amount';
+  static String kindAmountLabel(String kind, String amount) => '$kind $amount';
 
-  static String kindSubtitle(String kind, String detail) =>
-      '$kind · $detail';
+  static String kindSubtitle(String kind, String detail) => '$kind · $detail';
 
   static String recurringDot(String freq) => 'Recurring · $freq';
 
