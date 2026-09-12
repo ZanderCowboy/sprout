@@ -24,6 +24,7 @@ import 'package:sprout/features/auth/presentation/privacy_page.dart';
 import 'package:sprout/features/auth/presentation/sign_in_page.dart';
 import 'package:sprout/features/auth/presentation/terms_page.dart';
 import 'package:sprout/features/connectivity/presentation/connectivity_cubit.dart';
+import 'package:sprout/ui/export.dart';
 
 import '../mocks/mocks.dart';
 
@@ -288,14 +289,18 @@ void main() {
     );
     await tester.pump();
 
-    final sendCodeButton = tester.widget<SproutFilledButton>(
-      find.widgetWithText(SproutFilledButton, AppStrings.sendCode),
+    final sendCodeButtonFinder = find.ancestor(
+      of: find.text(AppStrings.sendCode),
+      matching: find.byType(SproutFilledButton),
     );
+    final sendCodeButton = tester.widget<SproutFilledButton>(sendCodeButtonFinder);
     expect(sendCodeButton.onPressed, isNull);
 
-    final googleButton = tester.widget<SproutOutlinedButton>(
-      find.widgetWithText(SproutOutlinedButton, AppStrings.continueWithGoogle),
+    final googleButtonFinder = find.ancestor(
+      of: find.text(AppStrings.continueWithGoogle),
+      matching: find.byType(SproutOutlinedButton),
     );
+    final googleButton = tester.widget<SproutOutlinedButton>(googleButtonFinder);
     expect(googleButton.onPressed, isNull);
   });
 }
