@@ -15,7 +15,7 @@ class ConnectivityCubit extends Cubit<bool> {
   }
 
   @visibleForTesting
-  ConnectivityCubit.seeded(bool online) : super(online);
+  ConnectivityCubit.seeded(super.online);
 
   StreamSubscription<List<ConnectivityResult>>? _subscription;
 

@@ -23,6 +23,7 @@ import 'package:sprout/features/auth/presentation/bloc/auth_cubit.dart';
 import 'package:sprout/features/auth/presentation/privacy_page.dart';
 import 'package:sprout/features/auth/presentation/sign_in_page.dart';
 import 'package:sprout/features/auth/presentation/terms_page.dart';
+import 'package:sprout/features/connectivity/presentation/connectivity_cubit.dart';
 
 import '../mocks/mocks.dart';
 
