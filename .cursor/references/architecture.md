@@ -18,6 +18,7 @@ sprout_app/lib/features/<feature>/
     mappers/                  # hive + supabase mappers (no mapping in UI)
   presentation/
     *_page.dart / *_screen.dart   # UI only — one public widget per file
+    _*.dart                       # private widget part files (part of parent page)
     *_bloc.dart / bloc/           # bloc/cubit class only
     *_event.dart / *_state.dart   # part files for bloc/cubit (part of parent)
     widgets/                      # extra widgets extracted from pages
@@ -84,4 +85,5 @@ Cross-feature imports go through `package:sprout/features/<other>/export.dart`. 
 - **Services:** `abstract class FooService` in `foo_service.dart` (class + public method docstrings); `FooServiceImpl` in `foo_service_impl.dart`. DI registers `FooService` → `FooServiceImpl`. Barrels export the abstract only.
 - **Blocs/cubits:** events and states in sibling `*_event.dart` / `*_state.dart` files using `part of` the parent `*_bloc.dart` or `*_cubit.dart`.
 - **Presentation:** one public widget class per `*_page.dart` / `*_screen.dart`; extract additional widgets to `presentation/widgets/` as public classes.
+- **Presentation private widgets:** Split private widget classes (leading `_`) into sibling `part` files using `part` / `part of` (same pattern as bloc/cubit event/state parts). Private widget classes go in `_snake_case.dart` part files with `part of 'parent_page.dart';` at top. Parent page imports parts: `part '_snake_case.dart';` after imports. Do not accumulate many private widgets in one page file.
 - Pages must not contain enums, sort helpers, or business rules.
