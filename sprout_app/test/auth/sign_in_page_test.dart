@@ -91,8 +91,8 @@ void main() {
         theme: buildAppTheme(),
         home: MultiBlocProvider(
           providers: [
-            BlocProvider.value(value: cubit),
-            BlocProvider.value(value: connectivity),
+            BlocProvider<AuthCubit>.value(value: cubit),
+            BlocProvider<ConnectivityCubit>.value(value: connectivity),
           ],
           child: const SignInPage(),
         ),
@@ -118,8 +118,8 @@ void main() {
         theme: buildAppTheme(),
         home: MultiBlocProvider(
           providers: [
-            BlocProvider.value(value: cubit),
-            BlocProvider.value(value: connectivity),
+            BlocProvider<AuthCubit>.value(value: cubit),
+            BlocProvider<ConnectivityCubit>.value(value: connectivity),
           ],
           child: SignInPage(onBackToIntro: () => back = true),
         ),
@@ -138,8 +138,8 @@ void main() {
         theme: buildAppTheme(),
         home: MultiBlocProvider(
           providers: [
-            BlocProvider.value(value: cubit),
-            BlocProvider.value(value: connectivity),
+            BlocProvider<AuthCubit>.value(value: cubit),
+            BlocProvider<ConnectivityCubit>.value(value: connectivity),
           ],
           child: const SignInPage(),
         ),
@@ -174,8 +174,8 @@ void main() {
     await tester.pumpWidget(
       MultiBlocProvider(
         providers: [
-          BlocProvider.value(value: cubit),
-          BlocProvider.value(value: connectivity),
+          BlocProvider<AuthCubit>.value(value: cubit),
+          BlocProvider<ConnectivityCubit>.value(value: connectivity),
         ],
         child: MaterialApp.router(
           theme: buildAppTheme(),
@@ -220,8 +220,8 @@ void main() {
     await tester.pumpWidget(
       MultiBlocProvider(
         providers: [
-          BlocProvider.value(value: cubit),
-          BlocProvider.value(value: connectivity),
+          BlocProvider<AuthCubit>.value(value: cubit),
+          BlocProvider<ConnectivityCubit>.value(value: connectivity),
         ],
         child: MaterialApp.router(
           theme: buildAppTheme(),
@@ -258,8 +258,8 @@ void main() {
         theme: buildAppTheme(),
         home: MultiBlocProvider(
           providers: [
-            BlocProvider.value(value: cubit),
-            BlocProvider.value(value: connectivity),
+            BlocProvider<AuthCubit>.value(value: cubit),
+            BlocProvider<ConnectivityCubit>.value(value: connectivity),
           ],
           child: const SignInPage(),
         ),
@@ -278,8 +278,8 @@ void main() {
         theme: buildAppTheme(),
         home: MultiBlocProvider(
           providers: [
-            BlocProvider.value(value: cubit),
-            BlocProvider.value(value: connectivity),
+            BlocProvider<AuthCubit>.value(value: cubit),
+            BlocProvider<ConnectivityCubit>.value(value: connectivity),
           ],
           child: const SignInPage(),
         ),
