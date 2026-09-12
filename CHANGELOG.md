@@ -2,6 +2,11 @@
 
 Changes heading to `main`. Newest entries at the top.
 
+## 2026-09-12 — Flutter 3.41.4
+
+- Project and CI pin Flutter **3.41.4** (Dart 3.11.1, DevTools 2.54.1)
+- README shows version badges plus the prerequisites table
+
 ## 2026-09-12 — First-win setup wizard
 
 - Fresh signup / first successful sign-in routes into 3-step wizard before Overview
