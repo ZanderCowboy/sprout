@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sprout/core/config/app_config.dart';
 import 'package:sprout/core/flags/remote_config_service.dart';
 import 'package:sprout/core/flags/remote_feature_flag.dart';
@@ -564,4 +565,10 @@ class FakeBudgetRepository implements BudgetRepository {
   Future<void> dispose() async {
     await _controller.close();
   }
+}
+
+class FakeConnectivityCubit extends Cubit<bool> {
+  FakeConnectivityCubit({bool initialOnline = true}) : super(initialOnline);
+
+  void setOnline(bool online) => emit(online);
 }
