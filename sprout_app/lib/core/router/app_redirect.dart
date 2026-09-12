@@ -9,6 +9,7 @@ Future<String?> resolveAuthRedirect({
   required UserContext userContext,
   required String location,
   Uri? uri,
+  Future<bool> Function()? hasExistingSetup,
 }) async {
   bool locIs(AppRoute route) => location == route.path;
 
@@ -27,8 +28,13 @@ Future<String?> resolveAuthRedirect({
   if (auth is! AuthViewGuest) {
     final userId = userContext.cachedUserId;
     if (userId != null) {
-      final firstRunCompleted =
-          await userContext.getFirstRunCompleted(userId);
+      var firstRunCompleted = await userContext.getFirstRunCompleted(userId);
+      if (!firstRunCompleted && hasExistingSetup != null) {
+        if (await hasExistingSetup()) {
+          await userContext.markFirstRunCompleted(userId);
+          firstRunCompleted = true;
+        }
+      }
       if (!firstRunCompleted) {
         return locIs(AppRoute.wizard) ? null : AppRoute.wizard.path;
       }

@@ -8,8 +8,10 @@ import 'package:sprout/core/core.dart';
 import 'package:sprout/core/di/service_locator.dart';
 import 'package:sprout/core/router/app_router.dart';
 import 'package:sprout/core/router/go_router_refresh_stream.dart';
+import 'package:sprout/features/accounts/export.dart';
 import 'package:sprout/features/auth/export.dart';
 import 'package:sprout/features/connectivity/export.dart';
+import 'package:sprout/features/goals/export.dart';
 import 'package:sprout/ui/export.dart';
 
 class SproutApp extends StatefulWidget {
@@ -33,6 +35,7 @@ class _SproutAppState extends State<SproutApp> {
       authCubit: _authCubit,
       userContext: sl<UserContext>(),
       refreshListenable: _refresh,
+      hasExistingSetup: _hasExistingSetup,
     );
   }
 
@@ -42,6 +45,13 @@ class _SproutAppState extends State<SproutApp> {
     _refresh.dispose();
     unawaited(_authCubit.close());
     super.dispose();
+  }
+
+  Future<bool> _hasExistingSetup() async {
+    final accounts = await sl<AccountsService>().getAccounts();
+    if (accounts.isNotEmpty) return true;
+    final goals = await sl<GoalsService>().getGoals();
+    return goals.isNotEmpty;
   }
 
   @override

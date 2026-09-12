@@ -2,6 +2,12 @@
 
 Changes heading to `main`. Newest entries at the top.
 
+## 2026-09-12 — Wizard first-run edges
+
+- Users who already have a goal or account skip the wizard instead of creating duplicates
+- Finish/save failures show a snackbar on the wizard
+- Overview empty and populated quick actions match the numbered steps: goal, account, deposit
+
 ## 2026-09-12 — Wizard setup polish
 
 - Goal, account, and deposit steps use the same icons and full color palette as the rest of the app

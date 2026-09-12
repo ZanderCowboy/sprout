@@ -6,13 +6,20 @@ class _WizardBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocListener<WizardCubit, WizardState>(
-      listenWhen: (prev, curr) =>
-          curr is WizardSkipped || curr is WizardCompleted,
+      listenWhen: (prev, curr) {
+        if (curr is WizardSkipped || curr is WizardCompleted) return true;
+        if (curr is! WizardReady || curr.errorMessage == null) return false;
+        return prev is! WizardReady || prev.errorMessage != curr.errorMessage;
+      },
       listener: (context, state) {
         if (state is WizardSkipped) {
           context.go(AppRoute.overview.path);
         } else if (state is WizardCompleted) {
           context.go(AppRoute.overview.path, extra: {'showWelcomeToast': true});
+        } else if (state is WizardReady && state.errorMessage != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(state.errorMessage!)),
+          );
         }
       },
       child: Scaffold(

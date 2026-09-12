@@ -20,6 +20,7 @@ GoRouter createAppRouter({
   required UserContext userContext,
   required GoRouterRefreshStream refreshListenable,
   GlobalKey<NavigatorState>? navigatorKey,
+  Future<bool> Function()? hasExistingSetup,
 }) {
   final rootKey = navigatorKey ?? GlobalKey<NavigatorState>(debugLabel: 'root');
 
@@ -34,6 +35,7 @@ GoRouter createAppRouter({
         userContext: userContext,
         location: state.matchedLocation,
         uri: state.uri,
+        hasExistingSetup: hasExistingSetup,
       );
     },
     routes: [

@@ -6,6 +6,7 @@ import 'package:sprout/core/constants/app_strings.dart';
 import 'package:sprout/core/user/user_context.dart';
 import 'package:sprout/features/accounts/application/accounts_service_impl.dart';
 import 'package:sprout/features/goals/application/goals_service_impl.dart';
+import 'package:sprout/features/goals/domain/goal.dart';
 import 'package:sprout/features/transactions/application/transactions_service_impl.dart';
 import 'package:sprout/features/wizard/presentation/wizard_cubit.dart';
 
@@ -102,6 +103,25 @@ void main() {
     cubit.setDepositAmount('');
     expect(ready().depositAmountError, isNull);
     expect(cubit.canFinish, isFalse);
+  });
+
+  test('load skips when the user already has a goal', () async {
+    await goalsRepo.upsertGoal(
+      Goal(
+        id: 'g1',
+        userId: 'u',
+        name: 'House',
+        targetAmountCents: 10000,
+        color: 0xFF000000,
+        createdAt: DateTime(2026, 1, 1),
+        updatedAt: DateTime(2026, 1, 1),
+      ),
+    );
+    await cubit.load();
+    expect(cubit.state, isA<WizardSkipped>());
+    final uid = await userContext.resolveUserId();
+    expect(await userContext.getFirstRunCompleted(uid), isTrue);
+    expect(await userContext.takePendingWelcomeToast(uid), isNull);
   });
 
   test('skip does not queue a welcome toast', () async {

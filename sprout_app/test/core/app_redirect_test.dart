@@ -49,6 +49,7 @@ void main() {
     required bool introCompleted,
     required String location,
     Uri? uri,
+    Future<bool> Function()? hasExistingSetup,
   }) {
     return resolveAuthRedirect(
       auth: auth,
@@ -56,6 +57,7 @@ void main() {
       userContext: userContext,
       location: location,
       uri: uri,
+      hasExistingSetup: hasExistingSetup,
     );
   }
 
@@ -248,6 +250,29 @@ void main() {
           location: AppRoute.signIn.path,
         ),
         AppRoute.wizard.path,
+      );
+    });
+
+    test('signed-in with existing setup skips wizard', () async {
+      await userContext.setActiveUserId('u1');
+      expect(
+        await redirect(
+          auth: signedIn,
+          introCompleted: true,
+          location: AppRoute.overview.path,
+          hasExistingSetup: () async => true,
+        ),
+        isNull,
+      );
+      expect(await userContext.getFirstRunCompleted('u1'), isTrue);
+      expect(
+        await redirect(
+          auth: signedIn,
+          introCompleted: true,
+          location: AppRoute.wizard.path,
+          hasExistingSetup: () async => true,
+        ),
+        AppRoute.overview.path,
       );
     });
 

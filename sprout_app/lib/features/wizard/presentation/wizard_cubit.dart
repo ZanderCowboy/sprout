@@ -54,6 +54,12 @@ class WizardCubit extends Cubit<WizardState> {
     _existingGoals = goals.map((g) => (id: g.id, name: g.name)).toList();
     final accounts = await _accountsService.getAccounts();
     _existingAccounts = accounts.map((a) => (id: a.id, name: a.name)).toList();
+    if (goals.isNotEmpty || accounts.isNotEmpty) {
+      final uid = await _userContext.resolveUserId();
+      await _userContext.markFirstRunCompleted(uid);
+      emit(const WizardSkipped());
+      return;
+    }
     final current = state;
     if (current is WizardReady) {
       emit(
