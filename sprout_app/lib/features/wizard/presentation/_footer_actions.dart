@@ -21,7 +21,7 @@ class _FooterActions extends StatelessWidget {
         color: AppColors.surfaceBar,
         border: Border(
           top: BorderSide(
-            color: scheme.outlineVariant.withOpacity(0.5),
+            color: scheme.outlineVariant.withValues(alpha: 0.5),
             width: 1,
           ),
         ),

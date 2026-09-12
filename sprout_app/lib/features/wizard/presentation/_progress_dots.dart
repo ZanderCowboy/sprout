@@ -19,7 +19,7 @@ class _ProgressDots extends StatelessWidget {
               shape: BoxShape.circle,
               color: i == currentStep
                   ? scheme.primary
-                  : scheme.onSurfaceVariant.withOpacity(0.3),
+                  : scheme.onSurfaceVariant.withValues(alpha: 0.3),
             ),
           ),
           if (i < 3) const SizedBox(width: 8),

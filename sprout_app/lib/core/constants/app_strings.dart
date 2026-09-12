@@ -44,6 +44,7 @@ abstract final class AppStrings {
   static const String date = 'Date';
   static const String time = 'Time';
   static const String note = 'Note';
+  static const String optional = 'Optional';
   static const String total = 'Total';
   static const String current = 'Current';
   static const String scheduled = 'Scheduled';

@@ -59,7 +59,6 @@ class _OverviewPageState extends State<OverviewPage> {
   }
 
   void _showWelcomeToast() {
-    final scheme = Theme.of(context).colorScheme;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
