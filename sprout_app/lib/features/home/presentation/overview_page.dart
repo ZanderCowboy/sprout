@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 import 'package:sprout/core/core.dart';
+import 'package:sprout/core/di/service_locator.dart';
 import 'package:sprout/features/accounts/export.dart';
 import 'package:sprout/features/goals/export.dart';
 import 'package:sprout/features/shell/shell.dart';
@@ -13,8 +15,76 @@ import 'widgets/overview_activity_row.dart';
 import 'widgets/overview_hero.dart';
 import 'widgets/overview_quick_actions.dart';
 
-class OverviewPage extends StatelessWidget {
+class OverviewPage extends StatefulWidget {
   const OverviewPage({super.key});
+
+  @override
+  State<OverviewPage> createState() => _OverviewPageState();
+}
+
+class _OverviewPageState extends State<OverviewPage> {
+  bool _hasShownWelcomeToast = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_hasShownWelcomeToast) {
+      final userContext = sl<UserContext>();
+      final userId = userContext.cachedUserId;
+      if (userId != null) {
+        _checkAndShowWelcomeToast(userId);
+      }
+    }
+  }
+
+  Future<void> _checkAndShowWelcomeToast(String userId) async {
+    final userContext = sl<UserContext>();
+    final settingsBox = await Hive.openBox<dynamic>('settings');
+    final key = 'wizard_toast_shown_$userId';
+    final shown = settingsBox.get(key) == true;
+    
+    if (!shown && mounted) {
+      final firstRunCompleted =
+          await userContext.getFirstRunCompleted(userId);
+      if (firstRunCompleted && mounted) {
+        _hasShownWelcomeToast = true;
+        await settingsBox.put(key, true);
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            _showWelcomeToast();
+          }
+        });
+      }
+    }
+  }
+
+  void _showWelcomeToast() {
+    final scheme = Theme.of(context).colorScheme;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(
+              Icons.celebration_outlined,
+              color: AppColors.accentLime,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(AppStrings.wizardFirstSeedPlanted),
+            ),
+          ],
+        ),
+        action: SnackBarAction(
+          label: AppStrings.done,
+          onPressed: () {
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          },
+        ),
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 5),
+      ),
+    );
+  }
 
   Future<void> _openNewAccount(BuildContext context) async {
     await showModalBottomSheet<void>(

@@ -44,3 +44,4 @@ flutter:
     - assets/config/production.json
     - assets/legal/terms.md
     - assets/legal/privacy.md
+    - assets/images/sprout-icon.png

@@ -2,6 +2,14 @@
 
 Changes heading to `main`. Newest entries at the top.
 
+## 2026-09-12 — First-win setup wizard
+
+- Fresh signup / first successful sign-in routes into 3-step wizard before Overview
+- Step 1: Goal (name + target), Step 2: Account (name + color), Step 3: Deposit (amount to both)
+- Skip exits immediately and persists — wizard never reappears
+- Finish saves goal + account + deposit (amount > 0) and shows one-time "You're growing" toast
+- Empty Overview CTAs reordered to goal → account → deposit
+
 ## 2026-09-02 — Manage opens Customer Center
 
 - Settings Premium Manage opens RevenueCat Customer Center instead of the paywall

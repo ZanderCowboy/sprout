@@ -55,7 +55,7 @@ class EmptyStateGuidance extends StatelessWidget {
                     GuidanceStep(
                       stepText: AppStrings.overviewEmptyStep1,
                       detailText: AppStrings.overviewEmptyStep1Detail,
-                      icon: Icons.account_balance_wallet_outlined,
+                      icon: Icons.flag_outlined,
                       stepStyle: stepStyle,
                       detailStyle: detailStyle,
                       scheme: scheme,
@@ -64,7 +64,7 @@ class EmptyStateGuidance extends StatelessWidget {
                     GuidanceStep(
                       stepText: AppStrings.overviewEmptyStep2,
                       detailText: AppStrings.overviewEmptyStep2Detail,
-                      icon: Icons.flag_outlined,
+                      icon: Icons.account_balance_wallet_outlined,
                       stepStyle: stepStyle,
                       detailStyle: detailStyle,
                       scheme: scheme,

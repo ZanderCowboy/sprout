@@ -1,0 +1,82 @@
+appId: app.stackmint.sprout.dev
+tags:
+  - wizard
+---
+# Wizard skip: tap Skip → land on empty Overview → verify first_run_completed persisted
+# Run: maestro test .maestro/wizard-skip.yaml
+
+- launchApp:
+    clearState: true
+    clearKeychain: true
+
+- extendedWaitUntil:
+    visible:
+      id: "intro_debug_sign_in"
+    timeout: 45000
+
+- tapOn:
+    id: "intro_debug_sign_in"
+
+# Should redirect to wizard (first run not completed)
+- extendedWaitUntil:
+    visible:
+      id: "wizard_skip"
+    timeout: 10000
+
+- assertVisible:
+    text: "Step 1 of 3"
+
+# Tap Skip immediately (do not advance to step 2)
+- tapOn:
+    id: "wizard_skip"
+
+# Should redirect to Overview
+- extendedWaitUntil:
+    visible:
+      id: "shell_tab_overview"
+    timeout: 10000
+
+# Verify empty state guidance appears
+- assertVisible:
+    text: "Welcome to Sprout"
+
+- assertVisible:
+    text: "1. Create a goal"
+
+- assertVisible:
+    text: "2. Add an account"
+
+- assertVisible:
+    text: "3. Make a deposit"
+
+# Verify empty state CTAs appear in correct order
+- assertVisible:
+    id: "overview_empty_new_goal"
+
+- assertVisible:
+    id: "overview_empty_new_account"
+
+- assertVisible:
+    id: "overview_empty_deposit"
+
+# Verify wizard does NOT reappear on app restart (first_run_completed persisted)
+- stopApp
+
+- launchApp
+
+- extendedWaitUntil:
+    visible:
+      id: "intro_debug_sign_in"
+    timeout: 45000
+
+- tapOn:
+    id: "intro_debug_sign_in"
+
+# Should go directly to Overview (wizard already skipped)
+- extendedWaitUntil:
+    visible:
+      id: "shell_tab_overview"
+    timeout: 10000
+
+- assertVisible:
+    text: "Welcome to Sprout"

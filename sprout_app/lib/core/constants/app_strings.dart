@@ -178,14 +178,32 @@ abstract final class AppStrings {
   static const String introSlide3Body =
       'Your savings stay with your account, not only on this device.';
 
+  // --- First-run wizard ---
+  static const String wizardGoalTitle = 'What are you growing?';
+  static const String wizardGoalSubtitle = 'Name the goal that gets you excited.';
+  static const String wizardAccountTitle = 'Where does the money live?';
+  static const String wizardAccountSubtitle = 
+      'Accounts hold your savings until you plant them toward a goal.';
+  static const String wizardDepositTitle = 'Plant the first seed';
+  static const String wizardDepositSubtitle =
+      'Log money into your account toward';
+  static const String wizardFinish = 'Finish';
+  static const String wizardSkip = 'Skip';
+  static const String wizardFirstSeedPlanted = 
+      "You're growing — first seed planted.";
+  static const String wizardMinimumDeposit = 'Minimum R10';
+  static const String wizardMaximumDeposit = 'Maximum';
+  static const String wizardDepositHint =
+      'Even a small deposit makes Overview come alive.';
+
   // --- Empty state guidance ---
   static const String overviewEmptyTitle = 'Welcome to Sprout';
-  static const String overviewEmptyStep1 = '1. Add an account';
+  static const String overviewEmptyStep1 = '1. Create a goal';
   static const String overviewEmptyStep1Detail =
-      'Create an account to hold your money (e.g. savings, wallet).';
-  static const String overviewEmptyStep2 = '2. Create a goal';
-  static const String overviewEmptyStep2Detail =
       'Set a target to save toward (e.g. vacation, new phone).';
+  static const String overviewEmptyStep2 = '2. Add an account';
+  static const String overviewEmptyStep2Detail =
+      'Create an account to hold your money (e.g. savings, wallet).';
   static const String overviewEmptyStep3 = '3. Make a deposit';
   static const String overviewEmptyStep3Detail =
       'Record money you put into an account and allocate it to a goal.';

@@ -2,6 +2,7 @@ enum AppRoute {
   loading('/loading'),
   intro('/intro'),
   signIn('/sign-in'),
+  wizard('/wizard'),
   terms('/terms'),
   privacy('/privacy'),
   overview('/overview'),

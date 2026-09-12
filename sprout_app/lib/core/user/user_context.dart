@@ -5,6 +5,7 @@ import 'package:uuid/uuid.dart';
 const String _kUserIdKey = 'active_user_id';
 const String _kLastVerifiedUserIdKey = 'last_verified_user_id';
 const String _kIntroCompletedKey = 'intro_completed';
+const String _kFirstRunCompletedKey = 'first_run_completed';
 
 class UserContext {
   UserContext(this._settingsBox, {SupabaseClient? supabaseClient})
@@ -54,5 +55,15 @@ class UserContext {
   Future<void> markIntroCompleted() async {
     _introCompleted = true;
     await _settingsBox.put(_kIntroCompletedKey, true);
+  }
+
+  Future<bool> getFirstRunCompleted(String userId) async {
+    final key = '${_kFirstRunCompletedKey}_$userId';
+    return _settingsBox.get(key) == true;
+  }
+
+  Future<void> markFirstRunCompleted(String userId) async {
+    final key = '${_kFirstRunCompletedKey}_$userId';
+    await _settingsBox.put(key, true);
   }
 }

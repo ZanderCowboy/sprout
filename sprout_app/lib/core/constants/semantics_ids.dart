@@ -18,6 +18,20 @@ abstract final class SemanticsIds {
   static const signInPrivacyLink = 'sign_in_privacy_link';
   static const signInDebugSignIn = 'sign_in_debug_sign_in';
 
+  // --- First-run wizard ---
+  static const wizardSkip = 'wizard_skip';
+  static const wizardNext = 'wizard_next';
+  static const wizardBack = 'wizard_back';
+  static const wizardFinish = 'wizard_finish';
+  static const wizardGoalName = 'wizard_goal_name';
+  static const wizardGoalTarget = 'wizard_goal_target';
+  static const wizardGoalColorSwatch = 'wizard_goal_color_swatch';
+  static const wizardAccountName = 'wizard_account_name';
+  static const wizardAccountColorSwatch = 'wizard_account_color_swatch';
+  static const wizardDepositAmount = 'wizard_deposit_amount';
+  static const wizardDepositNote = 'wizard_deposit_note';
+  static const wizardToastDismiss = 'wizard_toast_dismiss';
+
   // --- Startup ---
   static const startupRetry = 'startup_retry';
 
