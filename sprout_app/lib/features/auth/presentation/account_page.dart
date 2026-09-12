@@ -38,7 +38,7 @@ class AccountPage extends StatelessWidget {
         builder: (context, state) {
           return switch (state) {
             AuthViewLoading() ||
-            AuthViewGuest() => const Center(child: CircularProgressIndicator()),
+            AuthViewSignedOut() => const Center(child: CircularProgressIndicator()),
             AuthViewSignedIn(:final user, :final busy, :final errorMessage) =>
               ListView(
                 padding: const EdgeInsets.all(16),

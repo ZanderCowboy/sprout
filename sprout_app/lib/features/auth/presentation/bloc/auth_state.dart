@@ -11,8 +11,8 @@ final class AuthViewLoading extends AuthViewState {
   const AuthViewLoading();
 }
 
-final class AuthViewGuest extends AuthViewState {
-  const AuthViewGuest({
+final class AuthViewSignedOut extends AuthViewState {
+  const AuthViewSignedOut({
     required this.supabaseConfigured,
     required this.googleAvailable,
     this.email = '',
@@ -32,7 +32,7 @@ final class AuthViewGuest extends AuthViewState {
   final String? errorMessage;
   final String? infoMessage;
 
-  AuthViewGuest copyWith({
+  AuthViewSignedOut copyWith({
     bool? supabaseConfigured,
     bool? googleAvailable,
     String? email,
@@ -44,7 +44,7 @@ final class AuthViewGuest extends AuthViewState {
     bool clearError = false,
     bool clearInfo = false,
   }) {
-    return AuthViewGuest(
+    return AuthViewSignedOut(
       supabaseConfigured: supabaseConfigured ?? this.supabaseConfigured,
       googleAvailable: googleAvailable ?? this.googleAvailable,
       email: email ?? this.email,

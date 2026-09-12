@@ -66,7 +66,7 @@ class _SignInPageState extends State<SignInPage> {
         builder: (context, isOnline) {
           return BlocConsumer<AuthCubit, AuthViewState>(
         listener: (context, state) {
-          if (state is AuthViewGuest && !state.busy) {
+          if (state is AuthViewSignedOut && !state.busy) {
             if (_emailController.text != state.email) {
               _emailController.value = TextEditingValue(
                 text: state.email,
@@ -91,7 +91,7 @@ class _SignInPageState extends State<SignInPage> {
             AuthViewLoading() || AuthViewSignedIn() => const Center(
               child: CircularProgressIndicator(),
             ),
-            AuthViewGuest(
+            AuthViewSignedOut(
               :final supabaseConfigured,
               :final googleAvailable,
               :final otpSent,

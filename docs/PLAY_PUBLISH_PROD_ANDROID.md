@@ -21,7 +21,7 @@ Development builds use Firebase App Distribution instead — see [FIREBASE_DEV_D
 
 1. Create a **production** Supabase project (separate from development).
 2. Apply all SQL under [`supabase/migrations/`](../supabase/migrations/) to that project.
-3. Enable **Anonymous** auth if the app should sync (`Auth` → `Providers` → `Anonymous`).
+3. **Keep Anonymous auth disabled** (required sign-in only, `Auth` → `Providers` → `Anonymous` off).
 4. Put Project URL + anon/publishable key in `sprout_app/assets/config/production.json`.
 5. Encode for CI: `base64 -i sprout_app/assets/config/production.json | tr -d '\n'` → `APP_CONFIG_PROD_BASE64`.
 
