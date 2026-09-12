@@ -2,6 +2,38 @@
 
 Changes heading to `main`. Newest entries at the top.
 
+## 2026-09-12 — Wizard first-run edges
+
+- Users who already have a goal or account skip the wizard instead of creating duplicates
+- Finish/save failures show a snackbar on the wizard
+- Overview empty and populated quick actions match the numbered steps: goal, account, deposit
+
+## 2026-09-12 — Wizard setup polish
+
+- Goal, account, and deposit steps use the same icons and full color palette as the rest of the app
+- Target and deposit errors clear when the field is emptied; deposits validate min R10 and the goal target
+- Account and goal names must be readable (letters, numbers, spaces) instead of symbol soup
+- Step 3 explains the optional first deposit; Allocate later is a checkbox under the amount
+- Name errors wrap onto extra lines; the deposit hint sits in its own info banner
+- Welcome toast uses dark contrast so the lime accent stays readable
+
+## 2026-09-12 — Wizard redirect loop
+
+- First-run users stay on the setup wizard instead of bouncing `/wizard` → Overview → `/wizard`
+
+## 2026-09-12 — Flutter 3.41.4
+
+- Project and CI pin Flutter **3.41.4** (Dart 3.11.1, DevTools 2.54.1)
+- README shows version badges plus the prerequisites table
+
+## 2026-09-12 — First-win setup wizard
+
+- Fresh signup / first successful sign-in routes into 3-step wizard before Overview
+- Step 1: Goal (name + target), Step 2: Account (name + color), Step 3: Deposit (amount to both)
+- Skip exits immediately and persists — wizard never reappears
+- Finish saves goal + account + deposit (amount > 0) and shows one-time "You're growing" toast
+- Empty Overview CTAs reordered to goal → account → deposit
+
 ## 2026-09-02 — Manage opens Customer Center
 
 - Settings Premium Manage opens RevenueCat Customer Center instead of the paywall

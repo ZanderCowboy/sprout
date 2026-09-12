@@ -21,6 +21,7 @@ class SproutTextField extends StatelessWidget {
     this.autofocus = false,
     this.minLines,
     this.maxLines = 1,
+    this.style,
   });
 
   final String identifier;
@@ -38,6 +39,7 @@ class SproutTextField extends StatelessWidget {
   final bool autofocus;
   final int? minLines;
   final int? maxLines;
+  final TextStyle? style;
 
   @override
   Widget build(BuildContext context) {
@@ -58,6 +60,7 @@ class SproutTextField extends StatelessWidget {
         autofocus: autofocus,
         minLines: minLines,
         maxLines: maxLines,
+        style: style,
       ),
     );
   }

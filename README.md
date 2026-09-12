@@ -2,6 +2,10 @@
 
 Watch your money grow and for those who want to reach their goals quickly.
 
+[![Flutter](https://img.shields.io/badge/Flutter-3.41.4-02569B?logo=flutter&logoColor=white)](https://docs.flutter.dev/install/archive)
+[![Dart](https://img.shields.io/badge/Dart-3.11.1-0175C2?logo=dart&logoColor=white)](https://dart.dev)
+[![DevTools](https://img.shields.io/badge/DevTools-2.54.1-1389FD)](https://docs.flutter.dev/tools/devtools)
+
 Flutter savings app (offline-first with Hive, optional Supabase sync) in [`sprout_app/`](sprout_app/).
 
 
@@ -27,10 +31,10 @@ Or run the Cursor/VS Code task **Sprout · Firebase · distribute dev APK**.
 
 | Tool | Version |
 |------|---------|
-| Flutter | **3.38.10** (stable) |
-| Dart | **3.10.9** |
-| DevTools | 2.51.1 |
-| Dart SDK constraint | `^3.8.0` ([`sprout_app/pubspec.yaml`](sprout_app/pubspec.yaml)) |
+| Flutter | **3.41.4** (stable) |
+| Dart | **3.11.1** |
+| DevTools | 2.54.1 |
+| Dart SDK constraint | `^3.11.1` ([`sprout_app/pubspec.yaml`](sprout_app/pubspec.yaml)) |
 | Java (Android builds / CI) | 17 |
 
 Also need a device, emulator, or desktop target (`flutter devices`).

@@ -1,5 +1,6 @@
 import 'package:sprout/core/constants/constants.dart';
 import 'package:sprout/core/error/error.dart';
+import 'package:sprout/core/utils/entity_name.dart';
 import 'package:sprout/core/utils/unique_name.dart';
 import 'package:sprout/features/transactions/application/transactions_service.dart';
 import 'package:sprout/features/transactions/domain/transaction_frequency.dart';
@@ -22,6 +23,9 @@ class GoalsServiceImpl implements GoalsService {
 
   @override
   Future<void> saveGoal(Goal goal) async {
+    if (!EntityName.isValid(goal.name)) {
+      throw ValidationAppException(AppStrings.invalidEntityName);
+    }
     if (goal.targetAmountCents <= 0) {
       throw ValidationAppException(AppStrings.goalTargetMustBePositive);
     }

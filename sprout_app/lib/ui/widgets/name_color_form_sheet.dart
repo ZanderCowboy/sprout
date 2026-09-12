@@ -61,6 +61,7 @@ class NameColorFormSheet extends StatelessWidget {
               labelText: nameLabel,
               errorText: nameErrorText,
               helperText: nameErrorText == null ? nameHelperText : null,
+              errorMaxLines: 3,
             ),
             textCapitalization: TextCapitalization.words,
           )
@@ -72,6 +73,7 @@ class NameColorFormSheet extends StatelessWidget {
               labelText: nameLabel,
               errorText: nameErrorText,
               helperText: nameErrorText == null ? nameHelperText : null,
+              errorMaxLines: 3,
             ),
             textCapitalization: TextCapitalization.words,
           );
@@ -95,28 +97,9 @@ class NameColorFormSheet extends StatelessWidget {
           const SizedBox(height: 16),
           Text(AppStrings.color, style: Theme.of(context).textTheme.labelLarge),
           const SizedBox(height: 8),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              for (var i = 0; i < AppColors.cardPalette.length; i++)
-                Semantics(
-                  identifier: SemanticsIds.colorSwatchAt(i + 1),
-                  button: true,
-                  label: AppStrings.colorNumber(i + 1),
-                  selected: colorArgb == AppColors.cardPalette[i].toARGB32(),
-                  child: GestureDetector(
-                    onTap: () =>
-                        onColorSelected(AppColors.cardPalette[i].toARGB32()),
-                    child: CircleAvatar(
-                      backgroundColor: AppColors.cardPalette[i],
-                      child: colorArgb == AppColors.cardPalette[i].toARGB32()
-                          ? const Icon(Icons.check, color: Colors.white)
-                          : null,
-                    ),
-                  ),
-                ),
-            ],
+          SproutColorSwatches(
+            selectedArgb: colorArgb,
+            onSelected: onColorSelected,
           ),
           const SizedBox(height: 24),
           SproutFilledButton(

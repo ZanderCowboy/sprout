@@ -13,12 +13,14 @@ import 'package:sprout/features/home/export.dart';
 import 'package:sprout/features/settings/export.dart';
 import 'package:sprout/features/shell/export.dart';
 import 'package:sprout/features/transactions/export.dart';
+import 'package:sprout/features/wizard/export.dart';
 
 GoRouter createAppRouter({
   required AuthCubit authCubit,
   required UserContext userContext,
   required GoRouterRefreshStream refreshListenable,
   GlobalKey<NavigatorState>? navigatorKey,
+  Future<bool> Function()? hasExistingSetup,
 }) {
   final rootKey = navigatorKey ?? GlobalKey<NavigatorState>(debugLabel: 'root');
 
@@ -26,12 +28,14 @@ GoRouter createAppRouter({
     navigatorKey: rootKey,
     initialLocation: AppRoute.loading.path,
     refreshListenable: refreshListenable,
-    redirect: (context, state) {
-      return resolveAuthRedirect(
+    redirect: (context, state) async {
+      return await resolveAuthRedirect(
         auth: authCubit.state,
         introCompleted: userContext.introCompleted,
+        userContext: userContext,
         location: state.matchedLocation,
         uri: state.uri,
+        hasExistingSetup: hasExistingSetup,
       );
     },
     routes: [
@@ -66,6 +70,10 @@ GoRouter createAppRouter({
       GoRoute(
         path: AppRoute.privacy.path,
         builder: (context, state) => const PrivacyPage(),
+      ),
+      GoRoute(
+        path: AppRoute.wizard.path,
+        builder: (context, state) => const WizardPage(),
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {

@@ -9,7 +9,7 @@ inputs:
   flutter-version:
     description: "Flutter SDK version."
     required: false
-    default: "3.38.10"
+    default: "3.41.4"
   java-version:
     description: "Java version for Android builds."
     required: false
@@ -28,6 +28,7 @@ runs:
       uses: subosito/flutter-action@v2
       with:
         flutter-version: ${{ inputs.flutter-version }}
+        channel: stable
         cache: true
 
     - name: Flutter pub get

@@ -60,6 +60,13 @@ class _CreateGoalScreenState extends State<CreateGoalScreen> {
     }
   }
 
+  String? get _nameError {
+    final name = _name.text;
+    if (name.trim().isEmpty) return null;
+    if (!EntityName.isValid(name)) return AppStrings.invalidEntityName;
+    return null;
+  }
+
   String? get _targetError {
     final state = classifyPositiveZarField(_target.text);
     return switch (state) {
@@ -90,7 +97,7 @@ class _CreateGoalScreenState extends State<CreateGoalScreen> {
 
   bool _canSubmit(CreateGoalReady s) {
     final name = _name.text.trim();
-    if (name.isEmpty) return false;
+    if (name.isEmpty || !EntityName.isValid(name)) return false;
     if (classifyPositiveZarField(_target.text) != PositiveZarFieldState.ok) {
       return false;
     }
@@ -217,7 +224,7 @@ class _CreateGoalScreenState extends State<CreateGoalScreen> {
             title: AppStrings.newGoal,
             nameLabel: AppStrings.goalName,
             nameController: _name,
-            nameErrorText: null,
+            nameErrorText: _nameError,
             nameHelperText: AppStrings.required,
             colorArgb: _colorArgb,
             onColorSelected: (argb) => setState(() => _colorArgb = argb),

@@ -44,6 +44,7 @@ abstract final class AppStrings {
   static const String date = 'Date';
   static const String time = 'Time';
   static const String note = 'Note';
+  static const String optional = 'Optional';
   static const String total = 'Total';
   static const String current = 'Current';
   static const String scheduled = 'Scheduled';
@@ -91,6 +92,8 @@ abstract final class AppStrings {
   static const String duplicateAccountName =
       'You already have an account with this name.';
   static const String nameRequired = 'Please enter a name.';
+  static const String invalidEntityName =
+      'Use a readable name — letters, numbers, and spaces.';
   static const String invalidAmount = 'Enter a valid amount.';
   static const String amountCannotBeNegative = 'Amount cannot be negative.';
   static const String pickAnAccount = 'Pick an account.';
@@ -178,14 +181,43 @@ abstract final class AppStrings {
   static const String introSlide3Body =
       'Your savings stay with your account, not only on this device.';
 
+  // --- First-run wizard ---
+  static const String wizardGoalTitle = 'What are you growing?';
+  static const String wizardGoalSubtitle =
+      'Name the goal that gets you excited.';
+  static const String wizardAccountTitle = 'Where does the money live?';
+  static const String wizardAccountSubtitle =
+      'Accounts hold your savings until you allocate them toward a goal.';
+  static const String wizardDepositTitle = 'Start with a deposit';
+  static const String wizardDepositSubtitle =
+      'Log money you already have in this account toward your goal. '
+      'Skip if you want to allocate later.';
+  static const String wizardFinish = 'Finish';
+  static const String wizardSkip = 'Skip';
+  static const String wizardAllocateLater = 'Allocate later?';
+  static const String wizardAllocateLaterSubtitle = 'Skip the deposit for now.';
+  static const String wizardFirstSeedPlanted =
+      "You're growing — first seed planted.";
+  static const String wizardSetupReady =
+      "You're set up — allocate when you're ready.";
+  static const String wizardMinimumDeposit = 'Minimum R10';
+  static const String wizardMaximumDeposit = 'Maximum';
+  static const String wizardDepositBelowMinimum = 'Minimum deposit is R10.';
+  static const String wizardDepositAboveMaximum =
+      'Amount can\'t be more than your goal target.';
+  static const String wizardDepositHint =
+      'This records money you already have. Sprout does not move funds '
+      'from your bank.';
+  static String wizardStepOf(int step) => 'Step $step of 3';
+
   // --- Empty state guidance ---
   static const String overviewEmptyTitle = 'Welcome to Sprout';
-  static const String overviewEmptyStep1 = '1. Add an account';
+  static const String overviewEmptyStep1 = '1. Create a goal';
   static const String overviewEmptyStep1Detail =
-      'Create an account to hold your money (e.g. savings, wallet).';
-  static const String overviewEmptyStep2 = '2. Create a goal';
-  static const String overviewEmptyStep2Detail =
       'Set a target to save toward (e.g. vacation, new phone).';
+  static const String overviewEmptyStep2 = '2. Add an account';
+  static const String overviewEmptyStep2Detail =
+      'Create an account to hold your money (e.g. savings, wallet).';
   static const String overviewEmptyStep3 = '3. Make a deposit';
   static const String overviewEmptyStep3Detail =
       'Record money you put into an account and allocate it to a goal.';

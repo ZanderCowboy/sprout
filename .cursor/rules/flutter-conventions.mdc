@@ -11,6 +11,11 @@ Package name is `sprout`. App root is `sprout_app/`.
 - Cross-feature and core imports: `package:sprout/...`. Same-feature files may use relative imports.
 - Register new repositories/services in `sprout_app/lib/core/di/service_locator.dart` (`sl`).
 - Blocs/cubits: `sealed` events/states + `Equatable`. Split events/states into `*_event.dart` / `*_state.dart` part files next to the parent bloc/cubit.
+- **Presentation pages**: Split private widget classes into sibling `part` files using `part` / `part of` (same pattern as bloc/cubit event/state parts). Do not accumulate many private widgets in one page file.
+  - Private UI helper classes (`_ProgressDots`, `_HeroIcon`, `_Step1Goal`, etc.) go in `_snake_case.dart` part files: `part of 'parent_page.dart';` at top.
+  - Parent page imports the parts: `part '_snake_case.dart';` after imports, before the public page class.
+  - Private classes stay `_`-prefixed in part files (not public library widgets).
+  - Reusable/public widgets still belong under `presentation/widgets/` and export via barrel.
 - User-visible copy: `AppStrings` (`lib/core/constants/app_strings.dart`). Do **not** hard-code UI strings.
   - Includes: on-screen `Text`, `AppBar` titles, button/chip labels, tooltips, hints, dialogs, snackbars, Semantics/`label`/`semanticsLabel`, enum **display** labels (sort, frequency, category, kind), and `ValidationAppException` / user-facing `AuthAppException` messages.
   - Add the constant (or reuse an existing one) **before** using it in a widget. Prefer reuse over inventing near-duplicates.
