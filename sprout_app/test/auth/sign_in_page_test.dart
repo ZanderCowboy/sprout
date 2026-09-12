@@ -288,15 +288,15 @@ void main() {
     );
     await tester.pump();
 
-    final sendCodeButton = tester.widget<ElevatedButton>(
-      find.widgetWithText(ElevatedButton, AppStrings.sendCode),
+    final sendCodeButton = tester.widget<SproutFilledButton>(
+      find.widgetWithText(SproutFilledButton, AppStrings.sendCode),
     );
-    expect(sendCodeButton.enabled, isFalse);
+    expect(sendCodeButton.onPressed, isNull);
 
-    final googleButton = tester.widget<OutlinedButton>(
-      find.widgetWithText(OutlinedButton, AppStrings.continueWithGoogle),
+    final googleButton = tester.widget<SproutOutlinedButton>(
+      find.widgetWithText(SproutOutlinedButton, AppStrings.continueWithGoogle),
     );
-    expect(googleButton.enabled, isFalse);
+    expect(googleButton.onPressed, isNull);
   });
 }
 
