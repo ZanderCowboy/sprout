@@ -29,8 +29,8 @@ Future<String?> resolveAuthRedirect({
     if (userId != null) {
       final firstRunCompleted =
           await userContext.getFirstRunCompleted(userId);
-      if (!firstRunCompleted && !locIs(AppRoute.wizard)) {
-        return AppRoute.wizard.path;
+      if (!firstRunCompleted) {
+        return locIs(AppRoute.wizard) ? null : AppRoute.wizard.path;
       }
     }
   }

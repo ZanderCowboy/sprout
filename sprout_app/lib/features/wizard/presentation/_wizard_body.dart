@@ -40,7 +40,7 @@ class _WizardBody extends StatelessWidget {
                           _ProgressDots(currentStep: state.step),
                           const SizedBox(height: 8),
                           Text(
-                            'Step ${state.step} of 3',
+                            AppStrings.wizardStepOf(state.step),
                             style: Theme.of(context)
                                 .textTheme
                                 .labelMedium

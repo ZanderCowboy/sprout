@@ -1,5 +1,6 @@
 import 'package:sprout/core/constants/constants.dart';
 import 'package:sprout/core/error/error.dart';
+import 'package:sprout/core/utils/entity_name.dart';
 import 'package:sprout/core/utils/unique_name.dart';
 
 import '../domain/account.dart';
@@ -19,6 +20,9 @@ class AccountsServiceImpl implements AccountsService {
 
   @override
   Future<void> saveAccount(Account account) async {
+    if (!EntityName.isValid(account.name)) {
+      throw ValidationAppException(AppStrings.invalidEntityName);
+    }
     final existing = await _repository.getAccounts();
     final duplicate = UniqueName.isTaken(
       existing: existing.map((a) => (id: a.id, name: a.name)),

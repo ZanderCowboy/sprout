@@ -93,6 +93,7 @@ class GoalFormCubit extends Cubit<GoalFormState> {
 
   String? _nameError(String name) {
     if (name.trim().isEmpty) return null;
+    if (!EntityName.isValid(name)) return AppStrings.invalidEntityName;
     final taken = UniqueName.isTaken(
       existing: _existing,
       candidateName: name,

@@ -74,5 +74,12 @@ void main() {
       await pending;
       expect(userContext.introCompleted, isTrue);
     });
+
+    test('pending welcome toast is one-shot', () async {
+      final userContext = UserContext(settingsBox);
+      await userContext.setPendingWelcomeToast('u1', 'hello');
+      expect(await userContext.takePendingWelcomeToast('u1'), 'hello');
+      expect(await userContext.takePendingWelcomeToast('u1'), isNull);
+    });
   });
 }

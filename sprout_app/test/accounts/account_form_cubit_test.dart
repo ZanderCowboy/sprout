@@ -57,6 +57,15 @@ void main() {
     tempDir.deleteSync(recursive: true);
   });
 
+  test('nameError rejects a junk account name', () async {
+    await cubit.load();
+    cubit.nameChanged(r'er34$34rre');
+    final state = cubit.state;
+    expect(state, isA<AccountFormReady>());
+    expect((state as AccountFormReady).nameError, AppStrings.invalidEntityName);
+    expect(state.canSave, isFalse);
+  });
+
   test('nameError uses UniqueName after load', () async {
     await cubit.load();
     cubit.nameChanged('cheque');

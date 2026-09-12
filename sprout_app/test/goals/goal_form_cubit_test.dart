@@ -63,6 +63,15 @@ void main() {
     tempDir.deleteSync(recursive: true);
   });
 
+  test('nameError rejects a junk goal name', () async {
+    await cubit.load();
+    cubit.nameChanged(r'er34$34rre');
+    final state = cubit.state;
+    expect(state, isA<GoalFormReady>());
+    expect((state as GoalFormReady).nameError, AppStrings.invalidEntityName);
+    expect(state.canSave, isFalse);
+  });
+
   test('nameError uses UniqueName after load', () async {
     await cubit.load();
     cubit.nameChanged('house');

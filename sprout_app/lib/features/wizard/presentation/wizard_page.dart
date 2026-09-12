@@ -34,6 +34,7 @@ class WizardPage extends StatelessWidget {
         userContext: sl<UserContext>(),
         defaultGoalColorArgb: AppColors.cardColorAt(1).toARGB32(),
         defaultAccountColorArgb: AppColors.cardColorAt(0).toARGB32(),
+        defaultGoalIconCodePoint: Icons.savings_rounded.codePoint,
       )..load(),
       child: const _WizardBody(),
     );

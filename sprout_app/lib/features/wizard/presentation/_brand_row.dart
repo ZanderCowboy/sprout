@@ -11,8 +11,7 @@ class _BrandRow extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
       child: Row(
         children: [
-          Image.asset(
-            'assets/images/sprout-icon.png',
+          AppAssets.sproutIcon.image(
             width: 32,
             height: 32,
           ),

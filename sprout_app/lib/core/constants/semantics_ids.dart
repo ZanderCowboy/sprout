@@ -30,6 +30,7 @@ abstract final class SemanticsIds {
   static const wizardAccountColorSwatch = 'wizard_account_color_swatch';
   static const wizardDepositAmount = 'wizard_deposit_amount';
   static const wizardDepositNote = 'wizard_deposit_note';
+  static const wizardAllocateLater = 'wizard_allocate_later';
   static const wizardToastDismiss = 'wizard_toast_dismiss';
 
   // --- Startup ---

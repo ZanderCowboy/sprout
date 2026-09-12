@@ -44,7 +44,10 @@ class _Step1GoalState extends State<_Step1Goal> {
     final scheme = Theme.of(context).colorScheme;
     return Column(
       children: [
-        _HeroIcon(color: AppColors.accentCoral),
+        const _HeroIcon(
+          icon: Icons.flag_outlined,
+          color: AppColors.accentCoral,
+        ),
         const SizedBox(height: 16),
         Text(
           AppStrings.wizardGoalTitle,
@@ -72,6 +75,7 @@ class _Step1GoalState extends State<_Step1Goal> {
                   decoration: InputDecoration(
                     labelText: AppStrings.goalName,
                     errorText: widget.state.goalNameError,
+                    errorMaxLines: 3,
                   ),
                   textCapitalization: TextCapitalization.words,
                 ),
@@ -93,32 +97,10 @@ class _Step1GoalState extends State<_Step1Goal> {
                   style: Theme.of(context).textTheme.labelLarge,
                 ),
                 const SizedBox(height: 8),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    for (var i = 0; i < 3; i++)
-                      Semantics(
-                        identifier: SemanticsIds.colorSwatchAt(i + 1),
-                        button: true,
-                        label: AppStrings.colorNumber(i + 1),
-                        selected: widget.state.goalColorArgb ==
-                            AppColors.cardPalette[i].toARGB32(),
-                        child: GestureDetector(
-                          onTap: () => context
-                              .read<WizardCubit>()
-                              .setGoalColor(
-                                  AppColors.cardPalette[i].toARGB32()),
-                          child: CircleAvatar(
-                            backgroundColor: AppColors.cardPalette[i],
-                            child: widget.state.goalColorArgb ==
-                                    AppColors.cardPalette[i].toARGB32()
-                                ? const Icon(Icons.check, color: Colors.white)
-                                : null,
-                          ),
-                        ),
-                      ),
-                  ],
+                SproutColorSwatches(
+                  selectedArgb: widget.state.goalColorArgb,
+                  onSelected: (colorArgb) =>
+                      context.read<WizardCubit>().setGoalColor(colorArgb),
                 ),
               ],
             ),

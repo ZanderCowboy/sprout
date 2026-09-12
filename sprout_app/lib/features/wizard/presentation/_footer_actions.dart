@@ -42,10 +42,9 @@ class _FooterActions extends StatelessWidget {
                 ? SproutFilledButton(
                     identifier: SemanticsIds.wizardFinish,
                     label: AppStrings.wizardFinish,
-                    onPressed:
-                        cubit.canFinish && !state.submitting
-                            ? () => cubit.finish()
-                            : null,
+                    onPressed: cubit.canFinish && !state.submitting
+                        ? () => cubit.finish()
+                        : null,
                     style: FilledButton.styleFrom(
                       backgroundColor: AppColors.navSelected,
                       foregroundColor: Colors.white,
@@ -57,7 +56,9 @@ class _FooterActions extends StatelessWidget {
                     onPressed: state.submitting
                         ? null
                         : (state.step == 1
-                            ? (cubit.canGoToStep2 ? () => cubit.goToStep2() : null)
+                            ? (cubit.canGoToStep2
+                                ? () => cubit.goToStep2()
+                                : null)
                             : (cubit.canGoToStep3
                                 ? () => cubit.goToStep3()
                                 : null)),

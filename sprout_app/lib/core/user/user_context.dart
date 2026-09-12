@@ -6,6 +6,7 @@ const String _kUserIdKey = 'active_user_id';
 const String _kLastVerifiedUserIdKey = 'last_verified_user_id';
 const String _kIntroCompletedKey = 'intro_completed';
 const String _kFirstRunCompletedKey = 'first_run_completed';
+const String _kWelcomeToastKey = 'wizard_welcome_toast';
 
 class UserContext {
   UserContext(this._settingsBox, {SupabaseClient? supabaseClient})
@@ -65,5 +66,18 @@ class UserContext {
   Future<void> markFirstRunCompleted(String userId) async {
     final key = '${_kFirstRunCompletedKey}_$userId';
     await _settingsBox.put(key, true);
+  }
+
+  Future<void> setPendingWelcomeToast(String userId, String message) async {
+    await _settingsBox.put('${_kWelcomeToastKey}_$userId', message);
+  }
+
+  Future<String?> takePendingWelcomeToast(String userId) async {
+    final key = '${_kWelcomeToastKey}_$userId';
+    final value = _settingsBox.get(key) as String?;
+    if (value != null) {
+      await _settingsBox.delete(key);
+    }
+    return value;
   }
 }

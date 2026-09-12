@@ -35,7 +35,8 @@ class _Step2AccountState extends State<_Step2Account> {
     final scheme = Theme.of(context).colorScheme;
     return Column(
       children: [
-        _HeroIcon(
+        const _HeroIcon(
+          icon: Icons.account_balance_wallet_outlined,
           color: AppColors.accentViolet,
         ),
         const SizedBox(height: 16),
@@ -65,6 +66,7 @@ class _Step2AccountState extends State<_Step2Account> {
                   decoration: InputDecoration(
                     labelText: AppStrings.accountName,
                     errorText: widget.state.accountNameError,
+                    errorMaxLines: 3,
                   ),
                   textCapitalization: TextCapitalization.words,
                 ),
@@ -74,32 +76,10 @@ class _Step2AccountState extends State<_Step2Account> {
                   style: Theme.of(context).textTheme.labelLarge,
                 ),
                 const SizedBox(height: 8),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    for (var i = 0; i < 3; i++)
-                      Semantics(
-                        identifier: SemanticsIds.colorSwatchAt(i + 1),
-                        button: true,
-                        label: AppStrings.colorNumber(i + 1),
-                        selected: widget.state.accountColorArgb ==
-                            AppColors.cardPalette[i].toARGB32(),
-                        child: GestureDetector(
-                          onTap: () => context
-                              .read<WizardCubit>()
-                              .setAccountColor(
-                                  AppColors.cardPalette[i].toARGB32()),
-                          child: CircleAvatar(
-                            backgroundColor: AppColors.cardPalette[i],
-                            child: widget.state.accountColorArgb ==
-                                    AppColors.cardPalette[i].toARGB32()
-                                ? const Icon(Icons.check, color: Colors.white)
-                                : null,
-                          ),
-                        ),
-                      ),
-                  ],
+                SproutColorSwatches(
+                  selectedArgb: widget.state.accountColorArgb,
+                  onSelected: (colorArgb) =>
+                      context.read<WizardCubit>().setAccountColor(colorArgb),
                 ),
               ],
             ),

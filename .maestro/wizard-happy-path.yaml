@@ -67,7 +67,7 @@ tags:
     timeout: 5000
 
 - assertVisible:
-    text: "Plant the first seed"
+    text: "Start with a deposit"
 
 - assertVisible:
     text: "Cape Town trip"

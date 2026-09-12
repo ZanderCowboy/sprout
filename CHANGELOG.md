@@ -2,6 +2,19 @@
 
 Changes heading to `main`. Newest entries at the top.
 
+## 2026-09-12 — Wizard setup polish
+
+- Goal, account, and deposit steps use the same icons and full color palette as the rest of the app
+- Target and deposit errors clear when the field is emptied; deposits validate min R10 and the goal target
+- Account and goal names must be readable (letters, numbers, spaces) instead of symbol soup
+- Step 3 explains the optional first deposit; Allocate later is a checkbox under the amount
+- Name errors wrap onto extra lines; the deposit hint sits in its own info banner
+- Welcome toast uses dark contrast so the lime accent stays readable
+
+## 2026-09-12 — Wizard redirect loop
+
+- First-run users stay on the setup wizard instead of bouncing `/wizard` → Overview → `/wizard`
+
 ## 2026-09-12 — Flutter 3.41.4
 
 - Project and CI pin Flutter **3.41.4** (Dart 3.11.1, DevTools 2.54.1)

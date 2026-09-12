@@ -30,6 +30,19 @@ void main() {
     await repo.dispose();
   });
 
+  test('saveAccount rejects a junk name', () async {
+    expect(
+      () => service.saveAccount(account(id: '2', name: r'er34$34rre')),
+      throwsA(
+        isA<ValidationAppException>().having(
+          (e) => e.message,
+          'message',
+          AppStrings.invalidEntityName,
+        ),
+      ),
+    );
+  });
+
   test('saveAccount rejects a duplicate name', () async {
     await repo.upsertAccount(account(id: '1', name: 'Cheque'));
 

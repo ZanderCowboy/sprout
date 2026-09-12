@@ -17,6 +17,7 @@ final class WizardReady extends WizardState {
     required this.accountColorArgb,
     required this.depositAmountText,
     required this.depositNote,
+    this.allocateLater = false,
     this.goalNameError,
     this.goalTargetError,
     this.accountNameError,
@@ -37,6 +38,7 @@ final class WizardReady extends WizardState {
   final String? accountNameError;
   final String depositAmountText;
   final String depositNote;
+  final bool allocateLater;
   final String? depositAmountError;
   final String? errorMessage;
   final bool loaded;
@@ -54,10 +56,15 @@ final class WizardReady extends WizardState {
     String? accountNameError,
     String? depositAmountText,
     String? depositNote,
+    bool? allocateLater,
     String? depositAmountError,
     String? errorMessage,
     bool? loaded,
     bool? submitting,
+    bool updateGoalNameError = false,
+    bool updateGoalTargetError = false,
+    bool updateAccountNameError = false,
+    bool updateDepositAmountError = false,
     bool clearError = false,
   }) {
     return WizardReady(
@@ -65,14 +72,19 @@ final class WizardReady extends WizardState {
       goalName: goalName ?? this.goalName,
       goalTargetText: goalTargetText ?? this.goalTargetText,
       goalColorArgb: goalColorArgb ?? this.goalColorArgb,
-      goalNameError: goalNameError ?? this.goalNameError,
-      goalTargetError: goalTargetError ?? this.goalTargetError,
+      goalNameError: updateGoalNameError ? goalNameError : this.goalNameError,
+      goalTargetError:
+          updateGoalTargetError ? goalTargetError : this.goalTargetError,
       accountName: accountName ?? this.accountName,
       accountColorArgb: accountColorArgb ?? this.accountColorArgb,
-      accountNameError: accountNameError ?? this.accountNameError,
+      accountNameError:
+          updateAccountNameError ? accountNameError : this.accountNameError,
       depositAmountText: depositAmountText ?? this.depositAmountText,
       depositNote: depositNote ?? this.depositNote,
-      depositAmountError: depositAmountError ?? this.depositAmountError,
+      allocateLater: allocateLater ?? this.allocateLater,
+      depositAmountError: updateDepositAmountError
+          ? depositAmountError
+          : this.depositAmountError,
       errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
       loaded: loaded ?? this.loaded,
       submitting: submitting ?? this.submitting,
@@ -92,6 +104,7 @@ final class WizardReady extends WizardState {
         accountNameError,
         depositAmountText,
         depositNote,
+        allocateLater,
         depositAmountError,
         errorMessage,
         loaded,
@@ -104,5 +117,10 @@ final class WizardSkipped extends WizardState {
 }
 
 final class WizardCompleted extends WizardState {
-  const WizardCompleted();
+  const WizardCompleted({this.plantedSeed = true});
+
+  final bool plantedSeed;
+
+  @override
+  List<Object?> get props => [plantedSeed];
 }

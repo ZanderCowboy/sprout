@@ -146,6 +146,8 @@ ThemeData buildAppTheme() {
       filled: true,
       fillColor: colorScheme.surfaceContainerHighest,
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      errorMaxLines: 3,
+      helperMaxLines: 2,
       border: OutlineInputBorder(borderRadius: borderRadius),
       enabledBorder: OutlineInputBorder(
         borderRadius: borderRadius,

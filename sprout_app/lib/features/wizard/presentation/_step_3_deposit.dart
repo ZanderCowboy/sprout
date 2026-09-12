@@ -44,9 +44,13 @@ class _Step3DepositState extends State<_Step3Deposit> {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final targetCents = parseZarToCents(widget.state.goalTargetText) ?? 0;
+    final skipDeposit = widget.state.allocateLater;
     return Column(
       children: [
-        _HeroIcon(color: AppColors.accentLime),
+        const _HeroIcon(
+          icon: Icons.payments_outlined,
+          color: AppColors.seed,
+        ),
         const SizedBox(height: 16),
         Text(
           AppStrings.wizardDepositTitle,
@@ -55,7 +59,7 @@ class _Step3DepositState extends State<_Step3Deposit> {
         ),
         const SizedBox(height: 8),
         Text(
-          '${AppStrings.wizardDepositSubtitle} ${widget.state.goalName.trim()}.',
+          AppStrings.wizardDepositSubtitle,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: scheme.onSurfaceVariant,
               ),
@@ -81,23 +85,40 @@ class _Step3DepositState extends State<_Step3Deposit> {
                 SproutTextField(
                   identifier: SemanticsIds.wizardDepositAmount,
                   controller: _amountController,
+                  enabled: !skipDeposit,
                   decoration: InputDecoration(
                     labelText: AppStrings.amount,
-                    errorText: widget.state.depositAmountError,
-                    helperText: widget.state.depositAmountError == null
-                        ? '${AppStrings.wizardMinimumDeposit} • ${AppStrings.wizardMaximumDeposit} ${formatZarFromCents(targetCents)}'
-                        : null,
+                    errorText:
+                        skipDeposit ? null : widget.state.depositAmountError,
+                    helperText: skipDeposit ||
+                            widget.state.depositAmountError != null
+                        ? null
+                        : '${AppStrings.wizardMinimumDeposit} • ${AppStrings.wizardMaximumDeposit} ${formatZarFromCents(targetCents)}',
                     helperMaxLines: 2,
+                    errorMaxLines: 2,
                   ),
                   keyboardType: const TextInputType.numberWithOptions(
                     decimal: true,
                   ),
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
-                const SizedBox(height: 16),
+                SproutCheckboxTile(
+                  identifier: SemanticsIds.wizardAllocateLater,
+                  label: AppStrings.wizardAllocateLater,
+                  value: skipDeposit,
+                  onChanged: widget.state.submitting
+                      ? null
+                      : (checked) => context
+                          .read<WizardCubit>()
+                          .setAllocateLater(checked ?? false),
+                  subtitle: Text(AppStrings.wizardAllocateLaterSubtitle),
+                  contentPadding: EdgeInsets.zero,
+                ),
+                const SizedBox(height: 8),
                 SproutTextField(
                   identifier: SemanticsIds.wizardDepositNote,
                   controller: _noteController,
+                  enabled: !skipDeposit,
                   decoration: InputDecoration(
                     labelText: AppStrings.note,
                     hintText: AppStrings.optional,
@@ -105,24 +126,37 @@ class _Step3DepositState extends State<_Step3Deposit> {
                   textCapitalization: TextCapitalization.sentences,
                   maxLines: 2,
                 ),
+                const SizedBox(height: 16),
+                const Divider(),
                 const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.lightbulb_outline,
-                      size: 16,
-                      color: scheme.onSurfaceVariant,
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: scheme.surfaceContainerHighest,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(
+                          Icons.info_outline,
+                          size: 18,
+                          color: scheme.onSurfaceVariant,
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            AppStrings.wizardDepositHint,
+                            style:
+                                Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      color: scheme.onSurfaceVariant,
+                                    ),
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        AppStrings.wizardDepositHint,
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: scheme.onSurfaceVariant,
-                            ),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ],
             ),

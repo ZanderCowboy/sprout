@@ -218,5 +218,58 @@ void main() {
         AppRoute.overview.path,
       );
     });
+
+    test('signed-in first run incomplete stays on wizard', () async {
+      await userContext.setActiveUserId('u1');
+      expect(
+        await redirect(
+          auth: signedIn,
+          introCompleted: true,
+          location: AppRoute.wizard.path,
+        ),
+        isNull,
+      );
+    });
+
+    test('signed-in first run incomplete is sent to wizard', () async {
+      await userContext.setActiveUserId('u1');
+      expect(
+        await redirect(
+          auth: signedIn,
+          introCompleted: true,
+          location: AppRoute.overview.path,
+        ),
+        AppRoute.wizard.path,
+      );
+      expect(
+        await redirect(
+          auth: signedIn,
+          introCompleted: true,
+          location: AppRoute.signIn.path,
+        ),
+        AppRoute.wizard.path,
+      );
+    });
+
+    test('signed-in first run complete leaves wizard for overview', () async {
+      await userContext.setActiveUserId('u1');
+      await userContext.markFirstRunCompleted('u1');
+      expect(
+        await redirect(
+          auth: signedIn,
+          introCompleted: true,
+          location: AppRoute.wizard.path,
+        ),
+        AppRoute.overview.path,
+      );
+      expect(
+        await redirect(
+          auth: signedIn,
+          introCompleted: true,
+          location: AppRoute.overview.path,
+        ),
+        isNull,
+      );
+    });
   });
 }

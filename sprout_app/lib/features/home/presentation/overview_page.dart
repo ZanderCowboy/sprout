@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 
 import 'package:sprout/core/core.dart';
 import 'package:sprout/core/di/service_locator.dart';
@@ -39,28 +38,22 @@ class _OverviewPageState extends State<OverviewPage> {
 
   Future<void> _checkAndShowWelcomeToast(String userId) async {
     final userContext = sl<UserContext>();
-    final settingsBox = await Hive.openBox<dynamic>('settings');
-    final key = 'wizard_toast_shown_$userId';
-    final shown = settingsBox.get(key) == true;
-    
-    if (!shown && mounted) {
-      final firstRunCompleted =
-          await userContext.getFirstRunCompleted(userId);
-      if (firstRunCompleted && mounted) {
-        _hasShownWelcomeToast = true;
-        await settingsBox.put(key, true);
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted) {
-            _showWelcomeToast();
-          }
-        });
+    final message = await userContext.takePendingWelcomeToast(userId);
+    if (message == null || !mounted) return;
+
+    _hasShownWelcomeToast = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _showWelcomeToast(message);
       }
-    }
+    });
   }
 
-  void _showWelcomeToast() {
+  void _showWelcomeToast(String message) {
+    final scheme = Theme.of(context).colorScheme;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
+        backgroundColor: AppColors.surfaceBar,
         content: Row(
           children: [
             Icon(
@@ -69,12 +62,18 @@ class _OverviewPageState extends State<OverviewPage> {
             ),
             const SizedBox(width: 12),
             Expanded(
-              child: Text(AppStrings.wizardFirstSeedPlanted),
+              child: Text(
+                message,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: scheme.onSurface,
+                    ),
+              ),
             ),
           ],
         ),
         action: SnackBarAction(
           label: AppStrings.done,
+          textColor: AppColors.accentLime,
           onPressed: () {
             ScaffoldMessenger.of(context).hideCurrentSnackBar();
           },

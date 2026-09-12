@@ -2,9 +2,11 @@ part of 'wizard_page.dart';
 
 class _HeroIcon extends StatelessWidget {
   const _HeroIcon({
+    required this.icon,
     required this.color,
   });
 
+  final IconData icon;
   final Color color;
 
   @override
@@ -16,15 +18,7 @@ class _HeroIcon extends StatelessWidget {
         color: color.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(16),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(14),
-        child: Image.asset(
-          'assets/images/sprout-icon.png',
-          width: 28,
-          height: 28,
-          color: color,
-        ),
-      ),
+      child: Icon(icon, color: color, size: 28),
     );
   }
 }
