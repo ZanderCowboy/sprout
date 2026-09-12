@@ -97,19 +97,19 @@ void main() {
   });
 
   test('starts as guest when signed out', () {
-    expect(cubit.state, isA<AuthViewGuest>());
-    final guest = cubit.state as AuthViewGuest;
-    expect(guest.supabaseConfigured, isTrue);
-    expect(guest.googleAvailable, isTrue);
-    expect(guest.otpSent, isFalse);
+    expect(cubit.state, isA<AuthViewSignedOut>());
+    final signedOut = cubit.state as AuthViewSignedOut;
+    expect(signedOut.supabaseConfigured, isTrue);
+    expect(signedOut.googleAvailable, isTrue);
+    expect(signedOut.otpSent, isFalse);
   });
 
   test('sendOtp then verifyOtp transitions to signed in', () async {
     cubit.emailChanged('user@example.com');
     await cubit.sendOtp();
 
-    expect(cubit.state, isA<AuthViewGuest>());
-    final afterSend = cubit.state as AuthViewGuest;
+    expect(cubit.state, isA<AuthViewSignedOut>());
+    final afterSend = cubit.state as AuthViewSignedOut;
     expect(afterSend.otpSent, isTrue);
     expect(fakeAuth.sendOtpCalls, 1);
 
@@ -162,9 +162,9 @@ void main() {
     cubit.emailChanged('user@example.com');
     await cubit.sendOtp();
 
-    final guest = cubit.state as AuthViewGuest;
-    expect(guest.errorMessage, 'Rate limited');
-    expect(guest.busy, isFalse);
+    final signedOut = cubit.state as AuthViewSignedOut;
+    expect(signedOut.errorMessage, 'Rate limited');
+    expect(signedOut.busy, isFalse);
   });
 
   test('signOut returns to guest', () async {
@@ -175,7 +175,7 @@ void main() {
     expect(cubit.state, isA<AuthViewSignedIn>());
 
     await cubit.signOut();
-    expect(cubit.state, isA<AuthViewGuest>());
+    expect(cubit.state, isA<AuthViewSignedOut>());
   });
 
   test('updateDisplayName saves metadata', () async {
@@ -200,7 +200,7 @@ void main() {
     await Future<void>.delayed(Duration.zero);
 
     await cubit.deleteAccount();
-    expect(cubit.state, isA<AuthViewGuest>());
+    expect(cubit.state, isA<AuthViewSignedOut>());
     expect(fakeAuth.deleteOwnAccountCalls, 1);
     expect(fakeAuth.signOutCalls, 1);
   });

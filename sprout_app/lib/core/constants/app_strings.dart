@@ -171,6 +171,8 @@ abstract final class AppStrings {
       'Google Sign-In did not return an ID token.';
   static const String debugSignInDevOnly =
       'Debug sign-in is only available in the development flavor.';
+  static const String offlineSignInBlocked =
+      "You're offline — connect to sign in.";
   static const String introSlide1Title = 'Track your savings in one place';
   static const String introSlide1Body =
       'See your accounts, activity, and totals together so you always know where you stand.';

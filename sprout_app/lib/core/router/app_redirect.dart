@@ -17,7 +17,7 @@ Future<String?> resolveAuthRedirect({
     return locIs(AppRoute.loading) ? null : AppRoute.loading.path;
   }
 
-  if (auth is AuthViewGuest) {
+  if (auth is AuthViewSignedOut) {
     if (!introCompleted) {
       return locIs(AppRoute.intro) ? null : AppRoute.intro.path;
     }
@@ -25,7 +25,7 @@ Future<String?> resolveAuthRedirect({
     return _signInWithFrom(uri, location);
   }
 
-  if (auth is! AuthViewGuest) {
+  if (auth is! AuthViewSignedOut) {
     final userId = userContext.cachedUserId;
     if (userId != null) {
       var firstRunCompleted = await userContext.getFirstRunCompleted(userId);

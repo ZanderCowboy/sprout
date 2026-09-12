@@ -8,6 +8,7 @@ import 'package:sprout/core/constants/semantics_ids.dart';
 import 'package:sprout/core/router/app_route.dart';
 import 'package:sprout/features/auth/presentation/bloc/auth_cubit.dart';
 import 'package:sprout/features/auth/presentation/widgets/debug_sign_in_button.dart';
+import 'package:sprout/features/connectivity/presentation/connectivity_cubit.dart';
 import 'package:sprout/ui/export.dart';
 
 class SignInPage extends StatefulWidget {
@@ -61,9 +62,11 @@ class _SignInPageState extends State<SignInPage> {
               ),
         title: const Text(AppStrings.signIn),
       ),
-      body: BlocConsumer<AuthCubit, AuthViewState>(
+      body: BlocBuilder<ConnectivityCubit, bool>(
+        builder: (context, isOnline) {
+          return BlocConsumer<AuthCubit, AuthViewState>(
         listener: (context, state) {
-          if (state is AuthViewGuest && !state.busy) {
+          if (state is AuthViewSignedOut && !state.busy) {
             if (_emailController.text != state.email) {
               _emailController.value = TextEditingValue(
                 text: state.email,
@@ -88,7 +91,7 @@ class _SignInPageState extends State<SignInPage> {
             AuthViewLoading() || AuthViewSignedIn() => const Center(
               child: CircularProgressIndicator(),
             ),
-            AuthViewGuest(
+            AuthViewSignedOut(
               :final supabaseConfigured,
               :final googleAvailable,
               :final otpSent,
@@ -114,6 +117,31 @@ class _SignInPageState extends State<SignInPage> {
                     style: Theme.of(context).textTheme.bodyLarge,
                   ),
                   const SizedBox(height: 8),
+                  if (!isOnline)
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.errorContainer,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.cloud_off_rounded,
+                            color: Theme.of(context).colorScheme.onErrorContainer,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              AppStrings.offlineSignInBlocked,
+                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                color: Theme.of(context).colorScheme.onErrorContainer,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   if (!supabaseConfigured)
                     Text(
                       AppStrings.signInNotConfigured,
@@ -126,7 +154,7 @@ class _SignInPageState extends State<SignInPage> {
                     SproutTextField(
                       identifier: SemanticsIds.signInDisplayNameField,
                       controller: _displayNameController,
-                      enabled: !busy,
+                      enabled: isOnline && !busy,
                       textCapitalization: TextCapitalization.words,
                       autofillHints: const [AutofillHints.name],
                       decoration: const InputDecoration(
@@ -140,7 +168,7 @@ class _SignInPageState extends State<SignInPage> {
                     SproutTextField(
                       identifier: SemanticsIds.signInEmailField,
                       controller: _emailController,
-                      enabled: !busy,
+                      enabled: isOnline && !busy,
                       keyboardType: TextInputType.emailAddress,
                       autofillHints: const [AutofillHints.email],
                       decoration: const InputDecoration(
@@ -153,14 +181,14 @@ class _SignInPageState extends State<SignInPage> {
                     SproutFilledButton(
                       identifier: SemanticsIds.signInSendCode,
                       label: AppStrings.sendCode,
-                      onPressed: busy ? null : () => context.read<AuthCubit>().sendOtp(),
+                      onPressed: (!isOnline || busy) ? null : () => context.read<AuthCubit>().sendOtp(),
                     ),
                     if (otpSent) ...[
                       const SizedBox(height: 16),
                       SproutTextField(
                         identifier: SemanticsIds.signInOtpField,
                         controller: _otpController,
-                        enabled: !busy,
+                        enabled: isOnline && !busy,
                         keyboardType: TextInputType.number,
                         inputFormatters: [
                           FilteringTextInputFormatter.digitsOnly,
@@ -175,7 +203,7 @@ class _SignInPageState extends State<SignInPage> {
                       SproutFilledButton.tonal(
                         identifier: SemanticsIds.signInVerifyCode,
                         label: AppStrings.verifyCode,
-                        onPressed: busy
+                        onPressed: (!isOnline || busy)
                             ? null
                             : () => context.read<AuthCubit>().verifyOtp(
                                   _otpController.text,
@@ -198,7 +226,7 @@ class _SignInPageState extends State<SignInPage> {
                       SproutOutlinedButton.icon(
                         identifier: SemanticsIds.signInGoogle,
                         label: AppStrings.continueWithGoogle,
-                        onPressed: busy
+                        onPressed: (!isOnline || busy)
                             ? null
                             : () => context.read<AuthCubit>().signInWithGoogle(),
                         icon: const Icon(Icons.g_mobiledata_rounded),
@@ -269,7 +297,7 @@ class _SignInPageState extends State<SignInPage> {
                   ],
                   const SizedBox(height: 24),
                   DebugSignInButton(
-                    enabled: !busy,
+                    enabled: isOnline && !busy,
                     identifier: SemanticsIds.signInDebugSignIn,
                   ),
                   if (busy) ...[
@@ -292,6 +320,8 @@ class _SignInPageState extends State<SignInPage> {
                 ],
               ),
           };
+        },
+          );
         },
       ),
     );

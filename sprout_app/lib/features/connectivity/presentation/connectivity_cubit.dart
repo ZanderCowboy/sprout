@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:sprout/core/di/service_locator.dart';
@@ -12,6 +13,9 @@ class ConnectivityCubit extends Cubit<bool> {
     _subscription = Connectivity().onConnectivityChanged.listen(_onResults);
     Connectivity().checkConnectivity().then(_onResults);
   }
+
+  @visibleForTesting
+  ConnectivityCubit.seeded(super.online);
 
   StreamSubscription<List<ConnectivityResult>>? _subscription;
 
