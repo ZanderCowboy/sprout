@@ -4,6 +4,8 @@ Dispatch-only workflow: **Play Publish (Prod Android AAB)** builds a signed prod
 
 Development builds use Firebase App Distribution instead — see [FIREBASE_DEV_DISTRIBUTION.md](FIREBASE_DEV_DISTRIBUTION.md).
 
+Android `versionCode` comes from the `+N` suffix in [`sprout_app/pubspec.yaml`](../sprout_app/pubspec.yaml). Every merge to `main` increments `N` automatically ([BUILD_NUMBER.md](BUILD_NUMBER.md)). Merge before publishing so Play sees a new, increasing version code.
+
 ## Package / flavor
 
 | Item | Value |

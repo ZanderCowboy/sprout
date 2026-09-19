@@ -2,6 +2,7 @@
 
 This repo uses GitHub Actions for:
 - `CI Dev Checks` on every push: `flutter analyze` + `flutter test`
+- `Bump Build Number` on every push to `main`: increments `version: x.y.z+N` in `sprout_app/pubspec.yaml` (see [BUILD_NUMBER.md](BUILD_NUMBER.md))
 - `Firebase Distribute (Dev Android APK)` on manual trigger: builds a **development** APK and uploads it to Firebase App Distribution
 
 Production Play uploads are documented separately in [PLAY_PUBLISH_PROD_ANDROID.md](PLAY_PUBLISH_PROD_ANDROID.md).

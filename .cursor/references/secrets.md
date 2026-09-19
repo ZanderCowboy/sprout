@@ -1,6 +1,6 @@
 # Secrets and local config
 
-Never commit real keys, JSON configs, or generated Firebase options.
+Never commit real keys, JSON configs, generated Firebase options, or GitHub App `*.pem` files.
 
 ## Gitignored (must exist locally to run)
 
@@ -29,3 +29,5 @@ See `README.md`. Empty `supabaseUrl`/`supabaseAnonKey` → local-only. Empty `re
 Dashboard logins, 2FA, App Store / Play Console, pasting keys into JSON or GitHub secrets. State that single action; do not dump secret values into chat, commits, or rules.
 
 CI encoding: `docs` + `supabase/README.md` (`APP_CONFIG_DEV_BASE64` / `APP_CONFIG_PROD_BASE64`).
+
+Version bot (required for the `main` build bump): `VERSION_BOT_APP_ID` + `VERSION_BOT_APP_PRIVATE_KEY`. See `docs/BUILD_NUMBER.md`.

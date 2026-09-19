@@ -1,0 +1,36 @@
+name: "Bump Build Number"
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: version-management-main
+  cancel-in-progress: false
+
+jobs:
+  bump:
+    if: ${{ github.event_name == 'workflow_dispatch' || !contains(github.event.head_commit.message, '[skip ci]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate GitHub App Token
+        id: generate_token
+        uses: peter-murray/workflow-application-token-action@v5
+        with:
+          application_id: ${{ secrets.VERSION_BOT_APP_ID }}
+          application_private_key: ${{ secrets.VERSION_BOT_APP_PRIVATE_KEY }}
+
+      - name: Version Management
+        uses: ./.github/actions/version-management
+        with:
+          github_token: ${{ steps.generate_token.outputs.token }}
+          pubspec_path: sprout_app/pubspec.yaml
+          branch_name: main
+          bump_type: none
