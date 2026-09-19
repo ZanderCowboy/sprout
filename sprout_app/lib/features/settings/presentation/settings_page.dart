@@ -149,7 +149,7 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   void _openDebugLens() {
-    DebugLens.openDebugLens();
+    DebugLens.show(context);
   }
 
   @override
