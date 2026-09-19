@@ -2,6 +2,32 @@
 
 Changes heading to `main`. Newest entries at the top.
 
+## 2026-09-19 — Debug Lens covers previous screens
+
+- In-panel pages use an opaque Sprout surface again so dashboard tiles do not show through Network and other tools
+- Every tool still shares that same surface so the canvas color does not jump on push or pop
+
+## 2026-09-19 — Auto-bump build number on main
+
+- Every merge (or push) to `main` increments the `+N` build in `sprout_app/pubspec.yaml` and commits it
+- Play `versionCode` stays unique without a manual bump before each upload
+- Uses the same Version Bot GitHub App as Multichoice (`VERSION_BOT_APP_ID` + `VERSION_BOT_APP_PRIVATE_KEY`)
+
+## 2026-09-19 — Debug Lens in-panel navigation flash
+
+- Opening a tool (Network, Logs, …) and returning to the dashboard no longer flashes a different background
+- In-panel routes stay transparent over Sprout's canvas instead of each painting their own seed color
+
+## 2026-09-19 — Debug Lens matches app colors
+
+- Debug Lens panel uses Sprout's dark teal canvas instead of the package's navy/indigo background
+- Opening and closing the panel no longer flashes a different blue theme
+
+## 2026-09-19 — Debug Lens navigation during build
+
+- Opening the app no longer throws `setState() or markNeedsBuild() called during build` from Debug Lens
+- Navigation recording waits until after the current frame so Provider is not notified while GoRouter restores the navigator
+
 ## 2026-09-19 — Debug Lens API call sites
 
 - Remote Config values now feed Debug Lens through `DebugLens.instance.setRemoteConfigData`

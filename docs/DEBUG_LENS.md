@@ -54,10 +54,12 @@ The Sprout integration:
 - Enables DebugLens when `shouldEnableDebugLens()` returns `true`
   - Development flavor: always `true`
   - Production flavor: `RemoteConfigService.isEnabled(debugLensEnabled)`
-- Wraps the app with `DebugLens.wrap()` in `app.dart`
-- Registers `DebugLens.navigatorObserver` on the root GoRouter
+- Wraps the app with `SproutDebugLens.wrap()` in `app.dart` (Debug Lens 0.0.2 notifies Provider during Navigator restore; Sprout defers those callbacks until after the frame)
+- Panel canvas uses Sprout's theme (teal-dark surfaces) instead of Debug Lens's default navy/indigo
+- In-panel routes use that same opaque surface so previous screens do not show through and the canvas color does not jump
+- Registers `SproutDebugLens.navigatorObserver` on the root GoRouter
 - Feeds Firebase Remote Config values via `DebugLens.instance.setRemoteConfigData()`
-- Settings entry calls `DebugLens.show(context)` (gated by visibility logic)
+- Settings entry and the Debug Lens bubble call `SproutDebugLens.show(context)` (gated by visibility logic)
 
 ## Security
 

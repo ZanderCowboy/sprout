@@ -7,6 +7,7 @@ import 'package:debug_lens/debug_lens.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 
 import 'package:sprout/core/core.dart';
+import 'package:sprout/core/debug/sprout_debug_lens.dart';
 import 'package:sprout/core/di/service_locator.dart';
 import 'package:sprout/core/flags/remote_config_service.dart';
 import 'package:sprout/core/router/app_router.dart';
@@ -41,7 +42,7 @@ class _SproutAppState extends State<SproutApp> {
       refreshListenable: _refresh,
       hasExistingSetup: _hasExistingSetup,
       observers: [
-        if (shouldEnableDebugLens()) DebugLens.navigatorObserver,
+        if (shouldEnableDebugLens()) SproutDebugLens.navigatorObserver,
       ],
     );
     unawaited(_setupDebugLens());
@@ -112,7 +113,7 @@ class _SproutAppState extends State<SproutApp> {
               child: child ?? const SizedBox.shrink(),
             );
             if (shouldEnableDebugLens()) {
-              result = DebugLens.wrap(result);
+              result = SproutDebugLens.wrap(result);
             }
             return result;
           },
