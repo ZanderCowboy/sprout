@@ -2,6 +2,12 @@
 
 Changes heading to `main`. Newest entries at the top.
 
+## 2026-09-19 — Debug Lens API call sites
+
+- Remote Config values now feed Debug Lens through `DebugLens.instance.setRemoteConfigData`
+- Settings opens the panel with `DebugLens.show(context)`
+- Root navigator registers `DebugLens.navigatorObserver` so the panel can push
+
 ## 2026-09-19 — Debug Lens MVP
 
 - Debug Lens on-device debugging panel available in Settings (gated by flavor + Remote Config)

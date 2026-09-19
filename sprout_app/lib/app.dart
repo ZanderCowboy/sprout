@@ -8,6 +8,7 @@ import 'package:firebase_remote_config/firebase_remote_config.dart';
 
 import 'package:sprout/core/core.dart';
 import 'package:sprout/core/di/service_locator.dart';
+import 'package:sprout/core/flags/remote_config_service.dart';
 import 'package:sprout/core/router/app_router.dart';
 import 'package:sprout/core/router/go_router_refresh_stream.dart';
 import 'package:sprout/features/accounts/export.dart';
@@ -39,11 +40,14 @@ class _SproutAppState extends State<SproutApp> {
       userContext: sl<UserContext>(),
       refreshListenable: _refresh,
       hasExistingSetup: _hasExistingSetup,
+      observers: [
+        if (shouldEnableDebugLens()) DebugLens.navigatorObserver,
+      ],
     );
-    _setupDebugLens();
+    unawaited(_setupDebugLens());
   }
 
-  void _setupDebugLens() {
+  Future<void> _setupDebugLens() async {
     if (!shouldEnableDebugLens()) {
       return;
     }
@@ -54,14 +58,14 @@ class _SproutAppState extends State<SproutApp> {
       try {
         final rcInstance = FirebaseRemoteConfig.instance;
         final allKeys = rcInstance.getAll();
-        final rcMap = <String, dynamic>{};
+        final rcMap = <String, Object?>{};
         for (final entry in allKeys.entries) {
           final value = entry.value;
           if (value.source != ValueSource.valueStatic) {
             rcMap[entry.key] = value.asString();
           }
         }
-        DebugLens.setRemoteConfigData(rcMap);
+        await DebugLens.instance.setRemoteConfigData(rcMap);
       } on Object {
         // Fail silently if Remote Config is unavailable
       }

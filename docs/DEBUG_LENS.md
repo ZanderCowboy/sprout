@@ -55,8 +55,9 @@ The Sprout integration:
   - Development flavor: always `true`
   - Production flavor: `RemoteConfigService.isEnabled(debugLensEnabled)`
 - Wraps the app with `DebugLens.wrap()` in `app.dart`
-- Feeds Firebase Remote Config values via `DebugLens.setRemoteConfigData()`
-- Provides Settings entry point (gated by visibility logic)
+- Registers `DebugLens.navigatorObserver` on the root GoRouter
+- Feeds Firebase Remote Config values via `DebugLens.instance.setRemoteConfigData()`
+- Settings entry calls `DebugLens.show(context)` (gated by visibility logic)
 
 ## Security
 
