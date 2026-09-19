@@ -9,7 +9,7 @@ import 'package:sprout/features/auth/domain/auth_user.dart';
 import 'package:sprout/features/auth/presentation/bloc/auth_cubit.dart';
 
 void main() {
-  const guest = AuthViewGuest(
+  const signedOut = AuthViewSignedOut(
     supabaseConfigured: true,
     googleAvailable: false,
   );
@@ -84,7 +84,7 @@ void main() {
     test('unsigned without intro is forced to intro', () async {
       expect(
         await redirect(
-          auth: guest,
+          auth: signedOut,
           introCompleted: false,
           location: AppRoute.intro.path,
         ),
@@ -92,7 +92,7 @@ void main() {
       );
       expect(
         await redirect(
-          auth: guest,
+          auth: signedOut,
           introCompleted: false,
           location: AppRoute.signIn.path,
         ),
@@ -100,7 +100,7 @@ void main() {
       );
       expect(
         await redirect(
-          auth: guest,
+          auth: signedOut,
           introCompleted: false,
           location: AppRoute.overview.path,
         ),
@@ -110,7 +110,7 @@ void main() {
 
     test('unsigned with intro cannot open overview', () async {
       final result = await redirect(
-        auth: guest,
+        auth: signedOut,
         introCompleted: true,
         location: AppRoute.overview.path,
         uri: Uri.parse(AppRoute.overview.path),
@@ -118,46 +118,48 @@ void main() {
       expect(result, '${AppRoute.signIn.path}?from=%2Foverview');
     });
 
-    test('unsigned with intro can stay on sign-in, intro, terms, and privacy',
-        () async {
-      expect(
-        await redirect(
-          auth: guest,
-          introCompleted: true,
-          location: AppRoute.signIn.path,
-        ),
-        isNull,
-      );
-      expect(
-        await redirect(
-          auth: guest,
-          introCompleted: true,
-          location: AppRoute.intro.path,
-        ),
-        isNull,
-      );
-      expect(
-        await redirect(
-          auth: guest,
-          introCompleted: true,
-          location: AppRoute.terms.path,
-        ),
-        isNull,
-      );
-      expect(
-        await redirect(
-          auth: guest,
-          introCompleted: true,
-          location: AppRoute.privacy.path,
-        ),
-        isNull,
-      );
-    });
+    test(
+      'unsigned with intro can stay on sign-in, intro, terms, and privacy',
+      () async {
+        expect(
+          await redirect(
+            auth: signedOut,
+            introCompleted: true,
+            location: AppRoute.signIn.path,
+          ),
+          isNull,
+        );
+        expect(
+          await redirect(
+            auth: signedOut,
+            introCompleted: true,
+            location: AppRoute.intro.path,
+          ),
+          isNull,
+        );
+        expect(
+          await redirect(
+            auth: signedOut,
+            introCompleted: true,
+            location: AppRoute.terms.path,
+          ),
+          isNull,
+        );
+        expect(
+          await redirect(
+            auth: signedOut,
+            introCompleted: true,
+            location: AppRoute.privacy.path,
+          ),
+          isNull,
+        );
+      },
+    );
 
     test('unsigned with intro leaves loading for sign-in', () async {
       expect(
         await redirect(
-          auth: guest,
+          auth: signedOut,
           introCompleted: true,
           location: AppRoute.loading.path,
         ),

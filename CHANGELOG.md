@@ -2,6 +2,16 @@
 
 Changes heading to `main`. Newest entries at the top.
 
+## 2026-09-12 — Auth journey: required sign-in (no guest bypass)
+
+- Sign-in is now required after intro carousel — no anonymous or guest bypass
+- Offline sign-in messaging: sign-in page shows "You're offline — connect to sign in" banner and disables all auth controls when connectivity unavailable
+- Shell offline banner: signed-in users see offline indicator at top of shell when offline
+- App confirmed to have no anonymous sign-in calls — `AuthViewGuest` represents the unsigned form state, not a Supabase anonymous user
+- Journey: carousel → sign-in (required) → wizard → Overview
+- Maestro flow added: `first-open-online.yaml` tests complete first-open auth journey
+- Docs updated: `SUPABASE_AUTH_TODOS.md` reflects required sign-in and anonymous disabled
+
 ## 2026-09-12 — Wizard first-run edges
 
 - Users who already have a goal or account skip the wizard instead of creating duplicates

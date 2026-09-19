@@ -32,8 +32,8 @@ class AuthCubit extends Cubit<AuthViewState> {
   /// Development-only: skip OTP/Google and bind a stable local test user.
   Future<void> debugSignIn() async {
     final current = state;
-    if (current is AuthViewGuest && current.busy) return;
-    if (current is AuthViewGuest) {
+    if (current is AuthViewSignedOut && current.busy) return;
+    if (current is AuthViewSignedOut) {
       emit(current.copyWith(busy: true, clearError: true, clearInfo: true));
     }
     try {
@@ -42,7 +42,7 @@ class AuthCubit extends Cubit<AuthViewState> {
       emit(const AuthViewSignedIn(user: AuthService.maestroTestUser));
     } on AppException catch (e) {
       if (isClosed) return;
-      if (current is AuthViewGuest) {
+      if (current is AuthViewSignedOut) {
         emit(
           current.copyWith(
             busy: false,
@@ -56,13 +56,13 @@ class AuthCubit extends Cubit<AuthViewState> {
 
   void emailChanged(String email) {
     final current = state;
-    if (current is! AuthViewGuest || current.busy) return;
+    if (current is! AuthViewSignedOut || current.busy) return;
     emit(current.copyWith(email: email, clearError: true, clearInfo: true));
   }
 
   void displayNameChanged(String displayName) {
     final current = state;
-    if (current is! AuthViewGuest || current.busy) return;
+    if (current is! AuthViewSignedOut || current.busy) return;
     emit(
       current.copyWith(
         displayName: displayName,
@@ -74,7 +74,7 @@ class AuthCubit extends Cubit<AuthViewState> {
 
   Future<void> sendOtp() async {
     final current = state;
-    if (current is! AuthViewGuest || current.busy) return;
+    if (current is! AuthViewSignedOut || current.busy) return;
     if (!current.supabaseConfigured) return;
 
     emit(current.copyWith(busy: true, clearError: true, clearInfo: true));
@@ -112,7 +112,7 @@ class AuthCubit extends Cubit<AuthViewState> {
 
   Future<void> verifyOtp(String token) async {
     final current = state;
-    if (current is! AuthViewGuest || current.busy) return;
+    if (current is! AuthViewSignedOut || current.busy) return;
     if (!current.supabaseConfigured) return;
 
     emit(current.copyWith(busy: true, clearError: true, clearInfo: true));
@@ -147,7 +147,7 @@ class AuthCubit extends Cubit<AuthViewState> {
 
   Future<void> signInWithGoogle() async {
     final current = state;
-    if (current is! AuthViewGuest || current.busy) return;
+    if (current is! AuthViewSignedOut || current.busy) return;
     if (!current.supabaseConfigured || !current.googleAvailable) return;
 
     emit(current.copyWith(busy: true, clearError: true, clearInfo: true));
@@ -249,11 +249,13 @@ class AuthCubit extends Cubit<AuthViewState> {
       return;
     }
     final previous = state;
-    final email = previous is AuthViewGuest ? previous.email : '';
-    final displayName = previous is AuthViewGuest ? previous.displayName : '';
-    final otpSent = previous is AuthViewGuest ? previous.otpSent : false;
+    final email = previous is AuthViewSignedOut ? previous.email : '';
+    final displayName = previous is AuthViewSignedOut
+        ? previous.displayName
+        : '';
+    final otpSent = previous is AuthViewSignedOut ? previous.otpSent : false;
     emit(
-      AuthViewGuest(
+      AuthViewSignedOut(
         supabaseConfigured: _appConfig.isSupabaseConfigured,
         googleAvailable: _googleAvailable,
         email: email,

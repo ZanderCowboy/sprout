@@ -23,6 +23,8 @@ import 'package:sprout/features/auth/presentation/bloc/auth_cubit.dart';
 import 'package:sprout/features/auth/presentation/privacy_page.dart';
 import 'package:sprout/features/auth/presentation/sign_in_page.dart';
 import 'package:sprout/features/auth/presentation/terms_page.dart';
+import 'package:sprout/features/connectivity/presentation/connectivity_cubit.dart';
+import 'package:sprout/ui/export.dart';
 
 import '../mocks/mocks.dart';
 
@@ -33,6 +35,7 @@ void main() {
   late Box<dynamic> settingsBox;
   late FakeAuthRepository fakeAuth;
   late AuthCubit cubit;
+  late FakeConnectivityCubit connectivity;
 
   setUpAll(() {
     tempDir = Directory.systemTemp.createTempSync('sprout_sign_in_');
@@ -43,6 +46,7 @@ void main() {
     final stamp = DateTime.now().microsecondsSinceEpoch;
     settingsBox = await Hive.openBox<dynamic>('settings_$stamp');
     fakeAuth = FakeAuthRepository();
+    connectivity = FakeConnectivityCubit(initialOnline: true);
     const config = AppConfig(
       environment: AppEnvironment.development,
       supabaseUrl: 'https://example.supabase.co',
@@ -71,6 +75,7 @@ void main() {
 
   tearDown(() async {
     await cubit.close();
+    await connectivity.close();
     await fakeAuth.dispose();
     await settingsBox.deleteFromDisk();
   });
@@ -86,7 +91,13 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         theme: buildAppTheme(),
-        home: BlocProvider.value(value: cubit, child: const SignInPage()),
+        home: MultiBlocProvider(
+          providers: [
+            BlocProvider<AuthCubit>.value(value: cubit),
+            BlocProvider<ConnectivityCubit>.value(value: connectivity),
+          ],
+          child: const SignInPage(),
+        ),
       ),
     );
 
@@ -107,8 +118,11 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         theme: buildAppTheme(),
-        home: BlocProvider.value(
-          value: cubit,
+        home: MultiBlocProvider(
+          providers: [
+            BlocProvider<AuthCubit>.value(value: cubit),
+            BlocProvider<ConnectivityCubit>.value(value: connectivity),
+          ],
           child: SignInPage(onBackToIntro: () => back = true),
         ),
       ),
@@ -124,7 +138,13 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         theme: buildAppTheme(),
-        home: BlocProvider.value(value: cubit, child: const SignInPage()),
+        home: MultiBlocProvider(
+          providers: [
+            BlocProvider<AuthCubit>.value(value: cubit),
+            BlocProvider<ConnectivityCubit>.value(value: connectivity),
+          ],
+          child: const SignInPage(),
+        ),
       ),
     );
 
@@ -154,8 +174,11 @@ void main() {
     });
 
     await tester.pumpWidget(
-      BlocProvider.value(
-        value: cubit,
+      MultiBlocProvider(
+        providers: [
+          BlocProvider<AuthCubit>.value(value: cubit),
+          BlocProvider<ConnectivityCubit>.value(value: connectivity),
+        ],
         child: MaterialApp.router(
           theme: buildAppTheme(),
           routerConfig: GoRouter(
@@ -197,8 +220,11 @@ void main() {
     });
 
     await tester.pumpWidget(
-      BlocProvider.value(
-        value: cubit,
+      MultiBlocProvider(
+        providers: [
+          BlocProvider<AuthCubit>.value(value: cubit),
+          BlocProvider<ConnectivityCubit>.value(value: connectivity),
+        ],
         child: MaterialApp.router(
           theme: buildAppTheme(),
           routerConfig: GoRouter(
@@ -223,6 +249,63 @@ void main() {
 
     expect(find.byType(PrivacyPage), findsOneWidget);
     expect(find.textContaining('Local privacy placeholder.'), findsOneWidget);
+  });
+
+  testWidgets('offline banner shows when connectivity is offline', (
+    tester,
+  ) async {
+    connectivity.setOnline(false);
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: buildAppTheme(),
+        home: MultiBlocProvider(
+          providers: [
+            BlocProvider<AuthCubit>.value(value: cubit),
+            BlocProvider<ConnectivityCubit>.value(value: connectivity),
+          ],
+          child: const SignInPage(),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    expect(find.text(AppStrings.offlineSignInBlocked), findsOneWidget);
+    expect(find.byIcon(Icons.cloud_off_rounded), findsOneWidget);
+  });
+
+  testWidgets('auth controls disabled when offline', (tester) async {
+    connectivity.setOnline(false);
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: buildAppTheme(),
+        home: MultiBlocProvider(
+          providers: [
+            BlocProvider<AuthCubit>.value(value: cubit),
+            BlocProvider<ConnectivityCubit>.value(value: connectivity),
+          ],
+          child: const SignInPage(),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    final sendCodeButtonFinder = find.ancestor(
+      of: find.text(AppStrings.sendCode),
+      matching: find.byType(SproutFilledButton),
+    );
+    final sendCodeButton = tester.widget<SproutFilledButton>(
+      sendCodeButtonFinder,
+    );
+    expect(sendCodeButton.onPressed, isNull);
+
+    final googleButtonFinder = find.ancestor(
+      of: find.text(AppStrings.continueWithGoogle),
+      matching: find.byType(SproutOutlinedButton),
+    );
+    final googleButton = tester.widget<SproutOutlinedButton>(
+      googleButtonFinder,
+    );
+    expect(googleButton.onPressed, isNull);
   });
 }
 

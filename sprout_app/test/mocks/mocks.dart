@@ -8,6 +8,7 @@ import 'package:sprout/features/accounts/domain/accounts_repository.dart';
 import 'package:sprout/features/auth/domain/auth_repository.dart';
 import 'package:sprout/features/auth/domain/auth_user.dart';
 import 'package:sprout/features/auth/domain/local_session_cleaner.dart';
+import 'package:sprout/features/connectivity/presentation/connectivity_cubit.dart';
 import 'package:sprout/features/sync/domain/pending_sync_operation.dart';
 import 'package:sprout/features/sync/domain/sync_remote_datasource.dart';
 import 'package:sprout/features/budget/domain/budget_group.dart';
@@ -564,4 +565,11 @@ class FakeBudgetRepository implements BudgetRepository {
   Future<void> dispose() async {
     await _controller.close();
   }
+}
+
+class FakeConnectivityCubit extends ConnectivityCubit {
+  FakeConnectivityCubit({bool initialOnline = true})
+    : super.seeded(initialOnline);
+
+  void setOnline(bool online) => emit(online);
 }

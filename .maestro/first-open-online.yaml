@@ -1,0 +1,76 @@
+appId: app.stackmint.sprout.dev
+tags:
+  - smoke
+  - auth
+---
+# First open online: carousel → sign-in (required) → wizard → Overview
+# Tests GitHub #59 acceptance: required sign-in journey
+# Run: maestro test .maestro/first-open-online.yaml
+
+- launchApp:
+    clearState: true
+    clearKeychain: true
+
+# Should show intro carousel (not Overview)
+- extendedWaitUntil:
+    visible:
+      id: "intro_next"
+    timeout: 45000
+
+- assertVisible:
+    text: "Track your savings in one place"
+
+# Navigate through intro slides
+- tapOn:
+    id: "intro_next"
+
+- assertVisible:
+    text: "Set goals and watch them grow"
+
+- tapOn:
+    id: "intro_next"
+
+- assertVisible:
+    text: "Sign in so your data stays with you"
+
+# Final next → sign-in (required, no guest bypass)
+- tapOn:
+    id: "intro_next"
+
+# Should redirect to sign-in page
+- extendedWaitUntil:
+    visible:
+      id: "sign_in_debug_sign_in"
+    timeout: 5000
+
+- assertVisible:
+    text: "Sign in"
+
+- assertVisible:
+    text: "Sign in to sync your savings across devices."
+
+# Use debug sign-in to complete auth
+- tapOn:
+    id: "sign_in_debug_sign_in"
+
+# Should redirect to wizard (first run)
+- extendedWaitUntil:
+    visible:
+      id: "wizard_skip"
+    timeout: 10000
+
+- assertVisible:
+    text: "What are you growing?"
+
+# Skip wizard to land on Overview
+- tapOn:
+    id: "wizard_skip"
+
+# Should land on Overview (shell accessible after sign-in)
+- extendedWaitUntil:
+    visible:
+      id: "shell_tab_overview"
+    timeout: 10000
+
+- assertVisible:
+    text: "Welcome to Sprout"
