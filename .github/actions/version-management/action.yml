@@ -44,7 +44,7 @@ runs:
     # bypass branch rulesets. Compute-only mode uses the job checkout instead.
     - name: Checkout Branch
       if: inputs.commit_changes == 'true'
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         ref: ${{ inputs.branch_name }}
         fetch-depth: 0
