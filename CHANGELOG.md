@@ -2,6 +2,11 @@
 
 Changes heading to `main`. Newest entries at the top.
 
+## 2026-09-20 — GitHub Actions Node 24 and Ubuntu pin
+
+- Checkout, Java setup, and Play upload actions now run on Node 24 instead of deprecated Node 20
+- Workflows pin `ubuntu-24.04` so `ubuntu-latest` will not silently move to Ubuntu 26 in October
+
 ## 2026-09-20 — Release label gate and AGP bump
 
 - Merge-to-main release fails when the PR lacks a valid `major`/`minor`/`patch` label instead of shipping a build-only bump

@@ -74,7 +74,7 @@ jobs:
       github.event_name == 'workflow_dispatch' ||
       (github.event.pull_request.merged == true &&
        !contains(github.event.pull_request.labels.*.name, 'no-build'))
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     outputs:
       version_number: ${{ steps.version_management.outputs.version_number || steps.current_version.outputs.version_number }}
       version_part: ${{ steps.version_management.outputs.version_part || steps.current_version.outputs.version_part }}
@@ -89,7 +89,7 @@ jobs:
       git_ref: ${{ steps.resolve_bump_type.outputs.git_ref }}
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
           ref: ${{ github.event_name == 'workflow_dispatch' && (inputs.git_ref != '' && inputs.git_ref || 'main') || github.sha }}
@@ -211,14 +211,14 @@ jobs:
     name: Firebase Dev APK
     needs: [resolve]
     if: needs.resolve.outputs.skip_firebase != 'true'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     env:
       ANDROID_SIGNING_CONFIG_BASE64: ${{ secrets.ANDROID_SIGNING_CONFIG_BASE64 }}
       APP_CONFIG_DEV_BASE64: ${{ secrets.APP_CONFIG_DEV_BASE64 }}
       GOOGLE_SERVICES_DEV_BASE64: ${{ secrets.GOOGLE_SERVICES_DEV_BASE64 }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: ${{ needs.resolve.outputs.git_ref }}
 
@@ -285,14 +285,14 @@ jobs:
     name: Play Prod AAB
     needs: [resolve]
     if: needs.resolve.outputs.skip_play != 'true'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     env:
       ANDROID_SIGNING_CONFIG_BASE64: ${{ secrets.ANDROID_SIGNING_CONFIG_BASE64 }}
       APP_CONFIG_PROD_BASE64: ${{ secrets.APP_CONFIG_PROD_BASE64 }}
       GOOGLE_SERVICES_PROD_BASE64: ${{ secrets.GOOGLE_SERVICES_PROD_BASE64 }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: ${{ needs.resolve.outputs.git_ref }}
 
@@ -364,7 +364,7 @@ jobs:
           fi
 
       - name: Upload AAB to Google Play
-        uses: r0adkll/upload-google-play@v1.1.3
+        uses: r0adkll/upload-google-play@v1.1.5
         with:
           serviceAccountJsonPlainText: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
           packageName: app.stackmint.sprout
@@ -385,10 +385,10 @@ jobs:
       (needs.firebase.result == 'success' || needs.firebase.result == 'skipped') &&
       (needs.play.result == 'success' || needs.play.result == 'skipped') &&
       !(needs.firebase.result == 'skipped' && needs.play.result == 'skipped')
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout (for local actions)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Generate GitHub App Token
         id: generate_token
