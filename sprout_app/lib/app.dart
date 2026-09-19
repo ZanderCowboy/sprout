@@ -45,10 +45,10 @@ class _SproutAppState extends State<SproutApp> {
         if (shouldEnableDebugLens()) SproutDebugLens.navigatorObserver,
       ],
     );
-    unawaited(_setupDebugLens());
+    _setupDebugLens();
   }
 
-  Future<void> _setupDebugLens() async {
+  void _setupDebugLens() {
     if (!shouldEnableDebugLens()) {
       return;
     }
@@ -56,20 +56,27 @@ class _SproutAppState extends State<SproutApp> {
 
     final remoteConfig = sl<RemoteConfigService>();
     if (remoteConfig.isReady) {
-      try {
-        final rcInstance = FirebaseRemoteConfig.instance;
-        final allKeys = rcInstance.getAll();
-        final rcMap = <String, Object?>{};
-        for (final entry in allKeys.entries) {
-          final value = entry.value;
-          if (value.source != ValueSource.valueStatic) {
-            rcMap[entry.key] = value.asString();
-          }
+      unawaited(_loadRemoteConfigIntoDebugLens());
+    }
+  }
+
+  Future<void> _loadRemoteConfigIntoDebugLens() async {
+    try {
+      final rcInstance = FirebaseRemoteConfig.instance;
+      final allKeys = rcInstance.getAll();
+      final rcMap = <String, Object?>{};
+      for (final entry in allKeys.entries) {
+        final value = entry.value;
+        if (value.source != ValueSource.valueStatic) {
+          rcMap[entry.key] = value.asString();
         }
-        await DebugLens.instance.setRemoteConfigData(rcMap);
-      } on Object {
-        // Fail silently if Remote Config is unavailable
       }
+      await DebugLens.instance.setRemoteConfigData(
+        rcMap,
+        sourceLabel: 'Firebase',
+      );
+    } on Object {
+      // Fail silently if Remote Config is unavailable
     }
   }
 
