@@ -364,6 +364,10 @@ abstract final class AppStrings {
   static const String manage = 'Manage';
   static const String upgrade = 'Upgrade';
   static const String finance = 'Finance';
+  static const String debugTools = 'Debug tools';
+  static const String debugLens = 'Debug Lens';
+  static const String debugLensSubtitle =
+      'Network, logs, navigation, and Remote Config';
 
   static String appVersionLabel(String version, String buildNumber) =>
       'Version $version (Build $buildNumber)';

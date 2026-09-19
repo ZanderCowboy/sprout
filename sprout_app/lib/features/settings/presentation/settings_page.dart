@@ -3,15 +3,18 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:purchases_ui_flutter/purchases_ui_flutter.dart';
+import 'package:debug_lens/debug_lens.dart';
 
 import 'package:sprout/core/core.dart';
 import 'package:sprout/features/auth/export.dart';
 import 'package:sprout/features/purchases/presentation/premium_paywall_helper.dart';
 import 'package:sprout/ui/export.dart';
+import 'package:sprout/bootstrap.dart';
 import 'widgets/settings_finance_section.dart';
 import 'widgets/settings_footer.dart';
 import 'widgets/settings_premium_card.dart';
 import 'widgets/settings_profile_header.dart';
+import 'widgets/settings_nav_row.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -145,6 +148,10 @@ class _SettingsPageState extends State<SettingsPage> {
     context.push(AppRoute.privacy.path);
   }
 
+  void _openDebugLens() {
+    DebugLens.openDebugLens();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -170,6 +177,22 @@ class _SettingsPageState extends State<SettingsPage> {
               ],
               const SizedBox(height: 28),
               const SettingsFinanceSection(),
+              if (shouldEnableDebugLens()) ...[
+                const SizedBox(height: 28),
+                Text(
+                  AppStrings.debugTools,
+                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                ),
+                const SizedBox(height: 8),
+                SettingsNavRow(
+                  identifier: SemanticsIds.settingsDebugLens,
+                  label: AppStrings.debugLens,
+                  icon: Icons.bug_report_outlined,
+                  onTap: _openDebugLens,
+                ),
+              ],
               const SizedBox(height: 32),
               SettingsFooter(
                 versionLabel: _versionLabel,

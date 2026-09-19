@@ -2,6 +2,14 @@
 
 Changes heading to `main`. Newest entries at the top.
 
+## 2026-09-19 — Debug Lens MVP
+
+- Debug Lens on-device debugging panel available in Settings (gated by flavor + Remote Config)
+- Development flavor: always enabled (no Remote Config required)
+- Production flavor: Remote Config flag `debug_lens_enabled` (default false) enables break-glass debugging
+- Shows network calls, logs, navigation, Remote Config values, and device info
+- Entry point: Settings → Debug tools → Debug Lens (only visible when enabled)
+
 ## 2026-09-12 — Auth journey: required sign-in (no guest bypass)
 
 - Sign-in is now required after intro carousel — no anonymous or guest bypass
