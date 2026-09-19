@@ -281,7 +281,7 @@ Repo code now uses the **new** ids. Recreate Firebase Android apps and Google Cl
 - [x] `sprout_app/android/app/build.gradle.kts`: `applicationId` + `namespace` → `app.stackmint.sprout` (keep `.dev` suffix on development flavor)
 - [x] Move `MainActivity.kt` to `…/kotlin/app/stackmint/sprout/` and update `package`
 - [x] `development.json` / `production.json`: `androidApplicationId` (local gitignored files)
-- [x] `.github/workflows/play-publish-prod-android.yml`: `packageName`
+- [x] Release Main Play job: `packageName` `app.stackmint.sprout`
 - [x] Tests that hardcode the old id
 - [x] Docs: `README.md`, `docs/FIREBASE_DEV_DISTRIBUTION.md`, `docs/PLAY_PUBLISH_PROD_ANDROID.md`, `docs/REVENUECAT.md`, this file
 - [x] Run analyze / tests
@@ -448,7 +448,7 @@ Email OTP is independent of package id. If Google fails, check **Logs → Auth**
 
 ### G. CI secrets after rename
 
-GitHub **Settings → Secrets and variables → Actions**. Re-encode whenever the **file on disk** changes. Workflow `packageName` for Play is already `app.stackmint.sprout` in `[.github/workflows/play-publish-prod-android.yml](../.github/workflows/play-publish-prod-android.yml)`.
+GitHub **Settings → Secrets and variables → Actions**. Re-encode whenever the **file on disk** changes. Play `packageName` is `app.stackmint.sprout` in [`.github/workflows/release-main.yml`](../.github/workflows/release-main.yml).
 
 **Do now if you use Firebase App Distribution.** Prod Play secrets can wait.
 

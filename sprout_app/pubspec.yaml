@@ -12,7 +12,7 @@ dependencies:
     sdk: flutter
 
   cupertino_icons: ^1.0.8
-  connectivity_plus: ^6.1.1
+  connectivity_plus: ^7.3.1
   equatable: ^2.0.7
   fl_chart: ^0.70.2
   flutter_bloc: ^9.1.1
@@ -31,6 +31,8 @@ dependencies:
   google_sign_in: ^7.2.0
   flutter_markdown: ^0.7.7+1
   package_info_plus: ^10.2.1
+  debug_lens: ^0.0.2
+  provider: ^6.1.2
 
 dev_dependencies:
   flutter_test:

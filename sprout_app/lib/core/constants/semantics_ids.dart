@@ -127,6 +127,7 @@ abstract final class SemanticsIds {
   static const settingsTransactions = 'settings_transactions';
   static const settingsRecurring = 'settings_recurring';
   static const settingsBudget = 'settings_budget';
+  static const settingsDebugLens = 'settings_debug_lens';
 
   // --- Transactions ---
   static const transactionRow = 'transaction_row';

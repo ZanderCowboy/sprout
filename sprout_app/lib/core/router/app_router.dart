@@ -21,11 +21,13 @@ GoRouter createAppRouter({
   required GoRouterRefreshStream refreshListenable,
   GlobalKey<NavigatorState>? navigatorKey,
   Future<bool> Function()? hasExistingSetup,
+  List<NavigatorObserver> observers = const [],
 }) {
   final rootKey = navigatorKey ?? GlobalKey<NavigatorState>(debugLabel: 'root');
 
   return GoRouter(
     navigatorKey: rootKey,
+    observers: observers,
     initialLocation: AppRoute.loading.path,
     refreshListenable: refreshListenable,
     redirect: (context, state) async {

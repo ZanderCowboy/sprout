@@ -16,7 +16,8 @@ class RemoteConfigServiceImpl implements RemoteConfigService {
 
   @override
   Future<void> setup(AppConfig config) async {
-    if (config.environment != AppEnvironment.development) {
+    if (config.environment != AppEnvironment.development &&
+        !config.isFirebaseConfigured) {
       return;
     }
     if (!config.isFirebaseConfigured) {

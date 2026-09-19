@@ -1,0 +1,179 @@
+name: "Version Management"
+description: "Bumps pubspec.yaml version and commits with a GitHub App token"
+
+inputs:
+  github_token:
+    description: "GitHub App installation token"
+    required: true
+  pubspec_path:
+    description: "Path to the pubspec.yaml file"
+    required: true
+    default: "sprout_app/pubspec.yaml"
+  branch_name:
+    description: "Branch name to push changes to"
+    required: true
+    default: "main"
+  bump_type:
+    description: "Type of version bump (major, minor, patch, none)"
+    required: true
+    default: "none"
+  commit_changes:
+    description: "If false, only computes and outputs the next version (no commit/push)."
+    required: false
+    default: "true"
+  target_version:
+    description: "Optional exact version to commit/push (e.g. 1.2.3+456). When set, bump_type is ignored."
+    required: false
+    default: ""
+
+outputs:
+  version_number:
+    description: "The new version number, e.g. 1.2.3+456"
+    value: ${{ steps.version_update.outputs.version_number }}
+  version_part:
+    description: "The version part without the build number, e.g. 1.2.3"
+    value: ${{ steps.version_update.outputs.version_part }}
+  build_number:
+    description: "The build number extracted from the version, e.g. 456"
+    value: ${{ steps.version_update.outputs.build_number }}
+
+runs:
+  using: "composite"
+  steps:
+    # Commit mode: checkout target branch with the GitHub App token so pushes
+    # bypass branch rulesets. Compute-only mode uses the job checkout instead.
+    - name: Checkout Branch
+      if: inputs.commit_changes == 'true'
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ inputs.branch_name }}
+        fetch-depth: 0
+        token: ${{ inputs.github_token }}
+
+    - name: Update Version
+      id: version_update
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.github_token }}
+      run: |
+        set -euo pipefail
+
+        branch_name="${{ inputs.branch_name }}"
+        pubspec_path="${{ inputs.pubspec_path }}"
+        bump_type="${{ inputs.bump_type }}"
+        commit_changes="${{ inputs.commit_changes }}"
+        target_version="${{ inputs.target_version }}"
+
+        echo "Checking version in ${pubspec_path}:"
+
+        git config user.name "VersionBumpingBot"
+        git config user.email "bot@versionbumpingbot.com"
+        git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+
+        read_current_version() {
+          if [[ ! -f "$pubspec_path" ]]; then
+            echo "::error::File not found: $pubspec_path"
+            exit 1
+          fi
+
+          if ! grep -qE '^[[:space:]]*version:[[:space:]]*' "$pubspec_path"; then
+            echo "::error::No version field found in $pubspec_path"
+            exit 1
+          fi
+
+          local v
+          v="$(grep -E '^[[:space:]]*version:[[:space:]]*' "$pubspec_path" | head -n1 | sed -E 's/^[[:space:]]*version:[[:space:]]*//' | tr -d '\r' | xargs)"
+          if ! echo "$v" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+\+[0-9]+$'; then
+            echo "::error::Invalid version format in $pubspec_path: $v (expected x.y.z+build)"
+            exit 1
+          fi
+          echo "$v"
+        }
+
+        compute_next_version() {
+          local current_version current_part current_build major minor patch new_build
+
+          current_version="$(read_current_version)"
+          current_part="$(echo "$current_version" | cut -d'+' -f1)"
+          current_build="$(echo "$current_version" | cut -d'+' -f2)"
+
+          IFS='.' read -r major minor patch <<< "$current_part"
+
+          case "$bump_type" in
+            major)
+              major=$((major + 1)); minor=0; patch=0 ;;
+            minor)
+              minor=$((minor + 1)); patch=0 ;;
+            patch)
+              patch=$((patch + 1)) ;;
+            none)
+              : ;;
+            *)
+              echo "::error::Invalid bump_type: $bump_type. Expected: major, minor, patch, none"
+              exit 1 ;;
+          esac
+
+          new_build=$((current_build + 1))
+          echo "${major}.${minor}.${patch}+${new_build}"
+        }
+
+        commit_version() {
+          local new_version="$1"
+          sed -i -E "s/^[[:space:]]*version:[[:space:]]*.*/version: ${new_version}/" "$pubspec_path"
+          git add "$pubspec_path"
+          git commit -m "Bump version to $new_version [skip ci]" >/dev/null
+        }
+
+        max_retries=3
+        for attempt in $(seq 1 "$max_retries"); do
+          echo "Version bump attempt $attempt/$max_retries"
+
+          git fetch origin "$branch_name"
+          git reset --hard "origin/$branch_name"
+
+          current_version="$(read_current_version)"
+          echo "Current version: $current_version"
+
+          if [[ -n "$target_version" ]]; then
+            next_version="$target_version"
+            if ! echo "$next_version" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+\+[0-9]+$'; then
+              echo "::error::Invalid target_version: $next_version (expected x.y.z+build)"
+              exit 1
+            fi
+          else
+            next_version="$(compute_next_version)"
+          fi
+
+          if [[ "$next_version" == "$current_version" ]]; then
+            echo "::error::Next version equals current version ($current_version); refusing to commit"
+            exit 1
+          fi
+
+          echo "Updating version: $current_version -> $next_version"
+
+          if [[ "$commit_changes" != "true" ]]; then
+            version_part="$(echo "$next_version" | cut -d'+' -f1)"
+            build_number="$(echo "$next_version" | cut -d'+' -f2)"
+            echo "version_part=$version_part" >> "$GITHUB_OUTPUT"
+            echo "build_number=$build_number" >> "$GITHUB_OUTPUT"
+            echo "version_number=$next_version" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          commit_version "$next_version"
+
+          if git push origin "HEAD:$branch_name"; then
+            version_part="$(echo "$next_version" | cut -d'+' -f1)"
+            build_number="$(echo "$next_version" | cut -d'+' -f2)"
+            echo "version_part=$version_part" >> "$GITHUB_OUTPUT"
+            echo "build_number=$build_number" >> "$GITHUB_OUTPUT"
+            echo "version_number=$next_version" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "::warning::Push failed (possible version conflict). Retrying in 5 seconds..."
+          sleep 5
+        done
+
+        echo "::error::Failed to bump/push version after $max_retries attempts"
+        exit 1

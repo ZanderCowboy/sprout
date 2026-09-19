@@ -3,9 +3,13 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:debug_lens/debug_lens.dart';
+import 'package:firebase_remote_config/firebase_remote_config.dart';
 
 import 'package:sprout/core/core.dart';
+import 'package:sprout/core/debug/sprout_debug_lens.dart';
 import 'package:sprout/core/di/service_locator.dart';
+import 'package:sprout/core/flags/remote_config_service.dart';
 import 'package:sprout/core/router/app_router.dart';
 import 'package:sprout/core/router/go_router_refresh_stream.dart';
 import 'package:sprout/features/accounts/export.dart';
@@ -13,6 +17,7 @@ import 'package:sprout/features/auth/export.dart';
 import 'package:sprout/features/connectivity/export.dart';
 import 'package:sprout/features/goals/export.dart';
 import 'package:sprout/ui/export.dart';
+import 'package:sprout/bootstrap.dart';
 
 class SproutApp extends StatefulWidget {
   const SproutApp({super.key});
@@ -36,7 +41,43 @@ class _SproutAppState extends State<SproutApp> {
       userContext: sl<UserContext>(),
       refreshListenable: _refresh,
       hasExistingSetup: _hasExistingSetup,
+      observers: [
+        if (shouldEnableDebugLens()) SproutDebugLens.navigatorObserver,
+      ],
     );
+    _setupDebugLens();
+  }
+
+  void _setupDebugLens() {
+    if (!shouldEnableDebugLens()) {
+      return;
+    }
+    DebugLens.debugLensEnabled = true;
+
+    final remoteConfig = sl<RemoteConfigService>();
+    if (remoteConfig.isReady) {
+      unawaited(_loadRemoteConfigIntoDebugLens());
+    }
+  }
+
+  Future<void> _loadRemoteConfigIntoDebugLens() async {
+    try {
+      final rcInstance = FirebaseRemoteConfig.instance;
+      final allKeys = rcInstance.getAll();
+      final rcMap = <String, Object?>{};
+      for (final entry in allKeys.entries) {
+        final value = entry.value;
+        if (value.source != ValueSource.valueStatic) {
+          rcMap[entry.key] = value.asString();
+        }
+      }
+      await DebugLens.instance.setRemoteConfigData(
+        rcMap,
+        sourceLabel: 'Firebase',
+      );
+    } on Object {
+      // Fail silently if Remote Config is unavailable
+    }
   }
 
   @override
@@ -73,10 +114,16 @@ class _SproutAppState extends State<SproutApp> {
           themeMode: ThemeMode.dark,
           routerConfig: _router,
           debugShowCheckedModeBanner: false,
-          builder: (context, child) => EnvironmentBanner(
-            environment: sl<AppConfig>().environment,
-            child: child ?? const SizedBox.shrink(),
-          ),
+          builder: (context, child) {
+            Widget result = EnvironmentBanner(
+              environment: sl<AppConfig>().environment,
+              child: child ?? const SizedBox.shrink(),
+            );
+            if (shouldEnableDebugLens()) {
+              result = SproutDebugLens.wrap(result);
+            }
+            return result;
+          },
         ),
       ),
     );

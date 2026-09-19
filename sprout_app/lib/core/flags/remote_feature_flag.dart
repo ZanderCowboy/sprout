@@ -4,7 +4,10 @@ enum RemoteFeatureFlag {
   revenueCatEnabled('revenuecat_enabled', defaultValue: false),
 
   /// When true, show the detailed startup checklist UI instead of the splash.
-  showStartupChecks('show_startup_checks', defaultValue: false);
+  showStartupChecks('show_startup_checks', defaultValue: false),
+
+  /// When true, enable DebugLens in production builds. Always enabled in DEV.
+  debugLensEnabled('debug_lens_enabled', defaultValue: false);
 
   const RemoteFeatureFlag(this.key, {required this.defaultValue});
 

@@ -1,0 +1,12 @@
+{
+  "categories": {
+    "major": ["major"],
+    "minor": ["minor"],
+    "patch": ["patch"]
+  },
+  "no_build": ["no-build"],
+  "require_label": true,
+  "branches": {
+    "main": { "allowed_bumps": ["major", "minor", "patch", "none"] }
+  }
+}

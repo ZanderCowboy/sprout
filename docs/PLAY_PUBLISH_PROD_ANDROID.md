@@ -1,8 +1,12 @@
 # Play Store publish (production Android AAB)
 
-Dispatch-only workflow: **Play Publish (Prod Android AAB)** builds a signed production App Bundle and uploads it to Google Play.
+Production AAB upload is a job inside **Release Main** (`.github/workflows/release-main.yml`), not a separate workflow.
 
-Development builds use Firebase App Distribution instead — see [FIREBASE_DEV_DISTRIBUTION.md](FIREBASE_DEV_DISTRIBUTION.md).
+On every labeled merge to `main` (except `no-build`), CI builds a signed production App Bundle and uploads it to the Play **internal** track with the same `versionCode` as the Firebase development APK.
+
+When Firebase testers are happy, **promote that internal release in Play Console** to production (same AAB, no rebuild). Prefer Console promote over dispatching `play_track: production`.
+
+Development builds use Firebase App Distribution — see [FIREBASE_DEV_DISTRIBUTION.md](FIREBASE_DEV_DISTRIBUTION.md). Version labels and Version Bot: [BUILD_NUMBER.md](BUILD_NUMBER.md).
 
 ## Package / flavor
 
@@ -53,23 +57,35 @@ Requires `src/production/google-services.json`, `production.json`, and release s
 
 ## GitHub secrets
 
+Full inventory (all secrets, encode/`gh` restore): [GITHUB_SECRETS.md](GITHUB_SECRETS.md).
+
 | Secret | Required | Purpose |
 |--------|----------|---------|
 | `APP_CONFIG_PROD_BASE64` | yes | Production Supabase config JSON |
 | `GOOGLE_SERVICES_PROD_BASE64` | yes | Production `google-services.json` |
 | `ANDROID_SIGNING_CONFIG_BASE64` | yes | Upload keystore (same format as [FIREBASE_DEV_DISTRIBUTION.md](FIREBASE_DEV_DISTRIBUTION.md)) |
 | `PLAY_STORE_SERVICE_ACCOUNT_JSON` | yes | Play Console API service account (raw JSON) |
+| `VERSION_BOT_APP_ID` / `VERSION_BOT_APP_PRIVATE_KEY` | yes | Version commit after successful ship |
 
-## Manual workflow inputs
+## How to ship
 
-Go to **Actions** → **Play Publish (Prod Android AAB)** → **Run workflow**:
+### Automatic (preferred)
 
-- `git_ref` (optional): branch/tag/commit SHA to build (default: current ref)
-- `track`: `internal` (default), `alpha`, `beta`, or `production`
-- `release_status`: `completed` (default), `draft`, `halted`, or `inProgress`
-- `release_notes` (optional): en-US “What’s new” text (defaults to `Production release`)
+Merge a PR into `main` with a `major` / `minor` / `patch` label. **Release Main** uploads to Play **internal** with `status: completed`.
+
+### Manual (retry / other tracks)
+
+**Actions** → **Release Main** → **Run workflow**:
+
+- `git_ref` — branch/tag/SHA
+- `bump_type` / `commit_version` — see [BUILD_NUMBER.md](BUILD_NUMBER.md)
+- `play_track` — `internal` (default), `alpha`, `beta`, or `production`
+- `skip_firebase` — set true to only ship Play
+- `release_notes` — en-US “What’s new” (defaults to PR title on merge)
 
 ## Build command used in CI
+
+CI also passes `--build-name` / `--build-number` from the computed version:
 
 ```bash
 flutter build appbundle --release --flavor production -t lib/main_production.dart --no-tree-shake-icons
