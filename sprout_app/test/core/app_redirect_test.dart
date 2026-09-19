@@ -118,41 +118,43 @@ void main() {
       expect(result, '${AppRoute.signIn.path}?from=%2Foverview');
     });
 
-    test('unsigned with intro can stay on sign-in, intro, terms, and privacy',
-        () async {
-      expect(
-        await redirect(
-          auth: signedOut,
-          introCompleted: true,
-          location: AppRoute.signIn.path,
-        ),
-        isNull,
-      );
-      expect(
-        await redirect(
-          auth: signedOut,
-          introCompleted: true,
-          location: AppRoute.intro.path,
-        ),
-        isNull,
-      );
-      expect(
-        await redirect(
-          auth: signedOut,
-          introCompleted: true,
-          location: AppRoute.terms.path,
-        ),
-        isNull,
-      );
-      expect(
-        await redirect(
-          auth: signedOut,
-          introCompleted: true,
-          location: AppRoute.privacy.path,
-        ),
-        isNull,
-      );
-    });
+    test(
+      'unsigned with intro can stay on sign-in, intro, terms, and privacy',
+      () async {
+        expect(
+          await redirect(
+            auth: signedOut,
+            introCompleted: true,
+            location: AppRoute.signIn.path,
+          ),
+          isNull,
+        );
+        expect(
+          await redirect(
+            auth: signedOut,
+            introCompleted: true,
+            location: AppRoute.intro.path,
+          ),
+          isNull,
+        );
+        expect(
+          await redirect(
+            auth: signedOut,
+            introCompleted: true,
+            location: AppRoute.terms.path,
+          ),
+          isNull,
+        );
+        expect(
+          await redirect(
+            auth: signedOut,
+            introCompleted: true,
+            location: AppRoute.privacy.path,
+          ),
+          isNull,
+        );
+      },
+    );
 
     test('unsigned with intro leaves loading for sign-in', () async {
       expect(

@@ -569,7 +569,7 @@ class FakeBudgetRepository implements BudgetRepository {
 
 class FakeConnectivityCubit extends ConnectivityCubit {
   FakeConnectivityCubit({bool initialOnline = true})
-      : super.seeded(initialOnline);
+    : super.seeded(initialOnline);
 
   void setOnline(bool online) => emit(online);
 }

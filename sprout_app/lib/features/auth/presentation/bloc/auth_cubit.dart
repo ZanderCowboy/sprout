@@ -250,7 +250,9 @@ class AuthCubit extends Cubit<AuthViewState> {
     }
     final previous = state;
     final email = previous is AuthViewSignedOut ? previous.email : '';
-    final displayName = previous is AuthViewSignedOut ? previous.displayName : '';
+    final displayName = previous is AuthViewSignedOut
+        ? previous.displayName
+        : '';
     final otpSent = previous is AuthViewSignedOut ? previous.otpSent : false;
     emit(
       AuthViewSignedOut(

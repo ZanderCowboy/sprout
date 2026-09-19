@@ -37,8 +37,9 @@ class AccountPage extends StatelessWidget {
       body: BlocBuilder<AuthCubit, AuthViewState>(
         builder: (context, state) {
           return switch (state) {
-            AuthViewLoading() ||
-            AuthViewSignedOut() => const Center(child: CircularProgressIndicator()),
+            AuthViewLoading() || AuthViewSignedOut() => const Center(
+              child: CircularProgressIndicator(),
+            ),
             AuthViewSignedIn(:final user, :final busy, :final errorMessage) =>
               ListView(
                 padding: const EdgeInsets.all(16),

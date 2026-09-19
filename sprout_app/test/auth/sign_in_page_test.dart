@@ -293,14 +293,18 @@ void main() {
       of: find.text(AppStrings.sendCode),
       matching: find.byType(SproutFilledButton),
     );
-    final sendCodeButton = tester.widget<SproutFilledButton>(sendCodeButtonFinder);
+    final sendCodeButton = tester.widget<SproutFilledButton>(
+      sendCodeButtonFinder,
+    );
     expect(sendCodeButton.onPressed, isNull);
 
     final googleButtonFinder = find.ancestor(
       of: find.text(AppStrings.continueWithGoogle),
       matching: find.byType(SproutOutlinedButton),
     );
-    final googleButton = tester.widget<SproutOutlinedButton>(googleButtonFinder);
+    final googleButton = tester.widget<SproutOutlinedButton>(
+      googleButtonFinder,
+    );
     expect(googleButton.onPressed, isNull);
   });
 }
