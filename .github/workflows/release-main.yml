@@ -108,7 +108,8 @@ jobs:
         with:
           labels: ${{ toJson(github.event.pull_request.labels) }}
           target_branch: main
-          mode: resolve
+          # Fail the resolve job on missing/conflicting labels so Firebase/Play never run.
+          mode: validate
 
       - name: Resolve inputs
         id: resolve_bump_type
@@ -117,6 +118,7 @@ jobs:
           EVENT_NAME: ${{ github.event_name }}
           MANUAL_BUMP_TYPE: ${{ inputs.bump_type }}
           LABEL_BUMP_TYPE: ${{ steps.check_labels.outputs.bump_type }}
+          LABELS_VALID: ${{ steps.check_labels.outputs.valid }}
           MANUAL_COMMIT: ${{ inputs.commit_version }}
           MANUAL_PLAY_TRACK: ${{ inputs.play_track }}
           MANUAL_SKIP_FIREBASE: ${{ inputs.skip_firebase }}
@@ -140,7 +142,12 @@ jobs:
             git_ref="${MANUAL_GIT_REF:-main}"
           else
             bump_type="$LABEL_BUMP_TYPE"
-            # Always commit after a labeled merge release (bump is never none without no-build).
+            if [[ "${LABELS_VALID:-}" != "true" ]] ||
+               [[ "$bump_type" != "major" && "$bump_type" != "minor" && "$bump_type" != "patch" ]]; then
+              echo "::error::Merge release requires a valid major, minor, or patch label (got bump_type=${bump_type:-empty}, valid=${LABELS_VALID:-empty})."
+              exit 1
+            fi
+            # Commit only after a labeled semantic bump (no-build is excluded by the job if).
             commit_version="true"
             play_track="internal"
             skip_firebase="false"

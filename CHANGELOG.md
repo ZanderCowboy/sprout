@@ -2,6 +2,11 @@
 
 Changes heading to `main`. Newest entries at the top.
 
+## 2026-09-20 — Release label gate and AGP bump
+
+- Merge-to-main release fails when the PR lacks a valid `major`/`minor`/`patch` label instead of shipping a build-only bump
+- Android Gradle Plugin raised to `8.12.1` for `connectivity_plus` 7.x
+
 ## 2026-09-20 — GitHub secrets inventory doc
 
 - Added `docs/GITHUB_SECRETS.md`: every Actions secret, source file, encode/`gh` update commands, Play SA permissions, and restore checklist
