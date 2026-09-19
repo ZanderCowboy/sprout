@@ -2,6 +2,16 @@
 
 Changes heading to `main`. Newest entries at the top.
 
+## 2026-09-20 — GitHub secrets inventory doc
+
+- Added `docs/GITHUB_SECRETS.md`: every Actions secret, source file, encode/`gh` update commands, Play SA permissions, and restore checklist
+
+## 2026-09-20 — Merge-to-main release CI
+
+- Labeled merges to `main` compute the next semver, ship a development APK to Firebase and a production AAB to Play internal, then commit the version only after both uploads succeed
+- PRs into `main` require exactly one of `major`, `minor`, `patch`, or `no-build`
+- Standalone bump / Firebase / Play workflows are folded into **Release Main** (manual dispatch for retries)
+
 ## 2026-09-19 — Debug Lens covers previous screens
 
 - In-panel pages use an opaque Sprout surface again so dashboard tiles do not show through Network and other tools

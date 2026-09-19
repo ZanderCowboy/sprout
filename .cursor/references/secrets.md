@@ -28,6 +28,6 @@ See `README.md`. Empty `supabaseUrl`/`supabaseAnonKey` → local-only. Empty `re
 
 Dashboard logins, 2FA, App Store / Play Console, pasting keys into JSON or GitHub secrets. State that single action; do not dump secret values into chat, commits, or rules.
 
-CI encoding: `docs` + `supabase/README.md` (`APP_CONFIG_DEV_BASE64` / `APP_CONFIG_PROD_BASE64`).
+**GitHub Actions secrets (full inventory + update/restore):** [`docs/GITHUB_SECRETS.md`](../../docs/GITHUB_SECRETS.md).
 
-Version bot (required for the `main` build bump): `VERSION_BOT_APP_ID` + `VERSION_BOT_APP_PRIVATE_KEY`. See `docs/BUILD_NUMBER.md`.
+CI encoding snippets also appear in `supabase/README.md` and the Firebase/Play docs. Version bot create steps: `docs/BUILD_NUMBER.md`.

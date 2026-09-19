@@ -8,6 +8,6 @@ Load these on demand. Do not dump them into every chat.
 | [tooling.md](tooling.md) | Flavors, analyze/test, Make, codegen, Maestro MCP |
 | [testing.md](testing.md) | Unit/cubit tests, fakes, Hive in tests; skip widget tests unless asked |
 | [offline-sync.md](offline-sync.md) | Hive, pending queue, `canSync`, pull/push |
-| [secrets.md](secrets.md) | Config JSON, Firebase, keys, gitignore |
+| [secrets.md](secrets.md) | Config JSON, Firebase, keys, gitignore; CI inventory → `docs/GITHUB_SECRETS.md` |
 
 Canonical human docs stay in `README.md`, `docs/`, and `supabase/README.md`. This folder is the short agent map.

@@ -1,21 +1,40 @@
-# Build number
+# Build number and version labels
 
 Flutter version lives in [`sprout_app/pubspec.yaml`](../sprout_app/pubspec.yaml) as `version: x.y.z+N`.
 
-- `x.y.z` is the user-facing version name — bump this by hand for a named release
-- `N` is the Android `versionCode` (via `flutter.versionCode` in Gradle)
+- `x.y.z` is the user-facing version name — bumped from PR labels on merge to `main`
+- `N` is the Android `versionCode` (via `flutter.versionCode` in Gradle) — always increments with every release ship
 
-Every merge (or push) to `main` increments `N` and commits it with a GitHub App, same pattern as Multichoice.
+## PR labels (required)
 
-## Workflow
+Every PR into `main` must have **exactly one** of:
 
-**Bump Build Number** runs on push to `main` and on manual dispatch. It calls [`.github/actions/version-management`](../.github/actions/version-management/action.yml) with `bump_type: none` (build only).
+| Label | Result (example from `1.0.0+2`) |
+|-------|----------------------------------|
+| `major` | `2.0.0+3` |
+| `minor` | `1.1.0+3` |
+| `patch` | `1.0.1+3` |
+| `no-build` | No deploy, no version commit (docs/chore) |
 
-The bot commits `Bump version to x.y.z+N [skip ci]`. `[skip ci]` stops the bump workflow from looping and skips **CI Dev Checks** on that commit.
+Config: [`.github/config/version-labels.json`](../.github/config/version-labels.json).
 
-Play / Firebase uploads read whatever `+N` is on the ref you build. Merge to `main` first so the published artifact has a unique, increasing `versionCode`.
+**PR Version Labels** validates on open/sync/label. Add that check as a **required status check** on `main` so unlabeled PRs cannot merge.
+
+## Release flow
+
+**Release Main** (`.github/workflows/release-main.yml`) runs when a labeled PR merges into `main` (unless `no-build`):
+
+1. **Compute** the next `x.y.z+N` (no commit yet)
+2. **Ship in parallel** — development APK → Firebase App Distribution; production AAB → Play **internal**, both with `--build-name` / `--build-number`
+3. **Commit** `Bump version to x.y.z+N [skip ci]` via Version Bot only after both uploads succeed
+
+`[skip ci]` stops CI Dev Checks from re-running on the bot commit. The release workflow triggers on `pull_request` closed, not on the bot push.
+
+Manual retries and one-offs use the same workflow’s **Run workflow** form (`bump_type`, `play_track`, `skip_firebase` / `skip_play`, `commit_version`). Prefer promoting the existing Play internal release in Play Console over rebuilding for production.
 
 ## GitHub App secrets (required)
+
+Full Actions secrets inventory: [GITHUB_SECRETS.md](GITHUB_SECRETS.md).
 
 The default `GITHUB_TOKEN` cannot reliably push version commits. Workflows mint a short-lived installation token with [`peter-murray/workflow-application-token-action@v5`](https://github.com/peter-murray/workflow-application-token-action), then commit as **VersionBumpingBot**.
 

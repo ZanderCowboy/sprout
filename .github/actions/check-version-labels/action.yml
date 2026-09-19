@@ -1,0 +1,48 @@
+name: "Check Version Labels"
+description: "Checks PR labels and determines version bump type from shared config"
+
+inputs:
+  labels:
+    description: "JSON string of PR labels"
+    required: true
+  config_path:
+    description: "Path to version-labels.json"
+    required: false
+    default: ".github/config/version-labels.json"
+  target_branch:
+    description: "Base branch for allowed_bumps check (e.g. main)"
+    required: false
+    default: ""
+  mode:
+    description: "resolve (default) or validate (fail on conflict / missing label)"
+    required: false
+    default: "resolve"
+
+outputs:
+  bump_type:
+    description: "Type of version bump (major, minor, patch, none)"
+    value: ${{ steps.check_labels.outputs.bump_type }}
+  valid:
+    description: "Whether labels are valid (true/false)"
+    value: ${{ steps.check_labels.outputs.valid }}
+  error_message:
+    description: "Error message when valid is false"
+    value: ${{ steps.check_labels.outputs.error_message }}
+  matched_labels:
+    description: "Comma-separated version-related labels that were matched"
+    value: ${{ steps.check_labels.outputs.matched_labels }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Check Version Labels
+      id: check_labels
+      shell: bash
+      env:
+        LABELS_JSON: ${{ inputs.labels }}
+        CONFIG_PATH: ${{ inputs.config_path }}
+        TARGET_BRANCH: ${{ inputs.target_branch }}
+        MODE: ${{ inputs.mode }}
+      run: |
+        set -euo pipefail
+        bash "${GITHUB_WORKSPACE}/.github/scripts/resolve-version-labels.sh"

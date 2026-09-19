@@ -1,11 +1,14 @@
 # Firebase Dev Distribution (Android)
 
 This repo uses GitHub Actions for:
-- `CI Dev Checks` on every push: `flutter analyze` + `flutter test`
-- `Bump Build Number` on every push to `main`: increments `version: x.y.z+N` in `sprout_app/pubspec.yaml` (see [BUILD_NUMBER.md](BUILD_NUMBER.md))
-- `Firebase Distribute (Dev Android APK)` on manual trigger: builds a **development** APK and uploads it to Firebase App Distribution
 
-Production Play uploads are documented separately in [PLAY_PUBLISH_PROD_ANDROID.md](PLAY_PUBLISH_PROD_ANDROID.md).
+- **CI Dev Checks** on every push: `flutter analyze` + `flutter test`
+- **PR Version Labels** on PRs into `main`: require exactly one of `major` / `minor` / `patch` / `no-build`
+- **Release Main** on merge to `main` (and manual dispatch): development APK → Firebase App Distribution **and** production AAB → Play internal, then commit the version
+
+Versioning details: [BUILD_NUMBER.md](BUILD_NUMBER.md). Play details: [PLAY_PUBLISH_PROD_ANDROID.md](PLAY_PUBLISH_PROD_ANDROID.md).
+
+Firebase upload is a job inside **Release Main**, not a separate workflow.
 
 ## Android flavors
 
@@ -28,11 +31,14 @@ Local `firebase` commands in this workspace use a personal config directory. See
 
 ## GitHub Secrets required (dev distribute)
 
+Full inventory (all secrets, encode/`gh` restore): [GITHUB_SECRETS.md](GITHUB_SECRETS.md).
+
 - `FIREBASE_APP_ID`: Firebase App Distribution Android appId (dev app)
 - `FIREBASE_SERVICE_ACCOUNT_JSON`: the full private key JSON content (raw JSON string)
 - `GOOGLE_SERVICES_DEV_BASE64`: base64-encoded `src/development/google-services.json`
 - `APP_CONFIG_DEV_BASE64`: base64-encoded `sprout_app/assets/config/development.json`
 - `ANDROID_SIGNING_CONFIG_BASE64`: base64-encoded JSON blob containing the keystore and credentials (optional for local testing; recommended for installable CI APKs)
+- `VERSION_BOT_APP_ID` / `VERSION_BOT_APP_PRIVATE_KEY`: see [BUILD_NUMBER.md](BUILD_NUMBER.md)
 
 ## Android signing secret format
 
@@ -66,7 +72,7 @@ print(base64.b64encode(json.dumps(payload).encode()).decode())
 PY
 ```
 
-The workflow decodes this secret, recreates `android/release-key.jks`, and writes `android/key.properties` automatically.
+The workflow decodes this secret, recreates the keystore, and writes `android/key.properties` automatically.
 
 ## App config / google-services secret format
 
@@ -77,21 +83,28 @@ base64 -i sprout_app/android/app/src/development/google-services.json | tr -d '\
 
 If `APP_CONFIG_DEV_BASE64` is omitted, the workflow falls back to a placeholder config so the asset bundle still builds.
 
-## Manual workflow inputs
+## How to ship
 
-Go to **Actions** → **Firebase Distribute (Dev Android APK)** → **Run workflow**:
+### Automatic (preferred)
 
-- `git_ref` (optional): branch/tag/commit SHA to build (default: current ref)
-- `tester_groups`: comma-separated Firebase App Distribution groups
-- `release_notes` (optional): release notes shown to testers
+1. Open a PR into `main` and add exactly one version label (`major`, `minor`, `patch`, or `no-build`).
+2. Merge. **Release Main** builds the development APK with the new version and uploads it to Firebase group `default`. Release notes default to the PR title.
+
+### Manual (retry / rebuild)
+
+**Actions** → **Release Main** → **Run workflow**:
+
+- `git_ref` — branch/tag/SHA (default `main`)
+- `bump_type` — `none` / `patch` / `minor` / `major`
+- `skip_play` — set true to only ship Firebase
+- `commit_version` — set false with `bump_type: none` to rebuild without bumping
+- `tester_groups`, `release_notes`
 
 ## Artifact path used
 
-The workflow uploads:
-
 `sprout_app/build/app/outputs/flutter-apk/app-development-release.apk`
 
-Build command:
+Build command (CI also passes `--build-name` / `--build-number`):
 
 ```bash
 flutter build apk --release --flavor development -t lib/main_development.dart --no-tree-shake-icons
