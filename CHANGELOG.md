@@ -2,6 +2,14 @@
 
 Changes heading to `main`. Newest entries at the top.
 
+## 2026-09-20 — Split register and sign-in paths
+
+- Create account requires display name; sign-in is email-only (no name field or overwrite risk)
+- Dedicated verify OTP page shared by both paths (back to edit email, resend code)
+- Intro gate: first launch shows Create Account primary + "I already have an account" link; later unsigned launches show Sign In
+- Register OTP cannot create new users on sign-in path (shouldCreateUser split)
+- Sign-out keeps local Hive data (verified in code)
+
 ## 2026-09-20 — Fix Google Sign-In false cancellation error
 
 - Google Sign-In now shows accurate error messages when authentication fails
