@@ -93,10 +93,10 @@ class _SproutBottomBarItem extends StatelessWidget {
             alignment: Alignment.center,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: AppColors.navSelected,
+              color: AppColors.seed,
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.navSelected.withValues(alpha: 0.45),
+                  color: AppColors.seed.withValues(alpha: 0.45),
                   blurRadius: 12,
                   offset: const Offset(0, 2),
                 ),
@@ -136,7 +136,7 @@ class _SproutBottomBarItem extends StatelessWidget {
                   fontWeight: destination.selected
                       ? FontWeight.w700
                       : FontWeight.w500,
-                  color: destination.selected ? AppColors.navSelected : muted,
+                  color: destination.selected ? AppColors.seed : muted,
                 ),
               ),
             ],

@@ -12,6 +12,10 @@ Changes heading to `main`. Newest entries at the top.
 - Development flavor sends to Firebase DebugView; production flavor uses same API (PROD Firebase project setup remains #52)
 - Added `docs/FIREBASE_ANALYTICS.md` with event documentation and DebugView instructions
 
+## 2026-09-20 — Bottom bar teal selected tab
+
+- Selected tab disc and label now use teal (seed color) instead of coral, matching the Lush Growth design kit
+
 ## 2026-09-20 — Resend code after create account
 
 - Resend on the verify-email screen no longer treats a pending (unverified) signup as an existing account
