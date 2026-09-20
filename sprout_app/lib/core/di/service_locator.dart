@@ -63,12 +63,15 @@ Future<void> configureDependencies({
   required Box<PendingSyncHiveModel> pendingSyncBox,
   SupabaseClient? supabaseClient,
   RemoteConfigService? remoteConfigService,
+  AnalyticsService? analyticsService,
 }) async {
   sl.registerSingleton<AppConfig>(appConfig);
   sl.registerSingleton<RemoteConfigService>(
     remoteConfigService ?? RemoteConfigServiceImpl(),
   );
-  sl.registerLazySingleton<AnalyticsService>(() => AnalyticsServiceImpl());
+  sl.registerSingleton<AnalyticsService>(
+    analyticsService ?? AnalyticsServiceImpl(),
+  );
   sl.registerLazySingleton<TermsOfServiceService>(
     () => TermsOfServiceServiceImpl(remoteConfig: sl()),
   );
