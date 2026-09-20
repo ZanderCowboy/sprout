@@ -1,0 +1,61 @@
+appId: app.stackmint.sprout.dev
+tags:
+  - edge
+  - auth
+---
+# Google Sign-In smoke (DEV). System account picker is best-effort.
+# Expected: signed-in session (wizard or Overview), not cancelled.
+# Run: maestro test .maestro/google-sign-in.yaml
+
+- launchApp:
+    clearState: true
+    clearKeychain: true
+
+- extendedWaitUntil:
+    visible:
+      id: "intro_next"
+    timeout: 45000
+
+- tapOn:
+    id: "intro_next"
+
+- tapOn:
+    id: "intro_next"
+
+- tapOn:
+    id: "intro_next"
+
+- extendedWaitUntil:
+    visible:
+      id: "sign_in_google"
+    timeout: 10000
+
+- tapOn:
+    id: "sign_in_google"
+
+- extendedWaitUntil:
+    visible:
+      text: "Choose an account"
+    timeout: 30000
+
+# Prefer display name on emulator Play-review account
+- tapOn: "Test User Review"
+
+- extendedWaitUntil:
+    visible:
+      id: "wizard_skip"
+    timeout: 60000
+    optional: true
+
+- runFlow:
+    when:
+      visible:
+        id: "wizard_skip"
+    file: shared/skip-wizard.yaml
+
+- extendedWaitUntil:
+    visible:
+      text: ".*Portfolio total.*|.*Welcome to Sprout.*"
+    timeout: 60000
+
+- assertNotVisible: "Google Sign-In was cancelled."

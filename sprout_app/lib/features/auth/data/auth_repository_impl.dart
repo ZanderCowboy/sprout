@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' hide AuthUser;
 
@@ -129,10 +130,7 @@ class AuthRepositoryImpl implements AuthRepository {
     } on AuthException catch (e) {
       throw AuthAppException(e.message);
     } on GoogleSignInException catch (e) {
-      if (e.code == GoogleSignInExceptionCode.canceled) {
-        throw const AuthAppException(AppStrings.googleSignInCancelled);
-      }
-      throw AuthAppException(e.description ?? e.toString());
+      throw AuthAppException(_mapGoogleSignInException(e));
     } on Object catch (e) {
       throw AuthAppException(e.toString());
     }
@@ -215,6 +213,50 @@ class AuthRepositoryImpl implements AuthRepository {
       );
     }
   }
+
+  @visibleForTesting
+  static String mapGoogleSignInException(GoogleSignInException e) {
+    switch (e.code) {
+      case GoogleSignInExceptionCode.canceled:
+        // The canceled code is overloaded: it can mean user cancellation OR
+        // configuration errors (OAuth client / SHA-1 mismatch / etc.).
+        // Check the description to differentiate.
+        final description = e.description ?? '';
+        final lower = description.toLowerCase();
+        
+        // First check: if description looks like user cancellation, treat as such
+        final isUserCancel = lower.contains('cancelled by user') ||
+            lower.contains('canceled by user') ||
+            lower.contains('cancelled by') ||
+            lower.contains('canceled by');
+        if (isUserCancel) {
+          return AppStrings.googleSignInCancelled;
+        }
+        
+        // Second check: clear configuration/auth error signals
+        final isConfigError = lower.contains('reauth failed') ||
+            lower.contains('configuration') ||
+            lower.contains('sha') ||
+            lower.contains('client id');
+        if (isConfigError) {
+          return e.description ?? AppStrings.googleSignInFailed;
+        }
+        
+        // Default: treat as user cancellation
+        return AppStrings.googleSignInCancelled;
+      case GoogleSignInExceptionCode.clientConfigurationError:
+      case GoogleSignInExceptionCode.providerConfigurationError:
+        return e.description ?? AppStrings.googleSignInFailed;
+      case GoogleSignInExceptionCode.interrupted:
+      case GoogleSignInExceptionCode.uiUnavailable:
+      case GoogleSignInExceptionCode.userMismatch:
+      case GoogleSignInExceptionCode.unknownError:
+        return e.description ?? AppStrings.googleSignInFailed;
+    }
+  }
+
+  String _mapGoogleSignInException(GoogleSignInException e) =>
+      mapGoogleSignInException(e);
 
   AuthUser? _mapUser(User? user) {
     if (user == null || user.id.isEmpty) return null;

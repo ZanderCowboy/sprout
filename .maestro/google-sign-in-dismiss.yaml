@@ -1,0 +1,49 @@
+appId: app.stackmint.sprout.dev
+tags:
+  - edge
+  - auth
+---
+# Real dismiss of Google account picker should show cancelled (not a config error).
+
+- launchApp:
+    clearState: true
+    clearKeychain: true
+
+- extendedWaitUntil:
+    visible:
+      id: "intro_next"
+    timeout: 45000
+
+- tapOn:
+    id: "intro_next"
+
+- tapOn:
+    id: "intro_next"
+
+- tapOn:
+    id: "intro_next"
+
+- extendedWaitUntil:
+    visible:
+      id: "sign_in_google"
+    timeout: 10000
+
+- tapOn:
+    id: "sign_in_google"
+
+- extendedWaitUntil:
+    visible:
+      text: ".*Choose an account.*|.*sprout\\.play\\.review@gmail\\.com.*"
+    timeout: 30000
+
+- pressKey: back
+
+- extendedWaitUntil:
+    visible:
+      text: "Google Sign-In was cancelled."
+    timeout: 15000
+
+- assertVisible: "Google Sign-In was cancelled."
+- assertNotVisible: ".*\\[16\\].*"
+- assertVisible:
+    id: "sign_in_google"
