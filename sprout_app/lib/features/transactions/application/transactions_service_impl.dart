@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:sprout/core/analytics/analytics_events.dart';
 import 'package:sprout/core/analytics/analytics_service.dart';
 import 'package:sprout/core/constants/constants.dart';
 import 'package:sprout/core/error/error.dart';
@@ -180,7 +181,7 @@ class TransactionsServiceImpl implements TransactionsService {
     final userId = await _userContext.resolveUserId();
     final alreadyLogged = await _userContext.getFirstDepositLogged(userId);
     if (!alreadyLogged) {
-      await _analyticsService.logFirstDepositLogged();
+      await _analyticsService.logEvent(AnalyticsEvent.firstDepositLogged);
       await _userContext.markFirstDepositLogged(userId);
     }
   }

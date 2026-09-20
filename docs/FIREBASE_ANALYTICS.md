@@ -15,6 +15,8 @@ Sprout tracks core analytics events via Firebase Analytics:
 
 No PII (personally identifiable information) is logged in any event parameters.
 
+**Event Catalog:** See `lib/core/analytics/analytics_events.dart` for the single source of truth on all event names, parameter names, and allowed values. Call sites reference this catalog rather than using raw strings.
+
 ## Configuration
 
 ### Development Flavor
@@ -25,7 +27,29 @@ Firebase Analytics is configured and active for the **development** flavor (`app
 
 The same Analytics API is used in the production flavor, but the production Firebase project remains unconfigured per issue #52. Enable production Firebase Analytics by completing #52.
 
+## Architecture
+
+### Event Catalog (`analytics_events.dart`)
+
+Single source of truth defining:
+- **Event names** (`AnalyticsEvent` constants)
+- **Parameter names** (`AnalyticsParam` constants)
+- **Allowed values** (`ScreenName`, `SignInMethod` constants)
+- **Documentation** for each event and param
+
+Call sites reference these constants instead of raw strings.
+
+### Thin Service Layer (`AnalyticsService`)
+
+`AnalyticsService` is a thin wrapper around Firebase Analytics. It only **sends** events — no business logic, no state tracking, no branching.
+
+**Domain/app code decides when to fire events** based on business rules (e.g., first deposit tracking in `TransactionsServiceImpl`, sign-up vs sign-in logic in `AuthServiceImpl`).
+
+The service provides a single method: `logEvent(String eventName, [Map<String, Object>? parameters])`.
+
 ## Events
+
+For the complete event catalog with all allowed values, see `lib/core/analytics/analytics_events.dart`.
 
 ### `app_open`
 
@@ -99,9 +123,9 @@ Logged the first time a user records a deposit transaction (via wizard or normal
 
 **Parameters:** None
 
-**Location:** `TransactionsServiceImpl.recordDeposit()` and `TransactionsServiceImpl.recordAccountDeposit()`
+**Location:** `TransactionsServiceImpl._logFirstDepositIfNeeded()`
 
-**Tracking:** Uses `UserContext.getFirstDepositLogged()` / `markFirstDepositLogged()` per user ID to ensure the event fires only once.
+**Tracking:** Uses `UserContext.getFirstDepositLogged()` / `markFirstDepositLogged()` per user ID to ensure the event fires only once. Business logic lives in the service, not in `AnalyticsService`.
 
 ## Viewing Events in DebugView
 
@@ -117,7 +141,8 @@ Logged the first time a user records a deposit transaction (via wizard or normal
 
 ## Implementation
 
-- **Service:** `AnalyticsService` (abstract) / `AnalyticsServiceImpl`
+- **Event Catalog:** `lib/core/analytics/analytics_events.dart`
+- **Service:** `AnalyticsService` (abstract) / `AnalyticsServiceImpl` (thin wrapper)
 - **Location:** `lib/core/analytics/`
 - **Setup:** Initialized in `startup_initializer.dart` after DI configuration
 - **Dependencies:** `firebase_analytics` package (via `pubspec.yaml`)

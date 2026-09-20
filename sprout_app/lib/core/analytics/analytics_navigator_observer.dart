@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
+import 'package:sprout/core/analytics/analytics_events.dart';
 import 'package:sprout/core/analytics/analytics_service.dart';
 import 'package:sprout/core/router/app_route.dart';
 
-/// Maps GoRouter paths to analytics screen names.
+/// Maps GoRouter paths to analytics screen names from [ScreenName].
 String? _screenNameForRoute(String? routePath) {
   if (routePath == null) return null;
 
@@ -11,16 +12,16 @@ String? _screenNameForRoute(String? routePath) {
   final path = routePath.split('?').first;
   final normalized = path.startsWith('/') ? path.substring(1) : path;
 
-  // Map specific routes to screen names
+  // Map specific routes to screen names from catalog
   return switch (normalized) {
-    '' || 'overview' => 'overview',
-    'accounts' => 'accounts',
-    'goals' => 'goals',
-    'settings' => 'settings',
-    'sign-in' => 'sign_in',
-    'create-account' => 'create_account',
-    'verify-otp' => 'verify_otp',
-    'wizard' => 'wizard',
+    '' || 'overview' => ScreenName.overview,
+    'accounts' => ScreenName.accounts,
+    'goals' => ScreenName.goals,
+    'settings' => ScreenName.settings,
+    'sign-in' => ScreenName.signIn,
+    'create-account' => ScreenName.createAccount,
+    'verify-otp' => ScreenName.verifyOtp,
+    'wizard' => ScreenName.wizard,
     _ => _accountDetailScreenName(normalized),
   };
 }
@@ -28,7 +29,7 @@ String? _screenNameForRoute(String? routePath) {
 String? _accountDetailScreenName(String path) {
   // Match /accounts/:id
   if (path.startsWith('accounts/') && path.split('/').length == 2) {
-    return 'account';
+    return ScreenName.account;
   }
   return null;
 }
@@ -65,7 +66,10 @@ class AnalyticsNavigatorObserver extends NavigatorObserver {
     final routeName = route.settings.name;
     final screenName = _screenNameForRoute(routeName);
     if (screenName != null) {
-      _analyticsService.logScreenView(screenName);
+      _analyticsService.logEvent(
+        AnalyticsEvent.screenView,
+        {AnalyticsParam.screenName: screenName},
+      );
     }
   }
 }

@@ -29,52 +29,18 @@ class FakeAnalyticsService implements AnalyticsService {
   @override
   Future<void> setup() async {}
 
-  int screenViewCalls = 0;
-  String? lastScreenName;
+  final Map<String, List<Map<String, Object>?>> events = {};
 
   @override
-  Future<void> logScreenView(String screenName) async {
-    screenViewCalls++;
-    lastScreenName = screenName;
+  Future<void> logEvent(String eventName, [Map<String, Object>? parameters]) async {
+    events.putIfAbsent(eventName, () => []).add(parameters);
   }
 
-  int signInSuccessCalls = 0;
-  SignInMethod? lastSignInMethod;
+  int eventCount(String eventName) => events[eventName]?.length ?? 0;
 
-  @override
-  Future<void> logSignInSuccess(SignInMethod method) async {
-    signInSuccessCalls++;
-    lastSignInMethod = method;
-  }
-
-  int signUpSuccessCalls = 0;
-  SignInMethod? lastSignUpMethod;
-
-  @override
-  Future<void> logSignUpSuccess(SignInMethod method) async {
-    signUpSuccessCalls++;
-    lastSignUpMethod = method;
-  }
-
-  int signOutCalls = 0;
-
-  @override
-  Future<void> logSignOut() async {
-    signOutCalls++;
-  }
-
-  int wizardCompletedCalls = 0;
-
-  @override
-  Future<void> logWizardCompleted() async {
-    wizardCompletedCalls++;
-  }
-
-  int firstDepositLoggedCalls = 0;
-
-  @override
-  Future<void> logFirstDepositLogged() async {
-    firstDepositLoggedCalls++;
+  Map<String, Object>? lastParams(String eventName) {
+    final list = events[eventName];
+    return (list != null && list.isNotEmpty) ? list.last : null;
   }
 }
 

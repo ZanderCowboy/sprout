@@ -25,100 +25,21 @@ class AnalyticsServiceImpl implements AnalyticsService {
   }
 
   @override
-  Future<void> logScreenView(String screenName) async {
+  Future<void> logEvent(String eventName, [Map<String, Object>? parameters]) async {
     if (!_ready) return;
     try {
       await FirebaseAnalytics.instance.logEvent(
-        name: 'screen_view',
-        parameters: {'screen_name': screenName},
+        name: eventName,
+        parameters: parameters,
       );
       if (kDebugMode) {
-        debugPrint('AnalyticsService: logged screen_view($screenName)');
+        final paramsStr = parameters?.entries.map((e) => '${e.key}=${e.value}').join(', ') ?? '';
+        final display = paramsStr.isEmpty ? eventName : '$eventName($paramsStr)';
+        debugPrint('AnalyticsService: logged $display');
       }
     } on Object catch (e) {
       if (kDebugMode) {
-        debugPrint('AnalyticsService.logScreenView failed: $e');
-      }
-    }
-  }
-
-  @override
-  Future<void> logSignInSuccess(SignInMethod method) async {
-    if (!_ready) return;
-    try {
-      await FirebaseAnalytics.instance.logEvent(
-        name: 'sign_in_success',
-        parameters: {'method': method.value},
-      );
-      if (kDebugMode) {
-        debugPrint('AnalyticsService: logged sign_in_success(${method.value})');
-      }
-    } on Object catch (e) {
-      if (kDebugMode) {
-        debugPrint('AnalyticsService.logSignInSuccess failed: $e');
-      }
-    }
-  }
-
-  @override
-  Future<void> logSignUpSuccess(SignInMethod method) async {
-    if (!_ready) return;
-    try {
-      await FirebaseAnalytics.instance.logEvent(
-        name: 'sign_up_success',
-        parameters: {'method': method.value},
-      );
-      if (kDebugMode) {
-        debugPrint('AnalyticsService: logged sign_up_success(${method.value})');
-      }
-    } on Object catch (e) {
-      if (kDebugMode) {
-        debugPrint('AnalyticsService.logSignUpSuccess failed: $e');
-      }
-    }
-  }
-
-  @override
-  Future<void> logSignOut() async {
-    if (!_ready) return;
-    try {
-      await FirebaseAnalytics.instance.logEvent(name: 'sign_out');
-      if (kDebugMode) {
-        debugPrint('AnalyticsService: logged sign_out');
-      }
-    } on Object catch (e) {
-      if (kDebugMode) {
-        debugPrint('AnalyticsService.logSignOut failed: $e');
-      }
-    }
-  }
-
-  @override
-  Future<void> logWizardCompleted() async {
-    if (!_ready) return;
-    try {
-      await FirebaseAnalytics.instance.logEvent(name: 'wizard_completed');
-      if (kDebugMode) {
-        debugPrint('AnalyticsService: logged wizard_completed');
-      }
-    } on Object catch (e) {
-      if (kDebugMode) {
-        debugPrint('AnalyticsService.logWizardCompleted failed: $e');
-      }
-    }
-  }
-
-  @override
-  Future<void> logFirstDepositLogged() async {
-    if (!_ready) return;
-    try {
-      await FirebaseAnalytics.instance.logEvent(name: 'first_deposit_logged');
-      if (kDebugMode) {
-        debugPrint('AnalyticsService: logged first_deposit_logged');
-      }
-    } on Object catch (e) {
-      if (kDebugMode) {
-        debugPrint('AnalyticsService.logFirstDepositLogged failed: $e');
+        debugPrint('AnalyticsService.logEvent($eventName) failed: $e');
       }
     }
   }

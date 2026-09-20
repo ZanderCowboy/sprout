@@ -1,3 +1,4 @@
+import 'package:sprout/core/analytics/analytics_events.dart';
 import 'package:sprout/core/analytics/analytics_service.dart';
 import 'package:sprout/core/config/app_config.dart';
 import 'package:sprout/core/config/app_environment.dart';
@@ -99,11 +100,15 @@ class AuthServiceImpl implements AuthService {
       user = await _authRepository.updateDisplayName(trimmedName);
     }
     await bindAfterVerifiedSignIn(user);
-    if (isSignUp) {
-      await _analyticsService.logSignUpSuccess(SignInMethod.emailOtp);
-    } else {
-      await _analyticsService.logSignInSuccess(SignInMethod.emailOtp);
-    }
+    
+    // Log analytics event determined by caller
+    final eventName = isSignUp
+        ? AnalyticsEvent.signUpSuccess
+        : AnalyticsEvent.signInSuccess;
+    await _analyticsService.logEvent(
+      eventName,
+      {AnalyticsParam.method: SignInMethod.emailOtp},
+    );
     return user;
   }
 
@@ -115,11 +120,13 @@ class AuthServiceImpl implements AuthService {
     
     // Sign-up if this is a different user than previously verified
     final isSignUp = previousUserId == null || previousUserId != user.id;
-    if (isSignUp) {
-      await _analyticsService.logSignUpSuccess(SignInMethod.google);
-    } else {
-      await _analyticsService.logSignInSuccess(SignInMethod.google);
-    }
+    final eventName = isSignUp
+        ? AnalyticsEvent.signUpSuccess
+        : AnalyticsEvent.signInSuccess;
+    await _analyticsService.logEvent(
+      eventName,
+      {AnalyticsParam.method: SignInMethod.google},
+    );
     return user;
   }
 
@@ -131,7 +138,7 @@ class AuthServiceImpl implements AuthService {
   Future<void> signOut() async {
     _debugSignedIn = false;
     await _authRepository.signOut();
-    await _analyticsService.logSignOut();
+    await _analyticsService.logEvent(AnalyticsEvent.signOut);
   }
 
   @override
