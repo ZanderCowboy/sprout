@@ -27,8 +27,9 @@ class SproutDebugLens {
   static DebugBubblePreferences? _bubblePrefs;
 
   /// Root observer. Defers store notifications until after the current frame.
-  static final NavigatorObserver navigatorObserver =
-      DeferredNavigatorObserver(DebugLensNavigatorObserver());
+  static final NavigatorObserver navigatorObserver = DeferredNavigatorObserver(
+    DebugLensNavigatorObserver(),
+  );
 
   /// Provides Debug Lens state and the draggable bubble.
   static Widget wrap(Widget child) {
@@ -66,6 +67,9 @@ class SproutDebugLens {
             ),
             ChangeNotifierProvider<DebugLensLogger>.value(
               value: DebugLensLogger(),
+            ),
+            ChangeNotifierProvider<DebugBubblePreferences>.value(
+              value: snapshot.data!,
             ),
           ],
           child: _SproutDebugLensHost(child: child),
@@ -116,7 +120,9 @@ class _SproutDebugLensHost extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isOpen = context.watch<DebugLensController>().isOpen;
-    final bubbleVisible = SproutDebugLens.isBubbleVisible;
+    final bubbleVisible = context
+        .watch<DebugBubblePreferences>()
+        .isBubbleVisible;
     return Stack(
       children: [
         child,
