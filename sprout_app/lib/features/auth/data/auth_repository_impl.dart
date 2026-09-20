@@ -167,7 +167,7 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<void> deleteOwnAccount() async {
     try {
-      await _client.rpc('delete_own_account');
+      await _client.rpc<void>('delete_own_account');
     } on AuthException catch (e) {
       throw AuthAppException(e.message);
     } on PostgrestException {

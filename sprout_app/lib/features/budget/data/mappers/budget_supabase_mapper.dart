@@ -45,7 +45,7 @@ List<BudgetItem> _decodeItems(Object itemsJson) {
   try {
     if (itemsJson is! List) return const <BudgetItem>[];
     return itemsJson
-        .whereType<Map>()
+        .whereType<Map<dynamic, dynamic>>()
         .map((m) => Map<String, dynamic>.from(m))
         .map(
           (m) => BudgetItem(
