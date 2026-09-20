@@ -26,7 +26,8 @@ class FakeAuthRepository implements AuthRepository {
   AuthUser? _currentUser;
   final _controller = StreamController<AuthUser?>.broadcast();
 
-  int sendOtpCalls = 0;
+  int sendRegisterOtpCalls = 0;
+  int sendSignInOtpCalls = 0;
   int verifyOtpCalls = 0;
   int googleCalls = 0;
   int updateDisplayNameCalls = 0;
@@ -36,7 +37,8 @@ class FakeAuthRepository implements AuthRepository {
   String? lastEmail;
   String? lastToken;
   String? lastDisplayName;
-  Object? sendOtpError;
+  Object? sendRegisterOtpError;
+  Object? sendSignInOtpError;
   Object? verifyOtpError;
   Object? googleError;
   Object? updateDisplayNameError;
@@ -59,10 +61,18 @@ class FakeAuthRepository implements AuthRepository {
   Stream<AuthUser?> authStateChanges() => _controller.stream;
 
   @override
-  Future<void> sendEmailOtp(String email) async {
-    sendOtpCalls++;
+  Future<void> sendRegisterOtp(String email) async {
+    sendRegisterOtpCalls++;
     lastEmail = email;
-    final error = sendOtpError;
+    final error = sendRegisterOtpError;
+    if (error != null) throw error;
+  }
+
+  @override
+  Future<void> sendSignInOtp(String email) async {
+    sendSignInOtpCalls++;
+    lastEmail = email;
+    final error = sendSignInOtpError;
     if (error != null) throw error;
   }
 
