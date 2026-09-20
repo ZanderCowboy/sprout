@@ -83,18 +83,15 @@ if maestro test "$FLOW_FILE" 2>&1 | tee "$MAESTRO_OUTPUT"; then
     if [[ -n "$LATEST_TEST_DIR" ]]; then
       echo ""
       echo "📸 Copying screenshots from $LATEST_TEST_DIR"
-      
-      # Find and copy all play-*.png files
+
       COPIED_COUNT=0
-      for screenshot in "$LATEST_TEST_DIR"/play-*.png; do
-        if [[ -f "$screenshot" ]]; then
-          filename=$(basename "$screenshot")
-          cp "$screenshot" "$OUTPUT_DIR/$filename"
-          echo "   ✓ Copied $filename"
-          ((COPIED_COUNT++))
-        fi
-      done
-      
+      while IFS= read -r screenshot; do
+        filename=$(basename "$screenshot")
+        cp "$screenshot" "$OUTPUT_DIR/$filename"
+        echo "   ✓ Copied $filename"
+        COPIED_COUNT=$((COPIED_COUNT + 1))
+      done < <(find "$LATEST_TEST_DIR" -name 'play-*.png' -type f)
+
       if [[ $COPIED_COUNT -gt 0 ]]; then
         echo ""
         echo "✅ Successfully copied $COPIED_COUNT screenshot(s) to:"

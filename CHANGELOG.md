@@ -2,6 +2,17 @@
 
 Changes heading to `main`. Newest entries at the top.
 
+## 2026-09-20 — Play Store screenshots complete the first-run wizard
+
+- Screenshot capture fills a goal, account, and deposit on the wizard instead of skipping and seeding from Overview
+- Shared `complete-wizard` helper is reused by the wizard happy-path journey
+- Text fields keep their own semantics node so Maestro can tap the account name without hitting color swatches
+
+## 2026-09-20 — Maestro skips first-run wizard after debug sign-in
+
+- Shared `skip-wizard` helper taps Skip on the first-run wizard before waiting for Overview
+- Debug sign-in, intro, and sign-in journeys skip the wizard on a clean install so page flows still land on empty Overview
+
 ## 2026-09-20 — Play Store listing assets and Maestro screenshot automation
 
 - Added `store/play/` with icon-512.png and feature-graphic-1024x500.png generated from existing branding

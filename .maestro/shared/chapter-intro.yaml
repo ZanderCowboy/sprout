@@ -35,4 +35,6 @@ appId: app.stackmint.sprout.dev
 - tapOn:
     id: "intro_debug_sign_in"
 
+- runFlow: skip-wizard.yaml
+
 - runFlow: wait-overview.yaml

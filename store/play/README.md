@@ -87,11 +87,11 @@ Screenshots will be saved to `~/.maestro/tests/<timestamp>/play-*.png`. You'll n
 The screenshot capture flow (`.maestro/play-store-screenshots.yaml`):
 - Launches with clean state (no previous data)
 - Uses debug sign-in to bypass authentication
-- Seeds test data: "Everyday" account, "Everyday Fund" goal, $25.00 deposit
+- Completes the first-run wizard: "Cape Town trip" goal (R12 000), "EasyEquities TFSA" account, R2 500 deposit
 - Captures three screenshots:
   - `play-overview.png` — Overview screen with progress summary
-  - `play-goals.png` — Goals screen showing the seeded goal
-  - `play-accounts.png` — Accounts screen showing the seeded account
+  - `play-goals.png` — Goals screen showing the wizard goal
+  - `play-accounts.png` — Accounts screen showing the wizard account
 - Tagged `[play-store]` to exclude from default smoke test runs
 
 ## Uploading to Play Console

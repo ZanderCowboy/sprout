@@ -1,0 +1,64 @@
+appId: app.stackmint.sprout.dev
+env:
+  GOAL_NAME: "Cape Town trip"
+  TARGET: "12000"
+  ACCOUNT_NAME: "EasyEquities TFSA"
+  AMOUNT: "2500"
+---
+# Requires: first-run wizard visible after sign-in.
+# Env: GOAL_NAME, TARGET, ACCOUNT_NAME, AMOUNT (defaults above).
+# Does NOT wait for Overview — parent calls wait-overview.
+
+- extendedWaitUntil:
+    visible:
+      id: "wizard_skip"
+    timeout: 15000
+
+- tapOn:
+    id: "wizard_goal_name"
+
+- eraseText
+
+- inputText: ${GOAL_NAME}
+
+- tapOn:
+    id: "wizard_goal_target"
+
+- eraseText
+
+- inputText: ${TARGET}
+
+- tapOn:
+    id: "wizard_next"
+
+- extendedWaitUntil:
+    visible:
+      id: "wizard_account_name"
+    timeout: 5000
+
+- tapOn:
+    id: "wizard_account_name"
+
+- eraseText
+
+- inputText: ${ACCOUNT_NAME}
+
+- waitForAnimationToEnd
+
+- tapOn:
+    id: "wizard_next"
+
+- extendedWaitUntil:
+    visible:
+      id: "wizard_deposit_amount"
+    timeout: 5000
+
+- tapOn:
+    id: "wizard_deposit_amount"
+
+- eraseText
+
+- inputText: ${AMOUNT}
+
+- tapOn:
+    id: "wizard_finish"

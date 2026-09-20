@@ -3,33 +3,44 @@ tags:
   - play-store
 ---
 # Play Store screenshot capture flow
-# Captures key screens: Overview, Goals, Accounts with seeded content
+# Completes the first-run wizard (goal, account, deposit), then captures
+# Overview, Goals, and Accounts.
 # Output: ~/.maestro/tests/<timestamp>/play-*.png
 
 - launchApp:
     clearState: true
     clearKeychain: true
 
-# Debug sign-in from intro
-- runFlow: shared/debug-signin-intro.yaml
+- extendedWaitUntil:
+    visible:
+      id: "intro_debug_sign_in"
+    timeout: 45000
 
-# Seed account, goal, and deposit for populated content
+- tapOn:
+    id: "intro_debug_sign_in"
+
 - runFlow:
-    file: shared/seed-core.yaml
+    file: shared/complete-wizard.yaml
     env:
-      SEED_GOAL: "true"
-      SEED_DEPOSIT: "true"
+      GOAL_NAME: "Cape Town trip"
+      TARGET: "12000"
+      ACCOUNT_NAME: "EasyEquities TFSA"
+      AMOUNT: "2500"
 
-# Wait for Overview to be ready after seeding
 - extendedWaitUntil:
     visible:
       id: "overview_progress_header"
     timeout: 10000
 
-# Capture Overview screen
+# Welcome toast covers the hero; dismiss it before capturing.
+- tapOn:
+    text: "Done"
+    optional: true
+
+- waitForAnimationToEnd
+
 - takeScreenshot: play-overview
 
-# Navigate to Goals tab and capture
 - tapOn:
     id: "shell_tab_goals"
 
@@ -38,15 +49,10 @@ tags:
       text: "Goals"
     timeout: 5000
 
+- waitForAnimationToEnd
+
 - takeScreenshot: play-goals
 
-# Navigate to Accounts tab (via Overview since no direct Accounts tab semantics ID in shell)
-# Note: Based on SemanticsIds, we have shell_tab_overview, shell_tab_goals, shell_tab_settings
-# but no shell_tab_accounts. Let's check if accounts are accessible via the FAB or if we need
-# to navigate differently. For now, I'll create a new account from Overview to show accounts.
-
-# Actually, let's verify the shell tabs - there should be an accounts tab
-# Looking at semantics_ids.dart line 57: shellTabAccounts = 'shell_tab_accounts'
 - tapOn:
     id: "shell_tab_accounts"
 
@@ -55,11 +61,9 @@ tags:
       text: "Accounts"
     timeout: 5000
 
-# Wait a moment for any animations to settle
 - waitForAnimationToEnd
 
 - takeScreenshot: play-accounts
 
-# Return to Overview to end in a clean state
 - tapOn:
     id: "shell_tab_overview"
