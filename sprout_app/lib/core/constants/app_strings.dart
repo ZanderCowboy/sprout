@@ -163,6 +163,8 @@ abstract final class AppStrings {
   static const String checkYourEmail = 'Check your email';
   static const String resendCode = 'Resend code';
   static const String editEmail = 'Edit email';
+  static const String verificationCodeIncorrectOrExpired =
+      'Verification code is incorrect or expired';
   
   // Sign in / auth (general)
   static const String signIn = 'Sign in';

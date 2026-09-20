@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:sprout/core/constants/app_strings.dart';
@@ -21,17 +22,30 @@ class SignInPage extends StatefulWidget {
 
 class _SignInPageState extends State<SignInPage> {
   late final TextEditingController _emailController;
+  String _email = '';
 
   @override
   void initState() {
     super.initState();
     _emailController = TextEditingController();
+    _emailController.addListener(() {
+      if (_email != _emailController.text) {
+        setState(() => _email = _emailController.text);
+      }
+    });
   }
 
   @override
   void dispose() {
     _emailController.dispose();
     super.dispose();
+  }
+
+  bool _isValidEmail(String email) {
+    final trimmed = email.trim();
+    if (trimmed.isEmpty) return false;
+    final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+$');
+    return emailRegex.hasMatch(trimmed);
   }
 
   void _openTerms() {
@@ -174,7 +188,9 @@ class _SignInPageState extends State<SignInPage> {
                         SproutFilledButton(
                           identifier: SemanticsIds.signInContinue,
                           label: AppStrings.continueButton,
-                          onPressed: (!isOnline || busy)
+                          onPressed: (!isOnline ||
+                                  busy ||
+                                  !_isValidEmail(_emailController.text))
                               ? null
                               : () => context.read<AuthCubit>().sendSignInOtp(),
                         ),
@@ -199,7 +215,13 @@ class _SignInPageState extends State<SignInPage> {
                                 : () => context
                                       .read<AuthCubit>()
                                       .signInWithGoogle(),
-                            icon: const Icon(Icons.g_mobiledata_rounded),
+                            icon: SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: SvgPicture.asset(
+                                'assets/images/google_g_logo.svg',
+                              ),
+                            ),
                             labelWidget: const Text(
                               AppStrings.continueWithGoogle,
                             ),

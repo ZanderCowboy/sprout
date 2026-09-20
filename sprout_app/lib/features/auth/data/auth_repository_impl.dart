@@ -103,6 +103,13 @@ class AuthRepositoryImpl implements AuthRepository {
       }
       return user;
     } on AuthException catch (e) {
+      if (e.message.toLowerCase().contains('token') ||
+          e.message.toLowerCase().contains('expired') ||
+          e.message.toLowerCase().contains('invalid')) {
+        throw const AuthAppException(
+          AppStrings.verificationCodeIncorrectOrExpired,
+        );
+      }
       throw AuthAppException(e.message);
     } on AuthAppException {
       rethrow;

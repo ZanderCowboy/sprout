@@ -116,6 +116,9 @@ class _IntroPageState extends State<IntroPage> {
                         identifier: SemanticsIds.introCreateAccount,
                         label: AppStrings.createAccount,
                         onPressed: _goNext,
+                        style: FilledButton.styleFrom(
+                          minimumSize: const Size.fromHeight(52),
+                        ),
                       )
                     : SproutFilledButton(
                         identifier: SemanticsIds.introNext,
@@ -124,17 +127,20 @@ class _IntroPageState extends State<IntroPage> {
                       ),
               ),
               if (_isLastSlide) ...[
-                const SizedBox(height: 12),
+                const SizedBox(height: 16),
                 SizedBox(
                   width: double.infinity,
-                  child: SproutTextButton(
+                  child: SproutOutlinedButton(
                     identifier: SemanticsIds.introSignIn,
                     label: AppStrings.iAlreadyHaveAnAccount,
                     onPressed: _goToSignIn,
+                    style: OutlinedButton.styleFrom(
+                      minimumSize: const Size.fromHeight(52),
+                    ),
                     child: Text(
                       AppStrings.iAlreadyHaveAnAccount,
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: Theme.of(context).colorScheme.primary,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ),

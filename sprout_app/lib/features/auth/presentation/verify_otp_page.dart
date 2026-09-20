@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -20,17 +22,48 @@ class VerifyOtpPage extends StatefulWidget {
 class _VerifyOtpPageState extends State<VerifyOtpPage> {
   late final TextEditingController _otpController;
   String? _lastAutoSubmittedOtp;
+  String _otpValue = '';
+  Timer? _resendTimer;
+  int _resendCountdown = 0;
 
   @override
   void initState() {
     super.initState();
     _otpController = TextEditingController();
+    _otpController.addListener(() {
+      if (_otpValue != _otpController.text) {
+        setState(() => _otpValue = _otpController.text);
+      }
+    });
+    _startResendCooldown();
   }
 
   @override
   void dispose() {
     _otpController.dispose();
+    _resendTimer?.cancel();
     super.dispose();
+  }
+
+  bool _isValidOtp(String otp) {
+    return otp.trim().length == 6;
+  }
+
+  void _startResendCooldown() {
+    setState(() => _resendCountdown = 60);
+    _resendTimer?.cancel();
+    _resendTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
+      setState(() {
+        _resendCountdown--;
+        if (_resendCountdown <= 0) {
+          timer.cancel();
+        }
+      });
+    });
   }
 
   void _editEmail(BuildContext context) {
@@ -97,6 +130,15 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                         textAlign: TextAlign.center,
                         style: Theme.of(context).textTheme.bodyMedium
                             ?.copyWith(
+                              fontWeight: FontWeight.w500,
+                            ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        AppStrings.checkEmailForCode,
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.bodySmall
+                            ?.copyWith(
                               color: Theme.of(
                                 context,
                               ).colorScheme.onSurfaceVariant,
@@ -134,7 +176,9 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                       SproutFilledButton(
                         identifier: SemanticsIds.verifyOtpVerify,
                         label: AppStrings.verifyCode,
-                        onPressed: (!isOnline || busy)
+                        onPressed: (!isOnline ||
+                                busy ||
+                                !_isValidOtp(_otpController.text))
                             ? null
                             : () => context.read<AuthCubit>().verifyOtp(
                                 _otpController.text,
@@ -143,10 +187,15 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                       const SizedBox(height: 12),
                       SproutFilledButton.tonal(
                         identifier: SemanticsIds.verifyOtpResend,
-                        label: AppStrings.resendCode,
-                        onPressed: (!isOnline || busy)
+                        label: _resendCountdown > 0
+                            ? 'Resend code in ${_resendCountdown}s'
+                            : AppStrings.resendCode,
+                        onPressed: (!isOnline || busy || _resendCountdown > 0)
                             ? null
-                            : () => context.read<AuthCubit>().sendOtp(),
+                            : () {
+                                context.read<AuthCubit>().sendOtp();
+                                _startResendCooldown();
+                              },
                       ),
                       const SizedBox(height: 12),
                       Center(

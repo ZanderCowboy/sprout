@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:sprout/core/constants/app_strings.dart';
@@ -22,12 +23,24 @@ class CreateAccountPage extends StatefulWidget {
 class _CreateAccountPageState extends State<CreateAccountPage> {
   late final TextEditingController _emailController;
   late final TextEditingController _displayNameController;
+  String _email = '';
+  String _displayName = '';
 
   @override
   void initState() {
     super.initState();
     _emailController = TextEditingController();
     _displayNameController = TextEditingController();
+    _emailController.addListener(() {
+      if (_email != _emailController.text) {
+        setState(() => _email = _emailController.text);
+      }
+    });
+    _displayNameController.addListener(() {
+      if (_displayName != _displayNameController.text) {
+        setState(() => _displayName = _displayNameController.text);
+      }
+    });
   }
 
   @override
@@ -35,6 +48,17 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
     _emailController.dispose();
     _displayNameController.dispose();
     super.dispose();
+  }
+
+  bool _isValidEmail(String email) {
+    final trimmed = email.trim();
+    if (trimmed.isEmpty) return false;
+    final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+$');
+    return emailRegex.hasMatch(trimmed);
+  }
+
+  bool _isValidDisplayName(String name) {
+    return name.trim().isNotEmpty;
   }
 
   void _openTerms() {
@@ -200,7 +224,12 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                         SproutFilledButton(
                           identifier: SemanticsIds.createAccountContinue,
                           label: AppStrings.continueButton,
-                          onPressed: (!isOnline || busy)
+                          onPressed: (!isOnline ||
+                                  busy ||
+                                  !_isValidEmail(_emailController.text) ||
+                                  !_isValidDisplayName(
+                                    _displayNameController.text,
+                                  ))
                               ? null
                               : () => context.read<AuthCubit>().sendRegisterOtp(),
                         ),
@@ -225,7 +254,13 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                                 : () => context
                                       .read<AuthCubit>()
                                       .signInWithGoogle(),
-                            icon: const Icon(Icons.g_mobiledata_rounded),
+                            icon: SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: SvgPicture.asset(
+                                'assets/images/google_g_logo.svg',
+                              ),
+                            ),
                             labelWidget: const Text(
                               AppStrings.continueWithGoogle,
                             ),

@@ -20,6 +20,7 @@ dependencies:
     sdk: flutter
   flutter_bloc: ^9.1.1
   flutter_markdown: ^0.7.7+1
+  flutter_svg: ^2.0.14
   get_it: ^8.0.3
   go_router: ^17.5.0
   google_sign_in: ^7.2.0
@@ -47,3 +48,4 @@ flutter:
     - assets/legal/terms.md
     - assets/legal/privacy.md
     - assets/images/sprout-icon.png
+    - assets/images/google_g_logo.svg
