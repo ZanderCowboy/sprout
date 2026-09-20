@@ -184,6 +184,11 @@ list_export_paths() {
       printf '%s\n' "$f"
     fi
   done
+  if compgen -G "$ROOT/*.pem" >/dev/null 2>&1; then
+    for f in "$ROOT"/*.pem; do
+      [[ -f "$f" ]] && basename "$f"
+    done
+  fi
   if [[ -d "$ROOT/config" ]]; then
     find "$ROOT/config" -type f ! -name '.DS_Store' -print | sed "s|^$ROOT/||" | sort
   fi
@@ -289,6 +294,33 @@ cmd_status() {
     [[ -f "$dest/$f" ]] && rem="ok"
     printf '%-10s %-10s %s\n' "$loc" "$rem" "$f"
   done
+  local pem_files
+  pem_files="$(
+    {
+      if compgen -G "$ROOT/*.pem" >/dev/null 2>&1; then
+        for f in "$ROOT"/*.pem; do
+          [[ -f "$f" ]] && basename "$f"
+        done
+      fi
+      if compgen -G "$dest/*.pem" >/dev/null 2>&1; then
+        for f in "$dest"/*.pem; do
+          [[ -f "$f" ]] && basename "$f"
+        done
+      fi
+    } | sort -u
+  )"
+  if [[ -n "$pem_files" ]]; then
+    echo
+    echo "Root .pem files:"
+    while IFS= read -r f; do
+      [[ -z "$f" ]] && continue
+      local loc="missing"
+      local rem="missing"
+      [[ -f "$ROOT/$f" ]] && loc="ok"
+      [[ -f "$dest/$f" ]] && rem="ok"
+      printf '%-10s %-10s %s\n' "$loc" "$rem" "$f"
+    done <<<"$pem_files"
+  fi
   if [[ -d "$ROOT/config" ]] || [[ -d "$dest/config" ]]; then
     echo
     echo "config/ extras:"
