@@ -335,6 +335,7 @@ void main() {
       '123456',
     );
     await tester.pump();
+    await tester.pump();
 
     expect(fakeAuth.verifyOtpCallCount, 1);
     expect(fakeAuth.lastOtpToken, '123456');
@@ -364,6 +365,7 @@ void main() {
       find.widgetWithText(SproutTextField, AppStrings.verificationCode),
       '654321',
     );
+    await tester.pump();
     await tester.pump();
 
     expect(fakeAuth.verifyOtpCallCount, 1);
@@ -395,6 +397,7 @@ void main() {
       '111111',
     );
     await tester.pump();
+    await tester.pump();
 
     expect(fakeAuth.verifyOtpCallCount, 1);
 
@@ -403,11 +406,13 @@ void main() {
       '11111',
     );
     await tester.pump();
+    await tester.pump();
 
     await tester.enterText(
       find.widgetWithText(SproutTextField, AppStrings.verificationCode),
       '111111',
     );
+    await tester.pump();
     await tester.pump();
 
     expect(fakeAuth.verifyOtpCallCount, 1);
@@ -416,6 +421,7 @@ void main() {
       find.widgetWithText(SproutTextField, AppStrings.verificationCode),
       '222222',
     );
+    await tester.pump();
     await tester.pump();
 
     expect(fakeAuth.verifyOtpCallCount, 2);

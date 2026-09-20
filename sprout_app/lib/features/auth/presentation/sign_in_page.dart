@@ -222,7 +222,11 @@ class _SignInPageState extends State<SignInPage> {
                                   isOnline &&
                                   !busy) {
                                 _lastAutoSubmittedOtp = value;
-                                context.read<AuthCubit>().verifyOtp(value);
+                                WidgetsBinding.instance
+                                    .addPostFrameCallback((_) {
+                                  if (!mounted) return;
+                                  context.read<AuthCubit>().verifyOtp(value);
+                                });
                               }
                             },
                           ),
