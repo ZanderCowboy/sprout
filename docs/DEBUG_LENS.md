@@ -8,12 +8,14 @@ Debug Lens is an on-device debugging panel that provides visibility into network
 Debug Lens is **always enabled** in development builds:
 - No Remote Config flag required
 - Entry visible in Settings → Debug tools → Debug Lens
+- Debug bubble toggle available in Settings → Debug tools
 
 ### Production flavor
 Debug Lens is **gated by Remote Config**:
 - Default: **disabled** (`debug_lens_enabled = false`)
 - Enable for break-glass debugging by setting `debug_lens_enabled = true` in Firebase Remote Config
 - Only visible in Settings when the flag is enabled
+- Debug bubble toggle available when enabled
 
 ## Remote Config setup
 
@@ -47,6 +49,14 @@ Debug Lens provides:
 - **Remote Config**: current values and feature flags
 - **Device & App**: device info, app version, platform details
 - **Storage**: SharedPreferences inspection (debug_lens uses it internally)
+
+### Debug bubble
+
+The floating debug bubble provides quick access to Debug Lens:
+- Tap the bubble to open the Debug Lens panel
+- Show/hide the bubble via Settings → Debug tools → Show debug bubble
+- Bubble visibility preference persists across app relaunches
+- When hidden, Debug Lens remains accessible through Settings → Debug tools → Debug Lens
 
 ## Current integration
 

@@ -368,6 +368,9 @@ abstract final class AppStrings {
   static const String debugLens = 'Debug Lens';
   static const String debugLensSubtitle =
       'Network, logs, navigation, and Remote Config';
+  static const String debugBubbleVisible = 'Show debug bubble';
+  static const String debugBubbleSubtitle =
+      'Floating bubble to open Debug Lens';
 
   static String appVersionLabel(String version, String buildNumber) =>
       'Version $version (Build $buildNumber)';
