@@ -1,0 +1,57 @@
+﻿appId: app.stackmint.sprout.dev
+tags:
+  - auth
+  - edge
+env:
+  EMAIL: sprout.play.review@gmail.com
+---
+# Existing verified email on Create account → "Account already exists" + Sign in.
+# Requires email_has_account RPC (verified-only) on DEV.
+- launchApp:
+    clearState: true
+    clearKeychain: true
+
+- extendedWaitUntil:
+    visible:
+      id: "intro_next"
+    timeout: 45000
+
+- tapOn:
+    id: "intro_next"
+- tapOn:
+    id: "intro_next"
+- tapOn:
+    id: "intro_create_account"
+
+- extendedWaitUntil:
+    visible:
+      id: "create_account_continue"
+    timeout: 5000
+
+- tapOn:
+    id: "create_account_display_name_field"
+- inputText: "Play Review"
+- tapOn:
+    id: "create_account_email_field"
+- inputText: ${EMAIL}
+- hideKeyboard
+
+- tapOn:
+    id: "create_account_continue"
+
+- extendedWaitUntil:
+    visible:
+      text: "Account already exists"
+    timeout: 20000
+
+- assertVisible:
+    id: "create_account_existing_sign_in"
+
+- tapOn:
+    id: "create_account_existing_sign_in"
+
+- extendedWaitUntil:
+    visible:
+      id: "sign_in_continue"
+    timeout: 10000
+

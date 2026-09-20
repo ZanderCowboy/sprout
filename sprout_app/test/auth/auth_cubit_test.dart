@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 import 'package:sprout/core/config/app_config.dart';
 import 'package:sprout/core/config/app_environment.dart';
+import 'package:sprout/core/constants/app_strings.dart';
 import 'package:sprout/core/error/error.dart';
 import 'package:sprout/core/user/user_context.dart';
 import 'package:sprout/features/auth/application/auth_service.dart';
@@ -111,7 +112,7 @@ void main() {
     expect(cubit.state, isA<AuthViewSignedOut>());
     final afterSend = cubit.state as AuthViewSignedOut;
     expect(afterSend.otpSent, isTrue);
-    expect(fakeAuth.sendOtpCalls, 1);
+    expect(fakeAuth.sendSignInOtpCalls, 1);
 
     await cubit.verifyOtp('123456');
     expect(cubit.state, isA<AuthViewSignedIn>());
@@ -167,13 +168,115 @@ void main() {
   });
 
   test('sendOtp surfaces AuthFailure message', () async {
-    fakeAuth.sendOtpError = const AuthAppException('Rate limited');
+    fakeAuth.sendSignInOtpError = const AuthAppException('Rate limited');
     cubit.emailChanged('user@example.com');
     await cubit.sendOtp();
 
     final signedOut = cubit.state as AuthViewSignedOut;
     expect(signedOut.errorMessage, 'Rate limited');
     expect(signedOut.busy, isFalse);
+  });
+
+  test('sendRegisterOtp does not repeat check-email copy as info', () async {
+    cubit.emailChanged('user@example.com');
+    await cubit.sendRegisterOtp();
+
+    final signedOut = cubit.state as AuthViewSignedOut;
+    expect(signedOut.otpSent, isTrue);
+    expect(signedOut.isRegisterPath, isTrue);
+    expect(signedOut.infoMessage, isNull);
+    expect(fakeAuth.sendRegisterOtpCalls, 1);
+  });
+
+  test('register resend is not blocked by the pending signup row', () async {
+    fakeAuth.sendRegisterOtpErrorAfterFirst = const AuthAppException(
+      AppStrings.emailAlreadyHasAccount,
+    );
+    cubit.emailChanged('user@example.com');
+    await cubit.sendRegisterOtp();
+
+    await cubit.sendOtp();
+
+    final signedOut = cubit.state as AuthViewSignedOut;
+    expect(signedOut.errorMessage, isNull);
+    expect(signedOut.otpSent, isTrue);
+    expect(fakeAuth.sendRegisterOtpCalls, 1);
+    expect(fakeAuth.resendEmailOtpCalls, 1);
+    expect(fakeAuth.lastResendShouldCreateUser, isTrue);
+  });
+
+  test(
+    'sendRegisterOtp keeps user on create account when email exists',
+    () async {
+      fakeAuth.sendRegisterOtpError = const AuthAppException(
+        AppStrings.emailAlreadyHasAccount,
+      );
+      cubit.emailChanged('user@example.com');
+      await cubit.sendRegisterOtp();
+
+      final signedOut = cubit.state as AuthViewSignedOut;
+      expect(signedOut.otpSent, isFalse);
+      expect(signedOut.errorMessage, AppStrings.emailAlreadyHasAccount);
+      expect(signedOut.busy, isFalse);
+    },
+  );
+
+  test('switchToSignInPath clears register flags and error', () async {
+    fakeAuth.sendRegisterOtpError = const AuthAppException(
+      AppStrings.emailAlreadyHasAccount,
+    );
+    cubit.emailChanged('user@example.com');
+    await cubit.sendRegisterOtp();
+    cubit.switchToSignInPath();
+
+    final signedOut = cubit.state as AuthViewSignedOut;
+    expect(signedOut.isRegisterPath, isFalse);
+    expect(signedOut.otpSent, isFalse);
+    expect(signedOut.errorMessage, isNull);
+    expect(signedOut.email, 'user@example.com');
+  });
+
+  test(
+    'sendSignInOtp keeps user on sign in when email has no account',
+    () async {
+      fakeAuth.sendSignInOtpError = const AuthAppException(
+        AppStrings.emailHasNoAccount,
+      );
+      cubit.emailChanged('user@example.com');
+      await cubit.sendSignInOtp();
+
+      final signedOut = cubit.state as AuthViewSignedOut;
+      expect(signedOut.otpSent, isFalse);
+      expect(signedOut.errorMessage, AppStrings.emailHasNoAccount);
+      expect(signedOut.busy, isFalse);
+    },
+  );
+
+  test('switchToRegisterPath clears sign-in flags and error', () async {
+    fakeAuth.sendSignInOtpError = const AuthAppException(
+      AppStrings.emailHasNoAccount,
+    );
+    cubit.emailChanged('user@example.com');
+    await cubit.sendSignInOtp();
+    cubit.switchToRegisterPath();
+
+    final signedOut = cubit.state as AuthViewSignedOut;
+    expect(signedOut.isRegisterPath, isTrue);
+    expect(signedOut.otpSent, isFalse);
+    expect(signedOut.errorMessage, isNull);
+    expect(signedOut.email, 'user@example.com');
+  });
+
+  test('auth stream preserves register path after OTP send', () async {
+    cubit.emailChanged('user@example.com');
+    await cubit.sendRegisterOtp();
+    fakeAuth.setUser(null);
+    await Future<void>.delayed(Duration.zero);
+
+    final signedOut = cubit.state as AuthViewSignedOut;
+    expect(signedOut.isRegisterPath, isTrue);
+    expect(signedOut.otpSent, isTrue);
+    expect(signedOut.email, 'user@example.com');
   });
 
   test('signOut returns to guest', () async {

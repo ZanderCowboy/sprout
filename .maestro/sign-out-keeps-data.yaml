@@ -1,0 +1,48 @@
+﻿appId: app.stackmint.sprout.dev
+tags:
+  - edge
+  - auth
+---
+# #56: sign-out clears session but keeps local Hive data.
+# Run: maestro test .maestro/sign-out-keeps-data.yaml
+# Overview may not show goal names — assert on Goals tab.
+
+- launchApp:
+    clearState: true
+    clearKeychain: true
+
+- runFlow: shared/debug-signin-intro.yaml
+
+- runFlow:
+    file: shared/seed-core.yaml
+    env:
+      SEED_GOAL: "true"
+
+- tapOn:
+    id: "shell_tab_goals"
+
+- assertVisible:
+    text: ".*Everyday Fund.*"
+
+- runFlow: shared/chapter-sign-out.yaml
+
+# After introCompleted, unsigned gate is Sign in (primary).
+- extendedWaitUntil:
+    visible:
+      id: "sign_in_debug_sign_in"
+    timeout: 10000
+
+- tapOn:
+    id: "sign_in_debug_sign_in"
+
+- extendedWaitUntil:
+    visible:
+      id: "shell_tab_overview"
+    timeout: 20000
+
+# Local goal should still be present (no wizard if first_run already done)
+- tapOn:
+    id: "shell_tab_goals"
+
+- assertVisible:
+    text: ".*Everyday Fund.*"

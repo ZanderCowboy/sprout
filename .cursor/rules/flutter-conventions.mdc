@@ -16,9 +16,14 @@ Package name is `sprout`. App root is `sprout_app/`.
   - Parent page imports the parts: `part '_snake_case.dart';` after imports, before the public page class.
   - Private classes stay `_`-prefixed in part files (not public library widgets).
   - Reusable/public widgets still belong under `presentation/widgets/` and export via barrel.
+- Bundled images/SVGs: `AppAssets` (`lib/core/constants/app_assets.dart`). Do **not** hard-code `assets/...` paths in widgets.
+  - Add a field (or reuse one) **before** using a file. PNG/JPEG → `AppAssetImage.image`; SVG → `AppAssetImage.svg`. Render with `.image()`.
+  - Register the file in `pubspec.yaml` `flutter.assets` in the same change.
+  - Flavor JSON (`assets/config/*.json`) stays on documented entrypoint paths — not `AppAssets`.
 - User-visible copy: `AppStrings` (`lib/core/constants/app_strings.dart`). Do **not** hard-code UI strings.
   - Includes: on-screen `Text`, `AppBar` titles, button/chip labels, tooltips, hints, dialogs, snackbars, Semantics/`label`/`semanticsLabel`, enum **display** labels (sort, frequency, category, kind), and `ValidationAppException` / user-facing `AuthAppException` messages.
   - Add the constant (or reuse an existing one) **before** using it in a widget. Prefer reuse over inventing near-duplicates.
+  - Do not leave unused `AppStrings` constants. Wire them in the same change or delete them.
   - Keep interpolation at the call site (or a small `AppStrings` helper). Do not invent a new string per formatted amount.
   - **Not** copy: `SemanticsIds`, widget `Key`s, route paths, Hive/API wire values (`'deposit'`, `'daily'`), user-generated names.
   - No ARB / `gen-l10n` — one `AppStrings` class with section comments.

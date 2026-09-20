@@ -1,31 +1,29 @@
 appId: app.stackmint.sprout.dev
 ---
-# Requires: sign_in_otp_field visible (after chapter-otp-send).
+# Requires: verify_otp_code_field visible (after chapter-otp-send).
 # Wrong OTP auto-submits and stays on verify; right OTP auto-submits to shell.
 # Do NOT tap Verify — relies on 6-digit auto-submit.
 
 - tapOn:
-    id: "sign_in_otp_field"
+    id: "verify_otp_code_field"
 
 - inputText: "000000"
 
-# Allow failed verify round-trip; stay on OTP / Verify UI.
 - extendedWaitUntil:
     visible:
-      id: "sign_in_otp_field"
+      id: "verify_otp_code_field"
     timeout: 15000
 
 - assertVisible:
-    id: "sign_in_verify_code"
+    id: "verify_otp_verify"
 
 - tapOn:
-    id: "sign_in_otp_field"
+    id: "verify_otp_code_field"
 
 - eraseText
 
 - inputText: ${OTP_CODE}
 
-# Auto-submit success: optional first-run wizard, then Overview.
 - extendedWaitUntil:
     visible:
       id: "wizard_skip"

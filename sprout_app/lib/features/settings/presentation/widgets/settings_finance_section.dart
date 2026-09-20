@@ -26,6 +26,7 @@ class SettingsFinanceSection extends StatelessWidget {
         SettingsNavRow(
           identifier: SemanticsIds.settingsTransactions,
           label: AppStrings.transactions,
+          subtitle: AppStrings.viewAllDeposits,
           icon: Icons.receipt_long_rounded,
           onTap: () => context.push(AppRoute.transactions.path),
         ),
@@ -33,6 +34,7 @@ class SettingsFinanceSection extends StatelessWidget {
         SettingsNavRow(
           identifier: SemanticsIds.settingsRecurring,
           label: AppStrings.recurringPayments,
+          subtitle: AppStrings.viewEditCancelRecurring,
           icon: Icons.autorenew_rounded,
           onTap: () => context.push(AppRoute.recurring.path),
         ),
@@ -40,6 +42,7 @@ class SettingsFinanceSection extends StatelessWidget {
         SettingsNavRow(
           identifier: SemanticsIds.settingsBudget,
           label: AppStrings.masterBudget,
+          subtitle: AppStrings.planIncomeExpenses,
           icon: Icons.account_balance_wallet_rounded,
           onTap: () => context.push(AppRoute.budget.path),
         ),

@@ -207,6 +207,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 SettingsNavRow(
                   identifier: SemanticsIds.settingsDebugLens,
                   label: AppStrings.debugLens,
+                  subtitle: AppStrings.debugLensSubtitle,
                   icon: Icons.bug_report_outlined,
                   onTap: _openDebugLens,
                 ),

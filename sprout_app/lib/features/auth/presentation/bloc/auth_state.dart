@@ -15,6 +15,7 @@ final class AuthViewSignedOut extends AuthViewState {
   const AuthViewSignedOut({
     required this.supabaseConfigured,
     required this.googleAvailable,
+    this.isRegisterPath = false,
     this.email = '',
     this.displayName = '',
     this.otpSent = false,
@@ -25,6 +26,7 @@ final class AuthViewSignedOut extends AuthViewState {
 
   final bool supabaseConfigured;
   final bool googleAvailable;
+  final bool isRegisterPath;
   final String email;
   final String displayName;
   final bool otpSent;
@@ -35,6 +37,7 @@ final class AuthViewSignedOut extends AuthViewState {
   AuthViewSignedOut copyWith({
     bool? supabaseConfigured,
     bool? googleAvailable,
+    bool? isRegisterPath,
     String? email,
     String? displayName,
     bool? otpSent,
@@ -47,6 +50,7 @@ final class AuthViewSignedOut extends AuthViewState {
     return AuthViewSignedOut(
       supabaseConfigured: supabaseConfigured ?? this.supabaseConfigured,
       googleAvailable: googleAvailable ?? this.googleAvailable,
+      isRegisterPath: isRegisterPath ?? this.isRegisterPath,
       email: email ?? this.email,
       displayName: displayName ?? this.displayName,
       otpSent: otpSent ?? this.otpSent,
@@ -60,6 +64,7 @@ final class AuthViewSignedOut extends AuthViewState {
   List<Object?> get props => [
     supabaseConfigured,
     googleAvailable,
+    isRegisterPath,
     email,
     displayName,
     otpSent,

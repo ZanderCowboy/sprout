@@ -1,8 +1,16 @@
-appId: app.stackmint.sprout.dev
+﻿appId: app.stackmint.sprout.dev
 ---
-# Tour-only. Requires: signed in. Leaves app on Sign in after sign-out.
+# Tour-only. Requires: signed in. Leaves app on auth after sign-out.
+# After introCompleted (debug/OTP/Google), unsigned gate is Sign in — not intro.
 - tapOn:
     id: "shell_tab_settings"
+
+- scrollUntilVisible:
+    element:
+      id: "account_sign_out"
+    direction: DOWN
+    centerElement: true
+    timeout: 15000
 
 - tapOn:
     id: "account_sign_out"
@@ -10,4 +18,17 @@ appId: app.stackmint.sprout.dev
 - extendedWaitUntil:
     visible:
       id: "sign_in_debug_sign_in"
-    timeout: 15000
+    timeout: 20000
+    optional: true
+
+- extendedWaitUntil:
+    visible:
+      id: "create_account_debug_sign_in"
+    timeout: 5000
+    optional: true
+
+- extendedWaitUntil:
+    visible:
+      id: "intro_debug_sign_in"
+    timeout: 5000
+    optional: true

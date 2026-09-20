@@ -11,26 +11,34 @@ import 'package:sprout/features/auth/presentation/widgets/debug_sign_in_button.d
 import 'package:sprout/features/connectivity/presentation/connectivity_cubit.dart';
 import 'package:sprout/ui/export.dart';
 
-class SignInPage extends StatefulWidget {
-  const SignInPage({super.key, this.onBackToIntro});
+class CreateAccountPage extends StatefulWidget {
+  const CreateAccountPage({super.key, this.onBackToIntro});
 
   final VoidCallback? onBackToIntro;
 
   @override
-  State<SignInPage> createState() => _SignInPageState();
+  State<CreateAccountPage> createState() => _CreateAccountPageState();
 }
 
-class _SignInPageState extends State<SignInPage> {
+class _CreateAccountPageState extends State<CreateAccountPage> {
   late final TextEditingController _emailController;
+  late final TextEditingController _displayNameController;
   String _email = '';
+  String _displayName = '';
 
   @override
   void initState() {
     super.initState();
     _emailController = TextEditingController();
+    _displayNameController = TextEditingController();
     _emailController.addListener(() {
       if (_email != _emailController.text) {
         setState(() => _email = _emailController.text);
+      }
+    });
+    _displayNameController.addListener(() {
+      if (_displayName != _displayNameController.text) {
+        setState(() => _displayName = _displayNameController.text);
       }
     });
   }
@@ -38,6 +46,7 @@ class _SignInPageState extends State<SignInPage> {
   @override
   void dispose() {
     _emailController.dispose();
+    _displayNameController.dispose();
     super.dispose();
   }
 
@@ -48,6 +57,10 @@ class _SignInPageState extends State<SignInPage> {
     return emailRegex.hasMatch(trimmed);
   }
 
+  bool _isValidDisplayName(String name) {
+    return name.trim().isNotEmpty;
+  }
+
   void _openTerms() {
     context.push(AppRoute.terms.path);
   }
@@ -56,34 +69,34 @@ class _SignInPageState extends State<SignInPage> {
     context.push(AppRoute.privacy.path);
   }
 
-  void _goToCreateAccount() {
-    context.go(AppRoute.createAccount.path);
+  bool _existingAccountPromptOpen = false;
+
+  void _goToSignIn() {
+    context.go(AppRoute.signIn.path);
   }
 
-  bool _missingAccountPromptOpen = false;
-
-  Future<void> _promptMissingAccount(BuildContext context) async {
-    if (_missingAccountPromptOpen) return;
-    _missingAccountPromptOpen = true;
+  Future<void> _promptExistingAccount(BuildContext context) async {
+    if (_existingAccountPromptOpen) return;
+    _existingAccountPromptOpen = true;
     try {
-      final goToCreate = await showDialog<bool>(
+      final goToSignIn = await showDialog<bool>(
         context: context,
         builder: (ctx) => AlertDialog(
-          title: const Text(AppStrings.accountDoesNotExist),
-          content: const Text(AppStrings.emailHasNoAccount),
+          title: const Text(AppStrings.accountAlreadyExists),
+          content: const Text(AppStrings.emailAlreadyHasAccount),
           actions: SproutDialogActions.cancelConfirm(
             onCancel: () => Navigator.pop(ctx, false),
             onConfirm: () => Navigator.pop(ctx, true),
-            confirmLabel: AppStrings.createAccount,
-            confirmIdentifier: SemanticsIds.signInMissingCreateAccount,
+            confirmLabel: AppStrings.signIn,
+            confirmIdentifier: SemanticsIds.createAccountExistingSignIn,
           ),
         ),
       );
-      if (!context.mounted || goToCreate != true) return;
-      context.read<AuthCubit>().switchToRegisterPath();
-      context.go(AppRoute.createAccount.path);
+      if (!context.mounted || goToSignIn != true) return;
+      context.read<AuthCubit>().switchToSignInPath();
+      context.go(AppRoute.signIn.path);
     } finally {
-      _missingAccountPromptOpen = false;
+      _existingAccountPromptOpen = false;
     }
   }
 
@@ -94,11 +107,11 @@ class _SignInPageState extends State<SignInPage> {
         leading: widget.onBackToIntro == null
             ? null
             : SproutBackButton(
-                identifier: SemanticsIds.signInBack,
+                identifier: SemanticsIds.createAccountBack,
                 label: AppStrings.back,
                 onPressed: widget.onBackToIntro,
               ),
-        title: const Text(AppStrings.signIn),
+        title: const Text(AppStrings.createAccount),
       ),
       body: BlocBuilder<ConnectivityCubit, bool>(
         builder: (context, isOnline) {
@@ -113,10 +126,18 @@ class _SignInPageState extends State<SignInPage> {
                     ),
                   );
                 }
+                if (_displayNameController.text != state.displayName) {
+                  _displayNameController.value = TextEditingValue(
+                    text: state.displayName,
+                    selection: TextSelection.collapsed(
+                      offset: state.displayName.length,
+                    ),
+                  );
+                }
               }
               if (state is AuthViewSignedOut &&
-                  state.errorMessage == AppStrings.emailHasNoAccount) {
-                _promptMissingAccount(context);
+                  state.errorMessage == AppStrings.emailAlreadyHasAccount) {
+                _promptExistingAccount(context);
               }
               if (state is AuthViewSignedOut && state.otpSent) {
                 context.go(AppRoute.verifyOtp.path);
@@ -146,7 +167,7 @@ class _SignInPageState extends State<SignInPage> {
                       ),
                       const SizedBox(height: 24),
                       Text(
-                        AppStrings.signInSubtitle,
+                        AppStrings.createAccountSubtitle,
                         textAlign: TextAlign.center,
                         style: Theme.of(context).textTheme.bodyLarge,
                       ),
@@ -194,7 +215,23 @@ class _SignInPageState extends State<SignInPage> {
                       if (supabaseConfigured) ...[
                         const SizedBox(height: 16),
                         SproutTextField(
-                          identifier: SemanticsIds.signInEmailField,
+                          identifier:
+                              SemanticsIds.createAccountDisplayNameField,
+                          controller: _displayNameController,
+                          enabled: isOnline && !busy,
+                          textCapitalization: TextCapitalization.words,
+                          autofillHints: const [AutofillHints.name],
+                          decoration: const InputDecoration(
+                            labelText: AppStrings.displayNameRequired,
+                            border: OutlineInputBorder(),
+                          ),
+                          onChanged: context
+                              .read<AuthCubit>()
+                              .displayNameChanged,
+                        ),
+                        const SizedBox(height: 12),
+                        SproutTextField(
+                          identifier: SemanticsIds.createAccountEmailField,
                           controller: _emailController,
                           enabled: isOnline && !busy,
                           keyboardType: TextInputType.emailAddress,
@@ -217,14 +254,18 @@ class _SignInPageState extends State<SignInPage> {
                         ),
                         const SizedBox(height: 12),
                         SproutFilledButton(
-                          identifier: SemanticsIds.signInContinue,
+                          identifier: SemanticsIds.createAccountContinue,
                           label: AppStrings.continueButton,
                           onPressed:
                               (!isOnline ||
                                   busy ||
-                                  !_isValidEmail(_emailController.text))
+                                  !_isValidEmail(_emailController.text) ||
+                                  !_isValidDisplayName(
+                                    _displayNameController.text,
+                                  ))
                               ? null
-                              : () => context.read<AuthCubit>().sendSignInOtp(),
+                              : () =>
+                                    context.read<AuthCubit>().sendRegisterOtp(),
                         ),
                         if (googleAvailable) ...[
                           const SizedBox(height: 24),
@@ -240,7 +281,7 @@ class _SignInPageState extends State<SignInPage> {
                           ),
                           const SizedBox(height: 16),
                           SproutOutlinedButton.icon(
-                            identifier: SemanticsIds.signInGoogle,
+                            identifier: SemanticsIds.createAccountGoogle,
                             label: AppStrings.continueWithGoogle,
                             onPressed: (!isOnline || busy)
                                 ? null
@@ -268,7 +309,8 @@ class _SignInPageState extends State<SignInPage> {
                                 alignment: PlaceholderAlignment.baseline,
                                 baseline: TextBaseline.alphabetic,
                                 child: SproutTextButton(
-                                  identifier: SemanticsIds.signInTermsLink,
+                                  identifier:
+                                      SemanticsIds.createAccountTermsLink,
                                   label: AppStrings.termsOfService,
                                   onPressed: _openTerms,
                                   style: TextButton.styleFrom(
@@ -294,7 +336,8 @@ class _SignInPageState extends State<SignInPage> {
                                 alignment: PlaceholderAlignment.baseline,
                                 baseline: TextBaseline.alphabetic,
                                 child: SproutTextButton(
-                                  identifier: SemanticsIds.signInPrivacyLink,
+                                  identifier:
+                                      SemanticsIds.createAccountPrivacyLink,
                                   label: AppStrings.privacyPolicy,
                                   onPressed: _openPrivacy,
                                   style: TextButton.styleFrom(
@@ -322,11 +365,11 @@ class _SignInPageState extends State<SignInPage> {
                         const SizedBox(height: 16),
                         Center(
                           child: SproutTextButton(
-                            identifier: SemanticsIds.signInCreateAccountLink,
-                            label: AppStrings.createAnAccount,
-                            onPressed: _goToCreateAccount,
+                            identifier: SemanticsIds.createAccountSignInLink,
+                            label: AppStrings.iAlreadyHaveAnAccount,
+                            onPressed: _goToSignIn,
                             child: Text(
-                              AppStrings.createAnAccount,
+                              AppStrings.iAlreadyHaveAnAccount,
                               style: Theme.of(context).textTheme.bodyMedium
                                   ?.copyWith(
                                     color: Theme.of(
@@ -340,7 +383,7 @@ class _SignInPageState extends State<SignInPage> {
                       const SizedBox(height: 24),
                       DebugSignInButton(
                         enabled: isOnline && !busy,
-                        identifier: SemanticsIds.signInDebugSignIn,
+                        identifier: SemanticsIds.createAccountDebugSignIn,
                       ),
                       if (busy) ...[
                         const SizedBox(height: 24),
@@ -351,7 +394,8 @@ class _SignInPageState extends State<SignInPage> {
                         Text(infoMessage),
                       ],
                       if (errorMessage != null &&
-                          errorMessage != AppStrings.emailHasNoAccount) ...[
+                          errorMessage !=
+                              AppStrings.emailAlreadyHasAccount) ...[
                         const SizedBox(height: 16),
                         Text(
                           errorMessage,

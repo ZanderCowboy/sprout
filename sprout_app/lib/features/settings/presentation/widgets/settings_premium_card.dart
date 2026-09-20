@@ -24,7 +24,7 @@ class SettingsPremiumCard extends StatelessWidget {
     final subtitle = loading
         ? AppStrings.checkingSubscription
         : hasPremium
-        ? AppStrings.premiumStatusActive
+        ? AppStrings.premiumActive
         : AppStrings.unlockPremium;
     final actionLabel = hasPremium ? AppStrings.manage : AppStrings.upgrade;
     final radius = BorderRadius.circular(AppRadii.card);
@@ -67,7 +67,6 @@ class SettingsPremiumCard extends StatelessWidget {
                     subtitle,
                     style: textTheme.labelSmall?.copyWith(
                       color: scheme.onSurfaceVariant,
-                      letterSpacing: hasPremium && !loading ? 1.2 : null,
                     ),
                   ),
                   trailing: Text(

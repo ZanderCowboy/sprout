@@ -38,12 +38,15 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<void> sendEmailOtp(String email) async {
+  Future<void> sendRegisterOtp(String email) async {
     final normalized = email.trim();
     if (normalized.isEmpty) {
       throw const ValidationAppException(AppStrings.enterEmailAddress);
     }
     try {
+      if (await _emailHasAccount(normalized)) {
+        throw const AuthAppException(AppStrings.emailAlreadyHasAccount);
+      }
       await _client.auth.signInWithOtp(
         email: normalized,
         shouldCreateUser: true,
@@ -51,6 +54,54 @@ class AuthRepositoryImpl implements AuthRepository {
     } on AuthException catch (e) {
       throw AuthAppException(e.message);
     } on AuthAppException {
+      rethrow;
+    } on ValidationAppException {
+      rethrow;
+    } on Object catch (e) {
+      throw AuthAppException(e.toString());
+    }
+  }
+
+  @override
+  Future<void> sendSignInOtp(String email) async {
+    final normalized = email.trim();
+    if (normalized.isEmpty) {
+      throw const ValidationAppException(AppStrings.enterEmailAddress);
+    }
+    try {
+      if (!await _emailHasAccount(normalized)) {
+        throw const AuthAppException(AppStrings.emailHasNoAccount);
+      }
+      await _client.auth.signInWithOtp(
+        email: normalized,
+        shouldCreateUser: false,
+      );
+    } on AuthException catch (e) {
+      throw AuthAppException(e.message);
+    } on AuthAppException {
+      rethrow;
+    } on Object catch (e) {
+      throw AuthAppException(e.toString());
+    }
+  }
+
+  @override
+  Future<void> resendEmailOtp({
+    required String email,
+    required bool shouldCreateUser,
+  }) async {
+    final normalized = email.trim();
+    if (normalized.isEmpty) {
+      throw const ValidationAppException(AppStrings.enterEmailAddress);
+    }
+    try {
+      await _client.auth.signInWithOtp(
+        email: normalized,
+        shouldCreateUser: shouldCreateUser,
+      );
+    } on AuthException catch (e) {
+      throw AuthAppException(e.message);
+    } on ValidationAppException {
       rethrow;
     } on Object catch (e) {
       throw AuthAppException(e.toString());
@@ -83,6 +134,13 @@ class AuthRepositoryImpl implements AuthRepository {
       }
       return user;
     } on AuthException catch (e) {
+      if (e.message.toLowerCase().contains('token') ||
+          e.message.toLowerCase().contains('expired') ||
+          e.message.toLowerCase().contains('invalid')) {
+        throw const AuthAppException(
+          AppStrings.verificationCodeIncorrectOrExpired,
+        );
+      }
       throw AuthAppException(e.message);
     } on AuthAppException {
       rethrow;
@@ -195,6 +253,21 @@ class AuthRepositoryImpl implements AuthRepository {
     }
   }
 
+  /// True when [email] belongs to a verified Supabase user.
+  /// Unverified signup rows must not count — the first register OTP creates
+  /// one, and treating that as an account blocks resend / retry.
+  Future<bool> _emailHasAccount(String email) async {
+    try {
+      final result = await _client.rpc<dynamic>(
+        'email_has_account',
+        params: {'p_email': email},
+      );
+      return result == true;
+    } on PostgrestException catch (e) {
+      throw AuthAppException(e.message);
+    }
+  }
+
   Future<AuthResponse> _verifyEmailOrSignupOtp({
     required String email,
     required String token,
@@ -223,25 +296,27 @@ class AuthRepositoryImpl implements AuthRepository {
         // Check the description to differentiate.
         final description = e.description ?? '';
         final lower = description.toLowerCase();
-        
+
         // First check: if description looks like user cancellation, treat as such
-        final isUserCancel = lower.contains('cancelled by user') ||
+        final isUserCancel =
+            lower.contains('cancelled by user') ||
             lower.contains('canceled by user') ||
             lower.contains('cancelled by') ||
             lower.contains('canceled by');
         if (isUserCancel) {
           return AppStrings.googleSignInCancelled;
         }
-        
+
         // Second check: clear configuration/auth error signals
-        final isConfigError = lower.contains('reauth failed') ||
+        final isConfigError =
+            lower.contains('reauth failed') ||
             lower.contains('configuration') ||
             lower.contains('sha') ||
             lower.contains('client id');
         if (isConfigError) {
           return e.description ?? AppStrings.googleSignInFailed;
         }
-        
+
         // Default: treat as user cancellation
         return AppStrings.googleSignInCancelled;
       case GoogleSignInExceptionCode.clientConfigurationError:

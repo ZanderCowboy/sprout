@@ -1,0 +1,58 @@
+﻿appId: app.stackmint.sprout.dev
+tags:
+  - auth
+  - edge
+---
+# Unknown email on Sign in → "No account yet" dialog + Create account CTA.
+- launchApp:
+    clearState: true
+    clearKeychain: true
+
+- extendedWaitUntil:
+    visible:
+      id: "intro_next"
+    timeout: 45000
+
+- tapOn:
+    id: "intro_next"
+- tapOn:
+    id: "intro_next"
+- tapOn:
+    id: "intro_sign_in"
+
+- extendedWaitUntil:
+    visible:
+      id: "sign_in_continue"
+    timeout: 5000
+
+# Empty email — Continue must not leave Sign in
+- tapOn:
+    id: "sign_in_continue"
+- assertVisible:
+    id: "sign_in_email_field"
+- assertNotVisible:
+    id: "verify_otp_code_field"
+
+- tapOn:
+    id: "sign_in_email_field"
+- inputText: "qa.unknown+signin@example.com"
+- hideKeyboard
+
+- tapOn:
+    id: "sign_in_continue"
+
+- extendedWaitUntil:
+    visible:
+      text: "No account yet"
+    timeout: 20000
+
+- assertVisible:
+    id: "sign_in_missing_create_account"
+
+- tapOn:
+    id: "sign_in_missing_create_account"
+
+- extendedWaitUntil:
+    visible:
+      id: "create_account_continue"
+    timeout: 10000

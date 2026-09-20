@@ -5,18 +5,37 @@ abstract final class SemanticsIds {
   // --- Intro ---
   static const introNext = 'intro_next';
   static const introDebugSignIn = 'intro_debug_sign_in';
+  static const introCreateAccount = 'intro_create_account';
+  static const introSignIn = 'intro_sign_in';
+
+  // --- Create account ---
+  static const createAccountBack = 'create_account_back';
+  static const createAccountDisplayNameField = 'create_account_display_name_field';
+  static const createAccountEmailField = 'create_account_email_field';
+  static const createAccountContinue = 'create_account_continue';
+  static const createAccountGoogle = 'create_account_google';
+  static const createAccountTermsLink = 'create_account_terms_link';
+  static const createAccountPrivacyLink = 'create_account_privacy_link';
+  static const createAccountSignInLink = 'create_account_sign_in_link';
+  static const createAccountExistingSignIn = 'create_account_existing_sign_in';
+  static const createAccountDebugSignIn = 'create_account_debug_sign_in';
 
   // --- Sign in ---
   static const signInBack = 'sign_in_back';
-  static const signInDisplayNameField = 'sign_in_display_name_field';
   static const signInEmailField = 'sign_in_email_field';
-  static const signInSendCode = 'sign_in_send_code';
-  static const signInOtpField = 'sign_in_otp_field';
-  static const signInVerifyCode = 'sign_in_verify_code';
+  static const signInContinue = 'sign_in_continue';
   static const signInGoogle = 'sign_in_google';
   static const signInTermsLink = 'sign_in_terms_link';
   static const signInPrivacyLink = 'sign_in_privacy_link';
+  static const signInCreateAccountLink = 'sign_in_create_account_link';
+  static const signInMissingCreateAccount = 'sign_in_missing_create_account';
   static const signInDebugSignIn = 'sign_in_debug_sign_in';
+
+  // --- Verify OTP ---
+  static const verifyOtpBack = 'verify_otp_back';
+  static const verifyOtpCodeField = 'verify_otp_code_field';
+  static const verifyOtpVerify = 'verify_otp_verify';
+  static const verifyOtpResend = 'verify_otp_resend';
 
   // --- First-run wizard ---
   static const wizardSkip = 'wizard_skip';

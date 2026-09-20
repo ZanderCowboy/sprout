@@ -1,8 +1,8 @@
 appId: app.stackmint.sprout.dev
 ---
 # Requires: intro screen visible (fresh launch).
-# Walks intro → sign-in (terms/privacy), fills Play Review + ${EMAIL},
-# taps Send code, waits for OTP field. Does NOT debug-sign-in or Google.
+# Walks intro → create account (terms/privacy), fills Play Review + ${EMAIL},
+# taps Continue, waits for verify OTP field. Does NOT debug-sign-in or Google.
 - extendedWaitUntil:
     visible:
       id: "intro_next"
@@ -15,15 +15,15 @@ appId: app.stackmint.sprout.dev
     id: "intro_next"
 
 - tapOn:
-    id: "intro_next"
+    id: "intro_create_account"
 
 - extendedWaitUntil:
     visible:
-      id: "sign_in_send_code"
+      id: "create_account_continue"
     timeout: 5000
 
 - tapOn:
-    id: "sign_in_terms_link"
+    id: "create_account_terms_link"
 
 - extendedWaitUntil:
     visible:
@@ -33,7 +33,7 @@ appId: app.stackmint.sprout.dev
 - back
 
 - tapOn:
-    id: "sign_in_privacy_link"
+    id: "create_account_privacy_link"
 
 - extendedWaitUntil:
     visible:
@@ -43,21 +43,21 @@ appId: app.stackmint.sprout.dev
 - back
 
 - tapOn:
-    id: "sign_in_display_name_field"
+    id: "create_account_display_name_field"
 
 - inputText: "Play Review"
 
 - tapOn:
-    id: "sign_in_email_field"
+    id: "create_account_email_field"
 
 - inputText: ${EMAIL}
 
 - hideKeyboard
 
 - tapOn:
-    id: "sign_in_send_code"
+    id: "create_account_continue"
 
 - extendedWaitUntil:
     visible:
-      id: "sign_in_otp_field"
+      id: "verify_otp_code_field"
     timeout: 30000
