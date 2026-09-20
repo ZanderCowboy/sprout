@@ -50,6 +50,7 @@ abstract class AuthService {
     required String email,
     required String token,
     String? displayName,
+    bool isSignUp = false,
   });
 
   /// Signs in with Google and binds the verified session.

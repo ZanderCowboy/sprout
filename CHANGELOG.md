@@ -4,8 +4,10 @@ Changes heading to `main`. Newest entries at the top.
 
 ## 2026-09-20 — MVP Firebase Analytics event set
 
-- Added Firebase Analytics tracking for development flavor with minimal event set
-- Events: `app_open` (automatic), `sign_in_success` with method param, `wizard_completed`, `first_deposit_logged`
+- Added Firebase Analytics tracking for development flavor with core event set
+- Events: `app_open` (automatic), `screen_view` with screen_name, `sign_in_success` / `sign_up_success` with method param, `sign_out`, `wizard_completed`, `first_deposit_logged`
+- Automatic screen view tracking via NavigatorObserver for main screens (overview, accounts, goals, settings, sign-in, wizard, etc.)
+- Sign-up vs sign-in distinction: separate events based on new vs returning user
 - No PII in parameters
 - Development flavor sends to Firebase DebugView; production flavor uses same API (PROD Firebase project setup remains #52)
 - Added `docs/FIREBASE_ANALYTICS.md` with event documentation and DebugView instructions

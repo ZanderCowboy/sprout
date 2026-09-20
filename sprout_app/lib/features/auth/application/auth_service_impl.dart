@@ -91,6 +91,7 @@ class AuthServiceImpl implements AuthService {
     required String email,
     required String token,
     String? displayName,
+    bool isSignUp = false,
   }) async {
     var user = await _authRepository.verifyEmailOtp(email: email, token: token);
     final trimmedName = displayName?.trim() ?? '';
@@ -98,15 +99,27 @@ class AuthServiceImpl implements AuthService {
       user = await _authRepository.updateDisplayName(trimmedName);
     }
     await bindAfterVerifiedSignIn(user);
-    await _analyticsService.logSignInSuccess(SignInMethod.emailOtp);
+    if (isSignUp) {
+      await _analyticsService.logSignUpSuccess(SignInMethod.emailOtp);
+    } else {
+      await _analyticsService.logSignInSuccess(SignInMethod.emailOtp);
+    }
     return user;
   }
 
   @override
   Future<AuthUser> signInWithGoogle() async {
+    final previousUserId = _userContext.lastVerifiedUserId;
     final user = await _authRepository.signInWithGoogle();
     await bindAfterVerifiedSignIn(user);
-    await _analyticsService.logSignInSuccess(SignInMethod.google);
+    
+    // Sign-up if this is a different user than previously verified
+    final isSignUp = previousUserId == null || previousUserId != user.id;
+    if (isSignUp) {
+      await _analyticsService.logSignUpSuccess(SignInMethod.google);
+    } else {
+      await _analyticsService.logSignInSuccess(SignInMethod.google);
+    }
     return user;
   }
 
@@ -118,6 +131,7 @@ class AuthServiceImpl implements AuthService {
   Future<void> signOut() async {
     _debugSignedIn = false;
     await _authRepository.signOut();
+    await _analyticsService.logSignOut();
   }
 
   @override

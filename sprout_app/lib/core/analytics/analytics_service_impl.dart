@@ -25,6 +25,24 @@ class AnalyticsServiceImpl implements AnalyticsService {
   }
 
   @override
+  Future<void> logScreenView(String screenName) async {
+    if (!_ready) return;
+    try {
+      await FirebaseAnalytics.instance.logEvent(
+        name: 'screen_view',
+        parameters: {'screen_name': screenName},
+      );
+      if (kDebugMode) {
+        debugPrint('AnalyticsService: logged screen_view($screenName)');
+      }
+    } on Object catch (e) {
+      if (kDebugMode) {
+        debugPrint('AnalyticsService.logScreenView failed: $e');
+      }
+    }
+  }
+
+  @override
   Future<void> logSignInSuccess(SignInMethod method) async {
     if (!_ready) return;
     try {
@@ -38,6 +56,39 @@ class AnalyticsServiceImpl implements AnalyticsService {
     } on Object catch (e) {
       if (kDebugMode) {
         debugPrint('AnalyticsService.logSignInSuccess failed: $e');
+      }
+    }
+  }
+
+  @override
+  Future<void> logSignUpSuccess(SignInMethod method) async {
+    if (!_ready) return;
+    try {
+      await FirebaseAnalytics.instance.logEvent(
+        name: 'sign_up_success',
+        parameters: {'method': method.value},
+      );
+      if (kDebugMode) {
+        debugPrint('AnalyticsService: logged sign_up_success(${method.value})');
+      }
+    } on Object catch (e) {
+      if (kDebugMode) {
+        debugPrint('AnalyticsService.logSignUpSuccess failed: $e');
+      }
+    }
+  }
+
+  @override
+  Future<void> logSignOut() async {
+    if (!_ready) return;
+    try {
+      await FirebaseAnalytics.instance.logEvent(name: 'sign_out');
+      if (kDebugMode) {
+        debugPrint('AnalyticsService: logged sign_out');
+      }
+    } on Object catch (e) {
+      if (kDebugMode) {
+        debugPrint('AnalyticsService.logSignOut failed: $e');
       }
     }
   }

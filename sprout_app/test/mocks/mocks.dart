@@ -29,6 +29,15 @@ class FakeAnalyticsService implements AnalyticsService {
   @override
   Future<void> setup() async {}
 
+  int screenViewCalls = 0;
+  String? lastScreenName;
+
+  @override
+  Future<void> logScreenView(String screenName) async {
+    screenViewCalls++;
+    lastScreenName = screenName;
+  }
+
   int signInSuccessCalls = 0;
   SignInMethod? lastSignInMethod;
 
@@ -36,6 +45,22 @@ class FakeAnalyticsService implements AnalyticsService {
   Future<void> logSignInSuccess(SignInMethod method) async {
     signInSuccessCalls++;
     lastSignInMethod = method;
+  }
+
+  int signUpSuccessCalls = 0;
+  SignInMethod? lastSignUpMethod;
+
+  @override
+  Future<void> logSignUpSuccess(SignInMethod method) async {
+    signUpSuccessCalls++;
+    lastSignUpMethod = method;
+  }
+
+  int signOutCalls = 0;
+
+  @override
+  Future<void> logSignOut() async {
+    signOutCalls++;
   }
 
   int wizardCompletedCalls = 0;

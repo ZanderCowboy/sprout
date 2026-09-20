@@ -6,6 +6,8 @@ import 'package:go_router/go_router.dart';
 import 'package:debug_lens/debug_lens.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 
+import 'package:sprout/core/analytics/analytics_navigator_observer.dart';
+import 'package:sprout/core/analytics/analytics_service.dart';
 import 'package:sprout/core/core.dart';
 import 'package:sprout/core/debug/sprout_debug_lens.dart';
 import 'package:sprout/core/di/service_locator.dart';
@@ -42,6 +44,7 @@ class _SproutAppState extends State<SproutApp> {
       refreshListenable: _refresh,
       hasExistingSetup: _hasExistingSetup,
       observers: [
+        AnalyticsNavigatorObserver(sl<AnalyticsService>()),
         if (shouldEnableDebugLens()) SproutDebugLens.navigatorObserver,
       ],
     );
