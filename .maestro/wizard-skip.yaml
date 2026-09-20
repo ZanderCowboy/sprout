@@ -27,8 +27,7 @@ tags:
     text: "Step 1 of 3"
 
 # Tap Skip immediately (do not advance to step 2)
-- tapOn:
-    id: "wizard_skip"
+- runFlow: shared/skip-wizard.yaml
 
 # Should redirect to Overview
 - extendedWaitUntil:

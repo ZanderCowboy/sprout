@@ -2,6 +2,32 @@
 
 Changes heading to `main`. Newest entries at the top.
 
+## 2026-09-20 — Play Store feature graphic redesign with screenshots
+
+- Feature graphic now shows "Sprout" text + app icon on left, phone screenshots on right with rounded corners (device mockup style)
+- Script falls back gracefully to text + icon only if screenshots haven't been captured yet
+- Added "Known Gaps" section documenting development banner in screenshots, links to issue #70 for production auth flows
+- Updated README with regeneration workflow (capture screenshots first, then regenerate feature graphic)
+
+## 2026-09-20 — Play Store screenshots complete the first-run wizard
+
+- Screenshot capture fills a goal, account, and deposit on the wizard instead of skipping and seeding from Overview
+- Shared `complete-wizard` helper is reused by the wizard happy-path journey
+- Text fields keep their own semantics node so Maestro can tap the account name without hitting color swatches
+
+## 2026-09-20 — Maestro skips first-run wizard after debug sign-in
+
+- Shared `skip-wizard` helper taps Skip on the first-run wizard before waiting for Overview
+- Debug sign-in, intro, and sign-in journeys skip the wizard on a clean install so page flows still land on empty Overview
+
+## 2026-09-20 — Play Store listing assets and Maestro screenshot automation
+
+- Added `store/play/` with icon-512.png and feature-graphic-1024x500.png generated from existing branding
+- Added Maestro flow `.maestro/play-store-screenshots.yaml` to capture Overview, Goals, and Accounts screens with seeded data
+- Added `tool/capture_play_screenshots.sh` script to run Maestro flow and organize screenshots by device class
+- Added `tool/generate_play_assets.py` to regenerate icon and feature graphic from source branding assets
+- Screenshots are organized by device class: phone, sevenInch, tenInch
+
 ## 2026-09-20 — GitHub Actions Node 24 and Ubuntu pin
 
 - Checkout, Java setup, and Play upload actions now run on Node 24 instead of deprecated Node 20

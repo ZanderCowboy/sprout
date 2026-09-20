@@ -17,89 +17,21 @@ tags:
 - tapOn:
     id: "intro_debug_sign_in"
 
-# Should redirect to wizard (first run not completed)
-- extendedWaitUntil:
-    visible:
-      id: "wizard_skip"
-    timeout: 10000
+- runFlow: shared/complete-wizard.yaml
 
-- assertVisible:
-    text: "Step 1 of 3"
-
-- assertVisible:
-    text: "What are you growing?"
-
-# Step 1: Goal
-- tapOn:
-    id: "wizard_goal_name"
-
-- inputText: "Cape Town trip"
-
-- tapOn:
-    id: "wizard_goal_target"
-
-- inputText: "12000"
-
-- tapOn:
-    id: "wizard_next"
-
-# Step 2: Account
-- extendedWaitUntil:
-    visible:
-      text: "Step 2 of 3"
-    timeout: 5000
-
-- assertVisible:
-    text: "Where does the money live?"
-
-- tapOn:
-    id: "wizard_account_name"
-
-- inputText: "EasyEquities TFSA"
-
-- tapOn:
-    id: "wizard_next"
-
-# Step 3: Deposit
-- extendedWaitUntil:
-    visible:
-      text: "Step 3 of 3"
-    timeout: 5000
-
-- assertVisible:
-    text: "Start with a deposit"
-
-- assertVisible:
-    text: "Cape Town trip"
-
-- assertVisible:
-    text: "EasyEquities TFSA"
-
-- tapOn:
-    id: "wizard_deposit_amount"
-
-- inputText: "2500"
-
-- tapOn:
-    id: "wizard_finish"
-
-# Should redirect to Overview
 - extendedWaitUntil:
     visible:
       id: "shell_tab_overview"
     timeout: 10000
 
-# Verify progress card appears
 - assertVisible:
-    text: "Goal progress"
+    text: "Overall progress"
 
 - assertVisible:
     text: "Cape Town trip"
 
-# Verify balance shows non-zero
 - assertVisible:
     text: "R 2 500"
 
-# Verify welcome toast appears
 - assertVisible:
     text: "You're growing — first seed planted."

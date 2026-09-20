@@ -63,8 +63,7 @@ tags:
     text: "What are you growing?"
 
 # Skip wizard to land on Overview
-- tapOn:
-    id: "wizard_skip"
+- runFlow: shared/skip-wizard.yaml
 
 # Should land on Overview (shell accessible after sign-in)
 - extendedWaitUntil:

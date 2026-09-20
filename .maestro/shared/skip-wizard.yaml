@@ -1,0 +1,12 @@
+appId: app.stackmint.sprout.dev
+---
+# Requires: first-run wizard after sign-in (clean install / first_run incomplete).
+# Taps Skip and leaves Overview wait to the parent.
+
+- extendedWaitUntil:
+    visible:
+      id: "wizard_skip"
+    timeout: 15000
+
+- tapOn:
+    id: "wizard_skip"

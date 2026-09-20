@@ -14,7 +14,12 @@ Widget semanticButton({
 );
 
 Widget semanticTextField({required String identifier, required Widget child}) =>
-    Semantics(identifier: identifier, textField: true, child: child);
+    Semantics(
+      identifier: identifier,
+      textField: true,
+      container: true,
+      child: child,
+    );
 
 Widget semanticHeader({required String identifier, required Widget child}) =>
     Semantics(identifier: identifier, header: true, child: child);
