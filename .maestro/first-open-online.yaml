@@ -1,59 +1,50 @@
-appId: app.stackmint.sprout.dev
+﻿appId: app.stackmint.sprout.dev
 tags:
   - smoke
   - auth
 ---
-# First open online: carousel → sign-in (required) → wizard → Overview
-# Tests GitHub #59 acceptance: required sign-in journey
+# First open online: carousel → Create account → wizard → Overview
 # Run: maestro test .maestro/first-open-online.yaml
+# Slide titles share an a11y node with body text — use regex, not exact title.
 
 - launchApp:
     clearState: true
     clearKeychain: true
 
-# Should show intro carousel (not Overview)
 - extendedWaitUntil:
     visible:
       id: "intro_next"
     timeout: 45000
 
 - assertVisible:
-    text: "Track your savings in one place"
-
-# Navigate through intro slides
-- tapOn:
-    id: "intro_next"
-
-- assertVisible:
-    text: "Set goals and watch them grow"
+    text: ".*Track your savings in one place.*"
 
 - tapOn:
     id: "intro_next"
 
 - assertVisible:
-    text: "Sign in so your data stays with you"
+    text: ".*Set goals and watch them grow.*"
 
-# Final next → sign-in (required, no guest bypass)
 - tapOn:
     id: "intro_next"
 
-# Should redirect to sign-in page
+- assertVisible:
+    text: ".*Sign in so your data stays with you.*"
+
+- tapOn:
+    id: "intro_create_account"
+
 - extendedWaitUntil:
     visible:
-      id: "sign_in_debug_sign_in"
+      id: "create_account_debug_sign_in"
     timeout: 5000
 
 - assertVisible:
-    text: "Sign in"
+    text: ".*Create account.*|.*display name.*"
 
-- assertVisible:
-    text: "Sign in to sync your savings across devices."
-
-# Use debug sign-in to complete auth
 - tapOn:
-    id: "sign_in_debug_sign_in"
+    id: "create_account_debug_sign_in"
 
-# Should redirect to wizard (first run)
 - extendedWaitUntil:
     visible:
       id: "wizard_skip"
@@ -62,14 +53,12 @@ tags:
 - assertVisible:
     text: "What are you growing?"
 
-# Skip wizard to land on Overview
 - runFlow: shared/skip-wizard.yaml
 
-# Should land on Overview (shell accessible after sign-in)
 - extendedWaitUntil:
     visible:
       id: "shell_tab_overview"
     timeout: 10000
 
 - assertVisible:
-    text: "Welcome to Sprout"
+    text: ".*Welcome to Sprout.*"

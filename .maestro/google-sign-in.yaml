@@ -3,8 +3,7 @@ tags:
   - edge
   - auth
 ---
-# Google Sign-In smoke (DEV). System account picker is best-effort.
-# Expected: signed-in session (wizard or Overview), not cancelled.
+# Google Sign-In smoke (DEV) via Create account path (first launch).
 # Run: maestro test .maestro/google-sign-in.yaml
 
 - launchApp:
@@ -23,22 +22,21 @@ tags:
     id: "intro_next"
 
 - tapOn:
-    id: "intro_next"
+    id: "intro_create_account"
 
 - extendedWaitUntil:
     visible:
-      id: "sign_in_google"
+      id: "create_account_google"
     timeout: 10000
 
 - tapOn:
-    id: "sign_in_google"
+    id: "create_account_google"
 
 - extendedWaitUntil:
     visible:
       text: "Choose an account"
     timeout: 30000
 
-# Prefer display name on emulator Play-review account
 - tapOn: "Test User Review"
 
 - extendedWaitUntil:

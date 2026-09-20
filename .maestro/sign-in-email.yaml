@@ -1,0 +1,13 @@
+appId: app.stackmint.sprout.dev
+tags:
+  - page
+  - auth
+---
+# Sign-in path (email-only page) via intro secondary link.
+# Run: maestro test .maestro/sign-in-email.yaml
+
+- launchApp:
+    clearState: true
+    clearKeychain: true
+
+- runFlow: shared/chapter-sign-in-email.yaml
