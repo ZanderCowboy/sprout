@@ -20,7 +20,9 @@ python3 tool/generate_play_assets.py
 
 This script:
 - Resizes `docs/branding/sprout-icon-selected-1024.png` to 512×512 for the Play Store icon
-- Creates a 1024×500 feature graphic with the Sprout logo and "Lush Growth" tagline
+- Creates a 1024×500 feature graphic with "Sprout" text + icon on the left, and phone screenshots on the right (if available)
+
+**Note**: The feature graphic works best after capturing phone screenshots. If screenshots are not found, the graphic falls back to text + icon only. Regenerate after running `./tool/capture_play_screenshots.sh phone` to include screenshots in the feature graphic.
 
 To regenerate with different branding, modify `tool/generate_play_assets.py` or update the source icon.
 
@@ -113,6 +115,14 @@ Per Google Play Console:
 - **Dimensions**: 320px–3840px per side, aspect ratio 16:9 to 9:16
 - **Phone screenshots**: Required
 - **Tablet screenshots**: Optional but recommended
+
+## Known Gaps
+
+**Banner-free builds**: Play Store listing screenshots should ideally use a banner-free build (production or debug with banner disabled) for a cleaner appearance. The current Maestro flow uses the development flavor with debug sign-in, which displays the "DEV" banner ribbon.
+
+Issue [#70](https://github.com/ZanderCowboy/sprout/issues/70) tracks Maestro flows with real Google authentication and email OTP, which will enable screenshot capture on production builds without the development banner.
+
+For now, screenshots captured with the current workflow will include the development banner. This is acceptable for initial Play Store setup, but should be replaced with banner-free screenshots before public launch.
 
 ## Notes
 
