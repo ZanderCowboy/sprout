@@ -51,7 +51,7 @@ List<BudgetItem> _decodeItems(String json) {
     final raw = jsonDecode(json);
     if (raw is! List) return const <BudgetItem>[];
     return raw
-        .whereType<Map>()
+        .whereType<Map<dynamic, dynamic>>()
         .map((m) => Map<String, dynamic>.from(m))
         .map(
           (m) => BudgetItem(

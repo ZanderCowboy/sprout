@@ -28,12 +28,16 @@ class _SettingsPageState extends State<SettingsPage> {
   bool _loadingPremiumStatus = true;
   bool _hasPremium = false;
   String? _versionLabel;
+  bool _debugBubbleVisible = true;
 
   @override
   void initState() {
     super.initState();
     _loadPremiumStatus();
     _loadVersion();
+    if (shouldEnableDebugLens()) {
+      _loadDebugBubbleVisibility();
+    }
   }
 
   Future<void> _loadVersion() async {
@@ -49,6 +53,20 @@ class _SettingsPageState extends State<SettingsPage> {
     } on Object {
       // Leave the version line hidden when the plugin is unavailable.
     }
+  }
+
+  void _loadDebugBubbleVisibility() {
+    setState(() {
+      _debugBubbleVisible = SproutDebugLens.isBubbleVisible;
+    });
+  }
+
+  Future<void> _toggleDebugBubble(bool visible) async {
+    await SproutDebugLens.setBubbleVisible(visible);
+    if (!mounted) return;
+    setState(() {
+      _debugBubbleVisible = visible;
+    });
   }
 
   Future<void> _loadPremiumStatus() async {
@@ -182,8 +200,8 @@ class _SettingsPageState extends State<SettingsPage> {
                 Text(
                   AppStrings.debugTools,
                   style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 SettingsNavRow(
@@ -191,6 +209,15 @@ class _SettingsPageState extends State<SettingsPage> {
                   label: AppStrings.debugLens,
                   icon: Icons.bug_report_outlined,
                   onTap: _openDebugLens,
+                ),
+                const SizedBox(height: 8),
+                SproutSwitchTile(
+                  identifier: SemanticsIds.settingsDebugBubbleToggle,
+                  label: AppStrings.debugBubbleVisible,
+                  value: _debugBubbleVisible,
+                  onChanged: _toggleDebugBubble,
+                  title: Text(AppStrings.debugBubbleVisible),
+                  subtitle: Text(AppStrings.debugBubbleSubtitle),
                 ),
               ],
               const SizedBox(height: 32),

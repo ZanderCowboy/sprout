@@ -38,7 +38,7 @@ class BudgetGroupRow {
       colorHex: row['color_hex'] as String,
       iconCodePoint: (row['icon_code_point'] as num?)?.toInt(),
       iconFontFamily: row['icon_font_family'] as String?,
-      itemsJson: row['items_json'] ?? const <dynamic>[],
+      itemsJson: (row['items_json'] as Object?) ?? const <dynamic>[],
       createdAt: DateTime.parse(row['created_at'] as String),
       updatedAt: DateTime.parse(row['updated_at'] as String),
     );

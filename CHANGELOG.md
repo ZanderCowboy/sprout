@@ -2,6 +2,17 @@
 
 Changes heading to `main`. Newest entries at the top.
 
+## 2026-09-20 — Debug bubble toggle applies immediately
+
+- Settings → Debug tools → Show debug bubble hides or shows the floating overlay as soon as the switch changes
+- Opening Debug Lens is no longer required for the preference to take effect
+
+## 2026-09-20 — Debug Lens bubble can be hidden
+
+- Show/hide toggle for floating debug bubble in Settings → Debug tools
+- Preference persists across app relaunches using SharedPreferences
+- Debug Lens remains accessible through Settings when bubble is hidden
+
 ## 2026-09-20 — Play Store feature graphic redesign with screenshots
 
 - Feature graphic now shows "Sprout" text + app icon on left, phone screenshots on right with rounded corners (device mockup style)

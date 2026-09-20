@@ -1,0 +1,11 @@
+---
+description: Use Very Good Analysis (not flutter_lints) for Dart linting
+globs: sprout_app/**/*.dart
+alwaysApply: true
+---
+
+# Dart linting
+
+`sprout_app` uses `very_good_analysis`, pinned from `sprout_app/analysis_options.yaml`. Do not add `flutter_lints`.
+
+New and edited Dart must pass `cd sprout_app && flutter analyze`. Keep `sort_pub_dependencies` clean. Some VGA rules are disabled for existing debt — do not "clean up" unrelated files to re-enable them unless that is the task.
