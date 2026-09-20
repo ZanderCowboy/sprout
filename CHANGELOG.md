@@ -2,6 +2,13 @@
 
 Changes heading to `main`. Newest entries at the top.
 
+## 2026-09-20 — Guided first-run fallback for empty states
+
+- Overview empty state now disables deposit until both goal AND account exist (updated caption)
+- Accounts page shows tappable "Add an account" tile when empty
+- Goals page shows tappable "Add a goal" tile when empty
+- All empty-state tiles use existing UI patterns and open the same forms as toolbar actions
+
 ## 2026-09-20 — Debug bubble toggle applies immediately
 
 - Settings → Debug tools → Show debug bubble hides or shows the floating overlay as soon as the switch changes
