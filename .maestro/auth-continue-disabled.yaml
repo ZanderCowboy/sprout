@@ -1,0 +1,65 @@
+﻿appId: app.stackmint.sprout.dev
+tags:
+  - auth
+  - edge
+---
+# Continue is a no-op until Create account / Sign in fields are valid
+# (Semantics wrapper does not expose enabled=false to Maestro).
+- launchApp:
+    clearState: true
+    clearKeychain: true
+
+- extendedWaitUntil:
+    visible:
+      id: "intro_next"
+    timeout: 45000
+
+- tapOn:
+    id: "intro_next"
+- tapOn:
+    id: "intro_next"
+- tapOn:
+    id: "intro_create_account"
+
+- extendedWaitUntil:
+    visible:
+      id: "create_account_continue"
+    timeout: 5000
+
+- tapOn:
+    id: "create_account_continue"
+- assertVisible:
+    id: "create_account_email_field"
+- assertNotVisible:
+    id: "verify_otp_code_field"
+
+- tapOn:
+    id: "create_account_display_name_field"
+- inputText: "QA User"
+- tapOn:
+    id: "create_account_email_field"
+- inputText: "not-an-email"
+- hideKeyboard
+
+- tapOn:
+    id: "create_account_continue"
+- assertVisible:
+    id: "create_account_email_field"
+- assertNotVisible:
+    id: "verify_otp_code_field"
+
+# Sign-in empty Continue is also a no-op
+- tapOn:
+    id: "create_account_sign_in_link"
+
+- extendedWaitUntil:
+    visible:
+      id: "sign_in_continue"
+    timeout: 5000
+
+- tapOn:
+    id: "sign_in_continue"
+- assertVisible:
+    id: "sign_in_email_field"
+- assertNotVisible:
+    id: "verify_otp_code_field"
