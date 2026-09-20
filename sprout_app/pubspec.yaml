@@ -33,6 +33,7 @@ dependencies:
   package_info_plus: ^10.2.1
   debug_lens: ^0.0.2
   provider: ^6.1.2
+  shared_preferences: ^2.3.2
 
 dev_dependencies:
   flutter_test:

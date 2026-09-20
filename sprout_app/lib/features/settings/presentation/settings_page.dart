@@ -211,19 +211,13 @@ class _SettingsPageState extends State<SettingsPage> {
                   onTap: _openDebugLens,
                 ),
                 const SizedBox(height: 8),
-                SproutCard(
-                  child: SwitchListTile(
-                    value: _debugBubbleVisible,
-                    onChanged: _toggleDebugBubble,
-                    title: Text(AppStrings.debugBubbleVisible),
-                    subtitle: Text(AppStrings.debugBubbleSubtitle),
-                    secondary: const Icon(Icons.bubble_chart_outlined),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 4,
-                    ),
-                  ),
+                SproutSwitchTile(
                   identifier: SemanticsIds.settingsDebugBubbleToggle,
+                  label: AppStrings.debugBubbleVisible,
+                  value: _debugBubbleVisible,
+                  onChanged: _toggleDebugBubble,
+                  title: Text(AppStrings.debugBubbleVisible),
+                  subtitle: Text(AppStrings.debugBubbleSubtitle),
                 ),
               ],
               const SizedBox(height: 32),
