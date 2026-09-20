@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:sprout/core/core.dart';
 import 'package:sprout/features/shell/shell.dart';
 import 'package:sprout/ui/export.dart';
+import 'create_goal_screen.dart';
 import 'goals_bloc.dart';
 import 'enums/goals_sort.dart';
 import 'utils/goals_sorting.dart';
@@ -97,14 +98,37 @@ class _GoalsPageState extends State<GoalsPage> {
                 SliverToBoxAdapter(child: _header()),
                 SliverFillRemaining(
                   hasScrollBody: false,
-                  child: Center(
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(24, 24, 24, 96),
-                      child: Text(
-                        AppStrings.goalsEmptyGuidance,
-                        style: Theme.of(context).textTheme.bodyLarge,
-                        textAlign: TextAlign.center,
-                      ),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(24, 24, 24, 96),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 200),
+                          child: SproutQuickActionTile(
+                            identifier: SemanticsIds.goalsEmptyAddGoal,
+                            label: AppStrings.addAGoal,
+                            icon: Icons.add_rounded,
+                            iconColor: AppColors.accentCoral,
+                            onTap: () async {
+                              await showModalBottomSheet<void>(
+                                context: context,
+                                isScrollControlled: true,
+                                showDragHandle: true,
+                                builder: (_) => CreateGoalScreen(
+                                  defaultColor: AppColors.cardColorAt(1),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        Text(
+                          AppStrings.goalsEmptyGuidance,
+                          style: Theme.of(context).textTheme.bodyLarge,
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
                     ),
                   ),
                 ),

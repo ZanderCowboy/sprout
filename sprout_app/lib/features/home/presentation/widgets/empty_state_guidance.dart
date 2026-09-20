@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:sprout/core/core.dart';
-import 'package:sprout/features/goals/presentation/goals_bloc.dart';
 import 'overview_quick_actions.dart';
 
 class EmptyStateGuidance extends StatelessWidget {
@@ -26,81 +24,72 @@ class EmptyStateGuidance extends StatelessWidget {
       context,
     ).textTheme.bodyMedium?.copyWith(color: scheme.onSurfaceVariant);
 
-    return BlocBuilder<GoalsBloc, GoalsState>(
-      builder: (context, goalsState) {
-        final hasGoals =
-            goalsState is GoalsReady && goalsState.progressList.isNotEmpty;
-
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Card(
-              elevation: 0,
-              color: scheme.surfaceContainerHighest,
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Semantics(
-                      identifier: SemanticsIds.overviewEmptyTitle,
-                      header: true,
-                      child: Text(
-                        AppStrings.overviewEmptyTitle,
-                        key: const Key('overview_empty_title'),
-                        style: titleStyle,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    GuidanceStep(
-                      stepText: AppStrings.overviewEmptyStep1,
-                      detailText: AppStrings.overviewEmptyStep1Detail,
-                      icon: Icons.flag_outlined,
-                      stepStyle: stepStyle,
-                      detailStyle: detailStyle,
-                      scheme: scheme,
-                    ),
-                    const SizedBox(height: 16),
-                    GuidanceStep(
-                      stepText: AppStrings.overviewEmptyStep2,
-                      detailText: AppStrings.overviewEmptyStep2Detail,
-                      icon: Icons.account_balance_wallet_outlined,
-                      stepStyle: stepStyle,
-                      detailStyle: detailStyle,
-                      scheme: scheme,
-                    ),
-                    const SizedBox(height: 16),
-                    GuidanceStep(
-                      stepText: AppStrings.overviewEmptyStep3,
-                      detailText: AppStrings.overviewEmptyStep3Detail,
-                      icon: Icons.payments_outlined,
-                      stepStyle: stepStyle,
-                      detailStyle: detailStyle,
-                      scheme: scheme,
-                      disabledCaption: hasGoals
-                          ? null
-                          : AppStrings.overviewEmptyDepositDisabled,
-                    ),
-                  ],
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Card(
+          elevation: 0,
+          color: scheme.surfaceContainerHighest,
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Semantics(
+                  identifier: SemanticsIds.overviewEmptyTitle,
+                  header: true,
+                  child: Text(
+                    AppStrings.overviewEmptyTitle,
+                    key: const Key('overview_empty_title'),
+                    style: titleStyle,
+                  ),
                 ),
-              ),
+                const SizedBox(height: 20),
+                GuidanceStep(
+                  stepText: AppStrings.overviewEmptyStep1,
+                  detailText: AppStrings.overviewEmptyStep1Detail,
+                  icon: Icons.flag_outlined,
+                  stepStyle: stepStyle,
+                  detailStyle: detailStyle,
+                  scheme: scheme,
+                ),
+                const SizedBox(height: 16),
+                GuidanceStep(
+                  stepText: AppStrings.overviewEmptyStep2,
+                  detailText: AppStrings.overviewEmptyStep2Detail,
+                  icon: Icons.account_balance_wallet_outlined,
+                  stepStyle: stepStyle,
+                  detailStyle: detailStyle,
+                  scheme: scheme,
+                ),
+                const SizedBox(height: 16),
+                GuidanceStep(
+                  stepText: AppStrings.overviewEmptyStep3,
+                  detailText: AppStrings.overviewEmptyStep3Detail,
+                  icon: Icons.payments_outlined,
+                  stepStyle: stepStyle,
+                  detailStyle: detailStyle,
+                  scheme: scheme,
+                  disabledCaption: AppStrings.overviewEmptyDepositDisabled,
+                ),
+              ],
             ),
-            const SizedBox(height: 16),
-            OverviewQuickActions(
-              depositIdentifier: SemanticsIds.overviewEmptyDeposit,
-              accountIdentifier: SemanticsIds.overviewEmptyNewAccount,
-              goalIdentifier: SemanticsIds.overviewEmptyNewGoal,
-              onDeposit: onOpenDeposit,
-              onNewAccount: onOpenAccount,
-              onNewGoal: onOpenGoal,
-              depositEnabled: hasGoals,
-              depositKey: const Key('overview_empty_deposit'),
-              accountKey: const Key('overview_empty_new_account'),
-              goalKey: const Key('overview_empty_new_goal'),
-            ),
-          ],
-        );
-      },
+          ),
+        ),
+        const SizedBox(height: 16),
+        OverviewQuickActions(
+          depositIdentifier: SemanticsIds.overviewEmptyDeposit,
+          accountIdentifier: SemanticsIds.overviewEmptyNewAccount,
+          goalIdentifier: SemanticsIds.overviewEmptyNewGoal,
+          onDeposit: onOpenDeposit,
+          onNewAccount: onOpenAccount,
+          onNewGoal: onOpenGoal,
+          depositEnabled: false,
+          depositKey: const Key('overview_empty_deposit'),
+          accountKey: const Key('overview_empty_new_account'),
+          goalKey: const Key('overview_empty_new_goal'),
+        ),
+      ],
     );
   }
 }

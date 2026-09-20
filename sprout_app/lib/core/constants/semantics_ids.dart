@@ -79,6 +79,7 @@ abstract final class SemanticsIds {
   static const formSave = 'form_save';
   static const colorSwatch = 'color_swatch';
   static const accountCard = 'account_card';
+  static const accountsEmptyAddAccount = 'accounts_empty_add_account';
   static const accountDetailDeposit = 'account_detail_deposit';
   static const accountDetailEdit = 'account_detail_edit';
   static const accountDetailDelete = 'account_detail_delete';
@@ -94,6 +95,7 @@ abstract final class SemanticsIds {
   static const goalNoAccountsNewAccount = 'goal_no_accounts_new_account';
   static const goalNoAccountsCancel = 'goal_no_accounts_cancel';
   static const goalCard = 'goal_card';
+  static const goalsEmptyAddGoal = 'goals_empty_add_goal';
   static const goalSortMenu = 'goal_sort_menu';
   static const goalUnallocatedCard = 'goal_unallocated_card';
   static const goalIcon = 'goal_icon';
