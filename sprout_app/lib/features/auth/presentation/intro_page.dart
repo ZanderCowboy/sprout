@@ -53,6 +53,7 @@ class _IntroPageState extends State<IntroPage> {
   }
 
   void _goToSignIn() {
+    widget.onCompleted();
     context.go(AppRoute.signIn.path);
   }
 

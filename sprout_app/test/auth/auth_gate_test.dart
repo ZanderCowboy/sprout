@@ -38,6 +38,32 @@ void main() {
       await tester.pump();
       expect(completed, isTrue);
     });
+
+    testWidgets('sign-in link also completes intro', (tester) async {
+      var completed = false;
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: buildAppTheme(),
+          home: IntroPage(onCompleted: () => completed = true),
+        ),
+      );
+
+      expect(find.text(AppStrings.introSlide1Title), findsOneWidget);
+
+      await tester.tap(find.text(AppStrings.next));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 350));
+      expect(find.text(AppStrings.introSlide2Title), findsOneWidget);
+
+      await tester.tap(find.text(AppStrings.next));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 350));
+      expect(find.text(AppStrings.introSlide3Title), findsOneWidget);
+
+      await tester.tap(find.text(AppStrings.iAlreadyHaveAnAccount));
+      await tester.pump();
+      expect(completed, isTrue);
+    });
   });
 
   group('UserContext intro', () {
