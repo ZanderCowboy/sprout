@@ -2,6 +2,14 @@
 
 Changes heading to `main`. Newest entries at the top.
 
+## 2026-09-20 — Play Store listing assets and Maestro screenshot automation
+
+- Added `store/play/` with icon-512.png and feature-graphic-1024x500.png generated from existing branding
+- Added Maestro flow `.maestro/play-store-screenshots.yaml` to capture Overview, Goals, and Accounts screens with seeded data
+- Added `tool/capture_play_screenshots.sh` script to run Maestro flow and organize screenshots by device class
+- Added `tool/generate_play_assets.py` to regenerate icon and feature graphic from source branding assets
+- Screenshots are organized by device class: phone, sevenInch, tenInch
+
 ## 2026-09-20 — GitHub Actions Node 24 and Ubuntu pin
 
 - Checkout, Java setup, and Play upload actions now run on Node 24 instead of deprecated Node 20
