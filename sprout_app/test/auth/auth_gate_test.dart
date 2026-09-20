@@ -2,8 +2,10 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hive/hive.dart';
 import 'package:sprout/core/constants/app_strings.dart';
+import 'package:sprout/core/router/app_route.dart';
 import 'package:sprout/core/storage/hive_adapters.dart';
 import 'package:sprout/core/theme/app_theme.dart';
 import 'package:sprout/core/user/user_context.dart';
@@ -42,9 +44,24 @@ void main() {
     testWidgets('sign-in link also completes intro', (tester) async {
       var completed = false;
       await tester.pumpWidget(
-        MaterialApp(
+        MaterialApp.router(
           theme: buildAppTheme(),
-          home: IntroPage(onCompleted: () => completed = true),
+          routerConfig: GoRouter(
+            initialLocation: AppRoute.intro.path,
+            routes: [
+              GoRoute(
+                path: AppRoute.intro.path,
+                builder: (context, _) =>
+                    IntroPage(onCompleted: () => completed = true),
+              ),
+              GoRoute(
+                path: AppRoute.signIn.path,
+                builder: (context, _) => const Scaffold(
+                  body: Center(child: Text('Sign In')),
+                ),
+              ),
+            ],
+          ),
         ),
       );
 
