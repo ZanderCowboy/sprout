@@ -9,6 +9,14 @@ Changes heading to `main`. Newest entries at the top.
 - True user cancellations still show the cancellation message
 - Fixes issue where selecting an account would incorrectly report cancellation
 
+## 2026-09-20 — Local-config sync includes root .pem files
+
+- Export now copies root-level `*.pem` files to the sync destination
+- Import restores root-level `*.pem` files from the sync destination
+- Status displays LOCAL/DEST presence for root-level `*.pem` files
+- Manifest lists all tracked `.pem` paths
+- Scope limited to repo root only (not subdirectories)
+
 ## 2026-09-20 — Auth auto-submit verify code after 6 digits
 
 - OTP verification field now auto-submits when the 6th digit is entered

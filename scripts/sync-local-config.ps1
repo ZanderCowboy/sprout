@@ -128,6 +128,8 @@ function Get-ExportPaths {
     foreach ($f in ($CoreFiles + $ExtraFiles)) {
         if (Test-Path -LiteralPath (Join-Path $Root $f)) { $paths.Add($f) }
     }
+    Get-ChildItem -LiteralPath $Root -File -Filter '*.pem' -ErrorAction SilentlyContinue |
+        ForEach-Object { $paths.Add($_.Name) }
     $configDir = Join-Path $Root 'config'
     if (Test-Path -LiteralPath $configDir) {
         Get-ChildItem -LiteralPath $configDir -File -Recurse |
@@ -227,6 +229,20 @@ function Invoke-Status([string] $DestPath) {
         $loc = if (Test-Path -LiteralPath (Join-Path $Root ($f.Replace('/', '\')))) { 'ok' } else { 'missing' }
         $rem = if (Test-Path -LiteralPath (Join-Path $DestPath ($f.Replace('/', '\')))) { 'ok' } else { 'missing' }
         Write-Output ("{0,-10} {1,-10} {2}" -f $loc, $rem, $f)
+    }
+    $pemFiles = [System.Collections.Generic.HashSet[string]]::new()
+    Get-ChildItem -LiteralPath $Root -File -Filter '*.pem' -ErrorAction SilentlyContinue |
+        ForEach-Object { [void]$pemFiles.Add($_.Name) }
+    Get-ChildItem -LiteralPath $DestPath -File -Filter '*.pem' -ErrorAction SilentlyContinue |
+        ForEach-Object { [void]$pemFiles.Add($_.Name) }
+    if ($pemFiles.Count -gt 0) {
+        Write-Output ""
+        Write-Output 'Root .pem files:'
+        foreach ($f in ($pemFiles | Sort-Object)) {
+            $loc = if (Test-Path -LiteralPath (Join-Path $Root $f)) { 'ok' } else { 'missing' }
+            $rem = if (Test-Path -LiteralPath (Join-Path $DestPath $f)) { 'ok' } else { 'missing' }
+            Write-Output ("{0,-10} {1,-10} {2}" -f $loc, $rem, $f)
+        }
     }
     $localConfig = Join-Path $Root 'config'
     $destConfig = Join-Path $DestPath 'config'
