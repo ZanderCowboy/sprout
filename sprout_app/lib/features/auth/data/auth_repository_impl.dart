@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' hide AuthUser;
 
@@ -213,7 +214,8 @@ class AuthRepositoryImpl implements AuthRepository {
     }
   }
 
-  String _mapGoogleSignInException(GoogleSignInException e) {
+  @visibleForTesting
+  static String mapGoogleSignInException(GoogleSignInException e) {
     switch (e.code) {
       case GoogleSignInExceptionCode.canceled:
         // The canceled code is overloaded: it can mean user cancellation OR
@@ -239,6 +241,9 @@ class AuthRepositoryImpl implements AuthRepository {
         return e.description ?? AppStrings.googleSignInFailed;
     }
   }
+
+  String _mapGoogleSignInException(GoogleSignInException e) =>
+      mapGoogleSignInException(e);
 
   AuthUser? _mapUser(User? user) {
     if (user == null || user.id.isEmpty) return null;
