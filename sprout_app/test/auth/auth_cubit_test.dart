@@ -157,6 +157,15 @@ void main() {
     },
   );
 
+  test('Google sign-in surfaces AuthFailure message', () async {
+    fakeAuth.googleError = const AuthAppException('Network error');
+    await cubit.signInWithGoogle();
+
+    final signedOut = cubit.state as AuthViewSignedOut;
+    expect(signedOut.errorMessage, 'Network error');
+    expect(signedOut.busy, isFalse);
+  });
+
   test('sendOtp surfaces AuthFailure message', () async {
     fakeAuth.sendOtpError = const AuthAppException('Rate limited');
     cubit.emailChanged('user@example.com');

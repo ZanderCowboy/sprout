@@ -2,6 +2,13 @@
 
 Changes heading to `main`. Newest entries at the top.
 
+## 2026-09-20 — Fix Google Sign-In false cancellation error
+
+- Google Sign-In now shows accurate error messages when authentication fails
+- Configuration errors (SHA-1 mismatch, OAuth client issues) display the underlying error instead of "Sign-In was cancelled."
+- True user cancellations still show the cancellation message
+- Fixes issue where selecting an account would incorrectly report cancellation
+
 ## 2026-09-20 — Auth auto-submit verify code after 6 digits
 
 - OTP verification field now auto-submits when the 6th digit is entered

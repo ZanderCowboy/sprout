@@ -129,10 +129,7 @@ class AuthRepositoryImpl implements AuthRepository {
     } on AuthException catch (e) {
       throw AuthAppException(e.message);
     } on GoogleSignInException catch (e) {
-      if (e.code == GoogleSignInExceptionCode.canceled) {
-        throw const AuthAppException(AppStrings.googleSignInCancelled);
-      }
-      throw AuthAppException(e.description ?? e.toString());
+      throw AuthAppException(_mapGoogleSignInException(e));
     } on Object catch (e) {
       throw AuthAppException(e.toString());
     }
@@ -213,6 +210,33 @@ class AuthRepositoryImpl implements AuthRepository {
         email: email,
         token: token,
       );
+    }
+  }
+
+  String _mapGoogleSignInException(GoogleSignInException e) {
+    switch (e.code) {
+      case GoogleSignInExceptionCode.canceled:
+        // The canceled code is overloaded: it can mean user cancellation OR
+        // configuration errors (OAuth client / SHA-1 mismatch / etc.).
+        // Check the description to differentiate.
+        final description = e.description ?? '';
+        final isConfigError = description.contains('[16]') ||
+            description.toLowerCase().contains('reauth failed') ||
+            description.toLowerCase().contains('configuration') ||
+            description.toLowerCase().contains('sha') ||
+            description.toLowerCase().contains('client id');
+        if (isConfigError) {
+          return e.description ?? AppStrings.googleSignInFailed;
+        }
+        return AppStrings.googleSignInCancelled;
+      case GoogleSignInExceptionCode.clientConfigurationError:
+      case GoogleSignInExceptionCode.providerConfigurationError:
+        return e.description ?? AppStrings.googleSignInFailed;
+      case GoogleSignInExceptionCode.interrupted:
+      case GoogleSignInExceptionCode.uiUnavailable:
+      case GoogleSignInExceptionCode.userMismatch:
+      case GoogleSignInExceptionCode.unknownError:
+        return e.description ?? AppStrings.googleSignInFailed;
     }
   }
 
