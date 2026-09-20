@@ -3,13 +3,14 @@ import 'package:flutter/material.dart';
 /// Design tokens — vivid, premium accents (avoid mutating at runtime).
 abstract final class AppColors {
   static const Color seed = Color(0xFF0D9488);
-  static const Color accentLime = Color(0xFFBEF264);
+  static const Color accentLime = Color(0xFFA3E635);
   static const Color accentCoral = Color(0xFFFF6B6B);
 
   /// Selected tab disc (Lush Growth).
   static const Color navSelected = Color(0xFFCC6F4E);
   static const Color accentSky = Color(0xFF38BDF8);
   static const Color accentViolet = Color(0xFFA78BFA);
+
   /// Page canvas (Lush Growth frames).
   static const Color surfaceDeep = Color(0xFF0F1413);
 

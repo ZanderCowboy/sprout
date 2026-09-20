@@ -69,7 +69,7 @@ ThemeData buildAppTheme() {
       surfaceTintColor: Colors.transparent,
     ),
     floatingActionButtonTheme: FloatingActionButtonThemeData(
-      backgroundColor: AppColors.seed,
+      backgroundColor: AppColors.accentLime,
       foregroundColor: AppColors.surfaceDeep,
       elevation: 6,
       shape: const CircleBorder(),

@@ -5,7 +5,7 @@ import 'package:sprout/core/core.dart';
 
 import '_semantic.dart';
 
-/// Center nav action: solid teal disc, dark plus, haptic tap.
+/// Center nav action: solid lime disc, dark plus, haptic tap.
 class EnticingAddButton extends StatelessWidget {
   const EnticingAddButton({
     super.key,
@@ -38,16 +38,9 @@ class EnticingAddButton extends StatelessWidget {
             child: Container(
               width: size,
               height: size,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 shape: BoxShape.circle,
-                color: AppColors.seed,
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.seed.withValues(alpha: 0.35),
-                    blurRadius: 16,
-                    offset: const Offset(0, 6),
-                  ),
-                ],
+                color: AppColors.accentLime,
               ),
               child: const Icon(
                 Icons.add_rounded,
