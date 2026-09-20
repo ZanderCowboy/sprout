@@ -307,6 +307,153 @@ void main() {
     );
     expect(googleButton.onPressed, isNull);
   });
+
+  testWidgets('entering 6 digits auto-submits verification', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: buildAppTheme(),
+        home: MultiBlocProvider(
+          providers: [
+            BlocProvider<AuthCubit>.value(value: cubit),
+            BlocProvider<ConnectivityCubit>.value(value: connectivity),
+          ],
+          child: const SignInPage(),
+        ),
+      ),
+    );
+
+    await tester.enterText(find.byType(TextField).at(1), 'user@example.com');
+    await tester.tap(find.text(AppStrings.sendCode));
+    await tester.pump();
+
+    expect(find.text(AppStrings.verificationCode), findsOneWidget);
+
+    expect(fakeAuth.verifyOtpCallCount, 0);
+
+    await tester.enterText(
+      find.widgetWithText(SproutTextField, AppStrings.verificationCode),
+      '123456',
+    );
+    await tester.pump();
+
+    expect(fakeAuth.verifyOtpCallCount, 1);
+    expect(fakeAuth.lastOtpToken, '123456');
+  });
+
+  testWidgets('pasting 6 digits auto-submits verification', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: buildAppTheme(),
+        home: MultiBlocProvider(
+          providers: [
+            BlocProvider<AuthCubit>.value(value: cubit),
+            BlocProvider<ConnectivityCubit>.value(value: connectivity),
+          ],
+          child: const SignInPage(),
+        ),
+      ),
+    );
+
+    await tester.enterText(find.byType(TextField).at(1), 'user@example.com');
+    await tester.tap(find.text(AppStrings.sendCode));
+    await tester.pump();
+
+    expect(fakeAuth.verifyOtpCallCount, 0);
+
+    await tester.enterText(
+      find.widgetWithText(SproutTextField, AppStrings.verificationCode),
+      '654321',
+    );
+    await tester.pump();
+
+    expect(fakeAuth.verifyOtpCallCount, 1);
+    expect(fakeAuth.lastOtpToken, '654321');
+  });
+
+  testWidgets('auto-submit does not spam after failure', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: buildAppTheme(),
+        home: MultiBlocProvider(
+          providers: [
+            BlocProvider<AuthCubit>.value(value: cubit),
+            BlocProvider<ConnectivityCubit>.value(value: connectivity),
+          ],
+          child: const SignInPage(),
+        ),
+      ),
+    );
+
+    await tester.enterText(find.byType(TextField).at(1), 'user@example.com');
+    await tester.tap(find.text(AppStrings.sendCode));
+    await tester.pump();
+
+    fakeAuth.verifyOtpShouldFail = true;
+
+    await tester.enterText(
+      find.widgetWithText(SproutTextField, AppStrings.verificationCode),
+      '111111',
+    );
+    await tester.pump();
+
+    expect(fakeAuth.verifyOtpCallCount, 1);
+
+    await tester.enterText(
+      find.widgetWithText(SproutTextField, AppStrings.verificationCode),
+      '11111',
+    );
+    await tester.pump();
+
+    await tester.enterText(
+      find.widgetWithText(SproutTextField, AppStrings.verificationCode),
+      '111111',
+    );
+    await tester.pump();
+
+    expect(fakeAuth.verifyOtpCallCount, 1);
+
+    await tester.enterText(
+      find.widgetWithText(SproutTextField, AppStrings.verificationCode),
+      '222222',
+    );
+    await tester.pump();
+
+    expect(fakeAuth.verifyOtpCallCount, 2);
+    expect(fakeAuth.lastOtpToken, '222222');
+  });
+
+  testWidgets('manual verify button still works as fallback', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: buildAppTheme(),
+        home: MultiBlocProvider(
+          providers: [
+            BlocProvider<AuthCubit>.value(value: cubit),
+            BlocProvider<ConnectivityCubit>.value(value: connectivity),
+          ],
+          child: const SignInPage(),
+        ),
+      ),
+    );
+
+    await tester.enterText(find.byType(TextField).at(1), 'user@example.com');
+    await tester.tap(find.text(AppStrings.sendCode));
+    await tester.pump();
+
+    await tester.enterText(
+      find.widgetWithText(SproutTextField, AppStrings.verificationCode),
+      '99999',
+    );
+    await tester.pump();
+
+    expect(fakeAuth.verifyOtpCallCount, 0);
+
+    await tester.tap(find.text(AppStrings.verifyCode));
+    await tester.pump();
+
+    expect(fakeAuth.verifyOtpCallCount, 1);
+    expect(fakeAuth.lastOtpToken, '99999');
+  });
 }
 
 class _FakeAssetBundle extends CachingAssetBundle {

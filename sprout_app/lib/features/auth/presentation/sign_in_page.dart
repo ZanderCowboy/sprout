@@ -25,6 +25,8 @@ class _SignInPageState extends State<SignInPage> {
   late final TextEditingController _displayNameController;
   late final TextEditingController _otpController;
 
+  String? _lastAutoSubmittedOtp;
+
   @override
   void initState() {
     super.initState();
@@ -86,6 +88,7 @@ class _SignInPageState extends State<SignInPage> {
               }
               if (state is AuthViewSignedIn) {
                 _otpController.clear();
+                _lastAutoSubmittedOtp = null;
               }
             },
             builder: (context, state) {
@@ -207,12 +210,21 @@ class _SignInPageState extends State<SignInPage> {
                             keyboardType: TextInputType.number,
                             inputFormatters: [
                               FilteringTextInputFormatter.digitsOnly,
-                              LengthLimitingTextInputFormatter(8),
+                              LengthLimitingTextInputFormatter(6),
                             ],
                             decoration: const InputDecoration(
                               labelText: AppStrings.verificationCode,
                               border: OutlineInputBorder(),
                             ),
+                            onChanged: (value) {
+                              if (value.length == 6 &&
+                                  value != _lastAutoSubmittedOtp &&
+                                  isOnline &&
+                                  !busy) {
+                                _lastAutoSubmittedOtp = value;
+                                context.read<AuthCubit>().verifyOtp(value);
+                              }
+                            },
                           ),
                           const SizedBox(height: 12),
                           SproutFilledButton.tonal(

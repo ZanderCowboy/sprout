@@ -43,6 +43,10 @@ class FakeAuthRepository implements AuthRepository {
   Object? deleteOwnAccountError;
   Object? signOutError;
 
+  int get verifyOtpCallCount => verifyOtpCalls;
+  String? get lastOtpToken => lastToken;
+  bool verifyOtpShouldFail = false;
+
   void setUser(AuthUser? user) {
     _currentUser = user;
     _controller.add(user);
@@ -70,6 +74,9 @@ class FakeAuthRepository implements AuthRepository {
     verifyOtpCalls++;
     lastEmail = email;
     lastToken = token;
+    if (verifyOtpShouldFail) {
+      throw Exception('Invalid or expired OTP');
+    }
     final error = verifyOtpError;
     if (error != null) throw error;
     final user = AuthUser(id: 'verified-uid', email: email, isAnonymous: false);
