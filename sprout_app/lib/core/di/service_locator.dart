@@ -5,6 +5,8 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'package:sprout/core/analytics/analytics_service.dart';
+import 'package:sprout/core/analytics/analytics_service_impl.dart';
 import 'package:sprout/core/config/app_config.dart';
 import 'package:sprout/core/flags/remote_config_service.dart';
 import 'package:sprout/core/flags/remote_config_service_impl.dart';
@@ -66,6 +68,7 @@ Future<void> configureDependencies({
   sl.registerSingleton<RemoteConfigService>(
     remoteConfigService ?? RemoteConfigServiceImpl(),
   );
+  sl.registerLazySingleton<AnalyticsService>(() => AnalyticsServiceImpl());
   sl.registerLazySingleton<TermsOfServiceService>(
     () => TermsOfServiceServiceImpl(remoteConfig: sl()),
   );
@@ -152,7 +155,11 @@ Future<void> configureDependencies({
   sl.registerLazySingleton<GoalsService>(() => GoalsServiceImpl(sl(), sl()));
   sl.registerLazySingleton<BudgetService>(() => BudgetServiceImpl(sl()));
   sl.registerLazySingleton<TransactionsService>(
-    () => TransactionsServiceImpl(sl()),
+    () => TransactionsServiceImpl(
+      sl(),
+      userContext: sl(),
+      analyticsService: sl(),
+    ),
   );
 
   sl.registerLazySingleton<LocalSessionCleaner>(
@@ -171,6 +178,7 @@ Future<void> configureDependencies({
       userContext: sl(),
       appConfig: sl(),
       localSessionCleaner: sl(),
+      analyticsService: sl(),
       flushPending: () => sl<SyncService>().flushPending(),
       pullRemote: () async {
         await sl<AccountsRepository>().pullRemote();

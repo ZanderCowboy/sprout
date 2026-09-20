@@ -1,3 +1,4 @@
+import 'package:sprout/core/analytics/analytics_service.dart';
 import 'package:sprout/core/config/app_config.dart';
 import 'package:sprout/core/config/app_environment.dart';
 import 'package:sprout/core/constants/app_strings.dart';
@@ -14,6 +15,7 @@ class AuthServiceImpl implements AuthService {
     required UserContext userContext,
     required AppConfig appConfig,
     required LocalSessionCleaner localSessionCleaner,
+    required AnalyticsService analyticsService,
     required Future<void> Function() flushPending,
     required Future<void> Function() pullRemote,
     Future<void> Function()? logOutPurchases,
@@ -21,6 +23,7 @@ class AuthServiceImpl implements AuthService {
        _userContext = userContext,
        _appConfig = appConfig,
        _localSessionCleaner = localSessionCleaner,
+       _analyticsService = analyticsService,
        _flushPending = flushPending,
        _pullRemote = pullRemote,
        _logOutPurchases = logOutPurchases;
@@ -29,6 +32,7 @@ class AuthServiceImpl implements AuthService {
   final UserContext _userContext;
   final AppConfig _appConfig;
   final LocalSessionCleaner _localSessionCleaner;
+  final AnalyticsService _analyticsService;
   final Future<void> Function() _flushPending;
   final Future<void> Function() _pullRemote;
   final Future<void> Function()? _logOutPurchases;
@@ -94,6 +98,7 @@ class AuthServiceImpl implements AuthService {
       user = await _authRepository.updateDisplayName(trimmedName);
     }
     await bindAfterVerifiedSignIn(user);
+    await _analyticsService.logSignInSuccess(SignInMethod.emailOtp);
     return user;
   }
 
@@ -101,6 +106,7 @@ class AuthServiceImpl implements AuthService {
   Future<AuthUser> signInWithGoogle() async {
     final user = await _authRepository.signInWithGoogle();
     await bindAfterVerifiedSignIn(user);
+    await _analyticsService.logSignInSuccess(SignInMethod.google);
     return user;
   }
 

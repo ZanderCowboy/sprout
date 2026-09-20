@@ -3,6 +3,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'package:sprout/core/analytics/analytics_service.dart';
 import 'package:sprout/core/config/app_config.dart';
 import 'package:sprout/core/config/app_environment.dart';
 import 'package:sprout/core/constants/hive_boxes.dart';
@@ -29,6 +30,7 @@ enum StartupStep {
   openBoxes,
   loadConfig,
   initRemoteConfig,
+  initAnalytics,
   initSupabase,
   configureDI,
   resolveUser,
@@ -131,6 +133,16 @@ Future<void> initializeApp({
     detail: showStartupChecks
         ? 'show_startup_checks=true'
         : 'show_startup_checks=false',
+  );
+
+  reporter.update(StartupStep.initAnalytics, StartupStepStatus.running);
+  final analyticsService = sl<AnalyticsService>();
+  await analyticsService.setup();
+  reporter.update(
+    StartupStep.initAnalytics,
+    analyticsService.isReady
+        ? StartupStepStatus.done
+        : StartupStepStatus.skipped,
   );
 
   SupabaseClient? supabaseClient;

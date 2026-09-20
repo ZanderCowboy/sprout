@@ -2,6 +2,14 @@
 
 Changes heading to `main`. Newest entries at the top.
 
+## 2026-09-20 — MVP Firebase Analytics event set
+
+- Added Firebase Analytics tracking for development flavor with minimal event set
+- Events: `app_open` (automatic), `sign_in_success` with method param, `wizard_completed`, `first_deposit_logged`
+- No PII in parameters
+- Development flavor sends to Firebase DebugView; production flavor uses same API (PROD Firebase project setup remains #52)
+- Added `docs/FIREBASE_ANALYTICS.md` with event documentation and DebugView instructions
+
 ## 2026-09-20 — Resend code after create account
 
 - Resend on the verify-email screen no longer treats a pending (unverified) signup as an existing account

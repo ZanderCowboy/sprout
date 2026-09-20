@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:sprout/core/analytics/analytics_service.dart';
 import 'package:sprout/core/core.dart';
 import 'package:sprout/core/di/service_locator.dart';
 import 'package:sprout/features/accounts/export.dart';
@@ -32,6 +33,7 @@ class WizardPage extends StatelessWidget {
         goalsService: sl<GoalsService>(),
         transactionsService: sl<TransactionsService>(),
         userContext: sl<UserContext>(),
+        analyticsService: sl<AnalyticsService>(),
         defaultGoalColorArgb: AppColors.cardColorAt(1).toARGB32(),
         defaultAccountColorArgb: AppColors.cardColorAt(0).toARGB32(),
         defaultGoalIconCodePoint: Icons.savings_rounded.codePoint,
