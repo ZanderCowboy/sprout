@@ -1,0 +1,65 @@
+appId: app.stackmint.sprout.dev
+tags:
+  - play-store
+---
+# Play Store screenshot capture flow
+# Captures key screens: Overview, Goals, Accounts with seeded content
+# Output: ~/.maestro/tests/<timestamp>/play-*.png
+
+- launchApp:
+    clearState: true
+    clearKeychain: true
+
+# Debug sign-in from intro
+- runFlow: shared/debug-signin-intro.yaml
+
+# Seed account, goal, and deposit for populated content
+- runFlow:
+    file: shared/seed-core.yaml
+    env:
+      SEED_GOAL: "true"
+      SEED_DEPOSIT: "true"
+
+# Wait for Overview to be ready after seeding
+- extendedWaitUntil:
+    visible:
+      id: "overview_progress_header"
+    timeout: 10000
+
+# Capture Overview screen
+- takeScreenshot: play-overview
+
+# Navigate to Goals tab and capture
+- tapOn:
+    id: "shell_tab_goals"
+
+- extendedWaitUntil:
+    visible:
+      text: "Goals"
+    timeout: 5000
+
+- takeScreenshot: play-goals
+
+# Navigate to Accounts tab (via Overview since no direct Accounts tab semantics ID in shell)
+# Note: Based on SemanticsIds, we have shell_tab_overview, shell_tab_goals, shell_tab_settings
+# but no shell_tab_accounts. Let's check if accounts are accessible via the FAB or if we need
+# to navigate differently. For now, I'll create a new account from Overview to show accounts.
+
+# Actually, let's verify the shell tabs - there should be an accounts tab
+# Looking at semantics_ids.dart line 57: shellTabAccounts = 'shell_tab_accounts'
+- tapOn:
+    id: "shell_tab_accounts"
+
+- extendedWaitUntil:
+    visible:
+      text: "Accounts"
+    timeout: 5000
+
+# Wait a moment for any animations to settle
+- waitForAnimationToEnd
+
+- takeScreenshot: play-accounts
+
+# Return to Overview to end in a clean state
+- tapOn:
+    id: "shell_tab_overview"
