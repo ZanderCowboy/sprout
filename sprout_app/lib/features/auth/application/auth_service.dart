@@ -32,8 +32,11 @@ abstract class AuthService {
   /// Sync is allowed only with a verified (non-anonymous) Supabase session.
   bool get canSync;
 
-  /// Sends an email OTP to [email].
-  Future<void> sendEmailOtp(String email);
+  /// Sends a registration email OTP to [email] (creates new users).
+  Future<void> sendRegisterOtp(String email);
+
+  /// Sends a sign-in email OTP to [email] (existing users only).
+  Future<void> sendSignInOtp(String email);
 
   /// Verifies the OTP and binds the verified session to local storage.
   Future<AuthUser> verifyEmailOtp({

@@ -5,7 +5,9 @@ abstract class AuthRepository {
 
   Stream<AuthUser?> authStateChanges();
 
-  Future<void> sendEmailOtp(String email);
+  Future<void> sendRegisterOtp(String email);
+
+  Future<void> sendSignInOtp(String email);
 
   Future<AuthUser> verifyEmailOtp({
     required String email,

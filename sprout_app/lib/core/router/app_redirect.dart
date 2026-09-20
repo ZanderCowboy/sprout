@@ -42,7 +42,9 @@ Future<String?> resolveAuthRedirect({
   }
 
   if (locIs(AppRoute.intro) ||
+      locIs(AppRoute.createAccount) ||
       locIs(AppRoute.signIn) ||
+      locIs(AppRoute.verifyOtp) ||
       locIs(AppRoute.wizard) ||
       locIs(AppRoute.loading)) {
     final from = uri?.queryParameters['from'];
@@ -65,7 +67,9 @@ String _signInWithFrom(Uri? uri, String location) {
 
 bool _isSafeInternalFrom(String from) {
   if (!from.startsWith('/') || from.startsWith('//')) return false;
-  return from != AppRoute.signIn.path &&
+  return from != AppRoute.createAccount.path &&
+      from != AppRoute.signIn.path &&
+      from != AppRoute.verifyOtp.path &&
       from != AppRoute.intro.path &&
       from != AppRoute.wizard.path &&
       from != AppRoute.loading.path &&

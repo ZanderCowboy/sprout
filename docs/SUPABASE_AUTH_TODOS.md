@@ -32,7 +32,7 @@ Tick here as you go. Each open item jumps to the step below.
 - [x] [Set Site URL](#1-set-site-url-2-minutes) on the **dev** Supabase project
 - [x] [Confirm Android OAuth client](#2-confirm-android-oauth-client-google-cloud) for the **pre-rename** package `co.za.zanderkotze.sprout.dev` + debug SHA-1 (recreate for `app.stackmint.sprout.dev` in [D](#d-you--google-cloud-oauth))
 - [x] [Google sign-in works on device](#3-device-test-google-main-goal-for-tonight) (dev flavor)
-- [ ] [Sign-out keeps local data](#3-device-test-google-main-goal-for-tonight)
+- [x] [Sign-out keeps local data](#3-device-test-google-main-goal-for-tonight)
 - [x] [Re-login with Google works](#3-device-test-google-main-goal-for-tonight)
 - [x] [Optional cleanup](#5-optional-cleanup-dev-only): delete old anonymous users / orphaned rows
 - [ ] [Paste Terms and Privacy into Firebase Remote Config](#7-terms-and-privacy-firebase-remote-config-dev)
@@ -495,10 +495,9 @@ If `APP_CONFIG_DEV_BASE64` is missing, CI still builds with a **placeholder** co
 3. After sign-in: **discard leftover guest Hive** (do not migrate it onto the new uid), then pull cloud. Same-account re-login: keep local cache, flush pending, pull. Different verified account: clear Hive + pending, then pull.
 4. Sign-out: session only; return to sign-in. Local cache stays for that uid until a different account signs in.
 5. Startup failure: **Retry only** — no Continue local-only.
-6. Providers: email OTP + Google on Android. No Apple / iOS yet.
-7. Email OTP: optional **display name** (saved to `user_metadata.display_name`). Google: use the Google profile name already in metadata; do not ask again.
-8. Sign-in agrees to **in-app Terms and Privacy Policy** (tappable links on the sign-in screen; Account has the same rows). Markdown comes from Firebase Remote Config `terms_of_service` and `privacy_policy`, with bundled [`sprout_app/assets/legal/terms.md`](../sprout_app/assets/legal/terms.md) and [`sprout_app/assets/legal/privacy.md`](../sprout_app/assets/legal/privacy.md) as fallback.
-9. **Delete account** (in-app, Play requirement) calls `public.delete_own_account()` which deletes `auth.users` for `auth.uid()`. Cloud rows cascade. Local Hive entity boxes and pending sync are cleared; `intro_completed` stays. RevenueCat `logOut` runs if Purchases is configured. Sign-out then returns to the sign-in gate. **Premium / Play billing is separate** — deletion does not cancel or refund a subscription.
+6. Providers: email OTP + Google on Android. Register requires **display name**; sign-in is email-only. Google uses profile name from metadata; no display name prompt. No Apple / iOS yet.
+7. Sign-in agrees to **in-app Terms and Privacy Policy** (tappable links on the sign-in screen; Account has the same rows). Markdown comes from Firebase Remote Config `terms_of_service` and `privacy_policy`, with bundled [`sprout_app/assets/legal/terms.md`](../sprout_app/assets/legal/terms.md) and [`sprout_app/assets/legal/privacy.md`](../sprout_app/assets/legal/privacy.md) as fallback.
+8. **Delete account** (in-app, Play requirement) calls `public.delete_own_account()` which deletes `auth.users` for `auth.uid()`. Cloud rows cascade. Local Hive entity boxes and pending sync are cleared; `intro_completed` stays. RevenueCat `logOut` runs if Purchases is configured. Sign-out then returns to the sign-in gate. **Premium / Play billing is separate** — deletion does not cancel or refund a subscription.
 
 Config shape: [supabase/README.md](../supabase/README.md).
 

@@ -38,7 +38,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<void> sendEmailOtp(String email) async {
+  Future<void> sendRegisterOtp(String email) async {
     final normalized = email.trim();
     if (normalized.isEmpty) {
       throw const ValidationAppException(AppStrings.enterEmailAddress);
@@ -47,6 +47,26 @@ class AuthRepositoryImpl implements AuthRepository {
       await _client.auth.signInWithOtp(
         email: normalized,
         shouldCreateUser: true,
+      );
+    } on AuthException catch (e) {
+      throw AuthAppException(e.message);
+    } on AuthAppException {
+      rethrow;
+    } on Object catch (e) {
+      throw AuthAppException(e.toString());
+    }
+  }
+
+  @override
+  Future<void> sendSignInOtp(String email) async {
+    final normalized = email.trim();
+    if (normalized.isEmpty) {
+      throw const ValidationAppException(AppStrings.enterEmailAddress);
+    }
+    try {
+      await _client.auth.signInWithOtp(
+        email: normalized,
+        shouldCreateUser: false,
       );
     } on AuthException catch (e) {
       throw AuthAppException(e.message);

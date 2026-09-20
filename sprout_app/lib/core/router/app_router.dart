@@ -54,16 +54,34 @@ GoRouter createAppRouter({
             initialPage: userContext.introCompleted ? 2 : 0,
             onCompleted: () {
               userContext.markIntroCompleted();
-              context.go(AppRoute.signIn.path);
+              context.go(AppRoute.createAccount.path);
             },
+          );
+        },
+      ),
+      GoRoute(
+        path: AppRoute.createAccount.path,
+        builder: (context, state) {
+          return CreateAccountPage(
+            onBackToIntro: userContext.introCompleted
+                ? null
+                : () => context.go(AppRoute.intro.path),
           );
         },
       ),
       GoRoute(
         path: AppRoute.signIn.path,
         builder: (context, state) {
-          return SignInPage(onBackToIntro: () => context.go(AppRoute.intro.path));
+          return SignInPage(
+            onBackToIntro: userContext.introCompleted
+                ? null
+                : () => context.go(AppRoute.intro.path),
+          );
         },
+      ),
+      GoRoute(
+        path: AppRoute.verifyOtp.path,
+        builder: (context, state) => const VerifyOtpPage(),
       ),
       GoRoute(
         path: AppRoute.terms.path,

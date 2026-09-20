@@ -72,14 +72,14 @@ class AuthCubit extends Cubit<AuthViewState> {
     );
   }
 
-  Future<void> sendOtp() async {
+  Future<void> sendRegisterOtp() async {
     final current = state;
     if (current is! AuthViewSignedOut || current.busy) return;
     if (!current.supabaseConfigured) return;
 
     emit(current.copyWith(busy: true, clearError: true, clearInfo: true));
     try {
-      await _authService.sendEmailOtp(current.email);
+      await _authService.sendRegisterOtp(current.email);
       if (isClosed) return;
       emit(
         current.copyWith(
@@ -107,6 +107,54 @@ class AuthCubit extends Cubit<AuthViewState> {
           clearInfo: true,
         ),
       );
+    }
+  }
+
+  Future<void> sendSignInOtp() async {
+    final current = state;
+    if (current is! AuthViewSignedOut || current.busy) return;
+    if (!current.supabaseConfigured) return;
+
+    emit(current.copyWith(busy: true, clearError: true, clearInfo: true));
+    try {
+      await _authService.sendSignInOtp(current.email);
+      if (isClosed) return;
+      emit(
+        current.copyWith(
+          busy: false,
+          otpSent: true,
+          infoMessage: AppStrings.checkEmailForCode,
+          clearError: true,
+        ),
+      );
+    } on AppException catch (e) {
+      if (isClosed) return;
+      emit(
+        current.copyWith(
+          busy: false,
+          errorMessage: e.toFailure().message,
+          clearInfo: true,
+        ),
+      );
+    } on Object catch (e) {
+      if (isClosed) return;
+      emit(
+        current.copyWith(
+          busy: false,
+          errorMessage: e.toString(),
+          clearInfo: true,
+        ),
+      );
+    }
+  }
+
+  Future<void> sendOtp() async {
+    final current = state;
+    if (current is! AuthViewSignedOut) return;
+    if (current.isRegisterPath) {
+      await sendRegisterOtp();
+    } else {
+      await sendSignInOtp();
     }
   }
 

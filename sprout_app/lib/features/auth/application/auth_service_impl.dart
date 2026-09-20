@@ -66,8 +66,12 @@ class AuthServiceImpl implements AuthService {
   }
 
   @override
-  Future<void> sendEmailOtp(String email) =>
-      _authRepository.sendEmailOtp(email);
+  Future<void> sendRegisterOtp(String email) =>
+      _authRepository.sendRegisterOtp(email);
+
+  @override
+  Future<void> sendSignInOtp(String email) =>
+      _authRepository.sendSignInOtp(email);
 
   @override
   Future<AuthUser> verifyEmailOtp({

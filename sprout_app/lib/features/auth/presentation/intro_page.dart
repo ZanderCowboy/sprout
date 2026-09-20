@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:sprout/core/constants/app_colors.dart';
 import 'package:sprout/core/constants/app_strings.dart';
 import 'package:sprout/core/constants/semantics_ids.dart';
+import 'package:sprout/core/router/app_route.dart';
 import 'package:sprout/ui/export.dart';
 import 'widgets/debug_sign_in_button.dart';
 import 'widgets/intro_dot.dart';
@@ -48,6 +50,10 @@ class _IntroPageState extends State<IntroPage> {
       duration: const Duration(milliseconds: 280),
       curve: Curves.easeOutCubic,
     );
+  }
+
+  void _goToSignIn() {
+    context.go(AppRoute.signIn.path);
   }
 
   @override
@@ -104,12 +110,35 @@ class _IntroPageState extends State<IntroPage> {
               const SizedBox(height: 24),
               SizedBox(
                 width: double.infinity,
-                child: SproutFilledButton(
-                  identifier: SemanticsIds.introNext,
-                  label: _isLastSlide ? AppStrings.signIn : AppStrings.next,
-                  onPressed: _goNext,
-                ),
+                child: _isLastSlide
+                    ? SproutFilledButton(
+                        identifier: SemanticsIds.introCreateAccount,
+                        label: AppStrings.createAccount,
+                        onPressed: _goNext,
+                      )
+                    : SproutFilledButton(
+                        identifier: SemanticsIds.introNext,
+                        label: AppStrings.next,
+                        onPressed: _goNext,
+                      ),
               ),
+              if (_isLastSlide) ...[
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: SproutTextButton(
+                    identifier: SemanticsIds.introSignIn,
+                    label: AppStrings.iAlreadyHaveAnAccount,
+                    onPressed: _goToSignIn,
+                    child: Text(
+                      AppStrings.iAlreadyHaveAnAccount,
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
               const SizedBox(height: 12),
               const DebugSignInButton(),
             ],

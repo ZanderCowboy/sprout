@@ -108,10 +108,8 @@ abstract final class AppStrings {
   static const String nameRequiredShort = 'Name required';
 
   // --- Auth ---
-  static const String displayNameOptional = 'Display name (optional)';
-  static const String displayNameExistingAccountHint =
-      'Leave blank if you already have an account.';
   static const String displayName = 'Display name';
+  static const String displayNameRequired = 'Display name (required)';
   static const String editDisplayName = 'Edit display name';
   static const String changeEmail = 'Change email';
   static const String changeEmailComingSoon =
@@ -145,6 +143,28 @@ abstract final class AppStrings {
   static const String and = 'and';
   static const String termsLoadFailed = 'Could not load Terms of Service.';
   static const String privacyLoadFailed = 'Could not load Privacy Policy.';
+  
+  // Create account / sign in
+  static const String createAccount = 'Create account';
+  static const String createAccountSubtitle =
+      'Your goals sync across phones — sign in anywhere to see your progress.';
+  static const String iAlreadyHaveAnAccount = 'I already have an account';
+  static const String createAnAccount = 'Create an account';
+  static const String continueButton = 'Continue';
+  static const String codeWillBeSent =
+      "We'll send a 6-digit code to your email.";
+  static const String emailAlreadyHasAccount =
+      'That email already has an account. Sign in instead.';
+  static const String emailHasNoAccount =
+      'No account for this email. Create one?';
+  
+  // Verify OTP page
+  static const String verifyYourEmail = 'Verify your email';
+  static const String checkYourEmail = 'Check your email';
+  static const String resendCode = 'Resend code';
+  static const String editEmail = 'Edit email';
+  
+  // Sign in / auth (general)
   static const String signIn = 'Sign in';
   static const String signInSubtitle =
       'Sign in to sync your savings across devices.';
