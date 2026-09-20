@@ -89,6 +89,7 @@ void main() {
       userContext: UserContext(settingsBox),
       appConfig: config(supabase: true),
       localSessionCleaner: FakeLocalSessionCleaner(),
+      analyticsService: FakeAnalyticsService(),
       flushPending: () async {},
       pullRemote: () async {},
     );

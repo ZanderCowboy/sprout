@@ -143,6 +143,7 @@ String _labelFor(StartupStep step) {
     StartupStep.openBoxes => AppStrings.startupOpenBoxes,
     StartupStep.loadConfig => AppStrings.startupLoadConfig,
     StartupStep.initRemoteConfig => AppStrings.startupInitRemoteConfig,
+    StartupStep.initAnalytics => AppStrings.startupInitAnalytics,
     StartupStep.initSupabase => AppStrings.startupInitSupabase,
     StartupStep.configureDI => AppStrings.startupConfigureDI,
     StartupStep.resolveUser => AppStrings.startupResolveUser,

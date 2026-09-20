@@ -38,7 +38,11 @@ void main() {
     );
     txRepo = FakeTransactionsRepository();
     goalsRepo = FakeGoalsRepository();
-    final txService = TransactionsServiceImpl(txRepo);
+    final txService = TransactionsServiceImpl(
+      txRepo,
+      userContext: FakeUserContext(),
+      analyticsService: FakeAnalyticsService(),
+    );
     bloc = AccountDetailBloc(
       accountsService: AccountsServiceImpl(accountsRepo),
       transactionsService: txService,

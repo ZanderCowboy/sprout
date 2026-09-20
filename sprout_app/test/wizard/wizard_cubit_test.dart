@@ -35,14 +35,25 @@ void main() {
     accountsRepo = FakeAccountsRepository();
     txRepo = FakeTransactionsRepository();
     userContext = UserContext(settingsBox);
+    final fakeUserContext = FakeUserContext();
+    final fakeAnalytics = FakeAnalyticsService();
     cubit = WizardCubit(
       accountsService: AccountsServiceImpl(accountsRepo),
       goalsService: GoalsServiceImpl(
         goalsRepo,
-        TransactionsServiceImpl(txRepo),
+        TransactionsServiceImpl(
+          txRepo,
+          userContext: fakeUserContext,
+          analyticsService: fakeAnalytics,
+        ),
       ),
-      transactionsService: TransactionsServiceImpl(txRepo),
+      transactionsService: TransactionsServiceImpl(
+        txRepo,
+        userContext: fakeUserContext,
+        analyticsService: fakeAnalytics,
+      ),
       userContext: userContext,
+      analyticsService: fakeAnalytics,
       defaultGoalColorArgb: 0xFF112233,
       defaultAccountColorArgb: 0xFF445566,
       defaultGoalIconCodePoint: 0xE52F,
