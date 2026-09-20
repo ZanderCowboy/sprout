@@ -103,12 +103,6 @@ class _GoalsPageState extends State<GoalsPage> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(
-                          AppStrings.goalsEmptyGuidance,
-                          style: Theme.of(context).textTheme.bodyLarge,
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 24),
                         ConstrainedBox(
                           constraints: const BoxConstraints(maxWidth: 200),
                           child: SproutQuickActionTile(
@@ -127,6 +121,12 @@ class _GoalsPageState extends State<GoalsPage> {
                               );
                             },
                           ),
+                        ),
+                        const SizedBox(height: 24),
+                        Text(
+                          AppStrings.goalsEmptyGuidance,
+                          style: Theme.of(context).textTheme.bodyLarge,
+                          textAlign: TextAlign.center,
                         ),
                       ],
                     ),

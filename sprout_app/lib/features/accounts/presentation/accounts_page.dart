@@ -34,12 +34,6 @@ class AccountsPage extends StatelessWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(
-                          AppStrings.accountsEmptyGuidance,
-                          style: Theme.of(context).textTheme.bodyLarge,
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 24),
                         ConstrainedBox(
                           constraints: const BoxConstraints(maxWidth: 200),
                           child: SproutQuickActionTile(
@@ -58,6 +52,12 @@ class AccountsPage extends StatelessWidget {
                               );
                             },
                           ),
+                        ),
+                        const SizedBox(height: 24),
+                        Text(
+                          AppStrings.accountsEmptyGuidance,
+                          style: Theme.of(context).textTheme.bodyLarge,
+                          textAlign: TextAlign.center,
                         ),
                       ],
                     ),
