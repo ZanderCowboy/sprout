@@ -1,0 +1,20 @@
+---
+description: Keep pubspec.yaml dependencies alphabetically sorted
+globs: sprout_app/pubspec.yaml
+alwaysApply: true
+---
+
+# Sorted pubspec
+
+Keep `dependencies` and `dev_dependencies` in alphabetical order (`sort_pub_dependencies`). SDK entries (`flutter`, `flutter_test`) stay in that same A–Z list — do not pin them at the top.
+
+After `flutter pub add` / `flutter pub remove`, re-sort both lists. Example:
+
+```yaml
+dependencies:
+  bloc_concurrency: ^0.3.0
+  connectivity_plus: ^7.3.1
+  flutter:
+    sdk: flutter
+  flutter_bloc: ^9.1.1
+```

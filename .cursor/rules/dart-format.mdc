@@ -1,0 +1,17 @@
+---
+description: Dart format must match Cursor — dart format + analysis_options, never a custom width
+globs: sprout_app/**/*.dart
+alwaysApply: true
+---
+
+# Dart formatting
+
+Source of truth is `sprout_app/analysis_options.yaml` (`formatter.page_width: 80`, `trailing_commas: automate`). Cursor format-on-save uses the Dart SDK formatter with those options.
+
+After creating or editing Dart files, from `sprout_app/` run:
+
+```bash
+dart format path/to/changed.dart
+```
+
+Do **not** hand-wrap lines, pick a different width, or pass `--line-length` / `--page-width` that disagrees with analysis_options. Cloud agents must format before handing back so a local save does not rewrite the file.

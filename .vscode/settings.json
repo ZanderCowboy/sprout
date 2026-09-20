@@ -1,4 +1,9 @@
 {
+    "[dart]": {
+        "editor.defaultFormatter": "Dart-Code.dart-code",
+        "editor.formatOnSave": true
+    },
+    "dart.lineLength": 80,
     "terminal.integrated.env.osx": {
         "GH_CONFIG_DIR": "${env:HOME}/.config/gh-zandercowboy",
         "XDG_CONFIG_HOME": "${env:HOME}/.config/firebase-personal",

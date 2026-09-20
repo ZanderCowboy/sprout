@@ -200,8 +200,8 @@ class _SettingsPageState extends State<SettingsPage> {
                 Text(
                   AppStrings.debugTools,
                   style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 SettingsNavRow(
