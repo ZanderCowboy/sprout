@@ -34,7 +34,7 @@ void main() {
       await tester.pump(const Duration(milliseconds: 350));
       expect(find.text(AppStrings.introSlide3Title), findsOneWidget);
 
-      await tester.tap(find.text(AppStrings.signIn));
+      await tester.tap(find.text(AppStrings.createAccount));
       await tester.pump();
       expect(completed, isTrue);
     });
