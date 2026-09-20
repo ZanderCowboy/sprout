@@ -111,7 +111,7 @@ void main() {
     expect(cubit.state, isA<AuthViewSignedOut>());
     final afterSend = cubit.state as AuthViewSignedOut;
     expect(afterSend.otpSent, isTrue);
-    expect(fakeAuth.sendOtpCalls, 1);
+    expect(fakeAuth.sendSignInOtpCalls, 1);
 
     await cubit.verifyOtp('123456');
     expect(cubit.state, isA<AuthViewSignedIn>());
@@ -167,7 +167,7 @@ void main() {
   });
 
   test('sendOtp surfaces AuthFailure message', () async {
-    fakeAuth.sendOtpError = const AuthAppException('Rate limited');
+    fakeAuth.sendSignInOtpError = const AuthAppException('Rate limited');
     cubit.emailChanged('user@example.com');
     await cubit.sendOtp();
 
