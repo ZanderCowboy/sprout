@@ -61,6 +61,9 @@ linked_*.ds
 unlinked.ds
 unlinked_spec.ds
 
+# FVM (Flutter Version Management)
+.fvm/flutter_sdk
+
 # Android related
 **/android/**/gradle-wrapper.jar
 .gradle/

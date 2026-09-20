@@ -18,6 +18,16 @@ Changes heading to `main`. Newest entries at the top.
 
 - Selected bottom-bar tab no longer has a teal glow or drop shadow; the filled disc stays flat
 
+## 2026-09-20 — FVM isolation for Flutter 3.47.2
+
+- Added FVM (Flutter Version Management) configuration to isolate Sprout's Flutter version from other projects
+- Pinned Flutter 3.47.2 (stable) with Dart 3.13.2 via `.fvmrc`
+- Updated VS Code/Cursor workspace to use FVM SDK path (`.fvm/flutter_sdk`)
+- Added `docs/FVM_SETUP.md` with Mac and Windows installation and usage instructions
+- Updated README with FVM quick start and version isolation guidance
+- CI remains on Flutter 3.41.4 (upgrade tracked in #47)
+- Ensures work projects (e.g. Grosvenor 3.38.10) stay isolated via their own `.fvmrc`
+
 ## 2026-09-20 — MVP Firebase Analytics event set
 
 - Added Firebase Analytics tracking for development flavor with core event set

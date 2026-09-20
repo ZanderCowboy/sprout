@@ -4,6 +4,7 @@
         "editor.formatOnSave": true
     },
     "dart.lineLength": 80,
+    "dart.flutterSdkPath": ".fvm/flutter_sdk",
     "terminal.integrated.env.osx": {
         "GH_CONFIG_DIR": "${env:HOME}/.config/gh-zandercowboy",
         "XDG_CONFIG_HOME": "${env:HOME}/.config/firebase-personal",
