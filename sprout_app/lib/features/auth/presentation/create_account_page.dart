@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:sprout/core/constants/app_assets.dart';
 import 'package:sprout/core/constants/app_strings.dart';
 import 'package:sprout/core/constants/semantics_ids.dart';
 import 'package:sprout/core/router/app_route.dart';
@@ -69,8 +69,35 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
     context.push(AppRoute.privacy.path);
   }
 
+  bool _existingAccountPromptOpen = false;
+
   void _goToSignIn() {
     context.go(AppRoute.signIn.path);
+  }
+
+  Future<void> _promptExistingAccount(BuildContext context) async {
+    if (_existingAccountPromptOpen) return;
+    _existingAccountPromptOpen = true;
+    try {
+      final goToSignIn = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text(AppStrings.accountAlreadyExists),
+          content: const Text(AppStrings.emailAlreadyHasAccount),
+          actions: SproutDialogActions.cancelConfirm(
+            onCancel: () => Navigator.pop(ctx, false),
+            onConfirm: () => Navigator.pop(ctx, true),
+            confirmLabel: AppStrings.signIn,
+            confirmIdentifier: SemanticsIds.createAccountExistingSignIn,
+          ),
+        ),
+      );
+      if (!context.mounted || goToSignIn != true) return;
+      context.read<AuthCubit>().switchToSignInPath();
+      context.go(AppRoute.signIn.path);
+    } finally {
+      _existingAccountPromptOpen = false;
+    }
   }
 
   @override
@@ -107,6 +134,10 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                     ),
                   );
                 }
+              }
+              if (state is AuthViewSignedOut &&
+                  state.errorMessage == AppStrings.emailAlreadyHasAccount) {
+                _promptExistingAccount(context);
               }
               if (state is AuthViewSignedOut && state.otpSent) {
                 context.go(AppRoute.verifyOtp.path);
@@ -184,7 +215,8 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                       if (supabaseConfigured) ...[
                         const SizedBox(height: 16),
                         SproutTextField(
-                          identifier: SemanticsIds.createAccountDisplayNameField,
+                          identifier:
+                              SemanticsIds.createAccountDisplayNameField,
                           controller: _displayNameController,
                           enabled: isOnline && !busy,
                           textCapitalization: TextCapitalization.words,
@@ -224,14 +256,16 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                         SproutFilledButton(
                           identifier: SemanticsIds.createAccountContinue,
                           label: AppStrings.continueButton,
-                          onPressed: (!isOnline ||
+                          onPressed:
+                              (!isOnline ||
                                   busy ||
                                   !_isValidEmail(_emailController.text) ||
                                   !_isValidDisplayName(
                                     _displayNameController.text,
                                   ))
                               ? null
-                              : () => context.read<AuthCubit>().sendRegisterOtp(),
+                              : () =>
+                                    context.read<AuthCubit>().sendRegisterOtp(),
                         ),
                         if (googleAvailable) ...[
                           const SizedBox(height: 24),
@@ -254,12 +288,9 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                                 : () => context
                                       .read<AuthCubit>()
                                       .signInWithGoogle(),
-                            icon: SizedBox(
+                            icon: AppAssets.googleGLogo.image(
                               width: 20,
                               height: 20,
-                              child: SvgPicture.asset(
-                                'assets/images/google_g_logo.svg',
-                              ),
                             ),
                             labelWidget: const Text(
                               AppStrings.continueWithGoogle,
@@ -278,7 +309,8 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                                 alignment: PlaceholderAlignment.baseline,
                                 baseline: TextBaseline.alphabetic,
                                 child: SproutTextButton(
-                                  identifier: SemanticsIds.createAccountTermsLink,
+                                  identifier:
+                                      SemanticsIds.createAccountTermsLink,
                                   label: AppStrings.termsOfService,
                                   onPressed: _openTerms,
                                   style: TextButton.styleFrom(
@@ -304,7 +336,8 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                                 alignment: PlaceholderAlignment.baseline,
                                 baseline: TextBaseline.alphabetic,
                                 child: SproutTextButton(
-                                  identifier: SemanticsIds.createAccountPrivacyLink,
+                                  identifier:
+                                      SemanticsIds.createAccountPrivacyLink,
                                   label: AppStrings.privacyPolicy,
                                   onPressed: _openPrivacy,
                                   style: TextButton.styleFrom(
@@ -360,7 +393,9 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                         const SizedBox(height: 16),
                         Text(infoMessage),
                       ],
-                      if (errorMessage != null) ...[
+                      if (errorMessage != null &&
+                          errorMessage !=
+                              AppStrings.emailAlreadyHasAccount) ...[
                         const SizedBox(height: 16),
                         Text(
                           errorMessage,

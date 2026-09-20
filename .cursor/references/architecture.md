@@ -80,6 +80,7 @@ Cross-feature imports go through `package:sprout/features/<other>/export.dart`. 
 
 - Money is **integer cents**, not `double` currency.
 - User-facing copy lives in `AppStrings`.
+- Bundled images/SVGs live in `AppAssets` — never hard-code `assets/...` in widgets.
 - Validation throws `ValidationAppException` (see `lib/core/error/app_exception.dart`).
 - Register new repositories/services in `configureDependencies`.
 - **Services:** `abstract class FooService` in `foo_service.dart` (class + public method docstrings); `FooServiceImpl` in `foo_service_impl.dart`. DI registers `FooService` → `FooServiceImpl`. Barrels export the abstract only.

@@ -2,6 +2,26 @@
 
 Changes heading to `main`. Newest entries at the top.
 
+## 2026-09-20 — Resend code after create account
+
+- Resend on the verify-email screen no longer treats a pending (unverified) signup as an existing account
+- Create account / sign-in email checks only count verified Supabase users, so an unfinished signup can request another code
+
+## 2026-09-20 — Remove sign-out local-data caption
+
+- Settings no longer says signing out keeps local data on the device
+
+## 2026-09-20 — Sign-in unknown-email prompt
+
+- Sign in checks whether the email exists in Supabase before sending an OTP
+- Unknown emails get a "No account yet" dialog with a Create account action instead of the verify-code page
+
+## 2026-09-20 — Existing-email create-account prompt
+
+- Create account checks whether the email already exists in Supabase before sending an OTP
+- Existing accounts get an "Account already exists" dialog with a Sign in action instead of the verify-code page
+- Verify email no longer repeats "Check your email for a 6-digit code" under the form
+
 ## 2026-09-20 — Split register and sign-in paths
 
 - Create account requires display name; sign-in is email-only (no name field or overwrite risk)

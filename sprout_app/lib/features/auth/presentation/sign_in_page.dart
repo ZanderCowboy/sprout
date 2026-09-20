@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:sprout/core/constants/app_assets.dart';
 import 'package:sprout/core/constants/app_strings.dart';
 import 'package:sprout/core/constants/semantics_ids.dart';
 import 'package:sprout/core/router/app_route.dart';
@@ -60,6 +60,33 @@ class _SignInPageState extends State<SignInPage> {
     context.go(AppRoute.createAccount.path);
   }
 
+  bool _missingAccountPromptOpen = false;
+
+  Future<void> _promptMissingAccount(BuildContext context) async {
+    if (_missingAccountPromptOpen) return;
+    _missingAccountPromptOpen = true;
+    try {
+      final goToCreate = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text(AppStrings.accountDoesNotExist),
+          content: const Text(AppStrings.emailHasNoAccount),
+          actions: SproutDialogActions.cancelConfirm(
+            onCancel: () => Navigator.pop(ctx, false),
+            onConfirm: () => Navigator.pop(ctx, true),
+            confirmLabel: AppStrings.createAccount,
+            confirmIdentifier: SemanticsIds.signInMissingCreateAccount,
+          ),
+        ),
+      );
+      if (!context.mounted || goToCreate != true) return;
+      context.read<AuthCubit>().switchToRegisterPath();
+      context.go(AppRoute.createAccount.path);
+    } finally {
+      _missingAccountPromptOpen = false;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -86,6 +113,10 @@ class _SignInPageState extends State<SignInPage> {
                     ),
                   );
                 }
+              }
+              if (state is AuthViewSignedOut &&
+                  state.errorMessage == AppStrings.emailHasNoAccount) {
+                _promptMissingAccount(context);
               }
               if (state is AuthViewSignedOut && state.otpSent) {
                 context.go(AppRoute.verifyOtp.path);
@@ -188,7 +219,8 @@ class _SignInPageState extends State<SignInPage> {
                         SproutFilledButton(
                           identifier: SemanticsIds.signInContinue,
                           label: AppStrings.continueButton,
-                          onPressed: (!isOnline ||
+                          onPressed:
+                              (!isOnline ||
                                   busy ||
                                   !_isValidEmail(_emailController.text))
                               ? null
@@ -215,12 +247,9 @@ class _SignInPageState extends State<SignInPage> {
                                 : () => context
                                       .read<AuthCubit>()
                                       .signInWithGoogle(),
-                            icon: SizedBox(
+                            icon: AppAssets.googleGLogo.image(
                               width: 20,
                               height: 20,
-                              child: SvgPicture.asset(
-                                'assets/images/google_g_logo.svg',
-                              ),
                             ),
                             labelWidget: const Text(
                               AppStrings.continueWithGoogle,
@@ -321,7 +350,8 @@ class _SignInPageState extends State<SignInPage> {
                         const SizedBox(height: 16),
                         Text(infoMessage),
                       ],
-                      if (errorMessage != null) ...[
+                      if (errorMessage != null &&
+                          errorMessage != AppStrings.emailHasNoAccount) ...[
                         const SizedBox(height: 16),
                         Text(
                           errorMessage,

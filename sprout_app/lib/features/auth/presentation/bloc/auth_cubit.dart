@@ -4,7 +4,6 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:sprout/core/config/app_config.dart';
-import 'package:sprout/core/constants/app_strings.dart';
 import 'package:sprout/core/error/error.dart';
 import '../../application/auth_service.dart';
 import '../../domain/auth_user.dart';
@@ -85,8 +84,9 @@ class AuthCubit extends Cubit<AuthViewState> {
         current.copyWith(
           busy: false,
           otpSent: true,
-          infoMessage: AppStrings.checkEmailForCode,
+          isRegisterPath: true,
           clearError: true,
+          clearInfo: true,
         ),
       );
     } on AppException catch (e) {
@@ -94,6 +94,7 @@ class AuthCubit extends Cubit<AuthViewState> {
       emit(
         current.copyWith(
           busy: false,
+          isRegisterPath: true,
           errorMessage: e.toFailure().message,
           clearInfo: true,
         ),
@@ -103,6 +104,7 @@ class AuthCubit extends Cubit<AuthViewState> {
       emit(
         current.copyWith(
           busy: false,
+          isRegisterPath: true,
           errorMessage: e.toString(),
           clearInfo: true,
         ),
@@ -123,8 +125,95 @@ class AuthCubit extends Cubit<AuthViewState> {
         current.copyWith(
           busy: false,
           otpSent: true,
-          infoMessage: AppStrings.checkEmailForCode,
+          isRegisterPath: false,
           clearError: true,
+          clearInfo: true,
+        ),
+      );
+    } on AppException catch (e) {
+      if (isClosed) return;
+      emit(
+        current.copyWith(
+          busy: false,
+          isRegisterPath: false,
+          errorMessage: e.toFailure().message,
+          clearInfo: true,
+        ),
+      );
+    } on Object catch (e) {
+      if (isClosed) return;
+      emit(
+        current.copyWith(
+          busy: false,
+          isRegisterPath: false,
+          errorMessage: e.toString(),
+          clearInfo: true,
+        ),
+      );
+    }
+  }
+
+  /// Leaves create-account after an existing-email prompt.
+  void switchToSignInPath() {
+    final current = state;
+    if (current is! AuthViewSignedOut) return;
+    emit(
+      current.copyWith(
+        isRegisterPath: false,
+        otpSent: false,
+        clearError: true,
+        clearInfo: true,
+      ),
+    );
+  }
+
+  /// Leaves sign-in after an unknown-email prompt.
+  void switchToRegisterPath() {
+    final current = state;
+    if (current is! AuthViewSignedOut) return;
+    emit(
+      current.copyWith(
+        isRegisterPath: true,
+        otpSent: false,
+        clearError: true,
+        clearInfo: true,
+      ),
+    );
+  }
+
+  Future<void> sendOtp() async {
+    final current = state;
+    if (current is! AuthViewSignedOut) return;
+    if (current.otpSent) {
+      await _resendOtp();
+      return;
+    }
+    if (current.isRegisterPath) {
+      await sendRegisterOtp();
+    } else {
+      await sendSignInOtp();
+    }
+  }
+
+  Future<void> _resendOtp() async {
+    final current = state;
+    if (current is! AuthViewSignedOut || current.busy) return;
+    if (!current.supabaseConfigured) return;
+
+    emit(current.copyWith(busy: true, clearError: true, clearInfo: true));
+    try {
+      await _authService.resendEmailOtp(
+        email: current.email,
+        shouldCreateUser: current.isRegisterPath,
+      );
+      if (isClosed) return;
+      emit(
+        current.copyWith(
+          busy: false,
+          otpSent: true,
+          isRegisterPath: current.isRegisterPath,
+          clearError: true,
+          clearInfo: true,
         ),
       );
     } on AppException catch (e) {
@@ -145,16 +234,6 @@ class AuthCubit extends Cubit<AuthViewState> {
           clearInfo: true,
         ),
       );
-    }
-  }
-
-  Future<void> sendOtp() async {
-    final current = state;
-    if (current is! AuthViewSignedOut) return;
-    if (current.isRegisterPath) {
-      await sendRegisterOtp();
-    } else {
-      await sendSignInOtp();
     }
   }
 
@@ -302,10 +381,14 @@ class AuthCubit extends Cubit<AuthViewState> {
         ? previous.displayName
         : '';
     final otpSent = previous is AuthViewSignedOut ? previous.otpSent : false;
+    final isRegisterPath = previous is AuthViewSignedOut
+        ? previous.isRegisterPath
+        : false;
     emit(
       AuthViewSignedOut(
         supabaseConfigured: _appConfig.isSupabaseConfigured,
         googleAvailable: _googleAvailable,
+        isRegisterPath: isRegisterPath,
         email: email,
         displayName: displayName,
         otpSent: otpSent,

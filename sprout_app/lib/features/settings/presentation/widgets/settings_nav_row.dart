@@ -11,16 +11,19 @@ class SettingsNavRow extends StatelessWidget {
     required this.label,
     required this.icon,
     required this.onTap,
+    this.subtitle,
   });
 
   final String identifier;
   final String label;
+  final String? subtitle;
   final IconData icon;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
     final radius = BorderRadius.circular(AppRadii.card);
     final tileBase = Color.alphaBlend(
       AppColors.surfaceMuted.withValues(alpha: 0.42),
@@ -37,6 +40,14 @@ class SettingsNavRow extends StatelessWidget {
         label: label,
         leading: Icon(icon, color: scheme.onSurfaceVariant),
         title: Text(label),
+        subtitle: subtitle == null
+            ? null
+            : Text(
+                subtitle!,
+                style: textTheme.bodySmall?.copyWith(
+                  color: scheme.onSurfaceVariant,
+                ),
+              ),
         trailing: Icon(
           Icons.chevron_right_rounded,
           color: scheme.onSurfaceVariant,

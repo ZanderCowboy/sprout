@@ -38,6 +38,13 @@ abstract class AuthService {
   /// Sends a sign-in email OTP to [email] (existing users only).
   Future<void> sendSignInOtp(String email);
 
+  /// Resends an email OTP without checking whether the address already has
+  /// a verified account. Used after a code was already sent.
+  Future<void> resendEmailOtp({
+    required String email,
+    required bool shouldCreateUser,
+  });
+
   /// Verifies the OTP and binds the verified session to local storage.
   Future<AuthUser> verifyEmailOtp({
     required String email,

@@ -1,8 +1,6 @@
 abstract final class AppStrings {
   // --- App chrome ---
   static const String appTitle = 'Sprout';
-  static const String openMenu = 'Open menu';
-  static const String moreOptions = 'More options';
   static const String tabOverview = 'Overview';
   static const String tabAccounts = 'Accounts';
   static const String tabGoals = 'Goals';
@@ -70,7 +68,6 @@ abstract final class AppStrings {
   static const String targetAmountShort = 'Target amount';
   static const String required = 'Required';
   static const String currencyPrefix = 'R ';
-  static const String syncError = 'Could not sync with the server';
   static const String couldNotSave = 'Could not save. Try again.';
   static const String couldNotDelete = 'Could not delete. Try again.';
   static const String unallocated = 'Unallocated';
@@ -116,15 +113,10 @@ abstract final class AppStrings {
       'Changing your email address will be available in a later update.';
   static const String account = 'Account';
   static const String accountSectionProfile = 'Profile';
-  static const String accountSectionSession = 'Session';
-  static const String accountSectionLegal = 'Legal';
   static const String accountSectionDanger = 'Danger zone';
   static const String signedInWithGoogle = 'Signed in with Google';
   static const String signedInWithEmail = 'Signed in with email';
   static const String signOut = 'Sign out';
-  static const String signOutKeepsLocalData =
-      'Signing out keeps your local data on this device. '
-      'Cloud sync pauses until you sign in again.';
   static const String deleteAccount = 'Delete account';
   static const String deleteAccountConfirmTitle = 'Delete your account?';
   static const String deleteAccountWarning =
@@ -143,7 +135,7 @@ abstract final class AppStrings {
   static const String and = 'and';
   static const String termsLoadFailed = 'Could not load Terms of Service.';
   static const String privacyLoadFailed = 'Could not load Privacy Policy.';
-  
+
   // Create account / sign in
   static const String createAccount = 'Create account';
   static const String createAccountSubtitle =
@@ -153,11 +145,13 @@ abstract final class AppStrings {
   static const String continueButton = 'Continue';
   static const String codeWillBeSent =
       "We'll send a 6-digit code to your email.";
+  static const String accountAlreadyExists = 'Account already exists';
+  static const String accountDoesNotExist = 'No account yet';
   static const String emailAlreadyHasAccount =
       'That email already has an account. Sign in instead.';
   static const String emailHasNoAccount =
       'No account for this email. Create one?';
-  
+
   // Verify OTP page
   static const String verifyYourEmail = 'Verify your email';
   static const String checkYourEmail = 'Check your email';
@@ -165,7 +159,7 @@ abstract final class AppStrings {
   static const String editEmail = 'Edit email';
   static const String verificationCodeIncorrectOrExpired =
       'Verification code is incorrect or expired';
-  
+
   // Sign in / auth (general)
   static const String signIn = 'Sign in';
   static const String signInSubtitle =
@@ -173,7 +167,6 @@ abstract final class AppStrings {
   static const String signInNotConfigured =
       'Sign-in isn’t configured for this build.';
   static const String email = 'Email';
-  static const String sendCode = 'Send code';
   static const String verificationCode = 'Verification code';
   static const String verifyCode = 'Verify code';
   static const String continueWithGoogle = 'Continue with Google';
@@ -340,7 +333,6 @@ abstract final class AppStrings {
   static const String recurringDepositDisabled = 'Recurring deposit (Disabled)';
   static const String recurringDepositWontApply =
       'This recurring deposit won’t be applied.';
-  static const String cancelRemove = 'Cancel (remove)';
   static const String stopRecurring = 'Stop recurring';
   static const String seeAll = 'See all';
   static const String frequencyDaily = 'Daily';
@@ -382,7 +374,6 @@ abstract final class AppStrings {
   static const String subscriptionUpdateFailed = 'Subscription update failed.';
   static const String checkingSubscription = 'Checking subscription...';
   static const String premiumActive = 'Premium active';
-  static const String premiumStatusActive = 'ACTIVE';
   static const String unlockPremium = 'Unlock premium with Monthly or Annual';
   static const String sproutPremium = 'Sprout Premium';
   static const String manage = 'Manage';
@@ -403,7 +394,6 @@ abstract final class AppStrings {
       'View, edit, or cancel recurring deposits';
   static const String planIncomeExpenses =
       'Plan income and expenses (static template)';
-  static const String savingsApp = 'Savings app';
 
   // --- Startup ---
   static const String startupFailedTitle =
@@ -456,9 +446,6 @@ abstract final class AppStrings {
     return '$sign${percent.toStringAsFixed(1)}% this month';
   }
 
-  static String savedOfTarget(String saved, String target) =>
-      'Saved $saved of $target.';
-
   static String savedSlashTarget(String saved, String target) =>
       'Saved: $saved / $target';
 
@@ -466,10 +453,6 @@ abstract final class AppStrings {
       '$saved / $target';
 
   static String remainingColon(String amount) => 'Remaining: $amount';
-
-  static String savedAmount(String amount) => 'Saved $amount';
-
-  static String targetAmountLabel(String amount) => 'Target $amount';
 
   static String toGoCompleteAllGoals(String amount) =>
       '$amount to go to complete all goals.';
@@ -500,7 +483,4 @@ abstract final class AppStrings {
   static String recurringDot(String freq) => 'Recurring · $freq';
 
   static String nextColon(String when) => 'next $when';
-
-  static String goalLabelPrefix(String amount) =>
-      '${AppStrings.selectGoal}: $amount';
 }

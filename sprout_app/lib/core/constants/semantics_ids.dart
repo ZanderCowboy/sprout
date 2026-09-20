@@ -17,6 +17,7 @@ abstract final class SemanticsIds {
   static const createAccountTermsLink = 'create_account_terms_link';
   static const createAccountPrivacyLink = 'create_account_privacy_link';
   static const createAccountSignInLink = 'create_account_sign_in_link';
+  static const createAccountExistingSignIn = 'create_account_existing_sign_in';
   static const createAccountDebugSignIn = 'create_account_debug_sign_in';
 
   // --- Sign in ---
@@ -27,6 +28,7 @@ abstract final class SemanticsIds {
   static const signInTermsLink = 'sign_in_terms_link';
   static const signInPrivacyLink = 'sign_in_privacy_link';
   static const signInCreateAccountLink = 'sign_in_create_account_link';
+  static const signInMissingCreateAccount = 'sign_in_missing_create_account';
   static const signInDebugSignIn = 'sign_in_debug_sign_in';
 
   // --- Verify OTP ---

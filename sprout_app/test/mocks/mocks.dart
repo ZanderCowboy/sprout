@@ -28,6 +28,7 @@ class FakeAuthRepository implements AuthRepository {
 
   int sendRegisterOtpCalls = 0;
   int sendSignInOtpCalls = 0;
+  int resendEmailOtpCalls = 0;
   int verifyOtpCalls = 0;
   int googleCalls = 0;
   int updateDisplayNameCalls = 0;
@@ -38,7 +39,10 @@ class FakeAuthRepository implements AuthRepository {
   String? lastToken;
   String? lastDisplayName;
   Object? sendRegisterOtpError;
+  Object? sendRegisterOtpErrorAfterFirst;
   Object? sendSignInOtpError;
+  Object? resendEmailOtpError;
+  bool? lastResendShouldCreateUser;
   Object? verifyOtpError;
   Object? googleError;
   Object? updateDisplayNameError;
@@ -65,6 +69,22 @@ class FakeAuthRepository implements AuthRepository {
     sendRegisterOtpCalls++;
     lastEmail = email;
     final error = sendRegisterOtpError;
+    if (error != null) throw error;
+    if (sendRegisterOtpCalls > 1) {
+      final afterFirst = sendRegisterOtpErrorAfterFirst;
+      if (afterFirst != null) throw afterFirst;
+    }
+  }
+
+  @override
+  Future<void> resendEmailOtp({
+    required String email,
+    required bool shouldCreateUser,
+  }) async {
+    resendEmailOtpCalls++;
+    lastEmail = email;
+    lastResendShouldCreateUser = shouldCreateUser;
+    final error = resendEmailOtpError;
     if (error != null) throw error;
   }
 
