@@ -1,0 +1,23 @@
+appId: app.stackmint.sprout.dev
+tags:
+  - page
+env:
+  EMAIL: sprout.play.review@gmail.com
+---
+# OTP auto-submit journey (send → wrong stays → right navigates).
+# OTP_CODE must be provided at run time (do not commit secrets):
+#   OTP_CODE=xxxxxx maestro test .maestro/otp-auto-submit.yaml
+
+- launchApp:
+    clearState: true
+    clearKeychain: true
+
+- runFlow:
+    file: shared/chapter-otp-send.yaml
+    env:
+      EMAIL: ${EMAIL}
+
+- runFlow:
+    file: shared/chapter-otp-wrong-then-right.yaml
+    env:
+      OTP_CODE: ${OTP_CODE}

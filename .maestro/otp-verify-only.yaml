@@ -1,0 +1,10 @@
+appId: app.stackmint.sprout.dev
+tags:
+  - page
+---
+# Phase 2: app already on OTP field. Needs OTP_CODE env. No launchApp.
+
+- runFlow:
+    file: shared/chapter-otp-wrong-then-right.yaml
+    env:
+      OTP_CODE: ${OTP_CODE}

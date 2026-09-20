@@ -1,0 +1,16 @@
+appId: app.stackmint.sprout.dev
+tags:
+  - page
+env:
+  EMAIL: sprout.play.review@gmail.com
+---
+# Phase 1: send OTP email only. Leave app on OTP field.
+
+- launchApp:
+    clearState: true
+    clearKeychain: true
+
+- runFlow:
+    file: shared/chapter-otp-send.yaml
+    env:
+      EMAIL: ${EMAIL}
