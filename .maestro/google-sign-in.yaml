@@ -3,9 +3,8 @@ tags:
   - edge
   - auth
 ---
-# Google Sign-In smoke (DEV). Account picker is system UI — may need a human
-# if the device has no Google account or picker layout differs.
-# Expected: signed-in session (wizard or Overview), not "Google Sign-In was cancelled."
+# Google Sign-In smoke (DEV). System account picker is best-effort.
+# Expected: signed-in session (wizard or Overview), not cancelled.
 # Run: maestro test .maestro/google-sign-in.yaml
 
 - launchApp:
@@ -34,30 +33,14 @@ tags:
 - tapOn:
     id: "sign_in_google"
 
-# System account chooser (best-effort). Prefer Play review account on emulator.
 - extendedWaitUntil:
     visible:
-      text: ".*sprout\\.play\\.review@gmail\\.com.*|.*Choose an account.*|.*Continue.*"
+      text: "Choose an account"
     timeout: 30000
-    optional: true
 
-- tapOn:
-    text: "sprout.play.review@gmail.com"
-    optional: true
+# Prefer display name on emulator Play-review account
+- tapOn: "Test User Review"
 
-- tapOn:
-    text: ".*@gmail\\.com.*"
-    optional: true
-
-- tapOn:
-    text: "Continue"
-    optional: true
-
-- tapOn:
-    text: "OK"
-    optional: true
-
-# Must NOT stay on cancelled error
 - extendedWaitUntil:
     visible:
       id: "wizard_skip"
