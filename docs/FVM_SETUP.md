@@ -43,7 +43,7 @@ After installing via pub, ensure `$HOME/.pub-cache/bin` (macOS) or `%USERPROFILE
    fvm install
    ```
 
-   This reads `.fvmrc` (Flutter 3.47.2) and downloads that SDK version into FVM's cache.
+   This reads `.fvmrc` (Flutter 3.47.5) and downloads that SDK version into FVM's cache.
 
 2. **Verify the installation**:
 
@@ -51,7 +51,7 @@ After installing via pub, ensure `$HOME/.pub-cache/bin` (macOS) or `%USERPROFILE
    fvm flutter --version
    ```
 
-   Should report Flutter 3.47.2 and Dart 3.13.2.
+   Should report Flutter 3.47.5 and Dart 3.13.x.
 
 3. **Run pub get** using FVM:
 

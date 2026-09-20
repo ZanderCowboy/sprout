@@ -18,10 +18,10 @@ Changes heading to `main`. Newest entries at the top.
 
 - Selected bottom-bar tab no longer has a teal glow or drop shadow; the filled disc stays flat
 
-## 2026-09-20 — FVM isolation for Flutter 3.47.2
+## 2026-09-20 — FVM isolation for Flutter 3.47.5
 
 - Added FVM (Flutter Version Management) configuration to isolate Sprout's Flutter version from other projects
-- Pinned Flutter 3.47.2 (stable) with Dart 3.13.2 via `.fvmrc`
+- Pinned Flutter 3.47.5 (stable) with Dart 3.13.x via `.fvmrc`
 - Updated VS Code/Cursor workspace to use FVM SDK path (`.fvm/flutter_sdk`)
 - Added `docs/FVM_SETUP.md` with Mac and Windows installation and usage instructions
 - Updated README with FVM quick start and version isolation guidance
