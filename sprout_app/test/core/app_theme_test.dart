@@ -16,7 +16,10 @@ void main() {
     expect(theme.colorScheme.surfaceContainerHigh, AppColors.surfaceMuted);
     expect(theme.colorScheme.surfaceContainerHighest, AppColors.surfaceMuted);
     expect(theme.scaffoldBackgroundColor, AppColors.surfaceDeep);
-    expect(theme.bottomNavigationBarTheme.backgroundColor, AppColors.surfaceBar);
+    expect(
+      theme.bottomNavigationBarTheme.backgroundColor,
+      AppColors.surfaceBar,
+    );
   });
 
   test('buildAppTheme sets typography weights', () {
@@ -49,7 +52,7 @@ void main() {
     expect(theme.inputDecorationTheme.fillColor, AppColors.surfaceMuted);
     expect(
       theme.floatingActionButtonTheme.backgroundColor,
-      AppColors.seed,
+      AppColors.accentLime,
     );
   });
 }

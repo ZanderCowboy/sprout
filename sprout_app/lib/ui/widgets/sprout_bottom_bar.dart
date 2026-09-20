@@ -27,10 +27,7 @@ class SproutBottomBarDestination {
 
 /// Lush Growth chrome: destinations as data. Host overlays the center Add.
 class SproutBottomBar extends StatelessWidget {
-  const SproutBottomBar({
-    super.key,
-    required this.destinations,
-  });
+  const SproutBottomBar({super.key, required this.destinations});
 
   final List<SproutBottomBarDestination> destinations;
 
@@ -48,7 +45,9 @@ class SproutBottomBar extends StatelessWidget {
       elevation: 0,
       color: AppColors.surfaceBar,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadii.card)),
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(AppRadii.card),
+        ),
       ),
       child: SafeArea(
         top: false,
@@ -79,6 +78,8 @@ class SproutBottomBar extends StatelessWidget {
 class _SproutBottomBarItem extends StatelessWidget {
   const _SproutBottomBarItem({required this.destination});
 
+  static const double _discSize = 44;
+
   final SproutBottomBarDestination destination;
 
   @override
@@ -86,46 +87,52 @@ class _SproutBottomBarItem extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final muted = scheme.onSurfaceVariant;
 
-    final icon = destination.selected
-        ? Container(
-            width: 44,
-            height: 44,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: AppColors.seed,
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.seed.withValues(alpha: 0.45),
-                  blurRadius: 12,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Icon(
-              destination.selectedIcon,
-              color: AppColors.surfaceDeep,
-              size: 22,
-            ),
-          )
-        : Padding(
-            padding: const EdgeInsets.symmetric(vertical: 9),
-            child: Icon(destination.icon, color: muted, size: 26),
-          );
-
     return semanticButton(
       identifier: destination.identifier,
       label: destination.label,
       selected: destination.selected,
       child: InkWell(
         onTap: destination.onTap,
-        borderRadius: BorderRadius.circular(16),
+        excludeFromSemantics: true,
+        splashFactory: NoSplash.splashFactory,
+        overlayColor: const WidgetStatePropertyAll(Colors.transparent),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 4),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              icon,
+              Material(
+                color: Colors.transparent,
+                shape: const CircleBorder(),
+                child: InkWell(
+                  onTap: destination.onTap,
+                  excludeFromSemantics: true,
+                  customBorder: const CircleBorder(),
+                  child: Ink(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: destination.selected
+                          ? AppColors.seed
+                          : Colors.transparent,
+                    ),
+                    child: SizedBox(
+                      width: _discSize,
+                      height: _discSize,
+                      child: Center(
+                        child: Icon(
+                          destination.selected
+                              ? destination.selectedIcon
+                              : destination.icon,
+                          color: destination.selected
+                              ? AppColors.surfaceDeep
+                              : muted,
+                          size: destination.selected ? 22 : 26,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
               const SizedBox(height: 4),
               Text(
                 destination.label,

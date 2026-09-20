@@ -2,6 +2,22 @@
 
 Changes heading to `main`. Newest entries at the top.
 
+## 2026-09-21 — Lime Add button
+
+- Center Add button uses lime instead of teal so it reads apart from the selected tab disc
+
+## 2026-09-21 — Remove Add button glow
+
+- Center Add button no longer has a teal glow or drop shadow; the disc stays flat like the selected tab
+
+## 2026-09-21 — Circular tab tap splash
+
+- Tapping a bottom-bar tab shows a circular splash matching the selected disc, not a rounded rectangle around the whole tab
+
+## 2026-09-21 — Remove selected tab glow
+
+- Selected bottom-bar tab no longer has a teal glow or drop shadow; the filled disc stays flat
+
 ## 2026-09-20 — MVP Firebase Analytics event set
 
 - Added Firebase Analytics tracking for development flavor with core event set
