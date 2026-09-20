@@ -2,6 +2,14 @@
 
 Changes heading to `main`. Newest entries at the top.
 
+## 2026-09-20 — Auth auto-submit verify code after 6 digits
+
+- OTP verification field now auto-submits when the 6th digit is entered
+- Max length tightened from 8 to 6 digits to match email copy ("6-digit code")
+- Paste of 6-digit code also auto-submits
+- After failed verification, user can edit and retry without spam-submit (only fires when length becomes 6)
+- Manual Verify button kept as fallback
+
 ## 2026-09-20 — Guided first-run fallback for empty states
 
 - Overview empty state now disables deposit until both goal AND account exist (updated caption)

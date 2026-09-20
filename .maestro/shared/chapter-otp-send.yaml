@@ -1,0 +1,63 @@
+appId: app.stackmint.sprout.dev
+---
+# Requires: intro screen visible (fresh launch).
+# Walks intro → sign-in (terms/privacy), fills Play Review + ${EMAIL},
+# taps Send code, waits for OTP field. Does NOT debug-sign-in or Google.
+- extendedWaitUntil:
+    visible:
+      id: "intro_next"
+    timeout: 45000
+
+- tapOn:
+    id: "intro_next"
+
+- tapOn:
+    id: "intro_next"
+
+- tapOn:
+    id: "intro_next"
+
+- extendedWaitUntil:
+    visible:
+      id: "sign_in_send_code"
+    timeout: 5000
+
+- tapOn:
+    id: "sign_in_terms_link"
+
+- extendedWaitUntil:
+    visible:
+      text: "Terms of Service"
+    timeout: 10000
+
+- back
+
+- tapOn:
+    id: "sign_in_privacy_link"
+
+- extendedWaitUntil:
+    visible:
+      text: "Privacy Policy"
+    timeout: 10000
+
+- back
+
+- tapOn:
+    id: "sign_in_display_name_field"
+
+- inputText: "Play Review"
+
+- tapOn:
+    id: "sign_in_email_field"
+
+- inputText: ${EMAIL}
+
+- hideKeyboard
+
+- tapOn:
+    id: "sign_in_send_code"
+
+- extendedWaitUntil:
+    visible:
+      id: "sign_in_otp_field"
+    timeout: 30000

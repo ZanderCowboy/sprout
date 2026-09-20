@@ -1,0 +1,11 @@
+appId: app.stackmint.sprout.dev
+tags:
+  - edge
+---
+# Offline blocks sign-in (airplane mode). Android + Maestro ≥1.37.
+
+- launchApp:
+    clearState: true
+    clearKeychain: true
+
+- runFlow: shared/chapter-otp-offline-blocks.yaml
