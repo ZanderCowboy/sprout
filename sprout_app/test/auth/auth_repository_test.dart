@@ -16,6 +16,28 @@ void main() {
       expect(message, AppStrings.googleSignInCancelled);
     });
 
+    test('[16] Cancelled by user shows cancelled message', () {
+      final exception = GoogleSignInException(
+        code: GoogleSignInExceptionCode.canceled,
+        description: '[16] Cancelled by user.',
+      );
+
+      final message = AuthRepositoryImpl.mapGoogleSignInException(exception);
+
+      expect(message, AppStrings.googleSignInCancelled);
+    });
+
+    test('[16] Canceled by user shows cancelled message (US spelling)', () {
+      final exception = GoogleSignInException(
+        code: GoogleSignInExceptionCode.canceled,
+        description: '[16] Canceled by user.',
+      );
+
+      final message = AuthRepositoryImpl.mapGoogleSignInException(exception);
+
+      expect(message, AppStrings.googleSignInCancelled);
+    });
+
     test('[16] Account reauth failed shows error description', () {
       final exception = GoogleSignInException(
         code: GoogleSignInExceptionCode.canceled,

@@ -222,14 +222,27 @@ class AuthRepositoryImpl implements AuthRepository {
         // configuration errors (OAuth client / SHA-1 mismatch / etc.).
         // Check the description to differentiate.
         final description = e.description ?? '';
-        final isConfigError = description.contains('[16]') ||
-            description.toLowerCase().contains('reauth failed') ||
-            description.toLowerCase().contains('configuration') ||
-            description.toLowerCase().contains('sha') ||
-            description.toLowerCase().contains('client id');
+        final lower = description.toLowerCase();
+        
+        // First check: if description looks like user cancellation, treat as such
+        final isUserCancel = lower.contains('cancelled by user') ||
+            lower.contains('canceled by user') ||
+            lower.contains('cancelled by') ||
+            lower.contains('canceled by');
+        if (isUserCancel) {
+          return AppStrings.googleSignInCancelled;
+        }
+        
+        // Second check: clear configuration/auth error signals
+        final isConfigError = lower.contains('reauth failed') ||
+            lower.contains('configuration') ||
+            lower.contains('sha') ||
+            lower.contains('client id');
         if (isConfigError) {
           return e.description ?? AppStrings.googleSignInFailed;
         }
+        
+        // Default: treat as user cancellation
         return AppStrings.googleSignInCancelled;
       case GoogleSignInExceptionCode.clientConfigurationError:
       case GoogleSignInExceptionCode.providerConfigurationError:
