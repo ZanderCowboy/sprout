@@ -1,7 +1,10 @@
 import 'dart:async';
 
+import 'package:sprout/core/analytics/analytics_catalog.dart';
+import 'package:sprout/core/analytics/analytics_service.dart';
 import 'package:sprout/core/constants/constants.dart';
 import 'package:sprout/core/error/error.dart';
+import 'package:sprout/core/user/user_context.dart';
 
 import '../domain/funds_calculator.dart';
 import '../domain/funds_snapshot.dart';
@@ -14,9 +17,16 @@ import 'deposit_flow.dart';
 import 'transactions_service.dart';
 
 class TransactionsServiceImpl implements TransactionsService {
-  TransactionsServiceImpl(this._repository);
+  TransactionsServiceImpl(
+    this._repository, {
+    required UserContext userContext,
+    required AnalyticsService analyticsService,
+  }) : _userContext = userContext,
+       _analyticsService = analyticsService;
 
   final TransactionsRepository _repository;
+  final UserContext _userContext;
+  final AnalyticsService _analyticsService;
 
   @override
   Stream<List<Transaction>> watchTransactions() =>
@@ -128,17 +138,20 @@ class TransactionsServiceImpl implements TransactionsService {
     String? note,
     bool isRecurring = false,
     TransactionFrequency frequency = TransactionFrequency.none,
-  }) => _repository.addTransaction(
-    accountId: accountId,
-    kind: TransactionKind.deposit,
-    goalId: goalId,
-    groupId: groupId,
-    amountCents: amountCents,
-    occurredAt: occurredAt,
-    note: note,
-    isRecurring: isRecurring,
-    frequency: frequency,
-  );
+  }) async {
+    await _repository.addTransaction(
+      accountId: accountId,
+      kind: TransactionKind.deposit,
+      goalId: goalId,
+      groupId: groupId,
+      amountCents: amountCents,
+      occurredAt: occurredAt,
+      note: note,
+      isRecurring: isRecurring,
+      frequency: frequency,
+    );
+    await _logFirstDepositIfNeeded();
+  }
 
   @override
   Future<void> recordAccountDeposit({
@@ -149,17 +162,29 @@ class TransactionsServiceImpl implements TransactionsService {
     String? note,
     bool isRecurring = false,
     TransactionFrequency frequency = TransactionFrequency.none,
-  }) => _repository.addTransaction(
-    accountId: accountId,
-    kind: TransactionKind.deposit,
-    goalId: null,
-    groupId: groupId,
-    amountCents: amountCents,
-    occurredAt: occurredAt,
-    note: note,
-    isRecurring: isRecurring,
-    frequency: frequency,
-  );
+  }) async {
+    await _repository.addTransaction(
+      accountId: accountId,
+      kind: TransactionKind.deposit,
+      goalId: null,
+      groupId: groupId,
+      amountCents: amountCents,
+      occurredAt: occurredAt,
+      note: note,
+      isRecurring: isRecurring,
+      frequency: frequency,
+    );
+    await _logFirstDepositIfNeeded();
+  }
+
+  Future<void> _logFirstDepositIfNeeded() async {
+    final userId = await _userContext.resolveUserId();
+    final alreadyLogged = await _userContext.getFirstDepositLogged(userId);
+    if (!alreadyLogged) {
+      await _analyticsService.logEvent(AnalyticsEvent.firstDepositLogged);
+      await _userContext.markFirstDepositLogged(userId);
+    }
+  }
 
   @override
   Future<void> recordAllocation({

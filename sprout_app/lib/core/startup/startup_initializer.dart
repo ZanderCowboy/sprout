@@ -3,6 +3,8 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'package:sprout/core/analytics/analytics_service.dart';
+import 'package:sprout/core/analytics/analytics_service_impl.dart';
 import 'package:sprout/core/config/app_config.dart';
 import 'package:sprout/core/config/app_environment.dart';
 import 'package:sprout/core/constants/hive_boxes.dart';
@@ -29,6 +31,7 @@ enum StartupStep {
   openBoxes,
   loadConfig,
   initRemoteConfig,
+  initAnalytics,
   initSupabase,
   configureDI,
   resolveUser,
@@ -50,6 +53,7 @@ bool _hiveInitialized = false;
 bool _supabaseInitialized = false;
 bool _purchasesConfigured = false;
 final RemoteConfigService _remoteConfigService = RemoteConfigServiceImpl();
+final AnalyticsService _analyticsService = AnalyticsServiceImpl();
 
 Future<void> initializeApp({
   required String configAssetPath,
@@ -161,8 +165,18 @@ Future<void> initializeApp({
     pendingSyncBox: pendingSyncBox,
     supabaseClient: supabaseClient,
     remoteConfigService: _remoteConfigService,
+    analyticsService: _analyticsService,
   );
   reporter.update(StartupStep.configureDI, StartupStepStatus.done);
+
+  reporter.update(StartupStep.initAnalytics, StartupStepStatus.running);
+  await _analyticsService.setup();
+  reporter.update(
+    StartupStep.initAnalytics,
+    _analyticsService.isReady
+        ? StartupStepStatus.done
+        : StartupStepStatus.skipped,
+  );
 
   reporter.update(StartupStep.resolveUser, StartupStepStatus.running);
   final userId = await sl<UserContext>().resolveUserId();

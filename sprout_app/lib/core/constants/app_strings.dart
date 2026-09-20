@@ -407,6 +407,7 @@ abstract final class AppStrings {
   static const String startupOpenBoxes = 'Opening boxes';
   static const String startupLoadConfig = 'Loading config';
   static const String startupInitRemoteConfig = 'Loading feature flags';
+  static const String startupInitAnalytics = 'Initializing analytics';
   static const String startupInitSupabase = 'Connecting to Supabase';
   static const String startupConfigureDI = 'Configuring services';
   static const String startupResolveUser = 'Resolving user';

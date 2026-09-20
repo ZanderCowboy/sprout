@@ -31,7 +31,11 @@ void main() {
 
   setUp(() {
     repo = FakeTransactionsRepository();
-    service = TransactionsServiceImpl(repo);
+    service = TransactionsServiceImpl(
+      repo,
+      userContext: FakeUserContext(),
+      analyticsService: FakeAnalyticsService(),
+    );
   });
 
   tearDown(() async {

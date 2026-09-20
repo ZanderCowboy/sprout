@@ -17,7 +17,14 @@ void main() {
   setUp(() {
     goalsRepo = FakeGoalsRepository();
     txRepo = FakeTransactionsRepository();
-    goalsService = GoalsServiceImpl(goalsRepo, TransactionsServiceImpl(txRepo));
+    goalsService = GoalsServiceImpl(
+      goalsRepo,
+      TransactionsServiceImpl(
+        txRepo,
+        userContext: FakeUserContext(),
+        analyticsService: FakeAnalyticsService(),
+      ),
+    );
   });
 
   tearDown(() async {

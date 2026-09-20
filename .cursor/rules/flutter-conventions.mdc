@@ -10,6 +10,7 @@ Package name is `sprout`. App root is `sprout_app/`.
 
 - Cross-feature and core imports: `package:sprout/...`. Same-feature files may use relative imports.
 - Register new repositories/services in `sprout_app/lib/core/di/service_locator.dart` (`sl`).
+- **Enums and models always have their own files** — one enum or model class per file. Do not nest enums or model classes inside unrelated files. Barrel files (exports) can re-export them, but definitions stay separate.
 - Blocs/cubits: `sealed` events/states + `Equatable`. Split events/states into `*_event.dart` / `*_state.dart` part files next to the parent bloc/cubit.
 - **Presentation pages**: Split private widget classes into sibling `part` files using `part` / `part of` (same pattern as bloc/cubit event/state parts). Do not accumulate many private widgets in one page file.
   - Private UI helper classes (`_ProgressDots`, `_HeroIcon`, `_Step1Goal`, etc.) go in `_snake_case.dart` part files: `part of 'parent_page.dart';` at top.

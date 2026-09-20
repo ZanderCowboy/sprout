@@ -2,6 +2,8 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uuid/uuid.dart';
 
+import 'package:sprout/core/analytics/analytics_catalog.dart';
+import 'package:sprout/core/analytics/analytics_service.dart';
 import 'package:sprout/core/core.dart';
 import 'package:sprout/features/accounts/export.dart';
 import 'package:sprout/features/goals/export.dart';
@@ -15,6 +17,7 @@ class WizardCubit extends Cubit<WizardState> {
     required GoalsService goalsService,
     required TransactionsService transactionsService,
     required UserContext userContext,
+    required AnalyticsService analyticsService,
     required int defaultGoalColorArgb,
     required int defaultAccountColorArgb,
     required int defaultGoalIconCodePoint,
@@ -22,6 +25,7 @@ class WizardCubit extends Cubit<WizardState> {
         _goalsService = goalsService,
         _transactionsService = transactionsService,
         _userContext = userContext,
+        _analyticsService = analyticsService,
         _defaultGoalIconCodePoint = defaultGoalIconCodePoint,
         super(
           WizardReady(
@@ -40,6 +44,7 @@ class WizardCubit extends Cubit<WizardState> {
   final GoalsService _goalsService;
   final TransactionsService _transactionsService;
   final UserContext _userContext;
+  final AnalyticsService _analyticsService;
   final int _defaultGoalIconCodePoint;
   static const _uuid = Uuid();
 
@@ -351,6 +356,7 @@ class WizardCubit extends Cubit<WizardState> {
             ? AppStrings.wizardFirstSeedPlanted
             : AppStrings.wizardSetupReady,
       );
+      await _analyticsService.logEvent(AnalyticsEvent.wizardCompleted);
       emit(WizardCompleted(plantedSeed: plantSeed));
     } on AppException catch (e) {
       emit(current.copyWith(submitting: false, errorMessage: e.message));

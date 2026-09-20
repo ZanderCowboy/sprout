@@ -7,6 +7,7 @@ const String _kLastVerifiedUserIdKey = 'last_verified_user_id';
 const String _kIntroCompletedKey = 'intro_completed';
 const String _kFirstRunCompletedKey = 'first_run_completed';
 const String _kWelcomeToastKey = 'wizard_welcome_toast';
+const String _kFirstDepositLoggedKey = 'first_deposit_logged';
 
 class UserContext {
   UserContext(this._settingsBox, {SupabaseClient? supabaseClient})
@@ -79,5 +80,15 @@ class UserContext {
       await _settingsBox.delete(key);
     }
     return value;
+  }
+
+  Future<bool> getFirstDepositLogged(String userId) async {
+    final key = '${_kFirstDepositLoggedKey}_$userId';
+    return _settingsBox.get(key) == true;
+  }
+
+  Future<void> markFirstDepositLogged(String userId) async {
+    final key = '${_kFirstDepositLoggedKey}_$userId';
+    await _settingsBox.put(key, true);
   }
 }

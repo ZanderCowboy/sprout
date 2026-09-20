@@ -60,6 +60,7 @@ void main() {
       userContext: userContext,
       appConfig: appConfig ?? _testAppConfig,
       localSessionCleaner: sessionCleaner,
+      analyticsService: FakeAnalyticsService(),
       flushPending: () async {
         flushCalls++;
       },

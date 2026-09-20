@@ -45,7 +45,11 @@ void main() {
     cubit = GoalFormCubit(
       goalsService: GoalsServiceImpl(
         goalsRepo,
-        TransactionsServiceImpl(txRepo),
+        TransactionsServiceImpl(
+          txRepo,
+          userContext: FakeUserContext(),
+          analyticsService: FakeAnalyticsService(),
+        ),
       ),
       userContext: UserContext(settingsBox),
       defaultColorArgb: 0xFF112233,

@@ -61,6 +61,7 @@ void main() {
         userContext: UserContext(settingsBox),
         appConfig: config,
         localSessionCleaner: FakeLocalSessionCleaner(),
+        analyticsService: FakeAnalyticsService(),
         flushPending: () async {},
         pullRemote: () async {},
       ),

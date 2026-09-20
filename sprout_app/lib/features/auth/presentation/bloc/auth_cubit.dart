@@ -248,6 +248,7 @@ class AuthCubit extends Cubit<AuthViewState> {
         email: current.email,
         token: token,
         displayName: current.displayName,
+        isSignUp: current.isRegisterPath,
       );
       if (isClosed) return;
       _emitFromCurrent();

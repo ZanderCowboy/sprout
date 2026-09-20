@@ -1,8 +1,10 @@
 import 'dart:async';
 
+import 'package:sprout/core/analytics/analytics_service.dart';
 import 'package:sprout/core/config/app_config.dart';
 import 'package:sprout/core/flags/remote_config_service.dart';
 import 'package:sprout/core/flags/remote_feature_flag.dart';
+import 'package:sprout/core/user/user_context.dart';
 import 'package:sprout/features/accounts/domain/account.dart';
 import 'package:sprout/features/accounts/domain/accounts_repository.dart';
 import 'package:sprout/features/auth/domain/auth_repository.dart';
@@ -19,6 +21,95 @@ import 'package:sprout/features/transactions/domain/portfolio_summary.dart';
 import 'package:sprout/features/transactions/domain/transaction.dart';
 import 'package:sprout/features/transactions/domain/transaction_frequency.dart';
 import 'package:sprout/features/transactions/domain/transactions_repository.dart';
+
+class FakeAnalyticsService implements AnalyticsService {
+  @override
+  bool get isReady => true;
+
+  @override
+  Future<void> setup() async {}
+
+  final Map<String, List<Map<String, Object>?>> events = {};
+
+  @override
+  Future<void> logEvent(String eventName, [Map<String, Object>? parameters]) async {
+    events.putIfAbsent(eventName, () => []).add(parameters);
+  }
+
+  int eventCount(String eventName) => events[eventName]?.length ?? 0;
+
+  Map<String, Object>? lastParams(String eventName) {
+    final list = events[eventName];
+    return (list != null && list.isNotEmpty) ? list.last : null;
+  }
+}
+
+class FakeUserContext implements UserContext {
+  FakeUserContext({this.userId = 'test-user-id'});
+
+  String userId;
+  bool introCompletedValue = false;
+  bool firstRunCompletedValue = false;
+  bool firstDepositLoggedValue = false;
+  String? pendingWelcomeToast;
+
+  @override
+  Future<String> resolveUserId() async => userId;
+
+  @override
+  String? get cachedUserId => userId;
+
+  @override
+  String? get lastVerifiedUserId => userId;
+
+  @override
+  Future<void> setActiveUserId(String userId) async {
+    this.userId = userId;
+  }
+
+  @override
+  Future<void> markVerifiedUserId(String userId) async {
+    this.userId = userId;
+  }
+
+  @override
+  bool get introCompleted => introCompletedValue;
+
+  @override
+  Future<void> markIntroCompleted() async {
+    introCompletedValue = true;
+  }
+
+  @override
+  Future<bool> getFirstRunCompleted(String userId) async =>
+      firstRunCompletedValue;
+
+  @override
+  Future<void> markFirstRunCompleted(String userId) async {
+    firstRunCompletedValue = true;
+  }
+
+  @override
+  Future<void> setPendingWelcomeToast(String userId, String message) async {
+    pendingWelcomeToast = message;
+  }
+
+  @override
+  Future<String?> takePendingWelcomeToast(String userId) async {
+    final value = pendingWelcomeToast;
+    pendingWelcomeToast = null;
+    return value;
+  }
+
+  @override
+  Future<bool> getFirstDepositLogged(String userId) async =>
+      firstDepositLoggedValue;
+
+  @override
+  Future<void> markFirstDepositLogged(String userId) async {
+    firstDepositLoggedValue = true;
+  }
+}
 
 class FakeAuthRepository implements AuthRepository {
   FakeAuthRepository({AuthUser? initialUser}) : _currentUser = initialUser;
