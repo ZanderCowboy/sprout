@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import 'package:sprout/core/analytics/analytics_catalog.dart';
 import 'package:sprout/core/analytics/analytics_service.dart';
-import 'package:sprout/core/router/app_route.dart';
 
 /// Maps GoRouter paths to analytics screen names from [AnalyticsScreenName].
 String? _screenNameForRoute(String? routePath) {
