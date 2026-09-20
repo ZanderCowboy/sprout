@@ -2,6 +2,13 @@
 
 Changes heading to `main`. Newest entries at the top.
 
+## 2026-09-20 — Play Store feature graphic redesign with screenshots
+
+- Feature graphic now shows "Sprout" text + app icon on left, phone screenshots on right with rounded corners (device mockup style)
+- Script falls back gracefully to text + icon only if screenshots haven't been captured yet
+- Added "Known Gaps" section documenting development banner in screenshots, links to issue #70 for production auth flows
+- Updated README with regeneration workflow (capture screenshots first, then regenerate feature graphic)
+
 ## 2026-09-20 — Play Store screenshots complete the first-run wizard
 
 - Screenshot capture fills a goal, account, and deposit on the wizard instead of skipping and seeding from Overview
