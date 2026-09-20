@@ -77,9 +77,7 @@ class EmptyStateGuidance extends StatelessWidget {
                       stepStyle: stepStyle,
                       detailStyle: detailStyle,
                       scheme: scheme,
-                      disabledCaption: hasGoals
-                          ? null
-                          : AppStrings.overviewEmptyDepositDisabled,
+                      disabledCaption: AppStrings.overviewEmptyDepositDisabled,
                     ),
                   ],
                 ),
@@ -93,7 +91,7 @@ class EmptyStateGuidance extends StatelessWidget {
               onDeposit: onOpenDeposit,
               onNewAccount: onOpenAccount,
               onNewGoal: onOpenGoal,
-              depositEnabled: hasGoals,
+              depositEnabled: false,
               depositKey: const Key('overview_empty_deposit'),
               accountKey: const Key('overview_empty_new_account'),
               goalKey: const Key('overview_empty_new_goal'),

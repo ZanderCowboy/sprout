@@ -28,14 +28,37 @@ class AccountsPage extends StatelessWidget {
               if (state.accounts.isEmpty)
                 SliverFillRemaining(
                   hasScrollBody: false,
-                  child: Center(
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(24, 24, 24, 96),
-                      child: Text(
-                        AppStrings.accountsEmptyGuidance,
-                        style: Theme.of(context).textTheme.bodyLarge,
-                        textAlign: TextAlign.center,
-                      ),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(24, 24, 24, 96),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          AppStrings.accountsEmptyGuidance,
+                          style: Theme.of(context).textTheme.bodyLarge,
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 24),
+                        ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 200),
+                          child: SproutQuickActionTile(
+                            identifier: SemanticsIds.accountsEmptyAddAccount,
+                            label: AppStrings.addAnAccount,
+                            icon: Icons.add_rounded,
+                            iconColor: AppColors.accentViolet,
+                            onTap: () async {
+                              await showModalBottomSheet<void>(
+                                context: context,
+                                isScrollControlled: true,
+                                showDragHandle: true,
+                                builder: (_) => AccountFormSheet(
+                                  defaultColor: AppColors.cardColorAt(0),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 )

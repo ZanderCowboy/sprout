@@ -97,14 +97,37 @@ class _GoalsPageState extends State<GoalsPage> {
                 SliverToBoxAdapter(child: _header()),
                 SliverFillRemaining(
                   hasScrollBody: false,
-                  child: Center(
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(24, 24, 24, 96),
-                      child: Text(
-                        AppStrings.goalsEmptyGuidance,
-                        style: Theme.of(context).textTheme.bodyLarge,
-                        textAlign: TextAlign.center,
-                      ),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(24, 24, 24, 96),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          AppStrings.goalsEmptyGuidance,
+                          style: Theme.of(context).textTheme.bodyLarge,
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 24),
+                        ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 200),
+                          child: SproutQuickActionTile(
+                            identifier: SemanticsIds.goalsEmptyAddGoal,
+                            label: AppStrings.addAGoal,
+                            icon: Icons.add_rounded,
+                            iconColor: AppColors.accentCoral,
+                            onTap: () async {
+                              await showModalBottomSheet<void>(
+                                context: context,
+                                isScrollControlled: true,
+                                showDragHandle: true,
+                                builder: (_) => CreateGoalScreen(
+                                  defaultColor: AppColors.cardColorAt(1),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),

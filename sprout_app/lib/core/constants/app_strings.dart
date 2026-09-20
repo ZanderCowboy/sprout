@@ -225,14 +225,16 @@ abstract final class AppStrings {
       'Record money you put into an account and allocate it to a goal.';
   static const String accountsEmptyGuidance =
       'Add an account to track your money. Accounts hold deposits that you allocate to goals.';
+  static const String addAnAccount = 'Add an account';
   static const String goalsEmptyGuidance =
       'Create a goal to save toward. Goals track your progress toward targets.';
+  static const String addAGoal = 'Add a goal';
   static const String createAccountFirst =
       'Create an account first to hold money for this goal.';
   static const String addDepositCaptionAccountAmountOnly =
       'Enter an amount — this deposit goes to the account as unallocated.';
   static const String overviewEmptyDepositDisabled =
-      'Available after you add a goal.';
+      'Available after you add a goal and an account.';
   static const String noTransactionsYet = 'No transactions yet.';
   static const String noRecurringDepositsYet = 'No recurring deposits yet.';
   static const String noDepositsForAccount =
