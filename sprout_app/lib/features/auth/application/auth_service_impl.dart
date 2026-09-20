@@ -1,4 +1,4 @@
-import 'package:sprout/core/analytics/analytics_events.dart';
+import 'package:sprout/core/analytics/analytics_catalog.dart';
 import 'package:sprout/core/analytics/analytics_service.dart';
 import 'package:sprout/core/config/app_config.dart';
 import 'package:sprout/core/config/app_environment.dart';
@@ -107,7 +107,7 @@ class AuthServiceImpl implements AuthService {
         : AnalyticsEvent.signInSuccess;
     await _analyticsService.logEvent(
       eventName,
-      {AnalyticsParam.method: SignInMethod.emailOtp},
+      {AnalyticsParam.method: AnalyticsSignInMethod.emailOtp},
     );
     return user;
   }
@@ -125,7 +125,7 @@ class AuthServiceImpl implements AuthService {
         : AnalyticsEvent.signInSuccess;
     await _analyticsService.logEvent(
       eventName,
-      {AnalyticsParam.method: SignInMethod.google},
+      {AnalyticsParam.method: AnalyticsSignInMethod.google},
     );
     return user;
   }

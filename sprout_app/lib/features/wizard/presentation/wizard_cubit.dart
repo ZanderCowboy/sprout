@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uuid/uuid.dart';
 
-import 'package:sprout/core/analytics/analytics_events.dart';
+import 'package:sprout/core/analytics/analytics_catalog.dart';
 import 'package:sprout/core/analytics/analytics_service.dart';
 import 'package:sprout/core/core.dart';
 import 'package:sprout/features/accounts/export.dart';

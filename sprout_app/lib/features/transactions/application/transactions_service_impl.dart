@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:sprout/core/analytics/analytics_events.dart';
+import 'package:sprout/core/analytics/analytics_catalog.dart';
 import 'package:sprout/core/analytics/analytics_service.dart';
 import 'package:sprout/core/constants/constants.dart';
 import 'package:sprout/core/error/error.dart';

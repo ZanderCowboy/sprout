@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-import 'package:sprout/core/analytics/analytics_events.dart';
+import 'package:sprout/core/analytics/analytics_catalog.dart';
 import 'package:sprout/core/analytics/analytics_service.dart';
 import 'package:sprout/core/router/app_route.dart';
 
-/// Maps GoRouter paths to analytics screen names from [ScreenName].
+/// Maps GoRouter paths to analytics screen names from [AnalyticsScreenName].
 String? _screenNameForRoute(String? routePath) {
   if (routePath == null) return null;
 
@@ -14,14 +14,14 @@ String? _screenNameForRoute(String? routePath) {
 
   // Map specific routes to screen names from catalog
   return switch (normalized) {
-    '' || 'overview' => ScreenName.overview,
-    'accounts' => ScreenName.accounts,
-    'goals' => ScreenName.goals,
-    'settings' => ScreenName.settings,
-    'sign-in' => ScreenName.signIn,
-    'create-account' => ScreenName.createAccount,
-    'verify-otp' => ScreenName.verifyOtp,
-    'wizard' => ScreenName.wizard,
+    '' || 'overview' => AnalyticsScreenName.overview,
+    'accounts' => AnalyticsScreenName.accounts,
+    'goals' => AnalyticsScreenName.goals,
+    'settings' => AnalyticsScreenName.settings,
+    'sign-in' => AnalyticsScreenName.signIn,
+    'create-account' => AnalyticsScreenName.createAccount,
+    'verify-otp' => AnalyticsScreenName.verifyOtp,
+    'wizard' => AnalyticsScreenName.wizard,
     _ => _accountDetailScreenName(normalized),
   };
 }
@@ -29,7 +29,7 @@ String? _screenNameForRoute(String? routePath) {
 String? _accountDetailScreenName(String path) {
   // Match /accounts/:id
   if (path.startsWith('accounts/') && path.split('/').length == 2) {
-    return ScreenName.account;
+    return AnalyticsScreenName.account;
   }
   return null;
 }

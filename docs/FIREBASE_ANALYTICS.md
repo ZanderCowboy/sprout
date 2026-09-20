@@ -15,7 +15,14 @@ Sprout tracks core analytics events via Firebase Analytics:
 
 No PII (personally identifiable information) is logged in any event parameters.
 
-**Event Catalog:** See `lib/core/analytics/analytics_events.dart` for the single source of truth on all event names, parameter names, and allowed values. Call sites reference this catalog rather than using raw strings.
+**Event Catalog:** See `lib/core/analytics/` for the single source of truth on all event names, parameter names, and allowed values:
+- `analytics_event.dart` — Event name constants
+- `analytics_param.dart` — Parameter name constants
+- `analytics_screen_name.dart` — Screen name values
+- `analytics_sign_in_method.dart` — Sign-in/sign-up method values
+- `analytics_catalog.dart` — Barrel export for convenient imports
+
+Call sites reference these catalog constants rather than using raw strings. Each constant class has its own file per project conventions.
 
 ## Configuration
 
@@ -29,15 +36,16 @@ The same Analytics API is used in the production flavor, but the production Fire
 
 ## Architecture
 
-### Event Catalog (`analytics_events.dart`)
+### Event Catalog (`lib/core/analytics/`)
 
 Single source of truth defining:
-- **Event names** (`AnalyticsEvent` constants)
-- **Parameter names** (`AnalyticsParam` constants)
-- **Allowed values** (`ScreenName`, `SignInMethod` constants)
-- **Documentation** for each event and param
+- **Event names** (`AnalyticsEvent` constants in `analytics_event.dart`)
+- **Parameter names** (`AnalyticsParam` constants in `analytics_param.dart`)
+- **Screen name values** (`AnalyticsScreenName` constants in `analytics_screen_name.dart`)
+- **Sign-in method values** (`AnalyticsSignInMethod` constants in `analytics_sign_in_method.dart`)
+- **Barrel export** (`analytics_catalog.dart`) for convenient imports
 
-Call sites reference these constants instead of raw strings.
+Each constant class has its own file per project conventions (one enum/model per file). Call sites reference these constants instead of raw strings.
 
 ### Thin Service Layer (`AnalyticsService`)
 
@@ -49,7 +57,7 @@ The service provides a single method: `logEvent(String eventName, [Map<String, O
 
 ## Events
 
-For the complete event catalog with all allowed values, see `lib/core/analytics/analytics_events.dart`.
+For the complete event catalog with all allowed values, see the catalog files in `lib/core/analytics/`.
 
 ### `app_open`
 
@@ -141,7 +149,7 @@ Logged the first time a user records a deposit transaction (via wizard or normal
 
 ## Implementation
 
-- **Event Catalog:** `lib/core/analytics/analytics_events.dart`
+- **Event Catalog:** `lib/core/analytics/` (one constant class per file + barrel export)
 - **Service:** `AnalyticsService` (abstract) / `AnalyticsServiceImpl` (thin wrapper)
 - **Location:** `lib/core/analytics/`
 - **Setup:** Initialized in `startup_initializer.dart` after DI configuration
