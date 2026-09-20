@@ -330,6 +330,8 @@ void main() {
 
     expect(fakeAuth.verifyOtpCallCount, 0);
 
+    fakeAuth.verifyOtpShouldFail = true;
+
     await tester.enterText(
       find.widgetWithText(SproutTextField, AppStrings.verificationCode),
       '123456',
@@ -360,6 +362,8 @@ void main() {
     await tester.pump();
 
     expect(fakeAuth.verifyOtpCallCount, 0);
+
+    fakeAuth.verifyOtpShouldFail = true;
 
     await tester.enterText(
       find.widgetWithText(SproutTextField, AppStrings.verificationCode),
@@ -445,6 +449,8 @@ void main() {
     await tester.enterText(find.byType(TextField).at(1), 'user@example.com');
     await tester.tap(find.text(AppStrings.sendCode));
     await tester.pump();
+
+    fakeAuth.verifyOtpShouldFail = true;
 
     await tester.enterText(
       find.widgetWithText(SproutTextField, AppStrings.verificationCode),
