@@ -138,3 +138,6 @@ app.*.symbols
 
 # FVM Version Cache
 .fvm/
+
+# Kotlin compiler session files (local, ephemeral)
+sprout_app/android/.kotlin/
