@@ -2,6 +2,10 @@
 
 Changes heading to `main`. Newest entries at the top.
 
+## 2026-09-21 — Fix FVM 4 `.fvmrc` JSON format
+
+- Changed `.fvmrc` from a bare version string to FVM 4 JSON (`{"flutter": "3.47.5"}`) so `fvm install` can parse it
+
 ## 2026-09-21 — Lime Add button
 
 - Center Add button uses lime instead of teal so it reads apart from the selected tab disc

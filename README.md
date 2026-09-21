@@ -53,7 +53,7 @@ fvm flutter run --flavor development -t lib/main_development.dart
 
 VS Code / Cursor will automatically use the FVM SDK (configured in `.vscode/settings.json`).
 
-**Important:** Do NOT run `flutter upgrade` in your global Flutter installation or in work projects like Grosvenor. Each project's `.fvmrc` controls its own version. Sprout uses Flutter 3.47.2; work projects stay on their own versions (e.g. Grosvenor 3.38.10).
+**Important:** Do NOT run `flutter upgrade` in your global Flutter installation or in work projects like Grosvenor. Each project's `.fvmrc` controls its own version. Sprout uses Flutter 3.47.5; work projects stay on their own versions (e.g. Grosvenor 3.38.10).
 
 ## Getting started
 

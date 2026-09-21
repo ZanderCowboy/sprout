@@ -1,6 +1,6 @@
 # FVM Setup for Sprout
 
-Sprout uses [FVM (Flutter Version Management)](https://fvm.app/) to isolate its Flutter SDK version from other projects on your machine. This ensures Sprout runs on Flutter 3.47.2 without affecting work projects like Grosvenor (which stays on 3.38.10).
+Sprout uses [FVM (Flutter Version Management)](https://fvm.app/) to isolate its Flutter SDK version from other projects on your machine. This ensures Sprout runs on Flutter 3.47.5 without affecting work projects like Grosvenor (which stays on 3.38.10).
 
 ## Prerequisites
 
@@ -43,7 +43,9 @@ After installing via pub, ensure `$HOME/.pub-cache/bin` (macOS) or `%USERPROFILE
    fvm install
    ```
 
-   This reads `.fvmrc` (Flutter 3.47.5) and downloads that SDK version into FVM's cache.
+   This reads `.fvmrc` (JSON: `{"flutter": "3.47.5"}`) and downloads that SDK
+   version into FVM's cache. FVM 4 requires JSON; a bare version string such as
+   `3.47.5` will crash `fvm install` with a `FormatException`.
 
 2. **Verify the installation**:
 
@@ -88,7 +90,7 @@ If you need to manually configure it:
 
 **Do NOT run `flutter upgrade` in your global Flutter installation** or in the Grosvenor work project directory. Sprout's FVM setup is completely isolated:
 
-- **Sprout**: Uses FVM with Flutter 3.47.2 (via `.fvm/flutter_sdk`)
+- **Sprout**: Uses FVM with Flutter 3.47.5 (via `.fvm/flutter_sdk`)
 - **Grosvenor / work projects**: Continue using FVM with Flutter 3.38.10 (their own `.fvmrc`)
 
 Each project's `.fvmrc` controls its own Flutter version. FVM caches all versions globally but activates the correct one per project.
@@ -105,6 +107,11 @@ Each project's `.fvmrc` controls its own Flutter version. FVM caches all version
 - If you previously used a global Flutter SDK, remove it from PATH or ensure `fvm flutter` resolves to the FVM shim first
 
 ## Troubleshooting
+
+**`fvm install` fails with `FormatException: Unexpected character`**
+
+- `.fvmrc` must be JSON, not a bare version. Use `{"flutter": "3.47.5"}`.
+- Recreate it with `fvm use 3.47.5` if needed.
 
 **"flutter: command not found" when running `fvm flutter`**
 
