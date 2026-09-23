@@ -4,24 +4,30 @@ import 'package:sprout/features/transactions/domain/transaction_frequency.dart';
 import 'package:sprout/features/transactions/domain/transaction_rules.dart';
 
 Transaction _tx({required DateTime occurredAt}) => Transaction(
-      id: '1',
-      userId: 'u',
-      accountId: 'a',
-      kind: TransactionKind.deposit,
-      amountCents: 100,
-      occurredAt: occurredAt,
-      pendingSync: false,
-    );
+  id: '1',
+  userId: 'u',
+  accountId: 'a',
+  kind: TransactionKind.deposit,
+  amountCents: 100,
+  occurredAt: occurredAt,
+  pendingSync: false,
+);
 
 void main() {
   group('TransactionRules.isPending', () {
     test('uses calendar day not timestamp', () {
-      final now = DateTime(2026, 3, 15, 10, 0);
+      final now = DateTime(2026, 3, 15, 10);
       final sameDayEarlier = DateTime(2026, 3, 15, 23, 59);
       final tomorrow = DateTime(2026, 3, 16, 0, 1);
 
-      expect(TransactionRules.isPending(_tx(occurredAt: sameDayEarlier), now), isFalse);
-      expect(TransactionRules.isPending(_tx(occurredAt: tomorrow), now), isTrue);
+      expect(
+        TransactionRules.isPending(_tx(occurredAt: sameDayEarlier), now),
+        isFalse,
+      );
+      expect(
+        TransactionRules.isPending(_tx(occurredAt: tomorrow), now),
+        isTrue,
+      );
     });
   });
 
@@ -51,7 +57,7 @@ void main() {
         accountId: 'a',
         kind: TransactionKind.deposit,
         amountCents: 100,
-        occurredAt: DateTime(2026, 3, 1),
+        occurredAt: DateTime(2026, 3),
         pendingSync: false,
         isRecurring: true,
         frequency: TransactionFrequency.monthly,
@@ -63,7 +69,7 @@ void main() {
         kind: TransactionKind.allocation,
         goalId: 'g',
         amountCents: 100,
-        occurredAt: DateTime(2026, 3, 1),
+        occurredAt: DateTime(2026, 3),
         pendingSync: false,
         isRecurring: true,
         frequency: TransactionFrequency.monthly,
@@ -72,7 +78,7 @@ void main() {
       expect(TransactionRules.isRecurringDeposit(recurring), isTrue);
       expect(TransactionRules.isRecurringDeposit(allocation), isFalse);
       expect(
-        TransactionRules.isRecurringDeposit(_tx(occurredAt: DateTime(2026, 3, 1))),
+        TransactionRules.isRecurringDeposit(_tx(occurredAt: DateTime(2026, 3))),
         isFalse,
       );
     });

@@ -97,24 +97,28 @@ void main() {
     expect(cubit.canGoToStep3, isTrue);
   });
 
-  test('deposit amount validates min and max against the goal target', () async {
-    await cubit.load();
-    cubit.setGoalName('Cape Town trip');
-    cubit.setGoalTarget('100');
-    cubit.setDepositAmount('5');
-    expect(ready().depositAmountError, AppStrings.wizardDepositBelowMinimum);
+  test(
+    'deposit amount validates min and max against the goal target',
+    () async {
+      await cubit.load();
+      cubit
+        ..setGoalName('Cape Town trip')
+        ..setGoalTarget('100')
+        ..setDepositAmount('5');
+      expect(ready().depositAmountError, AppStrings.wizardDepositBelowMinimum);
 
-    cubit.setDepositAmount('250');
-    expect(ready().depositAmountError, AppStrings.wizardDepositAboveMaximum);
+      cubit.setDepositAmount('250');
+      expect(ready().depositAmountError, AppStrings.wizardDepositAboveMaximum);
 
-    cubit.setDepositAmount('50');
-    expect(ready().depositAmountError, isNull);
-    expect(cubit.canFinish, isTrue);
+      cubit.setDepositAmount('50');
+      expect(ready().depositAmountError, isNull);
+      expect(cubit.canFinish, isTrue);
 
-    cubit.setDepositAmount('');
-    expect(ready().depositAmountError, isNull);
-    expect(cubit.canFinish, isFalse);
-  });
+      cubit.setDepositAmount('');
+      expect(ready().depositAmountError, isNull);
+      expect(cubit.canFinish, isFalse);
+    },
+  );
 
   test('load skips when the user already has a goal', () async {
     await goalsRepo.upsertGoal(
@@ -124,8 +128,8 @@ void main() {
         name: 'House',
         targetAmountCents: 10000,
         color: 0xFF000000,
-        createdAt: DateTime(2026, 1, 1),
-        updatedAt: DateTime(2026, 1, 1),
+        createdAt: DateTime(2026),
+        updatedAt: DateTime(2026),
       ),
     );
     await cubit.load();

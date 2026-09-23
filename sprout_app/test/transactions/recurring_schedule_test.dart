@@ -12,7 +12,7 @@ void main() {
     });
 
     test('nextAfter advances past anchor', () {
-      final anchor = DateTime(2026, 1, 1);
+      final anchor = DateTime(2026);
       final after = DateTime(2026, 1, 15);
       final next = RecurringSchedule.nextAfter(
         anchor: anchor,
@@ -25,7 +25,7 @@ void main() {
     test('resolveNextScheduledDate clears next date when disabled', () {
       final resolved = RecurringSchedule.resolveNextScheduledDate(
         enabled: false,
-        now: DateTime(2026, 3, 1),
+        now: DateTime(2026, 3),
         occurredAt: DateTime(2026, 1, 27),
         currentFrequency: TransactionFrequency.monthly,
         effectiveFrequency: TransactionFrequency.monthly,
@@ -35,7 +35,7 @@ void main() {
     });
 
     test('resolveNextScheduledDate keeps future date on re-enable', () {
-      final now = DateTime(2026, 3, 1);
+      final now = DateTime(2026, 3);
       final previousNext = DateTime(2026, 3, 27);
       final resolved = RecurringSchedule.resolveNextScheduledDate(
         enabled: true,

@@ -7,34 +7,32 @@ Transaction _deposit({
   String? goalId,
   required int cents,
   required DateTime occurredAt,
-}) =>
-    Transaction(
-      id: '$accountId-$cents-${occurredAt.millisecondsSinceEpoch}',
-      userId: 'u',
-      accountId: accountId,
-      kind: TransactionKind.deposit,
-      goalId: goalId,
-      amountCents: cents,
-      occurredAt: occurredAt,
-      pendingSync: false,
-    );
+}) => Transaction(
+  id: '$accountId-$cents-${occurredAt.millisecondsSinceEpoch}',
+  userId: 'u',
+  accountId: accountId,
+  kind: TransactionKind.deposit,
+  goalId: goalId,
+  amountCents: cents,
+  occurredAt: occurredAt,
+  pendingSync: false,
+);
 
 Transaction _allocation({
   required String accountId,
   required String goalId,
   required int cents,
   required DateTime occurredAt,
-}) =>
-    Transaction(
-      id: 'alloc-$goalId-$cents',
-      userId: 'u',
-      accountId: accountId,
-      kind: TransactionKind.allocation,
-      goalId: goalId,
-      amountCents: cents,
-      occurredAt: occurredAt,
-      pendingSync: false,
-    );
+}) => Transaction(
+  id: 'alloc-$goalId-$cents',
+  userId: 'u',
+  accountId: accountId,
+  kind: TransactionKind.allocation,
+  goalId: goalId,
+  amountCents: cents,
+  occurredAt: occurredAt,
+  pendingSync: false,
+);
 
 void main() {
   final now = DateTime(2026, 3, 15, 12);
@@ -53,20 +51,30 @@ void main() {
       expect(saved['g2'], 100);
     });
 
-    test('unallocatedCentsForAccount subtracts allocations from unallocated deposits', () {
-      final txs = [
-        _deposit(accountId: 'a', goalId: null, cents: 1000, occurredAt: now),
-        _allocation(accountId: 'a', goalId: 'g1', cents: 300, occurredAt: now),
-      ];
+    test(
+      'unallocatedCentsForAccount subtracts allocations from unallocated deposits',
+      () {
+        final txs = [
+          _deposit(accountId: 'a', cents: 1000, occurredAt: now),
+          _allocation(
+            accountId: 'a',
+            goalId: 'g1',
+            cents: 300,
+            occurredAt: now,
+          ),
+        ];
 
-      expect(FundsCalculator.unallocatedCentsForAccount(txs, 'a', now: now), 700);
-    });
+        expect(
+          FundsCalculator.unallocatedCentsForAccount(txs, 'a', now: now),
+          700,
+        );
+      },
+    );
 
     test('ignores pending transactions', () {
       final txs = [
         _deposit(
           accountId: 'a',
-          goalId: null,
           cents: 1000,
           occurredAt: DateTime(2026, 3, 20),
         ),
@@ -87,11 +95,7 @@ void main() {
           cents: 44200,
           occurredAt: DateTime(2026, 3, 4),
         ),
-        _deposit(
-          accountId: 'b',
-          cents: 50000,
-          occurredAt: DateTime(2026, 3, 1),
-        ),
+        _deposit(accountId: 'b', cents: 50000, occurredAt: DateTime(2026, 3)),
       ];
 
       final change = FundsCalculator.accountMonthChangePercentById(
@@ -106,12 +110,7 @@ void main() {
     test('portfolioSummary sums non-pending deposits', () {
       final txs = [
         _deposit(accountId: 'a', goalId: 'g', cents: 500, occurredAt: now),
-        _deposit(
-          accountId: 'a',
-          goalId: null,
-          cents: 200,
-          occurredAt: DateTime(2026, 3, 20),
-        ),
+        _deposit(accountId: 'a', cents: 200, occurredAt: DateTime(2026, 3, 20)),
       ];
 
       final summary = FundsCalculator.portfolioSummary(txs, now: now);

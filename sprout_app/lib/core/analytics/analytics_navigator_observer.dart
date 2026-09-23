@@ -65,10 +65,9 @@ class AnalyticsNavigatorObserver extends NavigatorObserver {
     final routeName = route.settings.name;
     final screenName = _screenNameForRoute(routeName);
     if (screenName != null) {
-      _analyticsService.logEvent(
-        AnalyticsEvent.screenView,
-        {AnalyticsParam.screenName: screenName},
-      );
+      _analyticsService.logEvent(AnalyticsEvent.screenView, {
+        AnalyticsParam.screenName: screenName,
+      });
     }
   }
 }

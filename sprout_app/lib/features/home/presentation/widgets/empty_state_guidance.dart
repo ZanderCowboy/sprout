@@ -5,10 +5,10 @@ import 'overview_quick_actions.dart';
 
 class EmptyStateGuidance extends StatelessWidget {
   const EmptyStateGuidance({
-    super.key,
     required this.onOpenAccount,
     required this.onOpenGoal,
     required this.onOpenDeposit,
+    super.key,
   });
 
   final VoidCallback onOpenAccount;
@@ -96,7 +96,6 @@ class EmptyStateGuidance extends StatelessWidget {
 
 class GuidanceStep extends StatelessWidget {
   const GuidanceStep({
-    super.key,
     required this.stepText,
     required this.detailText,
     required this.icon,
@@ -104,6 +103,7 @@ class GuidanceStep extends StatelessWidget {
     required this.detailStyle,
     required this.scheme,
     this.disabledCaption,
+    super.key,
   });
 
   final String stepText;

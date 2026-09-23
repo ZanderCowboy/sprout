@@ -2,6 +2,13 @@
 
 Changes heading to `main`. Newest entries at the top.
 
+## 2026-09-23 — Confirm Flutter 3.47.5 upgrade complete
+
+- Verified Flutter 3.47.5 with Dart 3.13.4 as latest stable (FVM and CI already set by #48/#84)
+- Updated README badges and Prerequisites to reflect Dart 3.13.4
+- Reviewed breaking changes 3.41 → 3.44 → 3.47 (none applicable to Sprout codebase)
+- Confirmed `flutter analyze` and `flutter test` pass cleanly on 3.47.5
+
 ## 2026-09-21 — Fix FVM 4 `.fvmrc` JSON format
 
 - Changed `.fvmrc` from a bare version string to FVM 4 JSON (`{"flutter": "3.47.5"}`) so `fvm install` can parse it

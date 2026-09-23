@@ -42,12 +42,12 @@ class BudgetCategoryTab extends StatelessWidget {
 
 class BudgetCategoryTabBody extends StatefulWidget {
   const BudgetCategoryTabBody({
-    super.key,
     required this.category,
     required this.groups,
     required this.totals,
     required this.groupSort,
     required this.itemSort,
+    super.key,
   });
 
   final BudgetCategory category;
@@ -105,7 +105,7 @@ class _BudgetCategoryTabBodyState extends State<BudgetCategoryTabBody> {
 
   @override
   Widget build(BuildContext context) {
-    final separator = const SizedBox(height: 2);
+    const separator = SizedBox(height: 2);
     final all = [..._existing, ..._drafts];
     final allSorted = sortBudgetGroups(all, widget.groupSort);
     final bottomInset = MediaQuery.paddingOf(context).bottom;

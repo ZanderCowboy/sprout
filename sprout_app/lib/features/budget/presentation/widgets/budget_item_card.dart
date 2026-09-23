@@ -7,13 +7,13 @@ import '../../domain/budget_item.dart';
 
 class BudgetItemCard extends StatefulWidget {
   const BudgetItemCard({
-    super.key,
     required this.item,
     required this.onUpsert,
     required this.onDelete,
     this.isDraft = false,
     this.onDiscardDraft,
     this.onDraftChanged,
+    super.key,
   });
 
   final BudgetItem item;
@@ -270,61 +270,57 @@ class _BudgetItemCardState extends State<BudgetItemCard> {
                         ),
                 ),
                 const SizedBox(width: 10),
-                _editingAmount
-                    ? SizedBox(
-                        width: 110,
-                        child: TextField(
-                          controller: _amount,
-                          focusNode: _amountFocus,
-                          decoration: InputDecoration(
-                            isDense: true,
-                            border: InputBorder.none,
-                            hintText: _amountHint,
-                            hintStyle: Theme.of(context).textTheme.bodyLarge
-                                ?.copyWith(
-                                  color: scheme.onSurfaceVariant.withValues(
-                                    alpha: 0.45,
-                                  ),
-                                ),
-                          ),
-                          style: Theme.of(context).textTheme.bodyLarge
-                              ?.copyWith(
-                                fontWeight: FontWeight.w900,
-                                color: scheme.onSurfaceVariant,
+                if (_editingAmount)
+                  SizedBox(
+                    width: 110,
+                    child: TextField(
+                      controller: _amount,
+                      focusNode: _amountFocus,
+                      decoration: InputDecoration(
+                        isDense: true,
+                        border: InputBorder.none,
+                        hintText: _amountHint,
+                        hintStyle: Theme.of(context).textTheme.bodyLarge
+                            ?.copyWith(
+                              color: scheme.onSurfaceVariant.withValues(
+                                alpha: 0.45,
                               ),
-                          textAlign: TextAlign.end,
-                          keyboardType: const TextInputType.numberWithOptions(
-                            decimal: true,
-                            signed: false,
-                          ),
-                          autofocus: true,
-                        ),
-                      )
-                    : InkWell(
-                        onTap: () {
-                          setState(() {
-                            _editingAmount = true;
-                            _amount.text = _amountTextForField(
-                              widget.item.amount,
-                            );
-                          });
-                          _amountFocus.requestFocus();
-                        },
-                        child: Text(
-                          widget.item.amount == 0.0
-                              ? _amountHint
-                              : formatZarFromCents(
-                                  (widget.item.amount * 100).round(),
-                                ),
-                          style: Theme.of(context).textTheme.bodyLarge
-                              ?.copyWith(
-                                fontWeight: FontWeight.w900,
-                                color: scheme.onSurfaceVariant.withValues(
-                                  alpha: widget.item.amount == 0.0 ? 0.45 : 1.0,
-                                ),
-                              ),
+                            ),
+                      ),
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        fontWeight: FontWeight.w900,
+                        color: scheme.onSurfaceVariant,
+                      ),
+                      textAlign: TextAlign.end,
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
+                      autofocus: true,
+                    ),
+                  )
+                else
+                  InkWell(
+                    onTap: () {
+                      setState(() {
+                        _editingAmount = true;
+                        _amount.text = _amountTextForField(widget.item.amount);
+                      });
+                      _amountFocus.requestFocus();
+                    },
+                    child: Text(
+                      widget.item.amount == 0.0
+                          ? _amountHint
+                          : formatZarFromCents(
+                              (widget.item.amount * 100).round(),
+                            ),
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        fontWeight: FontWeight.w900,
+                        color: scheme.onSurfaceVariant.withValues(
+                          alpha: widget.item.amount == 0.0 ? 0.45 : 1.0,
                         ),
                       ),
+                    ),
+                  ),
               ],
             ),
           ),
