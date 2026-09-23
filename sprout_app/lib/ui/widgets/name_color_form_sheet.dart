@@ -5,7 +5,6 @@ import 'package:sprout/ui/export.dart';
 
 class NameColorFormSheet extends StatelessWidget {
   const NameColorFormSheet({
-    super.key,
     required this.title,
     required this.nameLabel,
     required this.nameController,
@@ -20,6 +19,7 @@ class NameColorFormSheet extends StatelessWidget {
     this.nameFieldKey,
     this.nameFieldIdentifier,
     this.primaryActionIdentifier,
+    super.key,
   });
 
   final String title;

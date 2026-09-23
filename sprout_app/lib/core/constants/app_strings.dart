@@ -221,7 +221,7 @@ abstract final class AppStrings {
   static const String wizardMaximumDeposit = 'Maximum';
   static const String wizardDepositBelowMinimum = 'Minimum deposit is R10.';
   static const String wizardDepositAboveMaximum =
-      'Amount can\'t be more than your goal target.';
+      "Amount can't be more than your goal target.";
   static const String wizardDepositHint =
       'This records money you already have. Sprout does not move funds '
       'from your bank.';

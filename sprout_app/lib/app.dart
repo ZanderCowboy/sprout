@@ -1,11 +1,11 @@
 import 'dart:async';
 
+import 'package:debug_lens/debug_lens.dart';
+import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:debug_lens/debug_lens.dart';
-import 'package:firebase_remote_config/firebase_remote_config.dart';
-
+import 'package:sprout/bootstrap.dart';
 import 'package:sprout/core/analytics/analytics_navigator_observer.dart';
 import 'package:sprout/core/analytics/analytics_service.dart';
 import 'package:sprout/core/core.dart';
@@ -19,7 +19,6 @@ import 'package:sprout/features/auth/export.dart';
 import 'package:sprout/features/connectivity/export.dart';
 import 'package:sprout/features/goals/export.dart';
 import 'package:sprout/ui/export.dart';
-import 'package:sprout/bootstrap.dart';
 
 class SproutApp extends StatefulWidget {
   const SproutApp({super.key});

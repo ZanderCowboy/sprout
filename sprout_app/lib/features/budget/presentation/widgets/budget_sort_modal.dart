@@ -7,9 +7,9 @@ import '../utils/budget_sorting.dart';
 
 class BudgetSortModal extends StatefulWidget {
   const BudgetSortModal({
-    super.key,
     required this.initialGroupSort,
     required this.initialItemSort,
+    super.key,
   });
 
   final BudgetSortOption initialGroupSort;

@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 /// Icon grid used for budget groups (inline card and full add sheet).
 class BudgetGroupIconPicker extends StatelessWidget {
   const BudgetGroupIconPicker({
-    super.key,
     required this.selected,
     required this.onSelected,
     required this.accent,
+    super.key,
   });
 
   final IconData selected;

@@ -143,7 +143,7 @@ Future<void> initializeApp({
     if (!_supabaseInitialized) {
       await Supabase.initialize(
         url: config.supabaseUrl,
-        publishableKey: config.supabaseAnonKey,
+        anonKey: config.supabaseAnonKey,
       );
       _supabaseInitialized = true;
     }

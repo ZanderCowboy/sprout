@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:sprout/core/constants/app_strings.dart';
 
 void main() {
-  testWidgets('MaterialApp smoke', (WidgetTester tester) async {
+  testWidgets('MaterialApp smoke', (tester) async {
     await tester.pumpWidget(
       const MaterialApp(
         home: Scaffold(body: Center(child: Text(AppStrings.appTitle))),
