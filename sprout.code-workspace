@@ -1,35 +1,37 @@
 {
-	"folders": [
-		{
-			"path": "."
-		}
-	],
-	"settings": {
-		"terminal.integrated.env.osx": {
-			"GH_CONFIG_DIR": "${env:HOME}/.config/gh-zandercowboy",
-			"XDG_CONFIG_HOME": "${env:HOME}/.config/firebase-personal",
-			"CLOUDSDK_CONFIG": "${env:HOME}/.config/gcloud-personal"
-		},
-		"terminal.integrated.env.windows": {
-			"GH_CONFIG_DIR": "${env:USERPROFILE}/.config/gh-zandercowboy",
-			"XDG_CONFIG_HOME": "${env:USERPROFILE}/.config/firebase-personal",
-			"CLOUDSDK_CONFIG": "${env:USERPROFILE}/.config/gcloud-personal"
-		},
-		"workbench.colorCustomizations": {
-			"activityBar.background": "#4A2215",
-			"titleBar.activeBackground": "#68301E",
-			"titleBar.activeForeground": "#FFFFFF",
-			"titleBar.inactiveBackground": "#4A2215",
-			"titleBar.inactiveForeground": "#FFFFFF",
-			"statusBar.background": "#823C25",
-			"statusBar.debuggingBackground": "#823C25",
-			"statusBar.noFolderBackground": "#823C25",
-			"activityBar.foreground": "#FFFFFF",
-			"activityBar.inactiveForeground": "#FFFFFF",
-			"statusBar.foreground": "#FFFFFF",
-			"statusBar.debuggingForeground": "#FFFFFF",
-			"statusBar.noFolderForeground": "#FFFFFF"
-		},
-		"java.configuration.updateBuildConfiguration": "interactive"
-	}
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+  "settings": {
+    "terminal.integrated.env.osx": {
+      "GH_CONFIG_DIR": "${env:HOME}/.config/gh-zandercowboy",
+      "XDG_CONFIG_HOME": "${env:HOME}/.config/firebase-personal",
+      "CLOUDSDK_CONFIG": "${env:HOME}/.config/gcloud-personal"
+    },
+    "terminal.integrated.env.windows": {
+      "GH_CONFIG_DIR": "${env:USERPROFILE}/.config/gh-zandercowboy",
+      "XDG_CONFIG_HOME": "${env:USERPROFILE}/.config/firebase-personal",
+      "CLOUDSDK_CONFIG": "${env:USERPROFILE}/.config/gcloud-personal"
+    },
+    "workbench.colorCustomizations": {
+      "activityBar.background": "#4A2215",
+      "titleBar.activeBackground": "#68301E",
+      "titleBar.activeForeground": "#FFFFFF",
+      "titleBar.inactiveBackground": "#4A2215",
+      "titleBar.inactiveForeground": "#FFFFFF",
+      "statusBar.background": "#823C25",
+      "statusBar.debuggingBackground": "#823C25",
+      "statusBar.noFolderBackground": "#823C25",
+      "activityBar.foreground": "#FFFFFF",
+      "activityBar.inactiveForeground": "#FFFFFF",
+      "statusBar.foreground": "#FFFFFF",
+      "statusBar.debuggingForeground": "#FFFFFF",
+      "statusBar.noFolderForeground": "#FFFFFF"
+    },
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "dart.flutterSdkPath": ".fvm/flutter_sdk",
+    "makefile.configureOnOpen": false
+  }
 }

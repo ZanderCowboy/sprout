@@ -2,6 +2,10 @@
 
 Changes heading to `main`. Newest entries at the top.
 
+## 2026-09-21 — Fix FVM 4 `.fvmrc` JSON format
+
+- Changed `.fvmrc` from a bare version string to FVM 4 JSON (`{"flutter": "3.47.5"}`) so `fvm install` can parse it
+
 ## 2026-09-21 — Lime Add button
 
 - Center Add button uses lime instead of teal so it reads apart from the selected tab disc
@@ -17,6 +21,17 @@ Changes heading to `main`. Newest entries at the top.
 ## 2026-09-21 — Remove selected tab glow
 
 - Selected bottom-bar tab no longer has a teal glow or drop shadow; the filled disc stays flat
+
+## 2026-09-20 — FVM isolation for Flutter 3.47.5
+
+- Added FVM (Flutter Version Management) configuration to isolate Sprout's Flutter version from other projects
+- Pinned Flutter 3.47.5 (stable) with Dart 3.13.x via `.fvmrc`
+- Updated VS Code/Cursor workspace to use FVM SDK path (`.fvm/flutter_sdk`)
+- Added `docs/FVM_SETUP.md` with Mac and Windows installation and usage instructions
+- Updated README with FVM quick start and version isolation guidance
+- CI upgraded to Flutter 3.47.5 (aligned with local FVM pin)
+- Ensures work projects (e.g. Grosvenor 3.38.10) stay isolated via their own `.fvmrc`
+- Fixed deprecated `anonKey` → `publishableKey` in Supabase initialization
 
 ## 2026-09-20 — MVP Firebase Analytics event set
 

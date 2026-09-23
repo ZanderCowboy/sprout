@@ -47,3 +47,7 @@ linter:
     unnecessary_breaks: false
     unnecessary_lambdas: false
     unnecessary_null_checks: false
+analyzer:
+  exclude:
+    - build/**
+    - android/**

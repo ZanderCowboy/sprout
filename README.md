@@ -2,7 +2,7 @@
 
 Watch your money grow and for those who want to reach their goals quickly.
 
-[![Flutter](https://img.shields.io/badge/Flutter-3.41.4-02569B?logo=flutter&logoColor=white)](https://docs.flutter.dev/install/archive)
+[![Flutter](https://img.shields.io/badge/Flutter-3.47.5-02569B?logo=flutter&logoColor=white)](https://docs.flutter.dev/install/archive)
 [![Dart](https://img.shields.io/badge/Dart-3.11.1-0175C2?logo=dart&logoColor=white)](https://dart.dev)
 [![DevTools](https://img.shields.io/badge/DevTools-2.54.1-1389FD)](https://docs.flutter.dev/tools/devtools)
 
@@ -16,7 +16,7 @@ Flavor name is `development` (not `dev` / `develop`). Flutter looks for `app-<fl
 From the repo root:
 
 ```bash
-cd sprout_app && flutter build apk --release --flavor development -t lib/main_development.dart && firebase appdistribution:distribute build/app/outputs/flutter-apk/app-development-release.apk --app 1:549104397391:android:4a8ab133ed8a2d67978e3a --groups default
+cd sprout_app && fvm flutter build apk --release --flavor development -t lib/main_development.dart && firebase appdistribution:distribute build/app/outputs/flutter-apk/app-development-release.apk --app 1:549104397391:android:4a8ab133ed8a2d67978e3a --groups default
 ```
 
 If the APK is already built, from the repo root:
@@ -29,26 +29,41 @@ Or run the Cursor/VS Code task **Sprout · Firebase · distribute dev APK**.
 
 ## Prerequisites
 
+Sprout uses [FVM (Flutter Version Management)](https://fvm.app/) to isolate its Flutter SDK version. See [FVM Setup](docs/FVM_SETUP.md) for installation and usage.
+
 | Tool | Version |
 |------|---------|
-| Flutter | **3.41.4** (stable) |
-| Dart | **3.11.1** |
-| DevTools | 2.54.1 |
+| Flutter | **3.47.5** (stable, via FVM) |
+| Dart | **3.13.x** |
+| DevTools | 2.60.0 |
 | Dart SDK constraint | `^3.11.1` ([`sprout_app/pubspec.yaml`](sprout_app/pubspec.yaml)) |
 | Java (Android builds / CI) | 17 |
 
-Also need a device, emulator, or desktop target (`flutter devices`).
+**Quick start:**
 
-CI uses the same Flutter version via [`.github/actions/flutter-setup`](.github/actions/flutter-setup/action.yml).
+```bash
+# Install the pinned Flutter version (reads .fvmrc)
+fvm install
 
-No code generation, melos, or `build_runner` — Hive adapters are checked in.
+# Use fvm prefix for all flutter commands in this repo
+cd sprout_app
+fvm flutter pub get
+fvm flutter run --flavor development -t lib/main_development.dart
+```
+
+VS Code / Cursor will automatically use the FVM SDK (configured in `.vscode/settings.json`).
+
+**Important:** Do NOT run `flutter upgrade` in your global Flutter installation or in work projects like Grosvenor. Each project's `.fvmrc` controls its own version. Sprout uses Flutter 3.47.5; work projects stay on their own versions (e.g. Grosvenor 3.38.10).
 
 ## Getting started
 
 ```bash
+# Install the pinned Flutter SDK via FVM (see Prerequisites)
+fvm install
+
 cd sprout_app
-flutter pub get
-flutter run --flavor development -t lib/main_development.dart
+fvm flutter pub get
+fvm flutter run --flavor development -t lib/main_development.dart
 ```
 
 Or use the VS Code / Cursor launch configs in [`.vscode/launch.json`](.vscode/launch.json):
@@ -136,9 +151,13 @@ See [`supabase/README.md`](supabase/README.md): create **two** projects (dev + p
 
 ```bash
 cd sprout_app
-flutter analyze
-flutter test
+fvm flutter analyze
+fvm flutter test
 ```
+
+CI uses the same Flutter version via [`.github/actions/flutter-setup`](.github/actions/flutter-setup/action.yml).
+
+No code generation, melos, or `build_runner` — Hive adapters are checked in.
 
 ## Maestro UI Tests (development flavor only)
 
@@ -151,7 +170,7 @@ Maestro flows are in `.maestro/` and cover per-page journeys plus smoke/edge flo
 
 ```bash
 cd sprout_app
-flutter run --flavor development -t lib/main_development.dart
+fvm flutter run --flavor development -t lib/main_development.dart
 ```
 
 ### Running tests
