@@ -2,7 +2,7 @@
 
 Watch your money grow and for those who want to reach their goals quickly.
 
-[![Flutter](https://img.shields.io/badge/Flutter-3.41.4-02569B?logo=flutter&logoColor=white)](https://docs.flutter.dev/install/archive)
+[![Flutter](https://img.shields.io/badge/Flutter-3.47.5-02569B?logo=flutter&logoColor=white)](https://docs.flutter.dev/install/archive)
 [![Dart](https://img.shields.io/badge/Dart-3.11.1-0175C2?logo=dart&logoColor=white)](https://dart.dev)
 [![DevTools](https://img.shields.io/badge/DevTools-2.54.1-1389FD)](https://docs.flutter.dev/tools/devtools)
 
@@ -155,7 +155,7 @@ fvm flutter analyze
 fvm flutter test
 ```
 
-CI uses Flutter 3.41.4 via [`.github/actions/flutter-setup`](.github/actions/flutter-setup/action.yml) (will be upgraded separately in #47).
+CI uses the same Flutter version via [`.github/actions/flutter-setup`](.github/actions/flutter-setup/action.yml).
 
 No code generation, melos, or `build_runner` — Hive adapters are checked in.
 

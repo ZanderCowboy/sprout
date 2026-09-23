@@ -29,8 +29,9 @@ Changes heading to `main`. Newest entries at the top.
 - Updated VS Code/Cursor workspace to use FVM SDK path (`.fvm/flutter_sdk`)
 - Added `docs/FVM_SETUP.md` with Mac and Windows installation and usage instructions
 - Updated README with FVM quick start and version isolation guidance
-- CI remains on Flutter 3.41.4 (upgrade tracked in #47)
+- CI upgraded to Flutter 3.47.5 (aligned with local FVM pin)
 - Ensures work projects (e.g. Grosvenor 3.38.10) stay isolated via their own `.fvmrc`
+- Fixed deprecated `anonKey` → `publishableKey` in Supabase initialization
 
 ## 2026-09-20 — MVP Firebase Analytics event set
 
