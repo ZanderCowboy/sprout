@@ -34,7 +34,7 @@ Sprout uses [FVM (Flutter Version Management)](https://fvm.app/) to isolate its 
 | Tool | Version |
 |------|---------|
 | Flutter | **3.47.5** (stable, via FVM) |
-| Dart | **3.13.x** |
+| Dart | **3.13.4** |
 | DevTools | 2.60.0 |
 | Dart SDK constraint | `^3.11.1` ([`sprout_app/pubspec.yaml`](sprout_app/pubspec.yaml)) |
 | Java (Android builds / CI) | 17 |
