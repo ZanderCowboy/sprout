@@ -21,7 +21,7 @@ class AccountsServiceImpl implements AccountsService {
   @override
   Future<void> saveAccount(Account account) async {
     if (!EntityName.isValid(account.name)) {
-      throw ValidationAppException(AppStrings.invalidEntityName);
+      throw const ValidationAppException(AppStrings.invalidEntityName);
     }
     final existing = await _repository.getAccounts();
     final duplicate = UniqueName.isTaken(
@@ -30,7 +30,7 @@ class AccountsServiceImpl implements AccountsService {
       excludeId: account.id,
     );
     if (duplicate) {
-      throw ValidationAppException(AppStrings.duplicateAccountName);
+      throw const ValidationAppException(AppStrings.duplicateAccountName);
     }
     await _repository.upsertAccount(account);
   }

@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-
 import 'package:sprout/core/core.dart';
 import 'package:sprout/features/shell/shell.dart';
 import 'package:sprout/ui/export.dart';
+
 import 'create_goal_screen.dart';
-import 'goals_bloc.dart';
 import 'enums/goals_sort.dart';
+import 'goals_bloc.dart';
 import 'utils/goals_sorting.dart';
 import 'widgets/goal_icon_picker.dart';
-import 'widgets/overall_goals_progress_header.dart';
 import 'widgets/goals_section_separator.dart';
+import 'widgets/overall_goals_progress_header.dart';
 import 'widgets/unallocated_funds_card.dart';
 
 class GoalsPage extends StatefulWidget {
@@ -189,7 +189,7 @@ class _GoalsPageState extends State<GoalsPage> {
                       const SizedBox(height: 12),
                   itemBuilder: (context, i) {
                     if (hasCompleted && i == firstCompletedIndex) {
-                      return GoalsSectionSeparator(title: AppStrings.completed);
+                      return const GoalsSectionSeparator(title: AppStrings.completed);
                     }
                     final idx = (hasCompleted && i > firstCompletedIndex)
                         ? i - 1

@@ -63,7 +63,7 @@ class BudgetGroup extends Equatable {
     );
   }
 
-  double get totalAmount => items.fold<double>(0.0, (sum, i) => sum + i.amount);
+  double get totalAmount => items.fold<double>(0, (sum, i) => sum + i.amount);
 
   @override
   List<Object?> get props => [

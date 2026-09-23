@@ -52,25 +52,20 @@ List<BudgetGroup> sortBudgetGroups(
         byPrimary = va.name.trim().toLowerCase().compareTo(
           vb.name.trim().toLowerCase(),
         );
-        break;
       case BudgetSortOption.nameZToA:
         byPrimary = vb.name.trim().toLowerCase().compareTo(
           va.name.trim().toLowerCase(),
         );
-        break;
       case BudgetSortOption.valueHighToLow:
         byPrimary = _toCents(
           vb.totalAmount,
         ).compareTo(_toCents(va.totalAmount));
-        break;
       case BudgetSortOption.valueLowToHigh:
         byPrimary = _toCents(
           va.totalAmount,
         ).compareTo(_toCents(vb.totalAmount));
-        break;
       case BudgetSortOption.asIs:
         byPrimary = 0;
-        break;
     }
 
     if (byPrimary != 0) return byPrimary;
@@ -98,21 +93,16 @@ List<BudgetItem> sortBudgetItems(
         byPrimary = va.name.trim().toLowerCase().compareTo(
           vb.name.trim().toLowerCase(),
         );
-        break;
       case BudgetSortOption.nameZToA:
         byPrimary = vb.name.trim().toLowerCase().compareTo(
           va.name.trim().toLowerCase(),
         );
-        break;
       case BudgetSortOption.valueHighToLow:
         byPrimary = _toCents(vb.amount).compareTo(_toCents(va.amount));
-        break;
       case BudgetSortOption.valueLowToHigh:
         byPrimary = _toCents(va.amount).compareTo(_toCents(vb.amount));
-        break;
       case BudgetSortOption.asIs:
         byPrimary = 0;
-        break;
     }
 
     if (byPrimary != 0) return byPrimary;

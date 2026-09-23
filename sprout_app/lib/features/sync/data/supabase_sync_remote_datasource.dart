@@ -1,11 +1,10 @@
-import 'package:supabase_flutter/supabase_flutter.dart';
-
 import 'package:sprout/features/accounts/data/account_mapper.dart';
 import 'package:sprout/features/budget/data/mappers/budget_supabase_mapper.dart';
 import 'package:sprout/features/goals/data/goal_mapper.dart';
 import 'package:sprout/features/transactions/data/pending_sync_payload.dart';
 import 'package:sprout/features/transactions/data/supabase_tables.dart';
 import 'package:sprout/features/transactions/data/transaction_mapper.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../domain/pending_sync_operation.dart';
 import '../domain/sync_remote_datasource.dart';

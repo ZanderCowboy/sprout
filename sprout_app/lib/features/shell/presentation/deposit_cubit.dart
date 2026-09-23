@@ -1,11 +1,10 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:uuid/uuid.dart';
-
 import 'package:sprout/core/core.dart';
 import 'package:sprout/features/accounts/export.dart';
 import 'package:sprout/features/goals/export.dart';
 import 'package:sprout/features/transactions/export.dart';
+import 'package:uuid/uuid.dart';
 
 import 'enums/deposit_bottom_sheet_mode.dart';
 
@@ -188,7 +187,7 @@ class DepositCubit extends Cubit<DepositState> {
         ? ''
         : (_initialAmountCents / 100).toStringAsFixed(2);
 
-    var ready = DepositReady(
+    final ready = DepositReady(
       accounts: accounts,
       goals: goals,
       accountId: accountId,

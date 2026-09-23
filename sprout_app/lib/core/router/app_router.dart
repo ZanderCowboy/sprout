@@ -31,7 +31,7 @@ GoRouter createAppRouter({
     initialLocation: AppRoute.loading.path,
     refreshListenable: refreshListenable,
     redirect: (context, state) async {
-      return await resolveAuthRedirect(
+      return resolveAuthRedirect(
         auth: authCubit.state,
         introCompleted: userContext.introCompleted,
         userContext: userContext,

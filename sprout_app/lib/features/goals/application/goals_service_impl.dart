@@ -24,10 +24,10 @@ class GoalsServiceImpl implements GoalsService {
   @override
   Future<void> saveGoal(Goal goal) async {
     if (!EntityName.isValid(goal.name)) {
-      throw ValidationAppException(AppStrings.invalidEntityName);
+      throw const ValidationAppException(AppStrings.invalidEntityName);
     }
     if (goal.targetAmountCents <= 0) {
-      throw ValidationAppException(AppStrings.goalTargetMustBePositive);
+      throw const ValidationAppException(AppStrings.goalTargetMustBePositive);
     }
     final existing = await _repository.getGoals();
     final duplicate = UniqueName.isTaken(
@@ -36,7 +36,7 @@ class GoalsServiceImpl implements GoalsService {
       excludeId: goal.id,
     );
     if (duplicate) {
-      throw ValidationAppException(AppStrings.duplicateGoalName);
+      throw const ValidationAppException(AppStrings.duplicateGoalName);
     }
     await _repository.upsertGoal(goal);
   }
@@ -57,7 +57,7 @@ class GoalsServiceImpl implements GoalsService {
     if (openingBalanceCents <= 0) return goal;
 
     if (openingBalanceAccountId == null || openingBalanceAccountId.isEmpty) {
-      throw ValidationAppException(AppStrings.pickAccountForOpeningBalance);
+      throw const ValidationAppException(AppStrings.pickAccountForOpeningBalance);
     }
 
     final when = occurredAt ?? DateTime.now();

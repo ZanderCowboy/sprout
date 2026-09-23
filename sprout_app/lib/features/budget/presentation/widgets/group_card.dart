@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
-
 import 'package:sprout/core/core.dart';
 import 'package:sprout/ui/export.dart';
 
 import '../../domain/budget_group.dart';
 import '../../domain/budget_item.dart';
+import '../utils/budget_sorting.dart';
 import 'add_item_card.dart';
 import 'budget_group_icon_picker.dart';
 import 'budget_item_card.dart';
-import '../utils/budget_sorting.dart';
 
 class GroupCard extends StatefulWidget {
   const GroupCard({
@@ -306,7 +305,7 @@ class _GroupCardState extends State<GroupCard> {
         }
       }
       _draftItems.add(
-        BudgetItem(id: UniqueKey().toString(), name: '', amount: 0.0),
+        BudgetItem(id: UniqueKey().toString(), name: '', amount: 0),
       );
     });
   }

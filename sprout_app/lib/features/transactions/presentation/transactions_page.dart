@@ -26,7 +26,7 @@ class TransactionsPage extends StatelessWidget {
           return Scaffold(
             appBar: AppBar(title: const Text(AppStrings.transactions)),
             body: switch (state) {
-              TransactionsReady s => _TransactionsBody(state: s),
+              final TransactionsReady s => _TransactionsBody(state: s),
               _ => const Center(child: CircularProgressIndicator()),
             },
           );

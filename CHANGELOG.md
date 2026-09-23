@@ -2,6 +2,12 @@
 
 Changes heading to `main`. Newest entries at the top.
 
+## 2026-09-23 — Re-enable first batch of linter rules
+
+- Re-enabled `prefer_const_constructors`, `prefer_const_declarations`, `prefer_const_literals_to_create_immutables`, `prefer_final_locals`, `directives_ordering`, `sort_constructors_first`, `unnecessary_lambdas`, `unnecessary_breaks`, `unnecessary_await_in_return`, and `prefer_int_literals`
+- Applied 119 automatic fixes across 55 files via `dart fix --apply`
+- Analyze and tests remain clean
+
 ## 2026-09-23 — Confirm Flutter 3.47.5 upgrade complete
 
 - Verified Flutter 3.47.5 with Dart 3.13.4 as latest stable (FVM and CI already set by #48/#84)

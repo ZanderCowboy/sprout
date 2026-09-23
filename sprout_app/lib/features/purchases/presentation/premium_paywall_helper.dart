@@ -17,7 +17,7 @@ abstract final class PremiumPaywall {
 
   /// True when the SDK has been configured for this app process.
   static Future<bool> isPurchasesReady() async {
-    return await Purchases.isConfigured;
+    return Purchases.isConfigured;
   }
 
   /// Best-effort RevenueCat logout after in-app account deletion.

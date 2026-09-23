@@ -1,13 +1,12 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:uuid/uuid.dart';
-
 import 'package:sprout/core/analytics/analytics_catalog.dart';
 import 'package:sprout/core/analytics/analytics_service.dart';
 import 'package:sprout/core/core.dart';
 import 'package:sprout/features/accounts/export.dart';
 import 'package:sprout/features/goals/export.dart';
 import 'package:sprout/features/transactions/export.dart';
+import 'package:uuid/uuid.dart';
 
 part 'wizard_state.dart';
 
@@ -308,7 +307,7 @@ class WizardCubit extends Cubit<WizardState> {
 
       final goalCents = parseZarToCents(current.goalTargetText);
       if (goalCents == null || goalCents <= 0) {
-        throw ValidationAppException(AppStrings.goalTargetMustBePositive);
+        throw const ValidationAppException(AppStrings.goalTargetMustBePositive);
       }
 
       final goal = Goal(
@@ -336,7 +335,7 @@ class WizardCubit extends Cubit<WizardState> {
       if (plantSeed) {
         final depositCents = parseZarToCents(current.depositAmountText);
         if (depositCents == null || depositCents <= 0) {
-          throw ValidationAppException(AppStrings.invalidAmount);
+          throw const ValidationAppException(AppStrings.invalidAmount);
         }
         final note = current.depositNote.trim();
         await _transactionsService.recordDeposit(

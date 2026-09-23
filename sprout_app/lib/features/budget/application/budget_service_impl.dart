@@ -22,12 +22,12 @@ class BudgetServiceImpl implements BudgetService {
   Future<void> saveBudgetGroup(BudgetGroup group) async {
     final trimmedName = group.name.trim();
     if (trimmedName.isEmpty) {
-      throw ValidationAppException(AppStrings.nameRequired);
+      throw const ValidationAppException(AppStrings.nameRequired);
     }
 
     for (final item in group.items) {
       if (item.amount < 0) {
-        throw ValidationAppException(AppStrings.amountCannotBeNegative);
+        throw const ValidationAppException(AppStrings.amountCannotBeNegative);
       }
     }
 
@@ -38,7 +38,7 @@ class BudgetServiceImpl implements BudgetService {
       excludeId: group.id,
     );
     if (duplicate) {
-      throw ValidationAppException(AppStrings.duplicateGroupName);
+      throw const ValidationAppException(AppStrings.duplicateGroupName);
     }
 
     await _repository.upsertBudgetGroup(group.copyWith(name: trimmedName));

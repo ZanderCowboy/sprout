@@ -18,7 +18,7 @@ class BudgetTabHeader extends StatelessWidget {
               identifier: SemanticsIds.budgetTabIncome,
               button: true,
               label: AppStrings.budgetIncome,
-              child: Text(AppStrings.budgetIncome),
+              child: const Text(AppStrings.budgetIncome),
             ),
           ),
           Tab(
@@ -27,7 +27,7 @@ class BudgetTabHeader extends StatelessWidget {
               identifier: SemanticsIds.budgetTabEssentials,
               button: true,
               label: AppStrings.budgetEssentials,
-              child: Text(AppStrings.budgetEssentials),
+              child: const Text(AppStrings.budgetEssentials),
             ),
           ),
           Tab(
@@ -36,7 +36,7 @@ class BudgetTabHeader extends StatelessWidget {
               identifier: SemanticsIds.budgetTabLifestyle,
               button: true,
               label: AppStrings.budgetLifestyle,
-              child: Text(AppStrings.budgetLifestyle),
+              child: const Text(AppStrings.budgetLifestyle),
             ),
           ),
         ],

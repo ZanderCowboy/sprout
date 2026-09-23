@@ -111,7 +111,7 @@ class _Step3DepositState extends State<_Step3Deposit> {
                       : (checked) => context
                           .read<WizardCubit>()
                           .setAllocateLater(checked ?? false),
-                  subtitle: Text(AppStrings.wizardAllocateLaterSubtitle),
+                  subtitle: const Text(AppStrings.wizardAllocateLaterSubtitle),
                   contentPadding: EdgeInsets.zero,
                 ),
                 const SizedBox(height: 8),
@@ -119,7 +119,7 @@ class _Step3DepositState extends State<_Step3Deposit> {
                   identifier: SemanticsIds.wizardDepositNote,
                   controller: _noteController,
                   enabled: !skipDeposit,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: AppStrings.note,
                     hintText: AppStrings.optional,
                   ),

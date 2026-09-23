@@ -56,7 +56,7 @@ class _OverviewPageState extends State<OverviewPage> {
         backgroundColor: AppColors.surfaceBar,
         content: Row(
           children: [
-            Icon(
+            const Icon(
               Icons.celebration_outlined,
               color: AppColors.accentLime,
             ),

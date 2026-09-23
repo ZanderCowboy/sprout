@@ -33,7 +33,7 @@ class _FooterActions extends StatelessWidget {
               child: SproutOutlinedButton(
                 identifier: SemanticsIds.wizardBack,
                 label: AppStrings.back,
-                onPressed: state.submitting ? null : () => cubit.goBack(),
+                onPressed: state.submitting ? null : cubit.goBack,
               ),
             ),
           if (state.step > 1) const SizedBox(width: 12),
@@ -43,7 +43,7 @@ class _FooterActions extends StatelessWidget {
                     identifier: SemanticsIds.wizardFinish,
                     label: AppStrings.wizardFinish,
                     onPressed: cubit.canFinish && !state.submitting
-                        ? () => cubit.finish()
+                        ? cubit.finish
                         : null,
                     style: FilledButton.styleFrom(
                       backgroundColor: AppColors.navSelected,
@@ -57,10 +57,10 @@ class _FooterActions extends StatelessWidget {
                         ? null
                         : (state.step == 1
                             ? (cubit.canGoToStep2
-                                ? () => cubit.goToStep2()
+                                ? cubit.goToStep2
                                 : null)
                             : (cubit.canGoToStep3
-                                ? () => cubit.goToStep3()
+                                ? cubit.goToStep3
                                 : null)),
                   ),
           ),

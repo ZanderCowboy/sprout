@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-
 import 'package:sprout/core/core.dart';
 import 'package:sprout/core/di/service_locator.dart';
 import 'package:sprout/features/accounts/export.dart';
 import 'package:sprout/features/goals/export.dart';
 import 'package:sprout/features/transactions/export.dart';
+import 'package:sprout/ui/export.dart';
+
 import 'bloc/transaction_detail_bloc.dart';
 import 'widgets/transaction_allocation_row.dart';
 import 'widgets/transaction_info_card.dart';
 import 'widgets/transaction_section_card.dart';
-import 'package:sprout/ui/export.dart';
 
 class TransactionDetailPage extends StatelessWidget {
   const TransactionDetailPage({super.key, required this.transactionId});
@@ -32,7 +32,7 @@ class TransactionDetailPage extends StatelessWidget {
           return Scaffold(
             appBar: AppBar(title: const Text(AppStrings.transaction)),
             body: switch (state) {
-              TransactionDetailReady s => _TransactionDetailBody(state: s),
+              final TransactionDetailReady s => _TransactionDetailBody(state: s),
               TransactionDetailMissing _ => const Center(
                 child: Text(AppStrings.transactionNotFound),
               ),

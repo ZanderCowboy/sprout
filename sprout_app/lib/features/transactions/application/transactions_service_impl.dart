@@ -222,10 +222,10 @@ class TransactionsServiceImpl implements TransactionsService {
     switch (mode) {
       case DepositFlowMode.fullDepositToGoal:
         if (depositAmountCents == null || depositAmountCents <= 0) {
-          throw ValidationAppException(AppStrings.invalidAmount);
+          throw const ValidationAppException(AppStrings.invalidAmount);
         }
         if (goalId == null || goalId.isEmpty) {
-          throw ValidationAppException(AppStrings.pickAGoal);
+          throw const ValidationAppException(AppStrings.pickAGoal);
         }
         await recordDeposit(
           accountId: accountId,
@@ -239,7 +239,7 @@ class TransactionsServiceImpl implements TransactionsService {
       case DepositFlowMode.allocateExistingUnallocated:
         final maxAllowed = availableUnallocatedCents;
         if (maxAllowed == null || maxAllowed <= 0) {
-          throw ValidationAppException(AppStrings.noUnallocatedForAccount);
+          throw const ValidationAppException(AppStrings.noUnallocatedForAccount);
         }
         var allocatedTotal = 0;
         for (final row in allocations) {
@@ -247,10 +247,10 @@ class TransactionsServiceImpl implements TransactionsService {
           allocatedTotal += row.amountCents;
         }
         if (allocatedTotal <= 0) {
-          throw ValidationAppException(AppStrings.enterAtLeastOneAllocation);
+          throw const ValidationAppException(AppStrings.enterAtLeastOneAllocation);
         }
         if (allocatedTotal > maxAllowed) {
-          throw ValidationAppException(AppStrings.allocationsExceedUnallocated);
+          throw const ValidationAppException(AppStrings.allocationsExceedUnallocated);
         }
         for (final row in allocations) {
           if (row.goalId.isEmpty || row.amountCents <= 0) continue;
@@ -264,7 +264,7 @@ class TransactionsServiceImpl implements TransactionsService {
         }
       case DepositFlowMode.depositToAccountThenAllocate:
         if (depositAmountCents == null || depositAmountCents <= 0) {
-          throw ValidationAppException(AppStrings.invalidAmount);
+          throw const ValidationAppException(AppStrings.invalidAmount);
         }
         await recordAccountDeposit(
           accountId: accountId,
@@ -280,7 +280,7 @@ class TransactionsServiceImpl implements TransactionsService {
           allocatedTotal += row.amountCents;
         }
         if (allocatedTotal > depositAmountCents) {
-          throw ValidationAppException(AppStrings.allocationsExceedDeposit);
+          throw const ValidationAppException(AppStrings.allocationsExceedDeposit);
         }
         for (final row in allocations) {
           if (row.goalId.isEmpty || row.amountCents <= 0) continue;
