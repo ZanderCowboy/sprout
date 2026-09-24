@@ -99,6 +99,7 @@ python -c "import base64, pathlib; print(base64.b64encode(pathlib.Path(r'sprout_
 - **Files:**
   - Dev → `sprout_app/android/app/src/development/google-services.json` (package `app.stackmint.sprout.dev`)
   - Prod → `sprout_app/android/app/src/production/google-services.json` (package `app.stackmint.sprout`)
+- **Note:** Only `development/res/` is committed to git. The `production/` folder is local-only (gitignored). Both flavor `google-services.json` files are gitignored and live directly under their flavor folder (not nested under `res/`).
 - **When to update:** After re-downloading from Firebase (new Android app, package rename, project change).
 - **Encode + set:**
 

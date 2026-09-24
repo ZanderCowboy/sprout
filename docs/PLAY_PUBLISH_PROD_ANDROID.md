@@ -72,9 +72,12 @@ For testing builds (Internal track), the PR title is typically sufficient. If pr
 1. Create a **production** Firebase project (or a separate Android app).
 2. Register Android package `app.stackmint.sprout`.
 3. Enable Analytics / Crashlytics to match the Gradle plugins.
-4. Download `google-services.json` → `sprout_app/android/app/src/production/google-services.json`.
-5. Encode for CI: `base64 -i …/src/production/google-services.json | tr -d '\n'` → `GOOGLE_SERVICES_PROD_BASE64`.
-6. Do **not** configure App Distribution for production.
+4. Download `google-services.json` → `sprout_app/android/app/src/production/google-services.json` (gitignored).
+5. Copy the `firebase` block fields from `google-services.json` into `production.json` (see [SUPABASE_AUTH_TODOS.md](SUPABASE_AUTH_TODOS.md) field map).
+6. Encode for CI: `base64 -i …/src/production/google-services.json | tr -d '\n'` → `GOOGLE_SERVICES_PROD_BASE64`.
+7. Do **not** configure App Distribution for production.
+
+**Status (2026-09-24):** Production Firebase Android app exists (appId `1:322562799608:android:9f248684262ce3e548880d`), `google-services.json` and `production.json` firebase block updated locally, GitHub secrets refreshed. Smoke test: build production flavor and confirm Crashlytics/Analytics in Console.
 
 ### Google Play Console
 
