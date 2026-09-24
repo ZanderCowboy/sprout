@@ -2,6 +2,11 @@
 
 Changes heading to `main`. Newest entries at the top.
 
+## 2026-09-25 — OTP email links to sprout.app
+
+- Sign-in code email template now includes a static link to the Sprout landing site (`https://sprout.app`)
+- Docs note that this must stay a marketing URL, not `{{ .ConfirmationURL }}`
+
 ## 2026-09-24 — PROD Firebase config and secrets checklist
 
 - Documented PROD Firebase Android app (`app.stackmint.sprout`, appId `1:322562799608:android:9f248684262ce3e548880d`) and local config setup completed 2026-09-24

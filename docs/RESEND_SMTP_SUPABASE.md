@@ -211,11 +211,18 @@ Your [DEV] Sprout login code
 
 Paste this into the **Body** field. Keep `{{ .Token }}` exactly as written (spaces around `.Token`).
 
+The landing link is a **static** `https://sprout.app` URL. Do **not** use `{{ .ConfirmationURL }}` — that is the auth confirm/magic-link URL and will not open the app.
+
+On the **dev** project, prefix the footer with `[DEV]` (shown below). On **prod**, drop that prefix so it reads `Sprout · Stackmint`.
+
 ```html
 <div style="font-family: system-ui, -apple-system, Segoe UI, sans-serif; max-width: 480px; margin: 0 auto; color: #111827;">
   <p style="font-size: 16px; line-height: 1.5;">Enter this code in Sprout to sign in:</p>
   <p style="font-size: 32px; letter-spacing: 0.2em; font-weight: 700; margin: 24px 0;">{{ .Token }}</p>
   <p style="font-size: 14px; line-height: 1.5; color: #4b5563;">This code expires in about an hour. If you did not request it, you can ignore this email.</p>
+  <p style="font-size: 14px; line-height: 1.5; margin: 24px 0 0;">
+    <a href="https://sprout.app" style="color: #111827; text-decoration: underline;">Visit sprout.app</a>
+  </p>
   <p style="font-size: 12px; color: #9ca3af;">[DEV] Sprout · Stackmint</p>
 </div>
 ```
