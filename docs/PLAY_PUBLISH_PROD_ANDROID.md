@@ -4,7 +4,35 @@ Production AAB upload is a job inside **Release Main** (`.github/workflows/relea
 
 On every labeled merge to `main` (except `no-build`), CI builds a signed production App Bundle and uploads it to the Play **internal** track with the same `versionCode` as the Firebase development APK.
 
-When Firebase testers are happy, **promote that internal release in Play Console** to production (same AAB, no rebuild). Prefer Console promote over dispatching `play_track: production`.
+## CI workflows
+
+### PR-time verification (CI Android Verify)
+
+`.github/workflows/ci-android-verify.yml` runs on PRs to `main` when build-affecting paths change:
+
+- **Builds** development release APK and production release AAB
+- **Does NOT upload** to Firebase or Play
+- Catches build failures before merge
+- Uses fixed placeholder version (0.0.0+1) since builds are not shipped
+- Skips for docs-only changes (e.g. `docs/**` alone)
+
+Manual trigger: **Actions** → **CI Android Verify** → **Run workflow** (select your branch).
+
+### Merge-to-main release (Release Main)
+
+`.github/workflows/release-main.yml` runs on labeled merges to `main`:
+
+- **Builds AND uploads** to Firebase App Distribution (dev APK) and Play Store internal track (prod AAB)
+- Commits the bumped version after successful uploads
+- See [FIREBASE_DEV_DISTRIBUTION.md](FIREBASE_DEV_DISTRIBUTION.md) and [BUILD_NUMBER.md](BUILD_NUMBER.md)
+
+## CI policy: testing tracks only (until Production go-ahead)
+
+- CI ships to **testing tracks only** (default: Internal) until Zander's explicit Production go-ahead.
+- `workflow_dispatch` still offers `play_track: production` for manual use — **do not use Production** until Zander's explicit approval.
+- **Prefer Play Console promote** from Internal to Production over dispatching `play_track: production`.
+
+When Firebase testers are happy, **promote that internal release in Play Console** to production (same AAB, no rebuild).
 
 Development builds use Firebase App Distribution — see [FIREBASE_DEV_DISTRIBUTION.md](FIREBASE_DEV_DISTRIBUTION.md). Version labels and Version Bot: [BUILD_NUMBER.md](BUILD_NUMBER.md).
 
@@ -18,6 +46,16 @@ Development builds use Firebase App Distribution — see [FIREBASE_DEV_DISTRIBUT
 | Config asset | `assets/config/production.json` |
 | Firebase config | `android/app/src/production/google-services.json` |
 | AAB output | `sprout_app/build/app/outputs/bundle/productionRelease/app-production-release.aab` |
+
+## Release notes for testing tracks
+
+CI writes release notes to `whatsnew/whatsnew-en-US`:
+
+- **On merge to main:** Uses the merged PR title as release notes.
+- **Manual dispatch (`workflow_dispatch`):** Uses the `release_notes` input if provided.
+- **Empty fallback:** Defaults to `"Internal testing release"` when track is `internal`; `"Production release"` for other tracks.
+
+For testing builds (Internal track), the PR title is typically sufficient. If providing custom notes for a manual dispatch, describe the feature or fix briefly (e.g., "Internal testing release — [brief feature or fix summary]").
 
 ## Manual checklist (one-time)
 
@@ -59,6 +97,8 @@ Requires `src/production/google-services.json`, `production.json`, and release s
 
 Full inventory (all secrets, encode/`gh` restore): [GITHUB_SECRETS.md](GITHUB_SECRETS.md).
 
+Play-related secrets required for CI Internal uploads:
+
 | Secret | Required | Purpose |
 |--------|----------|---------|
 | `APP_CONFIG_PROD_BASE64` | yes | Production Supabase config JSON |
@@ -66,6 +106,8 @@ Full inventory (all secrets, encode/`gh` restore): [GITHUB_SECRETS.md](GITHUB_SE
 | `ANDROID_SIGNING_CONFIG_BASE64` | yes | Upload keystore (same format as [FIREBASE_DEV_DISTRIBUTION.md](FIREBASE_DEV_DISTRIBUTION.md)) |
 | `PLAY_STORE_SERVICE_ACCOUNT_JSON` | yes | Play Console API service account (raw JSON) |
 | `VERSION_BOT_APP_ID` / `VERSION_BOT_APP_PRIVATE_KEY` | yes | Version commit after successful ship |
+
+**Note:** First successful CI Internal upload also requires the Play Console app to be set up and the review account to have access. See [PLAY_REVIEW_ACCESS.md](PLAY_REVIEW_ACCESS.md) for review account setup.
 
 ## How to ship
 

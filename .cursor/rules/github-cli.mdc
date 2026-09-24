@@ -11,4 +11,8 @@ Before any `gh` command:
 export GH_CONFIG_DIR="$HOME/.config/gh-zandercowboy"
 ```
 
-Use personal account **ZanderCowboy**, never work **Zander-K**. Do not run `gh auth switch`. Details: `docs/GITHUB_CLI_PERSONAL.md`.
+Use personal account **ZanderCowboy**, never work **Zander-K**. Do not run `gh auth switch`.
+
+`gh auth status` prints the `hosts.yml` username, not the token owner. After export, confirm with `gh api user --jq .login` — it must print `ZanderCowboy`. A 403 on `gh secret list` usually means the work token is still in use.
+
+Details: `docs/GITHUB_CLI_PERSONAL.md`.

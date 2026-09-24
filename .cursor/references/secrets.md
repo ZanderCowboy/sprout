@@ -2,6 +2,14 @@
 
 Never commit real keys, JSON configs, generated Firebase options, or GitHub App `*.pem` files.
 
+## Local `.secrets` (gitignored KEY=value)
+
+Repo-root `.secrets` is gitignored and synced with other local config (`make config-export` / `make config-import`). Never print values. Known keys:
+
+| Key | Purpose |
+|-----|---------|
+| `PLAY_REVIEW_EMAIL` | Play review Google password. Email stays in [PLAY_REVIEW_ACCESS.md](../../docs/PLAY_REVIEW_ACCESS.md) (`sprout.play.review@gmail.com`). Not a GitHub Actions secret. |
+
 ## Gitignored (must exist locally to run)
 
 - `sprout_app/assets/config/development.json`

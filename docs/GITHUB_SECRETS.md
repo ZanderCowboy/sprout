@@ -4,9 +4,11 @@ Canonical inventory for **ZanderCowboy/sprout**. Where each secret comes from, h
 
 **Where they live:** GitHub → repo → **Settings → Secrets and variables → Actions**.
 
-**Do not** commit secret values, keystores, PEMs, or service-account JSON. Local copies belong under gitignored paths (`sprout_app/assets/config/`, `…/google-services.json`, `/config/`).
+**Do not** commit secret values, keystores, PEMs, or service-account JSON. Local copies belong under gitignored paths (`sprout_app/assets/config/`, `…/google-services.json`, `/config/`, `.secrets`).
 
-Related: local flavor files + OneDrive restore → [`.cursor/references/secrets.md`](../.cursor/references/secrets.md). Workflows: [FIREBASE_DEV_DISTRIBUTION.md](FIREBASE_DEV_DISTRIBUTION.md), [PLAY_PUBLISH_PROD_ANDROID.md](PLAY_PUBLISH_PROD_ANDROID.md), [BUILD_NUMBER.md](BUILD_NUMBER.md).
+The Play review Google password is local only: `.secrets` key `PLAY_REVIEW_EMAIL` (see [PLAY_REVIEW_ACCESS.md](PLAY_REVIEW_ACCESS.md)). Do not add it here.
+
+Related: local flavor files + OneDrive restore → [`.cursor/references/secrets.md`](../.cursor/references/secrets.md). Workflows: [FIREBASE_DEV_DISTRIBUTION.md](FIREBASE_DEV_DISTRIBUTION.md), [PLAY_PUBLISH_PROD_ANDROID.md](PLAY_PUBLISH_PROD_ANDROID.md), [BUILD_NUMBER.md](BUILD_NUMBER.md). Play review account setup: [PLAY_REVIEW_ACCESS.md](PLAY_REVIEW_ACCESS.md).
 
 ---
 
@@ -31,11 +33,21 @@ Legacy standalone workflows may still reference the same names; **Release Main**
 
 ## Set / update with `gh` (preferred)
 
-Always use the personal CLI config:
+Always use the personal CLI config, then confirm the **token** is personal (`gh auth status` is not enough):
 
 ```powershell
 $env:GH_CONFIG_DIR = "$env:USERPROFILE\.config\gh-zandercowboy"
+gh api user --jq .login   # must print ZanderCowboy
 ```
+
+On macOS / zsh:
+
+```bash
+export GH_CONFIG_DIR="$HOME/.config/gh-zandercowboy"
+gh api user --jq .login   # must print ZanderCowboy
+```
+
+If `gh secret list` returns 403 about “repository read permissions” / “secrets fine-grained permission”, the work token (`Zander-K`) is still in use. Re-login as in [GITHUB_CLI_PERSONAL.md](GITHUB_CLI_PERSONAL.md).
 
 From repo root:
 

@@ -20,13 +20,17 @@ Git and `gh` are independent: SSH can be personal while `gh` is still work.
 
 ## What was added (`gh`)
 
-`gh` reads `~/.config/gh` unless `GH_CONFIG_DIR` is set. A second config directory isolates the personal login.
+`gh` reads `~/.config/gh` unless `GH_CONFIG_DIR` is set. A second config directory isolates **config files** (`config.yml`, `hosts.yml`). It does **not** isolate the macOS keyring token.
+
+On macOS, `gh` stores OAuth tokens under keychain service `gh:github.com`, keyed by GitHub username. Work (`Zander-K`) and personal (`ZanderCowboy`) can both exist there. If `hosts.yml` says `user: ZanderCowboy` but the only token in the keyring is `Zander-K`, every API call still uses the work token.
+
+`gh auth status` prints the **username from `hosts.yml`**, not who the token belongs to. It can say `Logged in … ZanderCowboy` while `gh api user` returns `Zander-K`. Treat status as a label check only.
 
 ### 1. Isolated config (outside the repo)
 
 Directory: `~/.config/gh-zandercowboy`
 
-Contains a normal `config.yml` (`git_protocol: ssh`). After login, `hosts.yml` plus a macOS keyring entry for `ZanderCowboy`. Do not commit this directory.
+Contains a normal `config.yml` (`git_protocol: ssh`). After a real personal login, `hosts.yml` lists `ZanderCowboy` **and** the keyring has a `gh:github.com` item whose account is `ZanderCowboy`. Do not commit this directory.
 
 ### 2. Workspace env so this window uses it
 
@@ -65,25 +69,35 @@ gh auth login --hostname github.com --git-protocol ssh --web --skip-ssh-key
 
 Complete the device flow in the browser **while signed in as ZanderCowboy**, not the work account.
 
+`! You were already logged in to this account` only means `hosts.yml` already named that user. It does **not** mean the token is personal. Always run the **Verify** API check after login.
+
 SSH keys were already uploaded, so `--skip-ssh-key` avoids a second key prompt.
 
 ## Verify
 
-```bash
-# This workspace / personal config
-GH_CONFIG_DIR="$HOME/.config/gh-zandercowboy" gh auth status
-# Expect: Logged in to github.com account ZanderCowboy
+Do **not** trust `gh auth status` for identity. Ask GitHub who the token is:
 
-# Default (work) — omit GH_CONFIG_DIR
-gh auth status
-# Expect: Logged in to github.com account Zander-K
+```bash
+# This workspace / personal config — must print ZanderCowboy
+gh api user --jq .login
+
+# Default (work) — omit GH_CONFIG_DIR; must print Zander-K
+env -u GH_CONFIG_DIR gh api user --jq .login
 ```
 
-In a **new** Cursor terminal in this window, `echo $GH_CONFIG_DIR` (PowerShell: `$env:GH_CONFIG_DIR`) should be `~/.config/gh-zandercowboy` and plain `gh auth status` should show `ZanderCowboy`.
+In a **new** Cursor terminal in this window, `echo $GH_CONFIG_DIR` (PowerShell: `$env:GH_CONFIG_DIR`) should be `~/.config/gh-zandercowboy`.
+
+`gh auth status` can still be used as a quick “config dir is pointed at personal” check. If it says `ZanderCowboy` but `gh api user` says `Zander-K`, re-run the login command in section 3.
+
+### If `gh secret list` returns 403
+
+Typical message: `You must have repository read permissions or have the repository secrets fine-grained permission`.
+
+That is the work token hitting a public repo it does not admin. `Zander-K` can clone `ZanderCowboy/sprout` but cannot list Actions secrets. Re-login as `ZanderCowboy`, then confirm `gh api user --jq .login` before listing secrets.
 
 ## Recreate on a new machine
 
 1. Point `origin` at SSH. On the Mac (work + personal keys): `git@github.com-personal:ZanderCowboy/sprout.git` with the `Host github.com-personal` SSH alias. On Windows, if the only key already authenticates as `ZanderCowboy`, `git@github.com:ZanderCowboy/sprout.git` is enough.
 2. Create `~/.config/gh-zandercowboy` and set `GH_CONFIG_DIR` in the workspace files above (Windows: `terminal.integrated.env.windows` + `%USERPROFILE%`).
 3. Run the `gh auth login` command in the previous section as `ZanderCowboy`.
-4. Confirm with `gh auth status` as in **Verify**.
+4. Confirm with `gh api user --jq .login` as in **Verify** (must print `ZanderCowboy`).
