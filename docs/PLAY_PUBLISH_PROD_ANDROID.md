@@ -4,6 +4,28 @@ Production AAB upload is a job inside **Release Main** (`.github/workflows/relea
 
 On every labeled merge to `main` (except `no-build`), CI builds a signed production App Bundle and uploads it to the Play **internal** track with the same `versionCode` as the Firebase development APK.
 
+## CI workflows
+
+### PR-time verification (CI Android Verify)
+
+`.github/workflows/ci-android-verify.yml` runs on PRs to `main` when build-affecting paths change:
+
+- **Builds** development release APK and production release AAB
+- **Does NOT upload** to Firebase or Play
+- Catches build failures before merge
+- Uses fixed placeholder version (0.0.0+1) since builds are not shipped
+- Skips for docs-only changes (e.g. `docs/**` alone)
+
+Manual trigger: **Actions** → **CI Android Verify** → **Run workflow** (select your branch).
+
+### Merge-to-main release (Release Main)
+
+`.github/workflows/release-main.yml` runs on labeled merges to `main`:
+
+- **Builds AND uploads** to Firebase App Distribution (dev APK) and Play Store internal track (prod AAB)
+- Commits the bumped version after successful uploads
+- See [FIREBASE_DEV_DISTRIBUTION.md](FIREBASE_DEV_DISTRIBUTION.md) and [BUILD_NUMBER.md](BUILD_NUMBER.md)
+
 ## CI policy: testing tracks only (until Production go-ahead)
 
 - CI ships to **testing tracks only** (default: Internal) until Zander's explicit Production go-ahead.

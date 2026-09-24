@@ -14,6 +14,8 @@ Changes heading to `main`. Newest entries at the top.
 - Documented release notes behavior: merge uses PR title, manual dispatch uses `release_notes` input
 - Cross-linked review account setup from `PLAY_PUBLISH_PROD_ANDROID.md` and `GITHUB_SECRETS.md`
 - Listed Play-related required secrets for CI Internal uploads
+- Added CI Android Verify workflow: PR-triggered build-only verification for development APK and production AAB (no upload); catches build failures before merge
+- Path-filtered to skip pure docs changes; manual dispatch available for testing
 
 ## 2026-09-23 — Re-enable first batch of linter rules
 
