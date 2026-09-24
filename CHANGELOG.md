@@ -2,6 +2,10 @@
 
 Changes heading to `main`. Newest entries at the top.
 
+## 2026-09-24 — Play review password in local `.secrets`
+
+- Documented that the Play review Google password lives in gitignored `.secrets` as `PLAY_REVIEW_EMAIL` (email stays in `docs/PLAY_REVIEW_ACCESS.md`; not a GitHub Actions secret)
+
 ## 2026-09-24 — Play CI and review account docs
 
 - Added `docs/PLAY_REVIEW_ACCESS.md` with Play Store review account email, sign-in, and pre-review verification checklist

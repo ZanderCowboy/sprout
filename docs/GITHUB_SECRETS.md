@@ -4,7 +4,9 @@ Canonical inventory for **ZanderCowboy/sprout**. Where each secret comes from, h
 
 **Where they live:** GitHub → repo → **Settings → Secrets and variables → Actions**.
 
-**Do not** commit secret values, keystores, PEMs, or service-account JSON. Local copies belong under gitignored paths (`sprout_app/assets/config/`, `…/google-services.json`, `/config/`).
+**Do not** commit secret values, keystores, PEMs, or service-account JSON. Local copies belong under gitignored paths (`sprout_app/assets/config/`, `…/google-services.json`, `/config/`, `.secrets`).
+
+The Play review Google password is local only: `.secrets` key `PLAY_REVIEW_EMAIL` (see [PLAY_REVIEW_ACCESS.md](PLAY_REVIEW_ACCESS.md)). Do not add it here.
 
 Related: local flavor files + OneDrive restore → [`.cursor/references/secrets.md`](../.cursor/references/secrets.md). Workflows: [FIREBASE_DEV_DISTRIBUTION.md](FIREBASE_DEV_DISTRIBUTION.md), [PLAY_PUBLISH_PROD_ANDROID.md](PLAY_PUBLISH_PROD_ANDROID.md), [BUILD_NUMBER.md](BUILD_NUMBER.md). Play review account setup: [PLAY_REVIEW_ACCESS.md](PLAY_REVIEW_ACCESS.md).
 
