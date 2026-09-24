@@ -10,12 +10,6 @@ class BudgetTotals {
     required this.disposableIncome,
   });
 
-  final Map<String, double> groupTotals;
-  final double totalIncome;
-  final double totalEssentials;
-  final double totalLifestyle;
-  final double disposableIncome;
-
   factory BudgetTotals.fromGroups(List<BudgetGroup> groups) {
     final totals = <String, double>{};
     var income = 0.0;
@@ -23,7 +17,7 @@ class BudgetTotals {
     var lifestyle = 0.0;
 
     for (final g in groups) {
-      final total = g.items.fold<double>(0.0, (sum, i) => sum + i.amount);
+      final total = g.items.fold<double>(0, (sum, i) => sum + i.amount);
       totals[g.id] = total;
       switch (g.category) {
         case BudgetCategory.income:
@@ -43,4 +37,10 @@ class BudgetTotals {
       disposableIncome: income - essentials - lifestyle,
     );
   }
+
+  final Map<String, double> groupTotals;
+  final double totalIncome;
+  final double totalEssentials;
+  final double totalLifestyle;
+  final double disposableIncome;
 }

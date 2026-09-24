@@ -1,7 +1,7 @@
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:sprout/features/transactions/data/local/pending_sync_hive_model.dart';
 import 'package:uuid/uuid.dart';
 
-import 'package:sprout/features/transactions/data/local/pending_sync_hive_model.dart';
 import '../domain/pending_sync_operation.dart';
 
 class PendingSyncQueue {
@@ -14,9 +14,11 @@ class PendingSyncQueue {
 
   static const _uuid = Uuid();
 
-  Future<void> enqueue(PendingSyncOperationType type, String payloadJson) async {
-    final queueId =
-        '${DateTime.now().millisecondsSinceEpoch}_${_uuid.v4()}';
+  Future<void> enqueue(
+    PendingSyncOperationType type,
+    String payloadJson,
+  ) async {
+    final queueId = '${DateTime.now().millisecondsSinceEpoch}_${_uuid.v4()}';
     await _box.put(
       queueId,
       PendingSyncHiveModel(

@@ -1,9 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:supabase_flutter/supabase_flutter.dart' hide AuthUser;
-
 import 'package:sprout/core/constants/app_strings.dart';
 import 'package:sprout/core/error/error.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' hide AuthUser;
+
 import '../domain/auth_repository.dart';
 import '../domain/auth_user.dart';
 

@@ -10,15 +10,6 @@ class GoalRow {
     this.iconCodePoint,
   });
 
-  final String id;
-  final String userId;
-  final String name;
-  final int targetAmountCents;
-  final int color;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-  final int? iconCodePoint;
-
   factory GoalRow.fromMap(Map<String, dynamic> row) {
     return GoalRow(
       id: row['id'] as String,
@@ -31,6 +22,15 @@ class GoalRow {
       iconCodePoint: (row['icon_code_point'] as num?)?.toInt(),
     );
   }
+
+  final String id;
+  final String userId;
+  final String name;
+  final int targetAmountCents;
+  final int color;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final int? iconCodePoint;
 
   Map<String, dynamic> toMap() => {
     'id': id,

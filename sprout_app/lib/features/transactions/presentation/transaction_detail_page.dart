@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-
 import 'package:sprout/core/core.dart';
 import 'package:sprout/core/di/service_locator.dart';
 import 'package:sprout/features/accounts/export.dart';
 import 'package:sprout/features/goals/export.dart';
 import 'package:sprout/features/transactions/export.dart';
+import 'package:sprout/ui/export.dart';
+
 import 'bloc/transaction_detail_bloc.dart';
 import 'widgets/transaction_allocation_row.dart';
 import 'widgets/transaction_info_card.dart';
 import 'widgets/transaction_section_card.dart';
-import 'package:sprout/ui/export.dart';
 
 class TransactionDetailPage extends StatelessWidget {
   const TransactionDetailPage({super.key, required this.transactionId});
@@ -32,7 +32,9 @@ class TransactionDetailPage extends StatelessWidget {
           return Scaffold(
             appBar: AppBar(title: const Text(AppStrings.transaction)),
             body: switch (state) {
-              TransactionDetailReady s => _TransactionDetailBody(state: s),
+              final TransactionDetailReady s => _TransactionDetailBody(
+                state: s,
+              ),
               TransactionDetailMissing _ => const Center(
                 child: Text(AppStrings.transactionNotFound),
               ),
@@ -119,7 +121,8 @@ class _TransactionDetailBodyState extends State<_TransactionDetailBody> {
 
     return BlocListener<TransactionDetailBloc, TransactionDetailState>(
       listenWhen: (previous, current) {
-        if (current is! TransactionDetailReady || current.noteFeedback == null) {
+        if (current is! TransactionDetailReady ||
+            current.noteFeedback == null) {
           return false;
         }
         final prev = previous is TransactionDetailReady
@@ -136,134 +139,136 @@ class _TransactionDetailBodyState extends State<_TransactionDetailBody> {
         ).showSnackBar(SnackBar(content: Text(state.noteFeedback!)));
       },
       child: ListView(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-      children: [
-        TransactionInfoCard(
-          title: formatZarFromCents(t.amountCents),
-          subtitle: '$kindLabel · $accountName · $goalName',
-        ),
-        const SizedBox(height: 10),
-        TransactionSectionCard(
-          title: AppStrings.details,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _kv(AppStrings.kind, kindLabel),
-              _kv(AppStrings.selectAccount, accountName),
-              _kv(AppStrings.selectGoal, goalName),
-              _kv(AppStrings.date, formatDate(t.occurredAt)),
-              _kv(AppStrings.time, formatDateTime(t.occurredAt)),
-              _kv(
-                AppStrings.recurring,
-                t.isRecurring && t.frequency != TransactionFrequency.none
-                    ? AppStrings.yesWithFrequency(
-                        transactionFrequencyLabel(t.frequency),
-                      )
-                    : AppStrings.no,
-              ),
-              if (t.nextScheduledDate != null)
-                _kv(
-                  AppStrings.nextScheduled,
-                  formatDateTime(t.nextScheduledDate!),
-                ),
-              _kv(
-                AppStrings.pendingSync,
-                t.pendingSync ? AppStrings.yes : AppStrings.no,
-              ),
-              if (t.groupId != null) _kv(AppStrings.group, t.groupId!),
-            ],
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+        children: [
+          TransactionInfoCard(
+            title: formatZarFromCents(t.amountCents),
+            subtitle: '$kindLabel · $accountName · $goalName',
           ),
-        ),
-        if (t.isRecurring && t.frequency != TransactionFrequency.none) ...[
           const SizedBox(height: 10),
           TransactionSectionCard(
-            title: AppStrings.recurringPayment,
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: SproutFilledButton.icon(
-                identifier: SemanticsIds.transactionManageRecurring,
-                label: AppStrings.manageRecurringPayments,
-                onPressed: () {
-                  context.push(AppRoute.recurring.path);
-                },
-                icon: const Icon(Icons.autorenew_rounded),
-                labelWidget: const Text(AppStrings.manageRecurringPayments),
-              ),
-            ),
-          ),
-        ],
-        if (hasGroup) ...[
-          const SizedBox(height: 10),
-          TransactionSectionCard(
-            title: AppStrings.splitGroup,
+            title: AppStrings.details,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (groupDepositCents > 0) ...[
+                _kv(AppStrings.kind, kindLabel),
+                _kv(AppStrings.selectAccount, accountName),
+                _kv(AppStrings.selectGoal, goalName),
+                _kv(AppStrings.date, formatDate(t.occurredAt)),
+                _kv(AppStrings.time, formatDateTime(t.occurredAt)),
+                _kv(
+                  AppStrings.recurring,
+                  t.isRecurring && t.frequency != TransactionFrequency.none
+                      ? AppStrings.yesWithFrequency(
+                          transactionFrequencyLabel(t.frequency),
+                        )
+                      : AppStrings.no,
+                ),
+                if (t.nextScheduledDate != null)
                   _kv(
-                    AppStrings.depositTotal,
-                    formatZarFromCents(groupDepositCents),
+                    AppStrings.nextScheduled,
+                    formatDateTime(t.nextScheduledDate!),
                   ),
-                  _kv(
-                    AppStrings.allocatedTotal,
-                    formatZarFromCents(groupAllocatedCents),
-                  ),
-                  _kv(
-                    AppStrings.remaining,
-                    formatZarFromCents(
-                      groupRemainingCents < 0 ? 0 : groupRemainingCents,
+                _kv(
+                  AppStrings.pendingSync,
+                  t.pendingSync ? AppStrings.yes : AppStrings.no,
+                ),
+                if (t.groupId != null) _kv(AppStrings.group, t.groupId!),
+              ],
+            ),
+          ),
+          if (t.isRecurring && t.frequency != TransactionFrequency.none) ...[
+            const SizedBox(height: 10),
+            TransactionSectionCard(
+              title: AppStrings.recurringPayment,
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: SproutFilledButton.icon(
+                  identifier: SemanticsIds.transactionManageRecurring,
+                  label: AppStrings.manageRecurringPayments,
+                  onPressed: () {
+                    context.push(AppRoute.recurring.path);
+                  },
+                  icon: const Icon(Icons.autorenew_rounded),
+                  labelWidget: const Text(AppStrings.manageRecurringPayments),
+                ),
+              ),
+            ),
+          ],
+          if (hasGroup) ...[
+            const SizedBox(height: 10),
+            TransactionSectionCard(
+              title: AppStrings.splitGroup,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (groupDepositCents > 0) ...[
+                    _kv(
+                      AppStrings.depositTotal,
+                      formatZarFromCents(groupDepositCents),
                     ),
-                  ),
-                  const Divider(height: 20),
+                    _kv(
+                      AppStrings.allocatedTotal,
+                      formatZarFromCents(groupAllocatedCents),
+                    ),
+                    _kv(
+                      AppStrings.remaining,
+                      formatZarFromCents(
+                        groupRemainingCents < 0 ? 0 : groupRemainingCents,
+                      ),
+                    ),
+                    const Divider(height: 20),
+                  ],
+                  for (final a in allocationsInGroup) ...[
+                    TransactionAllocationRow(
+                      amount: formatZarFromCents(a.amountCents),
+                      goalName: a.goalId == null
+                          ? AppStrings.unallocated
+                          : (widget.state.goalsById[a.goalId!]?.name ??
+                                AppStrings.unknownGoal),
+                      occurredAt: a.occurredAt,
+                    ),
+                    const SizedBox(height: 8),
+                  ],
+                  if (allocationsInGroup.isEmpty)
+                    Text(
+                      AppStrings.noAllocationsInGroup,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
                 ],
-                for (final a in allocationsInGroup) ...[
-                  TransactionAllocationRow(
-                    amount: formatZarFromCents(a.amountCents),
-                    goalName: a.goalId == null
-                        ? AppStrings.unallocated
-                        : (widget.state.goalsById[a.goalId!]?.name ??
-                              AppStrings.unknownGoal),
-                    occurredAt: a.occurredAt,
+              ),
+            ),
+          ],
+          const SizedBox(height: 10),
+          TransactionSectionCard(
+            title: AppStrings.note,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                SproutTextField(
+                  identifier: SemanticsIds.transactionNoteField,
+                  controller: _note,
+                  minLines: 2,
+                  maxLines: 6,
+                  decoration: const InputDecoration(
+                    hintText: AppStrings.addANoteHint,
                   ),
-                  const SizedBox(height: 8),
-                ],
-                if (allocationsInGroup.isEmpty)
-                  Text(
-                    AppStrings.noAllocationsInGroup,
-                    style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                const SizedBox(height: 12),
+                SproutFilledButton(
+                  identifier: SemanticsIds.transactionNoteSave,
+                  label: AppStrings.save,
+                  onPressed: widget.state.savingNote ? null : _saveNote,
+                  child: Text(
+                    widget.state.savingNote
+                        ? AppStrings.saving
+                        : AppStrings.save,
                   ),
+                ),
               ],
             ),
           ),
         ],
-        const SizedBox(height: 10),
-        TransactionSectionCard(
-          title: AppStrings.note,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              SproutTextField(
-                identifier: SemanticsIds.transactionNoteField,
-                controller: _note,
-                minLines: 2,
-                maxLines: 6,
-                decoration: const InputDecoration(
-                  hintText: AppStrings.addANoteHint,
-                ),
-              ),
-              const SizedBox(height: 12),
-              SproutFilledButton(
-                identifier: SemanticsIds.transactionNoteSave,
-                label: AppStrings.save,
-                onPressed: widget.state.savingNote ? null : _saveNote,
-                child: Text(
-                  widget.state.savingNote ? AppStrings.saving : AppStrings.save,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
       ),
     );
   }

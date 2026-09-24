@@ -6,7 +6,7 @@ import 'package:sprout/features/auth/data/auth_repository_impl.dart';
 void main() {
   group('AuthRepositoryImpl.mapGoogleSignInException', () {
     test('user cancellation shows cancelled message', () {
-      final exception = GoogleSignInException(
+      const exception = GoogleSignInException(
         code: GoogleSignInExceptionCode.canceled,
         description: 'User dismissed the account picker',
       );
@@ -17,7 +17,7 @@ void main() {
     });
 
     test('[16] Cancelled by user shows cancelled message', () {
-      final exception = GoogleSignInException(
+      const exception = GoogleSignInException(
         code: GoogleSignInExceptionCode.canceled,
         description: '[16] Cancelled by user.',
       );
@@ -28,7 +28,7 @@ void main() {
     });
 
     test('[16] Canceled by user shows cancelled message (US spelling)', () {
-      final exception = GoogleSignInException(
+      const exception = GoogleSignInException(
         code: GoogleSignInExceptionCode.canceled,
         description: '[16] Canceled by user.',
       );
@@ -39,7 +39,7 @@ void main() {
     });
 
     test('[16] Account reauth failed shows error description', () {
-      final exception = GoogleSignInException(
+      const exception = GoogleSignInException(
         code: GoogleSignInExceptionCode.canceled,
         description: '[16] Account reauth failed.',
       );
@@ -50,7 +50,7 @@ void main() {
     });
 
     test('OAuth configuration error shows error description', () {
-      final exception = GoogleSignInException(
+      const exception = GoogleSignInException(
         code: GoogleSignInExceptionCode.canceled,
         description: 'Invalid client ID configuration',
       );
@@ -61,7 +61,7 @@ void main() {
     });
 
     test('SHA-1 mismatch error shows error description', () {
-      final exception = GoogleSignInException(
+      const exception = GoogleSignInException(
         code: GoogleSignInExceptionCode.canceled,
         description: 'SHA-1 fingerprint mismatch',
       );
@@ -72,7 +72,7 @@ void main() {
     });
 
     test('reauth failed keyword triggers config error path', () {
-      final exception = GoogleSignInException(
+      const exception = GoogleSignInException(
         code: GoogleSignInExceptionCode.canceled,
         description: 'Account reauth failed due to network',
       );
@@ -83,7 +83,7 @@ void main() {
     });
 
     test('clientConfigurationError shows error description', () {
-      final exception = GoogleSignInException(
+      const exception = GoogleSignInException(
         code: GoogleSignInExceptionCode.clientConfigurationError,
         description: 'Client misconfigured',
       );
@@ -94,7 +94,7 @@ void main() {
     });
 
     test('providerConfigurationError shows error description', () {
-      final exception = GoogleSignInException(
+      const exception = GoogleSignInException(
         code: GoogleSignInExceptionCode.providerConfigurationError,
         description: 'Provider SDK unavailable',
       );
@@ -105,7 +105,7 @@ void main() {
     });
 
     test('unknownError with description shows description', () {
-      final exception = GoogleSignInException(
+      const exception = GoogleSignInException(
         code: GoogleSignInExceptionCode.unknownError,
         description: 'Something unexpected happened',
       );
@@ -116,7 +116,7 @@ void main() {
     });
 
     test('interrupted exception shows error description', () {
-      final exception = GoogleSignInException(
+      const exception = GoogleSignInException(
         code: GoogleSignInExceptionCode.interrupted,
         description: 'Sign-in was interrupted',
       );
@@ -127,7 +127,7 @@ void main() {
     });
 
     test('canceled without description falls back to cancelled message', () {
-      final exception = GoogleSignInException(
+      const exception = GoogleSignInException(
         code: GoogleSignInExceptionCode.canceled,
       );
 
@@ -137,7 +137,7 @@ void main() {
     });
 
     test('unknownError without description falls back to generic', () {
-      final exception = GoogleSignInException(
+      const exception = GoogleSignInException(
         code: GoogleSignInExceptionCode.unknownError,
       );
 

@@ -20,7 +20,7 @@ class SettingsPremiumCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final color = AppColors.seed;
+    const color = AppColors.seed;
     final subtitle = loading
         ? AppStrings.checkingSubscription
         : hasPremium
@@ -55,7 +55,7 @@ class SettingsPremiumCard extends StatelessWidget {
                 child: SproutListTile(
                   identifier: SemanticsIds.settingsPremium,
                   label: AppStrings.sproutPremium,
-                  leading: SproutGlowIcon(
+                  leading: const SproutGlowIcon(
                     icon: Icons.workspace_premium_rounded,
                     color: color,
                   ),

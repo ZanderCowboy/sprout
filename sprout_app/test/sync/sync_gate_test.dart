@@ -10,10 +10,10 @@ import 'package:sprout/features/accounts/data/accounts_repository_impl.dart';
 import 'package:sprout/features/accounts/data/local/account_hive_model.dart';
 import 'package:sprout/features/accounts/domain/account.dart';
 import 'package:sprout/features/auth/application/auth_service_impl.dart';
-import 'package:sprout/features/sync/application/sync_service_impl.dart';
 import 'package:sprout/features/auth/domain/auth_user.dart';
 import 'package:sprout/features/budget/data/local/models/budget_group_hive_model.dart';
 import 'package:sprout/features/goals/data/local/models/goal_hive_model.dart';
+import 'package:sprout/features/sync/application/sync_service_impl.dart';
 import 'package:sprout/features/sync/data/pending_sync_queue.dart';
 import 'package:sprout/features/sync/export.dart';
 import 'package:sprout/features/transactions/data/local/pending_sync_hive_model.dart';
@@ -42,10 +42,8 @@ void main() {
     final stamp = DateTime.now().microsecondsSinceEpoch;
     accountsBox = await Hive.openBox<AccountHiveModel>('accounts_$stamp');
     goalsBox = await Hive.openBox<GoalHiveModel>('goals_$stamp');
-    budgetGroupsBox =
-        await Hive.openBox<BudgetGroupHiveModel>('budget_$stamp');
-    transactionsBox =
-        await Hive.openBox<TransactionHiveModel>('tx_$stamp');
+    budgetGroupsBox = await Hive.openBox<BudgetGroupHiveModel>('budget_$stamp');
+    transactionsBox = await Hive.openBox<TransactionHiveModel>('tx_$stamp');
     pendingBox = await Hive.openBox<PendingSyncHiveModel>('pending_$stamp');
     settingsBox = await Hive.openBox<dynamic>('settings_$stamp');
   });
@@ -96,9 +94,7 @@ void main() {
 
     expect(service.canSync, isFalse);
 
-    fake.setUser(
-      const AuthUser(id: 'anon', email: null, isAnonymous: true),
-    );
+    fake.setUser(const AuthUser(id: 'anon', email: null, isAnonymous: true));
     expect(service.canSync, isFalse);
 
     fake.setUser(
@@ -151,10 +147,7 @@ void main() {
 
   test('SyncService.flushPending no-ops when canSync is false', () async {
     final queue = PendingSyncQueue(pendingBox);
-    await queue.enqueue(
-      PendingSyncOperationType.upsertAccount,
-      '{"id":"x"}',
-    );
+    await queue.enqueue(PendingSyncOperationType.upsertAccount, '{"id":"x"}');
     var flushed = false;
     final remote = FakeSyncRemoteDatasource();
     final sync = SyncServiceImpl(
@@ -174,10 +167,7 @@ void main() {
 
   test('SyncService.flushPending no-ops when remote has no session', () async {
     final queue = PendingSyncQueue(pendingBox);
-    await queue.enqueue(
-      PendingSyncOperationType.upsertAccount,
-      '{"id":"x"}',
-    );
+    await queue.enqueue(PendingSyncOperationType.upsertAccount, '{"id":"x"}');
     final remote = FakeSyncRemoteDatasource(authUserId: null);
     final sync = SyncServiceImpl(
       queue: queue,
@@ -194,14 +184,8 @@ void main() {
 
   test('SyncService.flushPending applies ops then dequeues', () async {
     final queue = PendingSyncQueue(pendingBox);
-    await queue.enqueue(
-      PendingSyncOperationType.upsertAccount,
-      '{"id":"a1"}',
-    );
-    await queue.enqueue(
-      PendingSyncOperationType.deleteGoal,
-      '{"id":"g1"}',
-    );
+    await queue.enqueue(PendingSyncOperationType.upsertAccount, '{"id":"a1"}');
+    await queue.enqueue(PendingSyncOperationType.deleteGoal, '{"id":"g1"}');
     final remote = FakeSyncRemoteDatasource();
     final transactions = FakeTransactionsRepository();
     final sync = SyncServiceImpl(
@@ -250,14 +234,8 @@ void main() {
 
   test('SyncService.flushPending stops on first remote failure', () async {
     final queue = PendingSyncQueue(pendingBox);
-    await queue.enqueue(
-      PendingSyncOperationType.upsertAccount,
-      '{"id":"a1"}',
-    );
-    await queue.enqueue(
-      PendingSyncOperationType.upsertGoal,
-      '{"id":"g1"}',
-    );
+    await queue.enqueue(PendingSyncOperationType.upsertAccount, '{"id":"a1"}');
+    await queue.enqueue(PendingSyncOperationType.upsertGoal, '{"id":"g1"}');
     final remote = FakeSyncRemoteDatasource()
       ..applyError = StateError('remote down');
     final sync = SyncServiceImpl(

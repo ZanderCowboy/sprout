@@ -13,21 +13,6 @@ class BudgetGroupRow {
     required this.updatedAt,
   });
 
-  final String id;
-  final String userId;
-  final String name;
-  final String? description;
-  final String category;
-  final String colorHex;
-  final int? iconCodePoint;
-  final String? iconFontFamily;
-
-  /// Supabase jsonb decoded value (ideally `List<dynamic>`).
-  final Object itemsJson;
-
-  final DateTime createdAt;
-  final DateTime updatedAt;
-
   factory BudgetGroupRow.fromMap(Map<String, dynamic> row) {
     return BudgetGroupRow(
       id: row['id'] as String,
@@ -43,6 +28,21 @@ class BudgetGroupRow {
       updatedAt: DateTime.parse(row['updated_at'] as String),
     );
   }
+
+  final String id;
+  final String userId;
+  final String name;
+  final String? description;
+  final String category;
+  final String colorHex;
+  final int? iconCodePoint;
+  final String? iconFontFamily;
+
+  /// Supabase jsonb decoded value (ideally `List<dynamic>`).
+  final Object itemsJson;
+
+  final DateTime createdAt;
+  final DateTime updatedAt;
 
   Map<String, dynamic> toMap() => {
     'id': id,

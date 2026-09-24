@@ -2,11 +2,7 @@ import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:purchases_ui_flutter/purchases_ui_flutter.dart';
 
 /// Outcome of a Customer Center session after the sheet is dismissed.
-enum CustomerCenterOutcome {
-  dismissed,
-  restored,
-  restoreFailed,
-}
+enum CustomerCenterOutcome { dismissed, restored, restoreFailed }
 
 /// Small presentation helper for RevenueCat paywall and Customer Center flows.
 ///
@@ -17,7 +13,7 @@ abstract final class PremiumPaywall {
 
   /// True when the SDK has been configured for this app process.
   static Future<bool> isPurchasesReady() async {
-    return await Purchases.isConfigured;
+    return Purchases.isConfigured;
   }
 
   /// Best-effort RevenueCat logout after in-app account deletion.

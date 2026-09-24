@@ -1,13 +1,13 @@
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sprout/features/accounts/export.dart';
+import 'package:sprout/features/transactions/export.dart';
 
 import '../application/goals_service.dart';
 import '../domain/goal.dart';
 import '../domain/goal_progress.dart';
 import '../domain/overall_goals_totals.dart';
-import 'package:sprout/features/accounts/export.dart';
-import 'package:sprout/features/transactions/export.dart';
 
 part 'goals_event.dart';
 part 'goals_state.dart';

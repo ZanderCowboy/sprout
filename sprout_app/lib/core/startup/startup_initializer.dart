@@ -1,8 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-
 import 'package:sprout/core/analytics/analytics_service.dart';
 import 'package:sprout/core/analytics/analytics_service_impl.dart';
 import 'package:sprout/core/config/app_config.dart';
@@ -15,16 +13,17 @@ import 'package:sprout/core/flags/remote_feature_flag.dart';
 import 'package:sprout/core/storage/hive_adapters.dart';
 import 'package:sprout/core/user/user_context.dart';
 import 'package:sprout/features/accounts/data/local/account_hive_model.dart';
+import 'package:sprout/features/accounts/domain/accounts_repository.dart';
 import 'package:sprout/features/auth/application/auth_service.dart';
 import 'package:sprout/features/budget/data/local/models/budget_group_hive_model.dart';
-import 'package:sprout/features/goals/data/local/models/goal_hive_model.dart';
-import 'package:sprout/features/sync/application/sync_service.dart';
-import 'package:sprout/features/accounts/domain/accounts_repository.dart';
-import 'package:sprout/features/goals/domain/goals_repository.dart';
 import 'package:sprout/features/budget/domain/budget_repository.dart';
-import 'package:sprout/features/transactions/domain/transactions_repository.dart';
+import 'package:sprout/features/goals/data/local/models/goal_hive_model.dart';
+import 'package:sprout/features/goals/domain/goals_repository.dart';
+import 'package:sprout/features/sync/application/sync_service.dart';
 import 'package:sprout/features/transactions/data/local/pending_sync_hive_model.dart';
 import 'package:sprout/features/transactions/data/local/transaction_hive_model.dart';
+import 'package:sprout/features/transactions/domain/transactions_repository.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 enum StartupStep {
   hiveInit,
@@ -272,6 +271,6 @@ Future<Box<BudgetGroupHiveModel>> _openBudgetGroupsBox() async {
       );
     }
     await Hive.deleteBoxFromDisk(HiveBoxes.budgetGroups);
-    return await Hive.openBox<BudgetGroupHiveModel>(HiveBoxes.budgetGroups);
+    return Hive.openBox<BudgetGroupHiveModel>(HiveBoxes.budgetGroups);
   }
 }

@@ -44,7 +44,7 @@ class GoalGrowthChartView extends StatelessWidget {
       end: Alignment.bottomCenter,
       colors: [
         goalColor.withValues(alpha: 0.35),
-        goalColor.withValues(alpha: 0.00),
+        goalColor.withValues(alpha: 0),
       ],
     );
 

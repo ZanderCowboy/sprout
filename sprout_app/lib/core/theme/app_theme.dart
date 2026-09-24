@@ -68,11 +68,11 @@ ThemeData buildAppTheme() {
       shadowColor: Colors.black45,
       surfaceTintColor: Colors.transparent,
     ),
-    floatingActionButtonTheme: FloatingActionButtonThemeData(
+    floatingActionButtonTheme: const FloatingActionButtonThemeData(
       backgroundColor: AppColors.accentLime,
       foregroundColor: AppColors.surfaceDeep,
       elevation: 6,
-      shape: const CircleBorder(),
+      shape: CircleBorder(),
     ),
     bottomNavigationBarTheme: BottomNavigationBarThemeData(
       backgroundColor: AppColors.surfaceBar,
@@ -118,7 +118,7 @@ ThemeData buildAppTheme() {
       backgroundColor: colorScheme.surfaceContainerHigh,
       surfaceTintColor: Colors.transparent,
       showDragHandle: true,
-      shape: RoundedRectangleBorder(
+      shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(AppRadii.sheet),
         ),

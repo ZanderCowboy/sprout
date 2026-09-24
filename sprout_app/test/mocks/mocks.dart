@@ -10,13 +10,13 @@ import 'package:sprout/features/accounts/domain/accounts_repository.dart';
 import 'package:sprout/features/auth/domain/auth_repository.dart';
 import 'package:sprout/features/auth/domain/auth_user.dart';
 import 'package:sprout/features/auth/domain/local_session_cleaner.dart';
-import 'package:sprout/features/connectivity/presentation/connectivity_cubit.dart';
-import 'package:sprout/features/sync/domain/pending_sync_operation.dart';
-import 'package:sprout/features/sync/domain/sync_remote_datasource.dart';
 import 'package:sprout/features/budget/domain/budget_group.dart';
 import 'package:sprout/features/budget/domain/budget_repository.dart';
+import 'package:sprout/features/connectivity/presentation/connectivity_cubit.dart';
 import 'package:sprout/features/goals/domain/goal.dart';
 import 'package:sprout/features/goals/domain/goals_repository.dart';
+import 'package:sprout/features/sync/domain/pending_sync_operation.dart';
+import 'package:sprout/features/sync/domain/sync_remote_datasource.dart';
 import 'package:sprout/features/transactions/domain/portfolio_summary.dart';
 import 'package:sprout/features/transactions/domain/transaction.dart';
 import 'package:sprout/features/transactions/domain/transaction_frequency.dart';
@@ -32,7 +32,10 @@ class FakeAnalyticsService implements AnalyticsService {
   final Map<String, List<Map<String, Object>?>> events = {};
 
   @override
-  Future<void> logEvent(String eventName, [Map<String, Object>? parameters]) async {
+  Future<void> logEvent(
+    String eventName, [
+    Map<String, Object>? parameters,
+  ]) async {
     events.putIfAbsent(eventName, () => []).add(parameters);
   }
 

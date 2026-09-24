@@ -20,16 +20,6 @@ final class BudgetReady extends BudgetState {
     required this.disposableIncome,
   });
 
-  final List<BudgetGroup> groups;
-
-  /// Total amount per groupId.
-  final Map<String, double> groupTotals;
-
-  final double totalIncome;
-  final double totalEssentials;
-  final double totalLifestyle;
-  final double disposableIncome;
-
   factory BudgetReady.fromGroups(List<BudgetGroup> groups) {
     final totals = BudgetTotals.fromGroups(groups);
     return BudgetReady(
@@ -41,6 +31,16 @@ final class BudgetReady extends BudgetState {
       disposableIncome: totals.disposableIncome,
     );
   }
+
+  final List<BudgetGroup> groups;
+
+  /// Total amount per groupId.
+  final Map<String, double> groupTotals;
+
+  final double totalIncome;
+  final double totalEssentials;
+  final double totalLifestyle;
+  final double disposableIncome;
 
   @override
   List<Object?> get props => [

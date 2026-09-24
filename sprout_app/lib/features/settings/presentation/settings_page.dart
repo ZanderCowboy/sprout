@@ -3,18 +3,18 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:purchases_ui_flutter/purchases_ui_flutter.dart';
-
+import 'package:sprout/bootstrap.dart';
 import 'package:sprout/core/core.dart';
 import 'package:sprout/core/debug/sprout_debug_lens.dart';
 import 'package:sprout/features/auth/export.dart';
 import 'package:sprout/features/purchases/presentation/premium_paywall_helper.dart';
 import 'package:sprout/ui/export.dart';
-import 'package:sprout/bootstrap.dart';
+
 import 'widgets/settings_finance_section.dart';
 import 'widgets/settings_footer.dart';
+import 'widgets/settings_nav_row.dart';
 import 'widgets/settings_premium_card.dart';
 import 'widgets/settings_profile_header.dart';
-import 'widgets/settings_nav_row.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -114,7 +114,6 @@ class _SettingsPageState extends State<SettingsPage> {
         messenger.showSnackBar(
           const SnackBar(content: Text(AppStrings.premiumUnlocked)),
         );
-        break;
       case PaywallResult.cancelled:
       case PaywallResult.notPresented:
         break;
@@ -122,7 +121,6 @@ class _SettingsPageState extends State<SettingsPage> {
         messenger.showSnackBar(
           const SnackBar(content: Text(AppStrings.subscriptionUpdateFailed)),
         );
-        break;
     }
   }
 
@@ -217,8 +215,8 @@ class _SettingsPageState extends State<SettingsPage> {
                   label: AppStrings.debugBubbleVisible,
                   value: _debugBubbleVisible,
                   onChanged: _toggleDebugBubble,
-                  title: Text(AppStrings.debugBubbleVisible),
-                  subtitle: Text(AppStrings.debugBubbleSubtitle),
+                  title: const Text(AppStrings.debugBubbleVisible),
+                  subtitle: const Text(AppStrings.debugBubbleSubtitle),
                 ),
               ],
               const SizedBox(height: 32),

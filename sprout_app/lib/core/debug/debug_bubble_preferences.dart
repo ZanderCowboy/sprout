@@ -6,11 +6,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// When the debug bubble is hidden, the floating bubble will not be shown,
 /// but Debug Lens itself remains functional and can be accessed from Settings.
 class DebugBubblePreferences extends ChangeNotifier {
+  DebugBubblePreferences(this._prefs);
+
   static const String _keyBubbleVisible = 'debug_bubble_visible';
 
   final SharedPreferences _prefs;
-
-  DebugBubblePreferences(this._prefs);
 
   /// Returns whether the debug bubble should be visible.
   ///

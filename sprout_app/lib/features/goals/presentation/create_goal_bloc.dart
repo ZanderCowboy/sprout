@@ -1,10 +1,9 @@
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:uuid/uuid.dart';
-
 import 'package:sprout/core/core.dart';
 import 'package:sprout/features/accounts/export.dart';
+import 'package:uuid/uuid.dart';
 
 import '../application/goals_service.dart';
 import '../domain/goal.dart';
