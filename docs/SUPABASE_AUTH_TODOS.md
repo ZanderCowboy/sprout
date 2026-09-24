@@ -2,7 +2,7 @@
 
 Flutter auth is **already built**. This file is only the human console work + device checks.
 
-**Do one environment at a time.** Right now: **dev only**. Ignore prod until Google sign-in works on a development build.
+**Do one environment at a time.** DEV is largely done. PROD auth setup is the **active track** (see §6 below).
 
 ---
 
@@ -27,16 +27,10 @@ Tick here as you go. Each open item jumps to the step below.
 
 
 
-### Dev — still to do (this order)
+### Dev — remaining items
 
-- [x] [Set Site URL](#1-set-site-url-2-minutes) on the **dev** Supabase project
-- [x] [Confirm Android OAuth client](#2-confirm-android-oauth-client-google-cloud) for the **pre-rename** package `co.za.zanderkotze.sprout.dev` + debug SHA-1 (recreate for `app.stackmint.sprout.dev` in [D](#d-you--google-cloud-oauth))
-- [x] [Google sign-in works on device](#3-device-test-google-main-goal-for-tonight) (dev flavor)
-- [x] [Sign-out keeps local data](#3-device-test-google-main-goal-for-tonight)
-- [x] [Re-login with Google works](#3-device-test-google-main-goal-for-tonight)
-- [x] [Optional cleanup](#5-optional-cleanup-dev-only): delete old anonymous users / orphaned rows
-- [ ] [Paste Terms and Privacy into Firebase Remote Config](#7-terms-and-privacy-firebase-remote-config-dev)
-- [ ] [Apply delete-account migration](#8-delete-account-rpc-dev) on the **dev** Supabase project
+- [ ] [Paste Terms and Privacy into Firebase Remote Config](#7-terms-and-privacy-firebase-remote-config-dev) on **dev** (`terms_of_service` + `privacy_policy` strings)
+- [ ] [Confirm signup email template](#4-email-otp-dev--done) includes `{{ .Token }}` on **dev** (Magic link already done)
 
 
 
@@ -51,10 +45,26 @@ Tick here as you go. Each open item jumps to the step below.
 
 
 
-### Later (not tonight)
+### PROD — active track (issue #51)
 
-- [ ] [Prod auth console + Google on production flavor](#6-prod--do-not-start-until-step-3-passes)
-- [ ] Prod Custom SMTP + Magic link template ([Resend — prod later](RESEND_SMTP_SUPABASE.md#prod-later))
+See [§6 PROD checklist](#6-prod-checklist-issue-51) below for the full runbook.
+
+Summary status:
+
+- [x] Prod Supabase project exists (**Sprout**, ref `bybqayuvhsaezqkjggxz`, `https://bybqayuvhsaezqkjggxz.supabase.co`)
+- [x] Local `production.json`: `supabaseUrl` + `supabaseAnonKey` set
+- [x] Local `production.json`: `googleWebClientId` copied from dev (same Web OAuth client)
+- [x] Delete-account migrations applied on PROD (2026-09-24): `20260819120000_delete_own_account.sql` + `20260819220000_delete_own_account_definer.sql`
+- [x] PROD Firebase Remote Config legal strings published (issue #52)
+- [ ] Supabase console: Site URL, Anonymous off, Google provider
+- [ ] Supabase console: Custom SMTP + both email templates
+- [ ] `APP_CONFIG_PROD_BASE64` GitHub secret refresh
+- [ ] Android OAuth client for `app.stackmint.sprout` + **Play App Signing SHA-1**
+- [ ] Record SHA-1 on issue #51
+- [ ] Device smoke test (production flavor)
+
+### Later
+
 - [ ] [Deferred](#deferred-not-now): magic-link deep links, Apple / iOS, email+password
 
 ---
@@ -220,20 +230,230 @@ Existing tables already `references auth.users (id) on delete cascade`. Deletion
 
 - [x] Dev: `20260819120000_delete_own_account.sql` (already applied)
 - [x] Dev: `20260819220000_delete_own_account_definer.sql` (applied via MCP)
-- [ ] Prod (later): both delete-account migrations
+- [x] Prod: both delete-account migrations applied **2026-09-24** via Supabase MCP
 
 ---
 
 
 
-### 6. Prod — do not start until step 3 passes
+### 6. PROD checklist (issue #51)
 
-When you are ready (separate checklist later):
+Runbook for **production** Supabase auth setup + Google Sign-In + Email OTP on the **production** flavor. Issue: [#51](https://github.com/ZanderCowboy/sprout/issues/51).
 
-- Prod Supabase: Google provider, Anonymous off, Site URL, migrations
-- Prod Web Client ID → `production.json` `googleWebClientId`
-- Android OAuth client for `app.stackmint.sprout` + **release** SHA-1
-- Device test on production flavor
+**Environment:**
+
+- Supabase project: **Sprout**, ref `bybqayuvhsaezqkjggxz`, URL `https://bybqayuvhsaezqkjggxz.supabase.co`
+- Package: `app.stackmint.sprout`
+- Flavor JSON: `sprout_app/assets/config/production.json` (gitignored)
+- Build & test: production flavor (`flutter run --flavor production -t lib/main_production.dart` or VS Code **Sprout · prod · …**)
+
+**References:**
+
+- Dev runbook: sections 1–4 above
+- Email template walkthrough: [RESEND_SMTP_SUPABASE.md](RESEND_SMTP_SUPABASE.md)
+- GitHub secrets refresh: [GITHUB_SECRETS.md](GITHUB_SECRETS.md)
+- Google Cloud OAuth: [section D](#d-you--google-cloud-oauth) below
+
+---
+
+#### A. Already done (record only; do not claim console steps you did not do)
+
+- [x] Prod Supabase project created (**Sprout**, `bybqayuvhsaezqkjggxz`)
+- [x] Local `production.json`: `supabaseUrl` + `supabaseAnonKey` (publishable anon key) set for that project
+- [x] Local `production.json`: `googleWebClientId` copied from development (same Web OAuth client — Zander must still enable that Web client ID + secret on **prod** Supabase Google provider)
+- [x] Delete-account migrations applied on **prod** via Supabase MCP on **2026-09-24**:
+  - `20260819120000_delete_own_account.sql` (private function + public wrapper)
+  - `20260819220000_delete_own_account_definer.sql` (public wrapper `SECURITY DEFINER`)
+- [x] PROD Firebase Remote Config: legal strings (`terms_of_service` + `privacy_policy`) published (issue #52)
+
+---
+
+#### B. Supabase console (PROD) — Site URL
+
+**Where:** Supabase **prod** project → **Authentication → URL Configuration**
+
+- [ ] **Site URL** set to `https://stackmint.app` (or `https://bybqayuvhsaezqkjggxz.supabase.co`)
+- [ ] **Additional Redirect URLs** left empty (deep links deferred)
+- [ ] Save
+
+---
+
+#### C. Supabase console (PROD) — Disable Anonymous sign-ins
+
+**Where:** Supabase **prod** project → **Authentication → Providers → Anonymous**
+
+- [ ] **Enable Anonymous sign-ins** toggle **OFF**
+- [ ] Save
+
+The app never calls `signInAnonymously`; this is belt-and-suspenders.
+
+---
+
+#### D. Supabase console (PROD) — Google provider
+
+**Where:** Supabase **prod** project → **Authentication → Providers → Google**
+
+**Prerequisites:** Google Cloud **Web** OAuth client (same one already in `development.json` → `googleWebClientId`) with Client ID + Client secret.
+
+- [ ] **Enable Google provider** toggle **ON**
+- [ ] Paste **Web Client ID** (same value as dev `googleWebClientId`) into **Client ID (for OAuth)** field
+- [ ] Paste **Web Client secret** into **Client Secret (for OAuth)** field
+- [ ] **Authorized Client IDs (optional)** left empty (Web-only flow; Android SHA-1 linkage is on Google Cloud side only)
+- [ ] Save
+
+**Note:** The **Web** OAuth client ID + secret enable Google Sign-In on all platforms. Do not paste Android OAuth client IDs here unless the UI specifically asks for them.
+
+---
+
+#### E. Supabase console (PROD) — Custom SMTP + email templates
+
+Follow the same Resend flow as dev: [RESEND_SMTP_SUPABASE.md](RESEND_SMTP_SUPABASE.md). The verified Resend domain (e.g. `mail.stackmint.app` or `stackmint.app`) and API key can be reused from dev.
+
+**Where:** Supabase **prod** project → **Authentication**
+
+1. **SMTP Settings** (or Email / Notifications):
+
+   - [ ] Enable **Custom SMTP**
+   - [ ] **Sender email**: e.g. `noreply@stackmint.app` (must match verified Resend domain)
+   - [ ] **Sender name**: e.g. `Sprout` (drop `[DEV]` for prod)
+   - [ ] **Host**: `smtp.resend.com`
+   - [ ] **Port**: `465`
+   - [ ] **Username**: `resend`
+   - [ ] **Password**: your Resend **API key**
+   - [ ] Save
+
+2. **Email Templates** → **Magic Link**:
+
+   - [ ] **Subject**: `Your Sprout login code is {{ .Token }}` (or similar; include `{{ .Token }}` to show code in inbox preview)
+   - [ ] **Body** (HTML): paste the OTP template from [RESEND_SMTP_SUPABASE.md § Body](RESEND_SMTP_SUPABASE.md#body-html) with `{{ .Token }}` prominently displayed; update sender name from `[DEV] Sprout` to `Sprout`
+   - [ ] Save
+
+3. **Email Templates** → **Confirm signup**:
+
+   - [ ] **Subject**: same as Magic Link (`Your Sprout login code is {{ .Token }}`)
+   - [ ] **Body** (HTML): same template as Magic Link (first-time emails use Confirm signup; returning emails use Magic Link; both need `{{ .Token }}` so the 6-digit code is always shown)
+   - [ ] Save
+
+**Why both templates?** Supabase uses **Confirm signup** for a new email and **Magic Link** for a returning email. If Confirm signup still has the default "confirm your email" link copy, first-time users will never see the OTP.
+
+---
+
+#### F. Local `production.json` — confirm fields
+
+**File:** `sprout_app/assets/config/production.json` (gitignored)
+
+Already set (from "Already done" above):
+
+- [x] `supabaseUrl`: `https://bybqayuvhsaezqkjggxz.supabase.co`
+- [x] `supabaseAnonKey`: prod publishable anon key (from Supabase **prod** project → Settings → API)
+- [x] `googleWebClientId`: same Web OAuth client ID as dev (enabled on prod Supabase in step D)
+
+**No changes needed** if those three are already correct. If you changed `googleWebClientId` or the Supabase keys, proceed to step G.
+
+---
+
+#### G. GitHub Actions secret — `APP_CONFIG_PROD_BASE64`
+
+**When:** After any change to `production.json` (Supabase keys, `googleWebClientId`, Firebase `appId`, etc.).
+
+**Where:** [GITHUB_SECRETS.md](GITHUB_SECRETS.md) § `APP_CONFIG_PROD_BASE64`
+
+From repo root (PowerShell example; adjust for bash/zsh):
+
+```powershell
+python -c "import base64, pathlib; print(base64.b64encode(pathlib.Path(r'sprout_app/assets/config/production.json').read_bytes()).decode(), end='')" | gh secret set APP_CONFIG_PROD_BASE64 --repo ZanderCowboy/sprout
+```
+
+Or bash/zsh:
+
+```bash
+base64 -i sprout_app/assets/config/production.json | tr -d '\n' | gh secret set APP_CONFIG_PROD_BASE64 --repo ZanderCowboy/sprout
+```
+
+- [ ] `APP_CONFIG_PROD_BASE64` updated (or confirmed unchanged if `production.json` was already correct)
+
+**Why?** The Release Main workflow decodes this secret and bundles it into the production AAB so Play builds use the real Supabase/Firebase/Google keys.
+
+---
+
+#### H. Google Cloud OAuth — Android client for `app.stackmint.sprout`
+
+**Where:** [Google Cloud Credentials](https://console.cloud.google.com/apis/credentials?project=sprout-app-development)
+
+**Prereqs:**
+
+1. Package `app.stackmint.sprout` published on **Play Console** (or first internal/alpha AAB uploaded).
+2. **Play App Signing SHA-1** fingerprint from Play Console → **Setup → App signing** → **App signing key certificate** → SHA-1 (not the upload certificate SHA-1; installs from Play use the app signing cert).
+
+**Steps:**
+
+1. **Create credentials** → **OAuth client ID** → Application type **Android**.
+2. **Package name**: `app.stackmint.sprout` (exactly; no `.dev` suffix).
+3. **SHA-1 certificate fingerprint**: paste the **Play App Signing SHA-1** from Play Console (form `AA:BB:CC:…` with colons; 40 hex chars).
+4. Name the client e.g. `Sprout Prod Android` or `Sprout Play Store`.
+5. Create.
+
+- [ ] Android OAuth client created for `app.stackmint.sprout` + **Play App Signing SHA-1**
+- [ ] SHA-1 value **recorded on issue #51** (paste the full fingerprint in a comment so it is not lost)
+
+**Why record SHA-1?** The app signing cert SHA-1 is stable after first upload; recording it on #51 ensures you can recreate the OAuth client or verify the config if Google sign-in fails on a Play-distributed production build.
+
+**Do not** paste the Android OAuth client ID into `production.json`. The Web client ID is sufficient; package + SHA-1 linkage on Google Cloud is enough for the Android flow to work.
+
+---
+
+#### I. Device smoke test (production flavor)
+
+**Build & install:**
+
+```bash
+cd sprout_app
+flutter build apk --release --flavor production -t lib/main_production.dart
+flutter install --release --flavor production
+```
+
+Or run via VS Code launch config **Sprout · prod · …** (if debug signing is acceptable for this test; Play-signed installs come later via internal track upload).
+
+**Test flow:**
+
+1. Fresh install or uninstall previous production build → intro or sign-in screen.
+2. **Sign in with Google**:
+   - [ ] Tap **Continue with Google** → account picker → authorize → signed in (Overview, not sign-in form)
+   - [ ] Settings → **Account** shows name/email/avatar (not "Sign in…")
+   - [ ] Create a local account/goal → verify sync to **prod** Supabase (Table Editor: `accounts`, `goals` with matching `user_id`)
+3. **Sign out**:
+   - [ ] Settings → Account → **Sign out** → back on sign-in (not unsigned Overview)
+   - [ ] Local data still in Hive (re-login shows the same accounts)
+4. **Re-login with Google**:
+   - [ ] Sign in with the same Google account → same user, cloud data still present
+5. **Email OTP** (if a test email is handy):
+   - [ ] Sign in → **Use email instead** → enter email → **Send code** → inbox receives the 6-digit code (`{{ .Token }}` in subject or body) from `noreply@stackmint.app` (or your Resend sender)
+   - [ ] Enter code → signed in
+   - [ ] Sign out → sign in with email again (returning email should use **Magic Link** template; still shows `{{ .Token }}`)
+6. **Delete account** (on a throwaway test account):
+   - [ ] Settings → Account → **Delete account** → confirm dialog mentions Premium/Play if subscribed → confirm
+   - [ ] Returned to sign-in; Supabase **prod** `auth.users` no longer has that uid
+   - [ ] Re-sign-in with the same Google/email → treated as new account (no old cloud data)
+
+**Failures:**
+
+- Google fails with "developer error" / package mismatch → wrong SHA-1 or wrong package on the Android OAuth client (step H).
+- Email OTP never arrives → check Resend **Logs** and Supabase **prod** → Logs → Auth; common causes: SMTP not saved, template missing `{{ .Token }}`, sender domain not verified.
+- Delete fails with permission denied → `20260819220000_delete_own_account_definer.sql` not applied or public wrapper not `SECURITY DEFINER`.
+
+- [ ] Google sign-in works on device (production flavor)
+- [ ] Sign-out returns to sign-in; local data kept
+- [ ] Re-login with Google works; cloud data persists
+- [ ] Email OTP works (send code → inbox → enter → signed in)
+- [ ] Delete account works (confirm → back on sign-in; cloud data removed)
+
+---
+
+#### J. Done
+
+When all checkboxes above are ticked and device smoke passes, production Supabase auth is **live**. Close issue #51.
+
+**Next:** Play Console internal track upload (when ready) with the same production flavor → testers/alpha users get the fully configured auth flow.
 
 ---
 

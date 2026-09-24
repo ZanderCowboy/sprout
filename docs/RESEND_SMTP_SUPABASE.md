@@ -239,7 +239,9 @@ If the email never arrives: Resend dashboard → Logs / Emails, and Supabase →
 
 ## Prod later
 
-When dev OTP works:
+When dev OTP works, repeat for **prod** Supabase. Full runbook: [SUPABASE_AUTH_TODOS.md § 6 PROD checklist](SUPABASE_AUTH_TODOS.md#6-prod-checklist-issue-51) (issue [#51](https://github.com/ZanderCowboy/sprout/issues/51)).
+
+Quick summary:
 
 1. Same Resend domain/API key can be reused.
 2. Enable Custom SMTP on the **prod** Supabase project with the same host/user/password.
