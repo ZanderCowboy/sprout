@@ -57,7 +57,9 @@ class GoalsServiceImpl implements GoalsService {
     if (openingBalanceCents <= 0) return goal;
 
     if (openingBalanceAccountId == null || openingBalanceAccountId.isEmpty) {
-      throw const ValidationAppException(AppStrings.pickAccountForOpeningBalance);
+      throw const ValidationAppException(
+        AppStrings.pickAccountForOpeningBalance,
+      );
     }
 
     final when = occurredAt ?? DateTime.now();

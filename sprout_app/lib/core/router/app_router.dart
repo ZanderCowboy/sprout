@@ -43,9 +43,8 @@ GoRouter createAppRouter({
     routes: [
       GoRoute(
         path: AppRoute.loading.path,
-        builder: (context, state) => const Scaffold(
-          body: Center(child: CircularProgressIndicator()),
-        ),
+        builder: (context, state) =>
+            const Scaffold(body: Center(child: CircularProgressIndicator())),
       ),
       GoRoute(
         path: AppRoute.intro.path,
@@ -139,7 +138,9 @@ GoRouter createAppRouter({
                     path: ':id',
                     parentNavigatorKey: rootKey,
                     builder: (context, state) {
-                      return GoalDetailPage(goalId: state.pathParameters['id']!);
+                      return GoalDetailPage(
+                        goalId: state.pathParameters['id']!,
+                      );
                     },
                   ),
                 ],

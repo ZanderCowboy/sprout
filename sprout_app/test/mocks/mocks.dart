@@ -32,7 +32,10 @@ class FakeAnalyticsService implements AnalyticsService {
   final Map<String, List<Map<String, Object>?>> events = {};
 
   @override
-  Future<void> logEvent(String eventName, [Map<String, Object>? parameters]) async {
+  Future<void> logEvent(
+    String eventName, [
+    Map<String, Object>? parameters,
+  ]) async {
     events.putIfAbsent(eventName, () => []).add(parameters);
   }
 

@@ -9,18 +9,12 @@ import 'package:uuid/uuid.dart';
 import 'enums/deposit_bottom_sheet_mode.dart';
 
 class DepositAllocationRowState extends Equatable {
-  const DepositAllocationRowState({
-    this.goalId,
-    this.amountText = '',
-  });
+  const DepositAllocationRowState({this.goalId, this.amountText = ''});
 
   final String? goalId;
   final String amountText;
 
-  DepositAllocationRowState copyWith({
-    String? goalId,
-    String? amountText,
-  }) {
+  DepositAllocationRowState copyWith({String? goalId, String? amountText}) {
     return DepositAllocationRowState(
       goalId: goalId ?? this.goalId,
       amountText: amountText ?? this.amountText,
@@ -111,7 +105,7 @@ final class DepositReady extends DepositState {
       availableUnallocatedForAccountCents: clearUnallocated
           ? null
           : availableUnallocatedForAccountCents ??
-              this.availableUnallocatedForAccountCents,
+                this.availableUnallocatedForAccountCents,
       errorMessage: clearError ? null : errorMessage ?? this.errorMessage,
       submitting: submitting ?? this.submitting,
     );
@@ -119,20 +113,20 @@ final class DepositReady extends DepositState {
 
   @override
   List<Object?> get props => [
-        accounts,
-        goals,
-        accountId,
-        goalId,
-        amountText,
-        selectedDate,
-        mode,
-        allocations,
-        isRecurring,
-        frequency,
-        availableUnallocatedForAccountCents,
-        errorMessage,
-        submitting,
-      ];
+    accounts,
+    goals,
+    accountId,
+    goalId,
+    amountText,
+    selectedDate,
+    mode,
+    allocations,
+    isRecurring,
+    frequency,
+    availableUnallocatedForAccountCents,
+    errorMessage,
+    submitting,
+  ];
 }
 
 final class DepositSubmitSuccess extends DepositState {
@@ -147,15 +141,16 @@ class DepositCubit extends Cubit<DepositState> {
     String? initialAccountId,
     String? initialGoalId,
     int? initialAmountCents,
-    DepositBottomSheetMode initialMode = DepositBottomSheetMode.fullDepositToGoal,
-  })  : _accountsService = accountsService,
-        _goalsService = goalsService,
-        _transactionsService = transactionsService,
-        _initialAccountId = initialAccountId,
-        _initialGoalId = initialGoalId,
-        _initialAmountCents = initialAmountCents,
-        _initialMode = initialMode,
-        super(const DepositInitial());
+    DepositBottomSheetMode initialMode =
+        DepositBottomSheetMode.fullDepositToGoal,
+  }) : _accountsService = accountsService,
+       _goalsService = goalsService,
+       _transactionsService = transactionsService,
+       _initialAccountId = initialAccountId,
+       _initialGoalId = initialGoalId,
+       _initialAmountCents = initialAmountCents,
+       _initialMode = initialMode,
+       super(const DepositInitial());
 
   final AccountsService _accountsService;
   final GoalsService _goalsService;
@@ -176,8 +171,8 @@ class DepositCubit extends Cubit<DepositState> {
     final goals = await _goalsService.getGoals();
     final initialAccount = _initialAccountId;
     final initialGoal = _initialGoalId;
-    final accountId = initialAccount != null &&
-            accounts.any((a) => a.id == initialAccount)
+    final accountId =
+        initialAccount != null && accounts.any((a) => a.id == initialAccount)
         ? initialAccount
         : accounts.first.id;
     final goalId = initialGoal != null && goals.any((g) => g.id == initialGoal)
@@ -298,7 +293,10 @@ class DepositCubit extends Cubit<DepositState> {
     final accountId = current.accountId;
     if (accountId == null) return;
     final txs = await _transactionsService.getForAccount(accountId);
-    final available = _transactionsService.unallocatedCentsForAccount(txs, accountId);
+    final available = _transactionsService.unallocatedCentsForAccount(
+      txs,
+      accountId,
+    );
     emit(
       current.copyWith(
         availableUnallocatedForAccountCents: available,

@@ -16,8 +16,9 @@ class _Step3DepositState extends State<_Step3Deposit> {
   @override
   void initState() {
     super.initState();
-    _amountController =
-        TextEditingController(text: widget.state.depositAmountText);
+    _amountController = TextEditingController(
+      text: widget.state.depositAmountText,
+    );
     _noteController = TextEditingController(text: widget.state.depositNote);
     _amountController.addListener(_onAmountChanged);
     _noteController.addListener(_onNoteChanged);
@@ -47,10 +48,7 @@ class _Step3DepositState extends State<_Step3Deposit> {
     final skipDeposit = widget.state.allocateLater;
     return Column(
       children: [
-        const _HeroIcon(
-          icon: Icons.payments_outlined,
-          color: AppColors.seed,
-        ),
+        const _HeroIcon(icon: Icons.payments_outlined, color: AppColors.seed),
         const SizedBox(height: 16),
         Text(
           AppStrings.wizardDepositTitle,
@@ -60,9 +58,9 @@ class _Step3DepositState extends State<_Step3Deposit> {
         const SizedBox(height: 8),
         Text(
           AppStrings.wizardDepositSubtitle,
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: scheme.onSurfaceVariant,
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 24),
@@ -88,10 +86,11 @@ class _Step3DepositState extends State<_Step3Deposit> {
                   enabled: !skipDeposit,
                   decoration: InputDecoration(
                     labelText: AppStrings.amount,
-                    errorText:
-                        skipDeposit ? null : widget.state.depositAmountError,
-                    helperText: skipDeposit ||
-                            widget.state.depositAmountError != null
+                    errorText: skipDeposit
+                        ? null
+                        : widget.state.depositAmountError,
+                    helperText:
+                        skipDeposit || widget.state.depositAmountError != null
                         ? null
                         : '${AppStrings.wizardMinimumDeposit} • ${AppStrings.wizardMaximumDeposit} ${formatZarFromCents(targetCents)}',
                     helperMaxLines: 2,
@@ -109,8 +108,8 @@ class _Step3DepositState extends State<_Step3Deposit> {
                   onChanged: widget.state.submitting
                       ? null
                       : (checked) => context
-                          .read<WizardCubit>()
-                          .setAllocateLater(checked ?? false),
+                            .read<WizardCubit>()
+                            .setAllocateLater(checked ?? false),
                   subtitle: const Text(AppStrings.wizardAllocateLaterSubtitle),
                   contentPadding: EdgeInsets.zero,
                 ),
@@ -148,10 +147,8 @@ class _Step3DepositState extends State<_Step3Deposit> {
                         Expanded(
                           child: Text(
                             AppStrings.wizardDepositHint,
-                            style:
-                                Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      color: scheme.onSurfaceVariant,
-                                    ),
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(color: scheme.onSurfaceVariant),
                           ),
                         ),
                       ],

@@ -16,9 +16,7 @@ void main() {
         iconCodePoint: null,
         iconFontFamily: null,
         category: BudgetCategory.income,
-        items: const [
-          BudgetItem(id: 'i1', name: 'Salary', amount: 10000),
-        ],
+        items: const [BudgetItem(id: 'i1', name: 'Salary', amount: 10000)],
         createdAt: DateTime(2026),
         updatedAt: DateTime(2026),
       ),
@@ -31,9 +29,7 @@ void main() {
         iconCodePoint: null,
         iconFontFamily: null,
         category: BudgetCategory.essentials,
-        items: const [
-          BudgetItem(id: 'e1', name: 'Rent', amount: 4000),
-        ],
+        items: const [BudgetItem(id: 'e1', name: 'Rent', amount: 4000)],
         createdAt: DateTime(2026),
         updatedAt: DateTime(2026),
       ),
@@ -46,9 +42,7 @@ void main() {
         iconCodePoint: null,
         iconFontFamily: null,
         category: BudgetCategory.lifestyle,
-        items: const [
-          BudgetItem(id: 'l1', name: 'Fun', amount: 1000),
-        ],
+        items: const [BudgetItem(id: 'l1', name: 'Fun', amount: 1000)],
         createdAt: DateTime(2026),
         updatedAt: DateTime(2026),
       ),

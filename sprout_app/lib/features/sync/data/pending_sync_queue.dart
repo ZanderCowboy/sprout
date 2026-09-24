@@ -14,9 +14,11 @@ class PendingSyncQueue {
 
   static const _uuid = Uuid();
 
-  Future<void> enqueue(PendingSyncOperationType type, String payloadJson) async {
-    final queueId =
-        '${DateTime.now().millisecondsSinceEpoch}_${_uuid.v4()}';
+  Future<void> enqueue(
+    PendingSyncOperationType type,
+    String payloadJson,
+  ) async {
+    final queueId = '${DateTime.now().millisecondsSinceEpoch}_${_uuid.v4()}';
     await _box.put(
       queueId,
       PendingSyncHiveModel(

@@ -26,7 +26,9 @@ class RecurringPaymentsPage extends StatelessWidget {
           return Scaffold(
             appBar: AppBar(title: const Text(AppStrings.recurringPayments)),
             body: switch (state) {
-              final RecurringPaymentsReady s => _RecurringPaymentsBody(state: s),
+              final RecurringPaymentsReady s => _RecurringPaymentsBody(
+                state: s,
+              ),
               _ => const Center(child: CircularProgressIndicator()),
             },
           );

@@ -40,19 +40,17 @@ class SupabaseSyncRemoteDatasource implements SyncRemoteDatasource {
         final t = decodeTransactionPayload(payloadJson);
         final txRow = transactionToSupabaseRow(t);
         txRow['user_id'] = authUid;
-        await client.from(SupabaseTables.transactions).upsert(
-              txRow,
-              onConflict: 'id',
-            );
+        await client
+            .from(SupabaseTables.transactions)
+            .upsert(txRow, onConflict: 'id');
         return t.id;
       case PendingSyncOperationType.upsertAccount:
         final a = decodeAccountPayload(payloadJson);
         final accountRow = accountToSupabaseRow(a);
         accountRow['user_id'] = authUid;
-        await client.from(SupabaseTables.accounts).upsert(
-              accountRow,
-              onConflict: 'id',
-            );
+        await client
+            .from(SupabaseTables.accounts)
+            .upsert(accountRow, onConflict: 'id');
         return null;
       case PendingSyncOperationType.deleteAccount:
         final id = decodeIdPayload(payloadJson);
@@ -62,10 +60,9 @@ class SupabaseSyncRemoteDatasource implements SyncRemoteDatasource {
         final g = decodeGoalPayload(payloadJson);
         final goalRow = goalToSupabaseRow(g);
         goalRow['user_id'] = authUid;
-        await client.from(SupabaseTables.goals).upsert(
-              goalRow,
-              onConflict: 'id',
-            );
+        await client
+            .from(SupabaseTables.goals)
+            .upsert(goalRow, onConflict: 'id');
         return null;
       case PendingSyncOperationType.deleteGoal:
         final id = decodeIdPayload(payloadJson);
@@ -79,10 +76,9 @@ class SupabaseSyncRemoteDatasource implements SyncRemoteDatasource {
         final bg = decodeBudgetGroupPayload(payloadJson);
         final row = budgetGroupToSupabaseRow(bg);
         row['user_id'] = authUid;
-        await client.from(SupabaseTables.budgetGroups).upsert(
-              row,
-              onConflict: 'id',
-            );
+        await client
+            .from(SupabaseTables.budgetGroups)
+            .upsert(row, onConflict: 'id');
         return null;
       case PendingSyncOperationType.deleteBudgetGroup:
         final id = decodeIdPayload(payloadJson);

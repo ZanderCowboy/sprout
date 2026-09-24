@@ -97,10 +97,7 @@ class TransactionsServiceImpl implements TransactionsService {
             now: now,
           ),
       accountMonthChangePercentById:
-          FundsCalculator.accountMonthChangePercentById(
-            transactions,
-            now: now,
-          ),
+          FundsCalculator.accountMonthChangePercentById(transactions, now: now),
     );
   }
 
@@ -239,7 +236,9 @@ class TransactionsServiceImpl implements TransactionsService {
       case DepositFlowMode.allocateExistingUnallocated:
         final maxAllowed = availableUnallocatedCents;
         if (maxAllowed == null || maxAllowed <= 0) {
-          throw const ValidationAppException(AppStrings.noUnallocatedForAccount);
+          throw const ValidationAppException(
+            AppStrings.noUnallocatedForAccount,
+          );
         }
         var allocatedTotal = 0;
         for (final row in allocations) {
@@ -247,10 +246,14 @@ class TransactionsServiceImpl implements TransactionsService {
           allocatedTotal += row.amountCents;
         }
         if (allocatedTotal <= 0) {
-          throw const ValidationAppException(AppStrings.enterAtLeastOneAllocation);
+          throw const ValidationAppException(
+            AppStrings.enterAtLeastOneAllocation,
+          );
         }
         if (allocatedTotal > maxAllowed) {
-          throw const ValidationAppException(AppStrings.allocationsExceedUnallocated);
+          throw const ValidationAppException(
+            AppStrings.allocationsExceedUnallocated,
+          );
         }
         for (final row in allocations) {
           if (row.goalId.isEmpty || row.amountCents <= 0) continue;
@@ -280,7 +283,9 @@ class TransactionsServiceImpl implements TransactionsService {
           allocatedTotal += row.amountCents;
         }
         if (allocatedTotal > depositAmountCents) {
-          throw const ValidationAppException(AppStrings.allocationsExceedDeposit);
+          throw const ValidationAppException(
+            AppStrings.allocationsExceedDeposit,
+          );
         }
         for (final row in allocations) {
           if (row.goalId.isEmpty || row.amountCents <= 0) continue;

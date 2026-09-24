@@ -27,12 +27,12 @@ class TransactionsRepositoryImpl implements TransactionsRepository {
     required bool Function() canSync,
     SupabaseClient? supabase,
     PendingSyncQueue? pendingSyncQueue,
-  })  : _box = box,
-        _userContext = userContext,
-        _appConfig = appConfig,
-        _canSync = canSync,
-        _supabase = supabase,
-        _pendingSyncQueue = pendingSyncQueue;
+  }) : _box = box,
+       _userContext = userContext,
+       _appConfig = appConfig,
+       _canSync = canSync,
+       _supabase = supabase,
+       _pendingSyncQueue = pendingSyncQueue;
 
   final Box<TransactionHiveModel> _box;
   final UserContext _userContext;
@@ -44,7 +44,9 @@ class TransactionsRepositoryImpl implements TransactionsRepository {
   static const _uuid = Uuid();
 
   bool get _shouldEnqueue =>
-      _appConfig.isSupabaseConfigured && _pendingSyncQueue != null && _canSync();
+      _appConfig.isSupabaseConfigured &&
+      _pendingSyncQueue != null &&
+      _canSync();
 
   void _notify() {
     if (!_updates.isClosed) _updates.add(null);
@@ -165,7 +167,9 @@ class TransactionsRepositoryImpl implements TransactionsRepository {
       amountCents: existing.amountCents,
       occurredAtMillis: existing.occurredAtMillis,
       note: normalizedNote.isEmpty ? null : normalizedNote,
-      pendingSync: _appConfig.isSupabaseConfigured ? true : existing.pendingSync,
+      pendingSync: _appConfig.isSupabaseConfigured
+          ? true
+          : existing.pendingSync,
       isRecurring: existing.isRecurring,
       recurringEnabled: existing.recurringEnabled,
       frequencyIndex: existing.frequencyIndex,
@@ -196,12 +200,13 @@ class TransactionsRepositoryImpl implements TransactionsRepository {
 
     final enabled = isRecurring && frequency != TransactionFrequency.none;
     final template = existing.isRecurring || enabled;
-    final currentFrequency = TransactionFrequency.values[existing.frequencyIndex];
+    final currentFrequency =
+        TransactionFrequency.values[existing.frequencyIndex];
     final effectiveFrequency = enabled
         ? frequency
         : (currentFrequency == TransactionFrequency.none
-            ? TransactionFrequency.monthly
-            : currentFrequency);
+              ? TransactionFrequency.monthly
+              : currentFrequency);
     final now = DateTime.now();
     final previousNext = existing.nextScheduledAtMillis == null
         ? null
@@ -210,7 +215,9 @@ class TransactionsRepositoryImpl implements TransactionsRepository {
     final next = RecurringSchedule.resolveNextScheduledDate(
       enabled: enabled,
       now: now,
-      occurredAt: DateTime.fromMillisecondsSinceEpoch(existing.occurredAtMillis),
+      occurredAt: DateTime.fromMillisecondsSinceEpoch(
+        existing.occurredAtMillis,
+      ),
       currentFrequency: currentFrequency,
       effectiveFrequency: effectiveFrequency,
       previousNext: previousNext,
@@ -226,7 +233,9 @@ class TransactionsRepositoryImpl implements TransactionsRepository {
       amountCents: existing.amountCents,
       occurredAtMillis: existing.occurredAtMillis,
       note: existing.note,
-      pendingSync: _appConfig.isSupabaseConfigured ? true : existing.pendingSync,
+      pendingSync: _appConfig.isSupabaseConfigured
+          ? true
+          : existing.pendingSync,
       isRecurring: template,
       recurringEnabled: enabled,
       frequencyIndex: template ? effectiveFrequency.index : 0,
@@ -310,8 +319,9 @@ class TransactionsRepositoryImpl implements TransactionsRepository {
 
     await _box.clear();
     for (final raw in rows) {
-      final t =
-          transactionFromSupabaseRow(Map<String, dynamic>.from(raw as Map));
+      final t = transactionFromSupabaseRow(
+        Map<String, dynamic>.from(raw as Map),
+      );
       await _box.put(t.id, transactionToHive(t));
     }
     _notify();

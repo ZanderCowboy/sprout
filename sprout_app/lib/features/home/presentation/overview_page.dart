@@ -56,17 +56,14 @@ class _OverviewPageState extends State<OverviewPage> {
         backgroundColor: AppColors.surfaceBar,
         content: Row(
           children: [
-            const Icon(
-              Icons.celebration_outlined,
-              color: AppColors.accentLime,
-            ),
+            const Icon(Icons.celebration_outlined, color: AppColors.accentLime),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
                 message,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: scheme.onSurface,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(color: scheme.onSurface),
               ),
             ),
           ],
@@ -227,7 +224,7 @@ class _OverviewPageState extends State<OverviewPage> {
                 )
               else
                 const SliverToBoxAdapter(child: SizedBox(height: 96)),
-            const SliverToBoxAdapter(child: SizedBox(height: 24)),
+              const SliverToBoxAdapter(child: SizedBox(height: 24)),
             ],
           ),
         );
