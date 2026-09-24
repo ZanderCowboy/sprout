@@ -31,11 +31,21 @@ Legacy standalone workflows may still reference the same names; **Release Main**
 
 ## Set / update with `gh` (preferred)
 
-Always use the personal CLI config:
+Always use the personal CLI config, then confirm the **token** is personal (`gh auth status` is not enough):
 
 ```powershell
 $env:GH_CONFIG_DIR = "$env:USERPROFILE\.config\gh-zandercowboy"
+gh api user --jq .login   # must print ZanderCowboy
 ```
+
+On macOS / zsh:
+
+```bash
+export GH_CONFIG_DIR="$HOME/.config/gh-zandercowboy"
+gh api user --jq .login   # must print ZanderCowboy
+```
+
+If `gh secret list` returns 403 about “repository read permissions” / “secrets fine-grained permission”, the work token (`Zander-K`) is still in use. Re-login as in [GITHUB_CLI_PERSONAL.md](GITHUB_CLI_PERSONAL.md).
 
 From repo root:
 

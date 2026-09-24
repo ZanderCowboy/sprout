@@ -45,7 +45,7 @@ Agent shells may not inherit workspace `GH_CONFIG_DIR`. Before any `gh` command:
 export GH_CONFIG_DIR="$HOME/.config/gh-zandercowboy"
 ```
 
-Must be account `ZanderCowboy`, never work `Zander-K`. Details: `docs/GITHUB_CLI_PERSONAL.md`.
+Must be account `ZanderCowboy`, never work `Zander-K`. `gh auth status` is not proof — confirm with `gh api user --jq .login`. A 403 on `gh secret list` means the work token is still in the keyring. Details: `docs/GITHUB_CLI_PERSONAL.md`.
 
 ## Firebase CLI
 

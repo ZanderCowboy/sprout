@@ -16,7 +16,7 @@ Never instruct the human to edit source files or apply patches. If something req
 - Feature architecture: `.cursor/rules/clean-architecture.mdc`.
 - Prefer existing `sprout_app/test/mocks/mocks.dart` (hand-written fakes, not mockito).
 - No Melos/`build_runner` today — Hive adapters are checked in at `hive_adapters.dart`. If codegen is added later, run it via Melos.
-- GitHub CLI must use personal account `ZanderCowboy`, not work `Zander-K`. Before any `gh` command: `export GH_CONFIG_DIR=$HOME/.config/gh-zandercowboy`.
+- GitHub CLI must use personal account `ZanderCowboy`, not work `Zander-K`. Before any `gh` command: `export GH_CONFIG_DIR=$HOME/.config/gh-zandercowboy`. Do not trust `gh auth status`; confirm with `gh api user --jq .login` (must print `ZanderCowboy`).
 - Firebase CLI must use the personal Google account, not work. Before any `firebase` command: `export XDG_CONFIG_HOME=$HOME/.config/firebase-personal`.
 - gcloud must use the personal Google account and `sprout-app-development`, not work. Before any `gcloud` command: `export CLOUDSDK_CONFIG=$HOME/.config/gcloud-personal`.
 - Changelog: prepend dated feature/fix bullets to [`CHANGELOG.md`](CHANGELOG.md) when work is ready for `main`. See `.cursor/rules/changelog.mdc`.
