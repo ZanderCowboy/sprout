@@ -211,11 +211,18 @@ Your [DEV] Sprout login code
 
 Paste this into the **Body** field. Keep `{{ .Token }}` exactly as written (spaces around `.Token`).
 
+The landing link is a **static** `https://sprout.app` URL. Do **not** use `{{ .ConfirmationURL }}` — that is the auth confirm/magic-link URL and will not open the app.
+
+On the **dev** project, prefix the footer with `[DEV]` (shown below). On **prod**, drop that prefix so it reads `Sprout · Stackmint`.
+
 ```html
 <div style="font-family: system-ui, -apple-system, Segoe UI, sans-serif; max-width: 480px; margin: 0 auto; color: #111827;">
   <p style="font-size: 16px; line-height: 1.5;">Enter this code in Sprout to sign in:</p>
   <p style="font-size: 32px; letter-spacing: 0.2em; font-weight: 700; margin: 24px 0;">{{ .Token }}</p>
   <p style="font-size: 14px; line-height: 1.5; color: #4b5563;">This code expires in about an hour. If you did not request it, you can ignore this email.</p>
+  <p style="font-size: 14px; line-height: 1.5; margin: 24px 0 0;">
+    <a href="https://sprout.app" style="color: #111827; text-decoration: underline;">Visit sprout.app</a>
+  </p>
   <p style="font-size: 12px; color: #9ca3af;">[DEV] Sprout · Stackmint</p>
 </div>
 ```
@@ -239,12 +246,19 @@ If the email never arrives: Resend dashboard → Logs / Emails, and Supabase →
 
 ## Prod later
 
-When dev OTP works:
+When dev OTP works, repeat for **prod** Supabase. Full runbook: [SUPABASE_AUTH_TODOS.md § 6 PROD checklist](SUPABASE_AUTH_TODOS.md#6-prod-checklist-issue-51) (issue [#51](https://github.com/ZanderCowboy/sprout/issues/51)).
+
+**PROD SMTP setup (still to do as of 2026-09-24):**
 
 1. Same Resend domain/API key can be reused.
-2. Enable Custom SMTP on the **prod** Supabase project with the same host/user/password.
-3. Edit the **prod** Magic link **and** Confirm signup templates the same way (`{{ .Token }}`).
-4. Prefer a dedicated sender if you like (`noreply@…` is fine for both).
+2. Enable **Custom SMTP** on the **prod** Supabase project with the same host/user/password (`smtp.resend.com`, port `465`, username `resend`, password = Resend API key).
+3. Edit the **prod Magic Link template**:
+   - Subject: `Your Sprout login code is {{ .Token }}` (drop `[DEV]`)
+   - Body: same OTP template HTML with `{{ .Token }}`; update sender name/footer from `[DEV] Sprout` to `Sprout`
+4. Edit the **prod Confirm signup template**:
+   - Subject: same as Magic Link (`Your Sprout login code is {{ .Token }}`)
+   - Body: same as Magic Link (first-time emails use Confirm signup; returning emails use Magic Link; both need `{{ .Token }}`)
+5. Sender email: `noreply@stackmint.app` (or your verified Resend domain), sender name: `Sprout` (no `[DEV]` for prod).
 
 ---
 

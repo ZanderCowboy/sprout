@@ -92,6 +92,7 @@ python -c "import base64, pathlib; print(base64.b64encode(pathlib.Path(r'sprout_
   - Missing `APP_CONFIG_DEV_BASE64` → CI may write a **placeholder** config so the APK still builds (testers won’t get real Supabase/Firebase).
   - Empty `supabaseUrl` / keys → local-only mode in that build.
   - Prod Flutter Firebase needs the `firebase { … }` block filled from the **production** `google-services.json` client for `app.stackmint.sprout` (see [SUPABASE_AUTH_TODOS.md](SUPABASE_AUTH_TODOS.md) field map).
+  - **Refresh after Supabase/auth changes:** If `supabaseUrl`, `supabaseAnonKey`, or `googleWebClientId` change in `production.json`, re-encode and update `APP_CONFIG_PROD_BASE64` (same for dev twin). See [SUPABASE_AUTH_TODOS.md § 6 PROD checklist](SUPABASE_AUTH_TODOS.md#6-prod-checklist-issue-51) step G.
 
 ### `GOOGLE_SERVICES_DEV_BASE64` / `GOOGLE_SERVICES_PROD_BASE64`
 

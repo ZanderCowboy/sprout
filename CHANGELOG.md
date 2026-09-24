@@ -2,6 +2,11 @@
 
 Changes heading to `main`. Newest entries at the top.
 
+## 2026-09-25 — OTP email links to sprout.app
+
+- Sign-in code email template now includes a static link to the Sprout landing site (`https://sprout.app`)
+- Docs note that this must stay a marketing URL, not `{{ .ConfirmationURL }}`
+
 ## 2026-09-24 — PROD Firebase config and secrets checklist
 
 - Documented PROD Firebase Android app (`app.stackmint.sprout`, appId `1:322562799608:android:9f248684262ce3e548880d`) and local config setup completed 2026-09-24
@@ -24,6 +29,14 @@ Changes heading to `main`. Newest entries at the top.
 - Listed Play-related required secrets for CI Internal uploads
 - Added CI Android Verify workflow: PR-triggered build-only verification for development APK and production AAB (no upload); catches build failures before merge
 - Path-filtered to skip pure docs changes; manual dispatch available for testing
+
+## 2026-09-24 — PROD Supabase auth checklist
+
+- Added comprehensive production Supabase auth runbook in `SUPABASE_AUTH_TODOS.md` §6 covering Google Sign-In, Email OTP, migrations, and device smoke testing
+- Updated status language to reflect DEV largely complete and PROD as the active track
+- Cross-referenced PROD checklist from `RESEND_SMTP_SUPABASE.md` and `GITHUB_SECRETS.md`
+- Marked completed console work as of 2026-09-24/2026-09-25 SAST: Site URL, Anonymous off, Google provider with new prod Web client (`322562799608-39de6ancdbvlakeviadd7jc3ittnu30t.apps.googleusercontent.com` in GCP `sprout-app-production`), `APP_CONFIG_PROD_BASE64` refreshed, Android OAuth client for `app.stackmint.sprout` + Play App Signing SHA-1
+- Remaining work: Custom SMTP + email templates, record SHA-1 on #51, device smoke test
 
 ## 2026-09-23 — Re-enable first batch of linter rules
 
