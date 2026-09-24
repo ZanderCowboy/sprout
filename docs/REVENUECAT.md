@@ -14,13 +14,17 @@ No premium feature gating is added yet (premium is opt-in via the paywall tile o
 | Item | Value |
 |------|--------|
 | RevenueCat project | **Sprout** (`proj8bd5ebcf`) |
-| Store (current) | **Test Store** (`app643c11c740`) |
+| Store | **Play Store** (production) + **Test Store** (development) |
+| Play app | `appcb952e263d` (package `app.stackmint.sprout`) |
 | Entitlement | `premium` |
 | Offering | `default` (current) |
 | Packages | `$rc_monthly` → `premium_monthly`, `$rc_annual` → `premium_annual` |
-| Test Store prices | Monthly **ZAR R79.99**, Annual **ZAR R799.99** (required for offerings to resolve) |
+| Test Store prices | Monthly **ZAR R79.99**, Annual **ZAR R799.99** (for development) |
+| Play Store prices | Monthly **R49.99** (7-day trial), Annual **R399** (7-day trial) |
 
-Public SDK key for Test Store (safe to embed in the client): put it in config as `revenueCatAndroidApiKey`, or override with `--dart-define=REVENUECAT_ANDROID_API_KEY=…`.
+**Production** uses a Play `goog_…` SDK key (safe to embed in the client): put it in gitignored `production.json` as `revenueCatAndroidApiKey`, or override with `--dart-define=REVENUECAT_ANDROID_API_KEY=…`.
+
+**Development** continues using the Test Store public key (`test_…`) for local testing.
 
 ## Config
 
@@ -55,16 +59,6 @@ Empty `revenueCatAndroidApiKey` → purchases step is **skipped**. Non-empty is 
 
 Flavor (`development` / `production`) and build mode (`debug` / `release`) are independent. `flutter build apk --flavor development` is still a **release** binary.
 
-RevenueCat’s SDK **rejects** Test Store keys (`test_…`) in release and profile. That is intentional — Test Store must never ship to Play. Sprout currently has only a Test Store app in the dashboard (no Play `goog_…` key yet).
-
-| What you want | What to run |
-|---------------|-------------|
-| Paywall / Test Store purchases | Debug: `flutter run --flavor development -t lib/main_development.dart` |
-| Sideload / Firebase App Distribution APK | Release development APK is fine; startup **skips** Purchases when the key is `test_…` (Premium tile hidden) |
-| Real Play Billing | Later: add a Play Store app in RevenueCat, put a `goog_…` key in config, install from Play Internal Testing (not a sideloaded APK) |
-
-Do **not** point the development flavor at production.json or a production `goog_…` key. Production is a different package (`app.stackmint.sprout`) and is not wired for Purchases yet.
-
 ## Kill switch (Firebase Remote Config)
 
 Code:
@@ -73,21 +67,25 @@ Code:
 - [`RemoteConfigService`](../sprout_app/lib/core/flags/remote_config_service.dart) — `setup` (Firebase + defaults) vs `fetchFlags` / `isEnabled`
 
 `Purchases.configure` is **fail-closed**:
-
 | Flavor | Behaviour |
 |--------|-----------|
 | development | `RemoteConfigService.setup` + `fetchFlags`, then `isEnabled(RemoteFeatureFlag.revenueCatEnabled)`. Configure only if `true`. Missing Firebase config, offline, or any error → **skip** (detail: `remote flag off`). |
-| production | Remote Config not wired yet → setup no-ops → **always skip** configure. |
+| production | `RemoteConfigService.setup` + `fetchFlags`, then `isEnabled(RemoteFeatureFlag.revenueCatEnabled)`. Configure only if `true`. Missing Firebase config, offline, or any error → **skip** (detail: `remote flag off`). |
 
-### Enable for testing (`[DEV] Sprout`)
+### Enable for testing
 
-1. Open [Firebase Console](https://console.firebase.google.com/) → project **sprout-app-development**.
-2. **Remote Config** → add parameter:
+**Development:** Open [Firebase Console](https://console.firebase.google.com/) → project **sprout-app-development**.
+
+**Production:** Open [Firebase Console](https://console.firebase.google.com/) → project **sprout-app-production**.
+
+For either flavor:
+
+1. **Remote Config** → add parameter:
    - Key: `revenuecat_enabled` (must match `RemoteFeatureFlag.revenueCatEnabled.key`)
    - Type: Boolean
    - Default value: `false`
-3. Publish. Set to `true` when you want to test RevenueCat; set back to `false` to disable without a new build.
-4. **Cold-start** the development app (full process kill). Hot restart may leave a previously configured native Purchases singleton alone.
+2. Publish. Set to `true` when you want to test RevenueCat; set back to `false` to disable without a new build.
+3. **Cold-start** the app (full process kill). Hot restart may leave a previously configured native Purchases singleton alone.
 
 In-app defaults also set `revenuecat_enabled: false` before fetch, so an unpublished parameter stays off.
 
@@ -135,7 +133,5 @@ Dashboard: [RevenueCat](https://app.revenuecat.com/) → **Sprout** → **Custom
 
 ## Later (not done yet)
 
-- Production Remote Config + Play `goog_…` keys (replace Test Store for release builds).
-- Create **Play Store** apps in RevenueCat for `app.stackmint.sprout` and `app.stackmint.sprout.dev`, attach Play Console products + service-account credentials.
 - Entitlement gating for premium features (unlocking specific app behavior).
 - iOS (`appl_…` key) when the `ios/` platform is added.

@@ -1,6 +1,6 @@
 /// Remote Config feature flags (keys must match Firebase Console parameters).
 enum RemoteFeatureFlag {
-  /// Kill switch for `Purchases.configure` (development only today).
+  /// Kill switch for `Purchases.configure` (all flavors).
   revenueCatEnabled('revenuecat_enabled', defaultValue: false),
 
   /// When true, show the detailed startup checklist UI instead of the splash.
