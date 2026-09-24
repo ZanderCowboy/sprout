@@ -2,6 +2,14 @@
 
 Changes heading to `main`. Newest entries at the top.
 
+## 2026-09-24 — PROD Firebase config and secrets checklist
+
+- Documented PROD Firebase Android app (`app.stackmint.sprout`, appId `1:322562799608:android:9f248684262ce3e548880d`) and local config setup completed 2026-09-24
+- Noted `production/` flavor folder is local-only (gitignored); only `development/res/` committed to git
+- Marked `GOOGLE_SERVICES_PROD_BASE64` and `APP_CONFIG_PROD_BASE64` GitHub secrets as updated 2026-09-24
+- Marked Remote Config `terms_of_service` + `privacy_policy` as published on production Firebase project 2026-09-24
+- Human smoke test remains: production flavor build + verify Crashlytics/Analytics in Console for prod app
+
 ## 2026-09-24 — Play review password in local `.secrets`
 
 - Documented that the Play review Google password lives in gitignored `.secrets` as `PLAY_REVIEW_EMAIL` (email stays in `docs/PLAY_REVIEW_ACCESS.md`; not a GitHub Actions secret)

@@ -185,22 +185,23 @@ First-time emails use **Confirm signup** (default subject “Confirm your email 
 
 
 
-### 7. Terms and Privacy (Firebase Remote Config, dev)
+### 7. Terms and Privacy (Firebase Remote Config)
 
 The app shows Terms and the Privacy Policy **in-app** (not a website). Markdown is loaded from Firebase Remote Config strings `terms_of_service` and `privacy_policy`. Until those parameters exist (or the device is offline / RC setup is skipped), it uses the current drafts bundled in [`sprout_app/assets/legal/terms.md`](../sprout_app/assets/legal/terms.md) and [`sprout_app/assets/legal/privacy.md`](../sprout_app/assets/legal/privacy.md). Paste **that same markdown** into RC so fetched clients stay in sync with the bundle.
 
 A public Privacy Policy at `https://privacy.stackmint.app/` is intended later (you own DNS/hosting). Until then, the in-app version is current.
 
-**Where:** [Firebase → sprout-app-development → Remote Config](https://console.firebase.google.com/project/sprout-app-development/config)
+**Where:**
+- Dev: [Firebase → sprout-app-development → Remote Config](https://console.firebase.google.com/project/sprout-app-development/config)
+- Prod: [Firebase → sprout-app-production → Remote Config](https://console.firebase.google.com/project/sprout-app-production/config)
 
 1. Add parameter **`terms_of_service`** (type **String**). Paste the markdown from `sprout_app/assets/legal/terms.md`.
 2. Add parameter **`privacy_policy`** (type **String**). Paste the markdown from `sprout_app/assets/legal/privacy.md`.
 3. Publish the changes.
 
-Prod keeps the bundled files until prod Firebase Remote Config is turned on.
-
 - [ ] Dev Remote Config: `terms_of_service` string published
 - [ ] Dev Remote Config: `privacy_policy` string published
+- [x] Prod Remote Config: `terms_of_service` and `privacy_policy` published (2026-09-24)
 
 ---
 
@@ -290,22 +291,26 @@ Repo code now uses the **new** ids. Recreate Firebase Android apps and Google Cl
 
 ### C. You — Firebase
 
-Firebase **project** stays the same (`sprout-app-development` for nightly, `sprout-app-production` later). You add a **second Android app** inside that project with the new package. The old `co.za.zanderkotze…` app can sit unused.
+Firebase **project** stays the same (`sprout-app-development` for nightly, `sprout-app-production` for Play). You add a **second Android app** inside that project with the new package. The old `co.za.zanderkotze…` app can sit unused.
 
-**Do now (dev only).** Skip production until Google works on `[DEV] Sprout`.
+**Where:**
+- Dev: [Firebase → sprout-app-development → Project settings → Your apps](https://console.firebase.google.com/project/sprout-app-development/settings/general)
+- Prod: [Firebase → sprout-app-production → Project settings → Your apps](https://console.firebase.google.com/project/sprout-app-production/settings/general)
 
-**Where:** [Firebase → sprout-app-development → Project settings → Your apps](https://console.firebase.google.com/project/sprout-app-development/settings/general)
 
-
-| Flavor                | Firebase project         | Android package to register |
-| --------------------- | ------------------------ | --------------------------- |
-| development (tonight) | `sprout-app-development` | `app.stackmint.sprout.dev`  |
-| production (later)    | `sprout-app-production`  | `app.stackmint.sprout`      |
+| Flavor      | Firebase project         | Android package to register |
+| ----------- | ------------------------ | --------------------------- |
+| development | `sprout-app-development` | `app.stackmint.sprout.dev`  |
+| production  | `sprout-app-production`  | `app.stackmint.sprout`      |
 
 
 **Add app (if not already):** **Add app** → Android → package name exactly as the table → nickname e.g. `Sprout Dev` → register. Skip `google-services.json` download in the wizard if you already replaced the file.
 
-**File on disk (gitignored):** `sprout_app/android/app/src/development/google-services.json`
+**File on disk (gitignored):**
+- Dev: `sprout_app/android/app/src/development/google-services.json`
+- Prod: `sprout_app/android/app/src/production/google-services.json`
+
+Both files are gitignored and live directly under their flavor folder (not nested under `res/`). Only `development/res/` is committed to git; the `production/` folder is local-only.
 
 That JSON may list **two** `client` entries (old package + new). That is fine. Gradle picks the client whose `package_name` matches the APK.
 
@@ -333,16 +338,17 @@ If `firebase.appId` still matches the **old** package’s `mobilesdk_app_id`, Re
 base64 -i sprout_app/android/app/src/development/google-services.json | tr -d '\n'
 ```
 
-→ `GOOGLE_SERVICES_DEV_BASE64`. Production twin later: `…/src/production/google-services.json` → `GOOGLE_SERVICES_PROD_BASE64`.
+→ `GOOGLE_SERVICES_DEV_BASE64`. Production twin: `…/src/production/google-services.json` → `GOOGLE_SERVICES_PROD_BASE64` (updated 2026-09-24).
 
 **Old Firebase Android apps:** ignore or delete `co.za.zanderkotze.sprout.dev` once the new app is proven. Deleting is optional; leftover clients in `google-services.json` are harmless.
 
 - [x] Firebase project(s): add Android apps with **new** package names (`app.stackmint.sprout.dev` on the **development** project, `app.stackmint.sprout` on **production**)
-- [x] Download new `google-services.json` → `android/app/src/development/` (and `…/production/` when you do prod)
+- [x] Download new `google-services.json` → `android/app/src/development/` and `…/production/` (both gitignored)
 - [x] Update `firebase` block in `development.json` from the **new** package’s `mobilesdk_app_id` (see table)
-- [x] Re-encode `GOOGLE_SERVICES_DEV_BASE64` (prod secret later)
-- [x] GitHub secret `FIREBASE_APP_ID` = new Android App ID
-- [x] GitHub secret `GOOGLE_SERVICES_DEV_BASE64`
+- [x] Re-encode `GOOGLE_SERVICES_DEV_BASE64` and `GOOGLE_SERVICES_PROD_BASE64` (updated 2026-09-24)
+- [x] GitHub secret `FIREBASE_APP_ID` = new Android App ID (dev)
+- [x] GitHub secret `APP_CONFIG_PROD_BASE64` (updated 2026-09-24)
+- [x] GitHub secret `GOOGLE_SERVICES_PROD_BASE64` (updated 2026-09-24)
 - [x] Remove or ignore old Firebase Android apps with the old package
 
 ---
@@ -472,16 +478,18 @@ base64 -i sprout_app/android/app/src/development/google-services.json | tr -d '\
 | `FIREBASE_APP_ID`                 | After new Android app                          | New `1:…:android:…` (same as `firebase.appId`)              |
 | `FIREBASE_SERVICE_ACCOUNT_JSON`   | Usually unchanged                              | Same service account if it still has App Distribution Admin |
 | `ANDROID_SIGNING_CONFIG_BASE64`   | Unchanged                                      | Keystore blob; not package-specific                         |
-| `APP_CONFIG_PROD_BASE64`          | Later                                          | After `production.json` is filled                           |
-| `GOOGLE_SERVICES_PROD_BASE64`     | Later                                          | Prod `google-services.json`                                 |
+| `APP_CONFIG_PROD_BASE64`          | Updated 2026-09-24                             | base64 of `production.json`                                 |
+| `GOOGLE_SERVICES_PROD_BASE64`     | Updated 2026-09-24                             | base64 of prod `google-services.json`                       |
 | `PLAY_STORE_SERVICE_ACCOUNT_JSON` | Later                                          | Play API account for package `app.stackmint.sprout`         |
 
 
 If `APP_CONFIG_DEV_BASE64` is missing, CI still builds with a **placeholder** config ([FIREBASE_DEV_DISTRIBUTION.md](FIREBASE_DEV_DISTRIBUTION.md)) — testers would not get your real Supabase/Firebase ids. Update it once `development.json` is right.
 
-- [ ] `APP_CONFIG_DEV_BASE64` (and `APP_CONFIG_PROD_BASE64` when prod JSON changes)
-- [ ] `GOOGLE_SERVICES_DEV_BASE64` (prod twin later)
+- [ ] `APP_CONFIG_DEV_BASE64`
+- [ ] `GOOGLE_SERVICES_DEV_BASE64`
 - [ ] `FIREBASE_APP_ID` matches the new Android app
+- [x] `APP_CONFIG_PROD_BASE64` (updated 2026-09-24)
+- [x] `GOOGLE_SERVICES_PROD_BASE64` (updated 2026-09-24)
 - [x] Workflow `packageName` is `app.stackmint.sprout` (repo already updated)
 
 ---
