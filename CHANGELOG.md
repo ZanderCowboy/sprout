@@ -25,6 +25,12 @@ Changes heading to `main`. Newest entries at the top.
 - Added CI Android Verify workflow: PR-triggered build-only verification for development APK and production AAB (no upload); catches build failures before merge
 - Path-filtered to skip pure docs changes; manual dispatch available for testing
 
+## 2026-09-24 — PROD Supabase auth checklist
+
+- Added comprehensive production Supabase auth runbook in `SUPABASE_AUTH_TODOS.md` §6 covering Google Sign-In, Email OTP, migrations, and device smoke testing
+- Updated status language to reflect DEV largely complete and PROD as the active track
+- Cross-referenced PROD checklist from `RESEND_SMTP_SUPABASE.md` and `GITHUB_SECRETS.md`
+
 ## 2026-09-23 — Re-enable first batch of linter rules
 
 - Re-enabled `prefer_const_constructors`, `prefer_const_declarations`, `prefer_const_literals_to_create_immutables`, `prefer_final_locals`, `directives_ordering`, `sort_constructors_first`, `unnecessary_lambdas`, `unnecessary_breaks`, `unnecessary_await_in_return`, and `prefer_int_literals`
