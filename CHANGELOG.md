@@ -2,6 +2,13 @@
 
 Changes heading to `main`. Newest entries at the top.
 
+## 2026-09-24 — Production RevenueCat Remote Config kill switch
+
+- Firebase Remote Config now works on production flavor (same fail-closed pattern as development)
+- `revenuecat_enabled` flag must be set in **sprout-app-production** Firebase project for production Purchases to configure
+- Documented Play Store app linkage (`appcb952e263d` for `app.stackmint.sprout`) with live prices (R49.99/mo, R399/yr, 7-day trials)
+- Updated docs to clarify Play Internal Testing install requirement for real billing (not sideloaded)
+
 ## 2026-09-25 — OTP email links to sprout.app
 
 - Sign-in code email template now includes a static link to the Sprout landing site (`https://sprout.app`)
