@@ -241,12 +241,17 @@ If the email never arrives: Resend dashboard → Logs / Emails, and Supabase →
 
 When dev OTP works, repeat for **prod** Supabase. Full runbook: [SUPABASE_AUTH_TODOS.md § 6 PROD checklist](SUPABASE_AUTH_TODOS.md#6-prod-checklist-issue-51) (issue [#51](https://github.com/ZanderCowboy/sprout/issues/51)).
 
-Quick summary:
+**PROD SMTP setup (still to do as of 2026-09-24):**
 
 1. Same Resend domain/API key can be reused.
-2. Enable Custom SMTP on the **prod** Supabase project with the same host/user/password.
-3. Edit the **prod** Magic link **and** Confirm signup templates the same way (`{{ .Token }}`).
-4. Prefer a dedicated sender if you like (`noreply@…` is fine for both).
+2. Enable **Custom SMTP** on the **prod** Supabase project with the same host/user/password (`smtp.resend.com`, port `465`, username `resend`, password = Resend API key).
+3. Edit the **prod Magic Link template**:
+   - Subject: `Your Sprout login code is {{ .Token }}` (drop `[DEV]`)
+   - Body: same OTP template HTML with `{{ .Token }}`; update sender name/footer from `[DEV] Sprout` to `Sprout`
+4. Edit the **prod Confirm signup template**:
+   - Subject: same as Magic Link (`Your Sprout login code is {{ .Token }}`)
+   - Body: same as Magic Link (first-time emails use Confirm signup; returning emails use Magic Link; both need `{{ .Token }}`)
+5. Sender email: `noreply@stackmint.app` (or your verified Resend domain), sender name: `Sprout` (no `[DEV]` for prod).
 
 ---
 

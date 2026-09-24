@@ -30,6 +30,8 @@ Changes heading to `main`. Newest entries at the top.
 - Added comprehensive production Supabase auth runbook in `SUPABASE_AUTH_TODOS.md` §6 covering Google Sign-In, Email OTP, migrations, and device smoke testing
 - Updated status language to reflect DEV largely complete and PROD as the active track
 - Cross-referenced PROD checklist from `RESEND_SMTP_SUPABASE.md` and `GITHUB_SECRETS.md`
+- Marked completed console work as of 2026-09-24/2026-09-25 SAST: Site URL, Anonymous off, Google provider with new prod Web client (`322562799608-39de6ancdbvlakeviadd7jc3ittnu30t.apps.googleusercontent.com` in GCP `sprout-app-production`), `APP_CONFIG_PROD_BASE64` refreshed, Android OAuth client for `app.stackmint.sprout` + Play App Signing SHA-1
+- Remaining work: Custom SMTP + email templates, record SHA-1 on #51, device smoke test
 
 ## 2026-09-23 — Re-enable first batch of linter rules
 

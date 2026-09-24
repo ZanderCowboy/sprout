@@ -53,15 +53,16 @@ Summary status:
 
 - [x] Prod Supabase project exists (**Sprout**, ref `bybqayuvhsaezqkjggxz`, `https://bybqayuvhsaezqkjggxz.supabase.co`)
 - [x] Local `production.json`: `supabaseUrl` + `supabaseAnonKey` set
-- [x] Local `production.json`: `googleWebClientId` copied from dev (same Web OAuth client)
+- [x] Local `production.json`: `googleWebClientId` set to **new prod Web client** (`322562799608-39de6ancdbvlakeviadd7jc3ittnu30t.apps.googleusercontent.com` in GCP project `sprout-app-production`)
 - [x] Delete-account migrations applied on PROD (2026-09-24): `20260819120000_delete_own_account.sql` + `20260819220000_delete_own_account_definer.sql`
 - [x] PROD Firebase Remote Config legal strings published (issue #52)
-- [ ] Supabase console: Site URL, Anonymous off, Google provider
-- [ ] Supabase console: Custom SMTP + both email templates
-- [ ] `APP_CONFIG_PROD_BASE64` GitHub secret refresh
-- [ ] Android OAuth client for `app.stackmint.sprout` + **Play App Signing SHA-1**
-- [ ] Record SHA-1 on issue #51
-- [ ] Device smoke test (production flavor)
+- [x] Supabase console: Site URL (`https://stackmint.app`), Anonymous **off**, Google provider **on** (prod Web client)
+- [x] `APP_CONFIG_PROD_BASE64` GitHub secret refreshed (2026-09-24 23:40 SAST)
+- [x] Android OAuth client for `app.stackmint.sprout` + **Play App Signing SHA-1** created in GCP `sprout-app-production`
+- [x] Play App Signing SHA-1 + SHA-256 added to Firebase prod Android app (`sprout-app-production` / `app.stackmint.sprout`)
+- [ ] Supabase console: Custom SMTP + both email templates (Magic Link **and** Confirm signup with `{{ .Token }}`)
+- [ ] Record Play App Signing SHA-1 fingerprint value on issue #51
+- [ ] Device smoke test (production flavor: Google, email OTP, sign-out, re-login)
 
 ### Later
 
@@ -256,52 +257,59 @@ Runbook for **production** Supabase auth setup + Google Sign-In + Email OTP on t
 
 ---
 
-#### A. Already done (record only; do not claim console steps you did not do)
+#### A. Already done (as of 2026-09-24 / 2026-09-25 SAST)
 
 - [x] Prod Supabase project created (**Sprout**, `bybqayuvhsaezqkjggxz`)
 - [x] Local `production.json`: `supabaseUrl` + `supabaseAnonKey` (publishable anon key) set for that project
-- [x] Local `production.json`: `googleWebClientId` copied from development (same Web OAuth client — Zander must still enable that Web client ID + secret on **prod** Supabase Google provider)
+- [x] Local `production.json`: `googleWebClientId` set to **new prod Web OAuth client** (`322562799608-39de6ancdbvlakeviadd7jc3ittnu30t.apps.googleusercontent.com`) created in GCP project `sprout-app-production` (not development)
 - [x] Delete-account migrations applied on **prod** via Supabase MCP on **2026-09-24**:
   - `20260819120000_delete_own_account.sql` (private function + public wrapper)
   - `20260819220000_delete_own_account_definer.sql` (public wrapper `SECURITY DEFINER`)
 - [x] PROD Firebase Remote Config: legal strings (`terms_of_service` + `privacy_policy`) published (issue #52)
+- [x] Supabase console (PROD): Site URL set to `https://stackmint.app`
+- [x] Supabase console (PROD): Anonymous sign-ins **disabled**
+- [x] Supabase console (PROD): Google provider **enabled** with the new prod Web client ID + secret
+- [x] GitHub secret `APP_CONFIG_PROD_BASE64` refreshed (2026-09-24 23:40 SAST)
+- [x] Google Cloud Android OAuth client created for `app.stackmint.sprout` + **Play App Signing SHA-1** in GCP project `sprout-app-production`
+- [x] Play App Signing SHA-1 + SHA-256 added to Firebase prod Android app (`sprout-app-production` / `app.stackmint.sprout`)
+- [x] Local gitignored `sprout_app/android/app/src/production/google-services.json` re-downloaded (project_id `sprout-app-production`, package `app.stackmint.sprout`)
 
 ---
 
-#### B. Supabase console (PROD) — Site URL
+#### B. Supabase console (PROD) — Site URL ✅ DONE
 
 **Where:** Supabase **prod** project → **Authentication → URL Configuration**
 
-- [ ] **Site URL** set to `https://stackmint.app` (or `https://bybqayuvhsaezqkjggxz.supabase.co`)
-- [ ] **Additional Redirect URLs** left empty (deep links deferred)
-- [ ] Save
+- [x] **Site URL** set to `https://stackmint.app`
+- [x] **Additional Redirect URLs** left empty (deep links deferred)
+- [x] Save
 
 ---
 
-#### C. Supabase console (PROD) — Disable Anonymous sign-ins
+#### C. Supabase console (PROD) — Disable Anonymous sign-ins ✅ DONE
 
 **Where:** Supabase **prod** project → **Authentication → Providers → Anonymous**
 
-- [ ] **Enable Anonymous sign-ins** toggle **OFF**
-- [ ] Save
+- [x] **Enable Anonymous sign-ins** toggle **OFF**
+- [x] Save
 
 The app never calls `signInAnonymously`; this is belt-and-suspenders.
 
 ---
 
-#### D. Supabase console (PROD) — Google provider
+#### D. Supabase console (PROD) — Google provider ✅ DONE
 
 **Where:** Supabase **prod** project → **Authentication → Providers → Google**
 
-**Prerequisites:** Google Cloud **Web** OAuth client (same one already in `development.json` → `googleWebClientId`) with Client ID + Client secret.
+**Prerequisites:** Google Cloud **Web** OAuth client created in GCP project `sprout-app-production` with Client ID + Client secret.
 
-- [ ] **Enable Google provider** toggle **ON**
-- [ ] Paste **Web Client ID** (same value as dev `googleWebClientId`) into **Client ID (for OAuth)** field
-- [ ] Paste **Web Client secret** into **Client Secret (for OAuth)** field
-- [ ] **Authorized Client IDs (optional)** left empty (Web-only flow; Android SHA-1 linkage is on Google Cloud side only)
-- [ ] Save
+- [x] **Enable Google provider** toggle **ON**
+- [x] Paste **Web Client ID** (`322562799608-39de6ancdbvlakeviadd7jc3ittnu30t.apps.googleusercontent.com` from `sprout-app-production`) into **Client ID (for OAuth)** field
+- [x] Paste **Web Client secret** into **Client Secret (for OAuth)** field
+- [x] **Authorized Client IDs (optional)** left empty (Web-only flow; Android SHA-1 linkage is on Google Cloud side only)
+- [x] Save
 
-**Note:** The **Web** OAuth client ID + secret enable Google Sign-In on all platforms. Do not paste Android OAuth client IDs here unless the UI specifically asks for them.
+**Note:** The **Web** OAuth client ID + secret enable Google Sign-In on all platforms. PROD uses its **own** Web client in GCP project `sprout-app-production`, not the dev client from `sprout-app-development`.
 
 ---
 
@@ -346,13 +354,13 @@ Already set (from "Already done" above):
 
 - [x] `supabaseUrl`: `https://bybqayuvhsaezqkjggxz.supabase.co`
 - [x] `supabaseAnonKey`: prod publishable anon key (from Supabase **prod** project → Settings → API)
-- [x] `googleWebClientId`: same Web OAuth client ID as dev (enabled on prod Supabase in step D)
+- [x] `googleWebClientId`: **new prod Web client** (`322562799608-39de6ancdbvlakeviadd7jc3ittnu30t.apps.googleusercontent.com`) from GCP project `sprout-app-production` (enabled on prod Supabase in step D)
 
-**No changes needed** if those three are already correct. If you changed `googleWebClientId` or the Supabase keys, proceed to step G.
+All three fields are correct as of 2026-09-24.
 
 ---
 
-#### G. GitHub Actions secret — `APP_CONFIG_PROD_BASE64`
+#### G. GitHub Actions secret — `APP_CONFIG_PROD_BASE64` ✅ DONE
 
 **When:** After any change to `production.json` (Supabase keys, `googleWebClientId`, Firebase `appId`, etc.).
 
@@ -370,15 +378,15 @@ Or bash/zsh:
 base64 -i sprout_app/assets/config/production.json | tr -d '\n' | gh secret set APP_CONFIG_PROD_BASE64 --repo ZanderCowboy/sprout
 ```
 
-- [ ] `APP_CONFIG_PROD_BASE64` updated (or confirmed unchanged if `production.json` was already correct)
+- [x] `APP_CONFIG_PROD_BASE64` updated **2026-09-24 23:40 SAST** (after `production.json` `googleWebClientId` set to new prod Web client)
 
 **Why?** The Release Main workflow decodes this secret and bundles it into the production AAB so Play builds use the real Supabase/Firebase/Google keys.
 
 ---
 
-#### H. Google Cloud OAuth — Android client for `app.stackmint.sprout`
+#### H. Google Cloud OAuth — Android client for `app.stackmint.sprout` ✅ DONE
 
-**Where:** [Google Cloud Credentials](https://console.cloud.google.com/apis/credentials?project=sprout-app-development)
+**Where:** [Google Cloud Credentials](https://console.cloud.google.com/apis/credentials?project=sprout-app-production)
 
 **Prereqs:**
 
@@ -393,8 +401,9 @@ base64 -i sprout_app/assets/config/production.json | tr -d '\n' | gh secret set 
 4. Name the client e.g. `Sprout Prod Android` or `Sprout Play Store`.
 5. Create.
 
-- [ ] Android OAuth client created for `app.stackmint.sprout` + **Play App Signing SHA-1**
-- [ ] SHA-1 value **recorded on issue #51** (paste the full fingerprint in a comment so it is not lost)
+- [x] Android OAuth client created for `app.stackmint.sprout` + **Play App Signing SHA-1** in GCP project `sprout-app-production`
+- [x] Play App Signing SHA-1 + SHA-256 added to Firebase prod Android app (`sprout-app-production` / `app.stackmint.sprout`)
+- [ ] Play App Signing SHA-1 fingerprint value **recorded on issue #51** (paste the full fingerprint in a comment so it is not lost)
 
 **Why record SHA-1?** The app signing cert SHA-1 is stable after first upload; recording it on #51 ensures you can recreate the OAuth client or verify the config if Google sign-in fails on a Play-distributed production build.
 
@@ -412,7 +421,18 @@ flutter build apk --release --flavor production -t lib/main_production.dart
 flutter install --release --flavor production
 ```
 
-Or run via VS Code launch config **Sprout · prod · …** (if debug signing is acceptable for this test; Play-signed installs come later via internal track upload).
+Or run via VS Code launch config **Sprout · prod · …** (uses debug signing; Play-signed installs come later via internal track upload).
+
+**Local debug signing (for `flutter run` production flavor smoke):**
+
+If Google Sign-In fails on a debug build with "developer error" / package mismatch:
+
+1. Add the **Android debug keystore SHA-1** to the Firebase prod Android app (`sprout-app-production` / `app.stackmint.sprout`) → Project settings → SHA certificate fingerprints (same pattern as adding Play App Signing SHA).
+2. Create a **second** Android OAuth client in GCP `sprout-app-production` for `app.stackmint.sprout` + **debug SHA-1**.
+
+Debug SHA-1 on CT-MAC-75: `48:C6:1E:01:91:A4:E2:96:EA:F5:90:4C:A5:3A:EA:00:D3:C6:17:2F`
+
+Debug signing is only for local smoke testing. Play-distributed production builds use the **Play App Signing SHA-1** already configured in step H.
 
 **Test flow:**
 
