@@ -354,11 +354,17 @@ jobs:
       - name: Prepare Play release notes
         env:
           RELEASE_NOTES: ${{ needs.resolve.outputs.release_notes }}
+          PLAY_TRACK: ${{ needs.resolve.outputs.play_track }}
         run: |
           set -euo pipefail
           mkdir -p whatsnew
           if [[ -z "${RELEASE_NOTES}" ]]; then
-            echo "Production release" > whatsnew/whatsnew-en-US
+            # Provide a track-aware fallback when release_notes is empty
+            if [[ "${PLAY_TRACK}" == "internal" ]]; then
+              echo "Internal testing release" > whatsnew/whatsnew-en-US
+            else
+              echo "Production release" > whatsnew/whatsnew-en-US
+            fi
           else
             printf '%s\n' "${RELEASE_NOTES}" > whatsnew/whatsnew-en-US
           fi

@@ -2,6 +2,15 @@
 
 Changes heading to `main`. Newest entries at the top.
 
+## 2026-09-24 — Play CI and review account docs
+
+- Added `docs/PLAY_REVIEW_ACCESS.md` with Play Store review account email, sign-in, and pre-review verification checklist
+- Clarified `docs/PLAY_PUBLISH_PROD_ANDROID.md`: CI ships to testing tracks only (Internal default) until Zander's explicit Production approval; prefer Play Console promote over `play_track: production` dispatch
+- Improved Release Main workflow: empty release notes default to "Internal testing release" for internal track, "Production release" for other tracks
+- Documented release notes behavior: merge uses PR title, manual dispatch uses `release_notes` input
+- Cross-linked review account setup from `PLAY_PUBLISH_PROD_ANDROID.md` and `GITHUB_SECRETS.md`
+- Listed Play-related required secrets for CI Internal uploads
+
 ## 2026-09-23 — Re-enable first batch of linter rules
 
 - Re-enabled `prefer_const_constructors`, `prefer_const_declarations`, `prefer_const_literals_to_create_immutables`, `prefer_final_locals`, `directives_ordering`, `sort_constructors_first`, `unnecessary_lambdas`, `unnecessary_breaks`, `unnecessary_await_in_return`, and `prefer_int_literals`

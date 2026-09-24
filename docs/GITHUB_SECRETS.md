@@ -6,7 +6,7 @@ Canonical inventory for **ZanderCowboy/sprout**. Where each secret comes from, h
 
 **Do not** commit secret values, keystores, PEMs, or service-account JSON. Local copies belong under gitignored paths (`sprout_app/assets/config/`, `…/google-services.json`, `/config/`).
 
-Related: local flavor files + OneDrive restore → [`.cursor/references/secrets.md`](../.cursor/references/secrets.md). Workflows: [FIREBASE_DEV_DISTRIBUTION.md](FIREBASE_DEV_DISTRIBUTION.md), [PLAY_PUBLISH_PROD_ANDROID.md](PLAY_PUBLISH_PROD_ANDROID.md), [BUILD_NUMBER.md](BUILD_NUMBER.md).
+Related: local flavor files + OneDrive restore → [`.cursor/references/secrets.md`](../.cursor/references/secrets.md). Workflows: [FIREBASE_DEV_DISTRIBUTION.md](FIREBASE_DEV_DISTRIBUTION.md), [PLAY_PUBLISH_PROD_ANDROID.md](PLAY_PUBLISH_PROD_ANDROID.md), [BUILD_NUMBER.md](BUILD_NUMBER.md). Play review account setup: [PLAY_REVIEW_ACCESS.md](PLAY_REVIEW_ACCESS.md).
 
 ---
 
