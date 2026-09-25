@@ -1,0 +1,54 @@
+appId: app.stackmint.sprout.dev
+tags:
+  - page
+  - premium
+  - budget
+  - subscribed
+---
+# Premium active: clearState + debugSignIn → Purchases.logIn(maestro-test-user)
+# with promo entitlement → Settings shows Premium active → Master Budget opens
+# with no paywall.
+# Run: maestro test .maestro/master-budget-premium.yaml
+
+- setAirplaneMode: disabled
+
+- launchApp:
+    clearState: true
+    clearKeychain: true
+
+- runFlow: shared/debug-signin-intro.yaml
+
+- tapOn:
+    id: "shell_tab_settings"
+
+- extendedWaitUntil:
+    visible:
+      id: "settings_premium"
+    timeout: 15000
+
+- extendedWaitUntil:
+    visible:
+      text: ".*Premium active.*"
+    timeout: 30000
+
+- assertVisible:
+    text: ".*Premium active.*"
+
+- extendedWaitUntil:
+    visible:
+      id: "settings_budget"
+    timeout: 10000
+
+- tapOn:
+    id: "settings_budget"
+
+- extendedWaitUntil:
+    visible:
+      text: "Master Budget"
+    timeout: 15000
+
+- assertVisible:
+    text: "Master Budget"
+
+- assertVisible:
+    id: "budget_sort"

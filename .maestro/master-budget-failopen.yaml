@@ -1,0 +1,46 @@
+appId: app.stackmint.sprout.dev
+tags:
+  - page
+  - premium
+  - budget
+  - failopen
+---
+# Fail-open: airplane before cold start → RC fetch fails → in-app default
+# revenuecat_enabled=false → canUsePremiumFeature(true) → Master Budget opens
+# without paywall (same pattern as settings-premium-killswitch-off.yaml).
+# Run: maestro test .maestro/master-budget-failopen.yaml
+
+- setAirplaneMode: enabled
+
+- launchApp:
+    clearState: true
+    clearKeychain: true
+
+- runFlow: shared/debug-signin-intro.yaml
+
+- tapOn:
+    id: "shell_tab_settings"
+
+- extendedWaitUntil:
+    visible:
+      id: "settings_budget"
+    timeout: 15000
+
+- assertVisible:
+    id: "settings_budget"
+
+- tapOn:
+    id: "settings_budget"
+
+- extendedWaitUntil:
+    visible:
+      text: "Master Budget"
+    timeout: 15000
+
+- assertVisible:
+    text: "Master Budget"
+
+- assertVisible:
+    id: "budget_sort"
+
+- setAirplaneMode: disabled

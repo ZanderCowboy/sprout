@@ -1,0 +1,67 @@
+appId: app.stackmint.sprout.dev
+tags:
+  - page
+  - premium
+  - budget
+  - paywall
+---
+# Free/unsubscribed: tap Master Budget → paywall → back stays on Settings.
+# REQUIRES maestro-test-user promo revoked (or Upgrade visible). While promo
+# grant is active, clearState+debugSignIn → logIn → Premium and this FAILS.
+# Run: maestro test .maestro/master-budget-paywall.yaml
+
+- setAirplaneMode: disabled
+
+- launchApp:
+    clearState: true
+    clearKeychain: true
+
+- runFlow: shared/debug-signin-intro.yaml
+
+- tapOn:
+    id: "shell_tab_settings"
+
+- extendedWaitUntil:
+    visible:
+      id: "settings_premium"
+    timeout: 15000
+
+- extendedWaitUntil:
+    visible:
+      text: ".*Upgrade.*"
+    timeout: 20000
+
+- assertVisible:
+    text: ".*Upgrade.*"
+
+- extendedWaitUntil:
+    visible:
+      id: "settings_budget"
+    timeout: 10000
+
+- tapOn:
+    id: "settings_budget"
+
+- extendedWaitUntil:
+    visible:
+      text: ".*(Monthly|Annual|R79|Subscribe|Continue).*"
+    timeout: 25000
+
+- assertVisible:
+    text: ".*(Monthly|Annual|R79|Subscribe|Continue).*"
+
+- back
+
+- extendedWaitUntil:
+    visible:
+      id: "settings_budget"
+    timeout: 10000
+
+- assertVisible:
+    id: "settings_budget"
+
+- assertNotVisible:
+    id: "budget_sort"
+
+- assertNotVisible:
+    text: "Master Budget"
