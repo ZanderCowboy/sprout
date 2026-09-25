@@ -1,0 +1,60 @@
+appId: app.stackmint.sprout.dev
+tags:
+  - page
+  - premium
+  - purchases
+  - subscribed
+---
+# Assert Settings Premium card shows subscribed state (Premium active + Manage).
+#
+# IMPORTANT — Purchases appUserID vs debug sign-in:
+# - Cold start with clearState: resolveUserId() mints a random UUID and
+#   Purchases.configure uses that UUID BEFORE debugSignIn.
+# - debugSignIn sets UserContext/Hive to AuthService.maestroTestUserId
+#   (`maestro-test-user`) but does NOT call Purchases.logIn — so the promo
+#   grant on `maestro-test-user` is NOT seen after clearState alone.
+# - After process death / soft relaunch (no clearState), configure reads Hive
+#   and uses `maestro-test-user` — grant on that id then applies.
+# - Mid-session grant on the clearState UUID is a QA procedure and is NOT
+#   fully automatable in Maestro alone (clearState would mint a new UUID).
+#
+# This flow uses clearState:true so it is durable for CI once either:
+#   (A) product adds Purchases.logIn('maestro-test-user') after debugSignIn and
+#       RC grants premium on maestro-test-user, OR
+#   (B) a prior Test Store purchase on that same install left premium active
+#       (see settings-premium-purchase.yaml).
+# Until (A), expect FAIL after fresh clearState even when maestro-test-user
+# has a promotional grant.
+#
+# Run: maestro test .maestro/settings-premium-subscribed.yaml
+
+- setAirplaneMode: disabled
+
+- launchApp:
+    clearState: true
+    clearKeychain: true
+
+- runFlow: shared/debug-signin-intro.yaml
+
+- tapOn:
+    id: "shell_tab_settings"
+
+- extendedWaitUntil:
+    visible:
+      id: "settings_premium"
+    timeout: 15000
+
+- assertVisible:
+    id: "settings_premium"
+
+# Wait out "Checking subscription...". Merged SproutListTile semantics need regex.
+- extendedWaitUntil:
+    visible:
+      text: ".*Premium active.*"
+    timeout: 30000
+
+- assertVisible:
+    text: ".*Premium active.*"
+
+- assertVisible:
+    text: ".*Manage.*"
