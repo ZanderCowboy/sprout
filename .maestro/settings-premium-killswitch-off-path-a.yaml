@@ -1,0 +1,13 @@
+appId: app.stackmint.sprout.dev
+tags:
+  - page
+  - premium
+  - killswitch
+  - issue-106
+  - path-a
+---
+# #106 / #99 Path A AC — kill switch off (airplane fail-open default):
+# settings_premium must stay hidden. Reuses settings-premium-killswitch-off.yaml.
+# Run: maestro test .maestro/settings-premium-killswitch-off-path-a.yaml
+
+- runFlow: settings-premium-killswitch-off.yaml

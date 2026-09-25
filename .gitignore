@@ -141,3 +141,6 @@ app.*.symbols
 
 # Kotlin compiler session files (local, ephemeral)
 sprout_app/android/.kotlin/
+
+# Local Maestro JUnit/log dumps (Personal QA)
+.maestro-results/

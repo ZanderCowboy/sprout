@@ -1,0 +1,18 @@
+appId: app.stackmint.sprout.dev
+tags:
+  - page
+  - premium
+  - purchases
+  - paywall
+  - issue-106
+  - path-a
+---
+# #106 / #99 Path A AC — Free user: Settings Premium shows Upgrade and opens
+# paywall (NOT Customer Center). Thin wrapper around the shared paywall flow.
+#
+# IMPORTANT: debugSignIn → Purchases.logIn(maestro-test-user). If that App User
+# ID has an active `premium` promo/purchase, this flow will see Premium active
+# instead of Upgrade — revoke the promo (or wait for expiry) before free-row QA.
+# Run: maestro test .maestro/settings-premium-upgrade-opens-paywall.yaml
+
+- runFlow: settings-premium-paywall.yaml

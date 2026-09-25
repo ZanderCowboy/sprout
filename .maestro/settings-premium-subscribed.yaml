@@ -11,20 +11,14 @@ tags:
 # - Cold start with clearState: resolveUserId() mints a random UUID and
 #   Purchases.configure uses that UUID BEFORE debugSignIn.
 # - debugSignIn sets UserContext/Hive to AuthService.maestroTestUserId
-#   (`maestro-test-user`) but does NOT call Purchases.logIn — so the promo
-#   grant on `maestro-test-user` is NOT seen after clearState alone.
-# - After process death / soft relaunch (no clearState), configure reads Hive
-#   and uses `maestro-test-user` — grant on that id then applies.
-# - Mid-session grant on the clearState UUID is a QA procedure and is NOT
-#   fully automatable in Maestro alone (clearState would mint a new UUID).
-#
-# This flow uses clearState:true so it is durable for CI once either:
-#   (A) product adds Purchases.logIn('maestro-test-user') after debugSignIn and
-#       RC grants premium on maestro-test-user, OR
-#   (B) a prior Test Store purchase on that same install left premium active
-#       (see settings-premium-purchase.yaml).
-# Until (A), expect FAIL after fresh clearState even when maestro-test-user
-# has a promotional grant.
+#   (`maestro-test-user`) AND calls Purchases.logIn(maestro-test-user) via
+#   PremiumPaywall.logInIfConfigured (wired in service_locator).
+# - Therefore a promotional grant (or Test Store purchase) on
+#   `maestro-test-user` is visible after clearState + debugSignIn.
+# - For free/Upgrade paywall flows, revoke the promo (or wait for expiry)
+#   on maestro-test-user first — see settings-premium-upgrade-opens-paywall.yaml.
+# - To open Customer Center after Premium active, see
+#   settings-premium-customer-center.yaml (#106 Path A).
 #
 # Run: maestro test .maestro/settings-premium-subscribed.yaml
 
