@@ -194,6 +194,7 @@ Future<void> configureDependencies({
         await sl<BudgetRepository>().pullRemote();
         await sl<TransactionsRepository>().pullRemote();
       },
+      logInPurchases: PremiumPaywall.logInIfConfigured,
       logOutPurchases: PremiumPaywall.logOutIfConfigured,
     ),
   );

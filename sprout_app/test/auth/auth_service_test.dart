@@ -53,6 +53,7 @@ void main() {
 
   AuthServiceImpl buildAuthService({
     AppConfig? appConfig,
+    Future<void> Function(String)? logInPurchases,
     Future<void> Function()? logOutPurchases,
   }) {
     return AuthServiceImpl(
@@ -67,6 +68,7 @@ void main() {
       pullRemote: () async {
         pullCalls++;
       },
+      logInPurchases: logInPurchases,
       logOutPurchases: logOutPurchases,
     );
   }
@@ -148,6 +150,27 @@ void main() {
     expect(userContext.lastVerifiedUserId, 'verified-uid');
     expect(flushCalls, 0);
     expect(pullCalls, 1);
+  });
+
+  test('verified sign-in syncs RevenueCat identity when callback provided',
+      () async {
+    var logInCalls = 0;
+    String? lastLogInUserId;
+
+    final service = buildAuthService(
+      logInPurchases: (userId) async {
+        logInCalls++;
+        lastLogInUserId = userId;
+      },
+    );
+
+    await service.verifyEmailOtp(
+      email: 'guest@example.com',
+      token: '123456',
+    );
+
+    expect(logInCalls, 1);
+    expect(lastLogInUserId, 'verified-uid');
   });
 
   test('verifyEmailOtp with display name updates metadata', () async {
@@ -259,6 +282,26 @@ void main() {
     expect(userContext.cachedUserId, 'verified-uid');
   });
 
+  test('signOut calls RevenueCat logout when callback provided', () async {
+    var logOutCalls = 0;
+
+    final service = buildAuthService(
+      logOutPurchases: () async {
+        logOutCalls++;
+      },
+    );
+
+    await userContext.setActiveUserId('verified-uid');
+    fakeAuth.setUser(
+      const AuthUser(id: 'verified-uid', email: 'a@b.com', isAnonymous: false),
+    );
+
+    await service.signOut();
+
+    expect(logOutCalls, 1);
+    expect(fakeAuth.currentUser, isNull);
+  });
+
   test(
     'deleteAccount RPCs then clears Hive and session, keeps intro',
     () async {
@@ -318,6 +361,23 @@ void main() {
 
     await authService.signOut();
     expect(authService.isDebugSignedIn, isFalse);
+  });
+
+  test('debugSignIn syncs RevenueCat identity when callback provided', () async {
+    var logInCalls = 0;
+    String? lastLogInUserId;
+
+    final service = buildAuthService(
+      logInPurchases: (userId) async {
+        logInCalls++;
+        lastLogInUserId = userId;
+      },
+    );
+
+    await service.debugSignIn();
+
+    expect(logInCalls, 1);
+    expect(lastLogInUserId, AuthService.maestroTestUserId);
   });
 
   test('debugSignIn is rejected in production', () async {

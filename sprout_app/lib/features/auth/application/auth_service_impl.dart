@@ -19,6 +19,7 @@ class AuthServiceImpl implements AuthService {
     required AnalyticsService analyticsService,
     required Future<void> Function() flushPending,
     required Future<void> Function() pullRemote,
+    Future<void> Function(String appUserId)? logInPurchases,
     Future<void> Function()? logOutPurchases,
   }) : _authRepository = authRepository,
        _userContext = userContext,
@@ -27,6 +28,7 @@ class AuthServiceImpl implements AuthService {
        _analyticsService = analyticsService,
        _flushPending = flushPending,
        _pullRemote = pullRemote,
+       _logInPurchases = logInPurchases,
        _logOutPurchases = logOutPurchases;
 
   final AuthRepository _authRepository;
@@ -36,6 +38,7 @@ class AuthServiceImpl implements AuthService {
   final AnalyticsService _analyticsService;
   final Future<void> Function() _flushPending;
   final Future<void> Function() _pullRemote;
+  final Future<void> Function(String appUserId)? _logInPurchases;
   final Future<void> Function()? _logOutPurchases;
   bool _debugSignedIn = false;
 
@@ -62,6 +65,16 @@ class AuthServiceImpl implements AuthService {
     await _userContext.setActiveUserId(AuthService.maestroTestUserId);
     await _userContext.markIntroCompleted();
     // Do not mark verified — keep sync disabled for local-only test data.
+
+    // Sync RevenueCat identity for promo grants in E2E flows.
+    final logInPurchases = _logInPurchases;
+    if (logInPurchases != null) {
+      try {
+        await logInPurchases(AuthService.maestroTestUserId);
+      } on Object {
+        // Best-effort identity sync; debug sign-in continues either way.
+      }
+    }
   }
 
   @override
@@ -139,6 +152,16 @@ class AuthServiceImpl implements AuthService {
     _debugSignedIn = false;
     await _authRepository.signOut();
     await _analyticsService.logEvent(AnalyticsEvent.signOut);
+
+    // Best-effort RevenueCat logout to restore anonymous identity.
+    final logOutPurchases = _logOutPurchases;
+    if (logOutPurchases != null) {
+      try {
+        await logOutPurchases();
+      } on Object {
+        // Continue sign-out even if RevenueCat logout fails.
+      }
+    }
   }
 
   @override
@@ -171,6 +194,16 @@ class AuthServiceImpl implements AuthService {
       await _userContext.markVerifiedUserId(newUid);
       await _flushPending();
       await _pullRemote();
+
+      // Sync RevenueCat identity for same-user re-login.
+      final logInPurchases = _logInPurchases;
+      if (logInPurchases != null) {
+        try {
+          await logInPurchases(newUid);
+        } on Object {
+          // Best-effort identity sync; continue bind.
+        }
+      }
       return;
     }
 
@@ -178,5 +211,15 @@ class AuthServiceImpl implements AuthService {
     await _userContext.setActiveUserId(newUid);
     await _userContext.markVerifiedUserId(newUid);
     await _pullRemote();
+
+    // Sync RevenueCat identity for new-user bind.
+    final logInPurchases = _logInPurchases;
+    if (logInPurchases != null) {
+      try {
+        await logInPurchases(newUid);
+      } on Object {
+        // Best-effort identity sync; continue bind.
+      }
+    }
   }
 }
