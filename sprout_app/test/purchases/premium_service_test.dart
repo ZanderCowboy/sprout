@@ -13,6 +13,8 @@ void main() {
       fakeRemoteConfig = FakeRemoteConfigService();
       premiumService = PremiumServiceImpl(
         remoteConfigService: fakeRemoteConfig,
+        hasPremium: () async => false,
+        isPurchasesReady: () async => false,
       );
     });
 
@@ -44,6 +46,8 @@ void main() {
             remoteConfigService: FakeRemoteConfigServiceWithFlag(
               revenueCatEnabled: true,
             ),
+            hasPremium: () async => false,
+            isPurchasesReady: () async => false,
           );
 
           final result = await premiumService.canUsePremiumFeature(
@@ -68,6 +72,8 @@ void main() {
             remoteConfigService: FakeRemoteConfigServiceWithFlag(
               revenueCatEnabled: true,
             ),
+            hasPremium: () async => false,
+            isPurchasesReady: () async => false,
           );
 
           final result = await premiumService.canShowPaywall();
@@ -101,6 +107,8 @@ void main() {
             remoteConfigService: FakeRemoteConfigServiceWithFlag(
               revenueCatEnabled: true,
             ),
+            hasPremium: () async => false,
+            isPurchasesReady: () async => false,
           );
 
           final result = await premiumService.canUsePremiumFeature(
@@ -127,6 +135,8 @@ void main() {
             remoteConfigService: FakeRemoteConfigServiceWithFlag(
               revenueCatEnabled: true,
             ),
+            hasPremium: () async => false,
+            isPurchasesReady: () async => false,
           );
 
           final result = await premiumService.canUsePremiumFeature(

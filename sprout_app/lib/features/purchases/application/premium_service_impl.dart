@@ -7,9 +7,15 @@ import 'premium_service.dart';
 class PremiumServiceImpl implements PremiumService {
   PremiumServiceImpl({
     required RemoteConfigService remoteConfigService,
-  }) : _remoteConfigService = remoteConfigService;
+    Future<bool> Function()? hasPremium,
+    Future<bool> Function()? isPurchasesReady,
+  })  : _remoteConfigService = remoteConfigService,
+        _hasPremium = hasPremium ?? PremiumPaywall.hasPremium,
+        _isPurchasesReady = isPurchasesReady ?? PremiumPaywall.isPurchasesReady;
 
   final RemoteConfigService _remoteConfigService;
+  final Future<bool> Function() _hasPremium;
+  final Future<bool> Function() _isPurchasesReady;
 
   @override
   Future<bool> canUsePremiumFeature({required bool isPremiumFeature}) async {
@@ -20,7 +26,7 @@ class PremiumServiceImpl implements PremiumService {
 
     if (!revenueCatEnabled) return true;
 
-    return PremiumPaywall.hasPremium();
+    return _hasPremium();
   }
 
   @override
@@ -29,11 +35,11 @@ class PremiumServiceImpl implements PremiumService {
         _remoteConfigService.isEnabled(RemoteFeatureFlag.revenueCatEnabled);
     if (!revenueCatEnabled) return false;
 
-    return PremiumPaywall.isPurchasesReady();
+    return _isPurchasesReady();
   }
 
   @override
   Future<bool> hasPremiumEntitlement() async {
-    return PremiumPaywall.hasPremium();
+    return _hasPremium();
   }
 }
