@@ -128,11 +128,39 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Future<void> _presentCustomerCenter() async {
+    final premiumService = sl<PremiumService>();
+
+    // Gate: respect the kill switch (Purchases not ready or flag off).
+    final canShow = await premiumService.canShowPaywall();
+    if (!mounted) return;
+    if (!canShow) return;
+
+    // Refresh CustomerInfo to avoid identity/entitlement race after purchase.
+    final hasPremiumNow = await PremiumPaywall.hasPremiumAfterRefresh();
+    if (!mounted) return;
+    if (!hasPremiumNow) {
+      // Lost premium between load and tap. Update UI but don't present.
+      setState(() => _hasPremium = false);
+      return;
+    }
+
     final hadPremium = _hasPremium;
-    final outcome = await PremiumPaywall.presentCustomerCenter();
+
+    // Present Customer Center with error handling.
+    CustomerCenterOutcome? outcome;
+    try {
+      outcome = await PremiumPaywall.presentCustomerCenter();
+    } on Object {
+      // Presentation failed (SDK error, no network, etc.). Clear any stale
+      // snackbar and fail silently (no crash).
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).clearSnackBars();
+      return;
+    }
+
     if (!mounted) return;
 
-    final premiumService = sl<PremiumService>();
+    // Re-check entitlement after dismiss.
     final hasPremium = await premiumService.hasPremiumEntitlement();
     if (!mounted) return;
     setState(() => _hasPremium = hasPremium);
