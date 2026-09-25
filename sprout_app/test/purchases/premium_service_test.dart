@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sprout/core/flags/remote_feature_flag.dart';
 import 'package:sprout/features/purchases/application/premium_service.dart';
 import 'package:sprout/features/purchases/application/premium_service_impl.dart';
 

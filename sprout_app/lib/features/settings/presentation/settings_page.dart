@@ -6,6 +6,7 @@ import 'package:purchases_ui_flutter/purchases_ui_flutter.dart';
 import 'package:sprout/bootstrap.dart';
 import 'package:sprout/core/core.dart';
 import 'package:sprout/core/debug/sprout_debug_lens.dart';
+import 'package:sprout/core/di/service_locator.dart';
 import 'package:sprout/features/auth/export.dart';
 import 'package:sprout/features/purchases/export.dart';
 import 'package:sprout/ui/export.dart';
