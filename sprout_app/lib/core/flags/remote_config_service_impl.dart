@@ -3,7 +3,6 @@ import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/foundation.dart';
 
 import 'package:sprout/core/config/app_config.dart';
-import 'package:sprout/core/config/app_environment.dart';
 import 'package:sprout/core/flags/remote_config_service.dart';
 import 'package:sprout/core/flags/remote_feature_flag.dart';
 
@@ -16,10 +15,6 @@ class RemoteConfigServiceImpl implements RemoteConfigService {
 
   @override
   Future<void> setup(AppConfig config) async {
-    if (config.environment != AppEnvironment.development &&
-        !config.isFirebaseConfigured) {
-      return;
-    }
     if (!config.isFirebaseConfigured) {
       if (kDebugMode) {
         debugPrint(

@@ -17,8 +17,8 @@ abstract class RemoteConfigService {
 
   /// Initializes Firebase (once) and applies Remote Config settings + defaults.
   ///
-  /// No-op (and leaves [isReady] false) when not development or Firebase
-  /// options are missing from [AppConfig]. Does not fetch from the network.
+  /// No-op (and leaves [isReady] false) when Firebase options are missing from
+  /// [AppConfig]. Does not fetch from the network.
   Future<void> setup(AppConfig config);
 
   /// Fetches and activates Remote Config from the network.
