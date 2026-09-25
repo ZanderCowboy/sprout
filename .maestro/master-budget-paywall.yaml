@@ -6,8 +6,9 @@ tags:
   - paywall
 ---
 # Free/unsubscribed: tap Master Budget → paywall → back stays on Settings.
-# REQUIRES maestro-test-user promo revoked (or Upgrade visible). While promo
-# grant is active, clearState+debugSignIn → logIn → Premium and this FAILS.
+# Needs Upgrade visible (no active entitlement on maestro-test-user after logIn).
+# Planner absence after dismiss: budget_sort not visible (Master Budget text
+# remains as Settings finance row label).
 # Run: maestro test .maestro/master-budget-paywall.yaml
 
 - setAirplaneMode: disabled
@@ -60,8 +61,6 @@ tags:
 - assertVisible:
     id: "settings_budget"
 
+# Master Budget text remains on Settings finance row — planner gated by budget_sort.
 - assertNotVisible:
     id: "budget_sort"
-
-- assertNotVisible:
-    text: "Master Budget"
