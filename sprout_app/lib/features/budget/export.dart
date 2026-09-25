@@ -5,6 +5,7 @@ export 'domain/budget_item.dart';
 export 'domain/budget_repository.dart';
 export 'domain/budget_totals.dart';
 export 'presentation/budget_bloc.dart';
+export 'presentation/budget_planner_gate.dart';
 export 'presentation/budget_planner_screen.dart';
 export 'presentation/widgets/add_group_sheet.dart';
 export 'presentation/widgets/group_card.dart';

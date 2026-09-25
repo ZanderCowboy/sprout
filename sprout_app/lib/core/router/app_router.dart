@@ -182,7 +182,7 @@ GoRouter createAppRouter({
                   GoRoute(
                     path: 'budget',
                     parentNavigatorKey: rootKey,
-                    builder: (context, state) => const BudgetPlannerScreen(),
+                    builder: (context, state) => const BudgetPlannerGate(),
                   ),
                 ],
               ),

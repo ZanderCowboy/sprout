@@ -1,0 +1,112 @@
+appId: app.stackmint.sprout.dev
+tags:
+  - page
+  - premium
+  - budget
+  - purchase
+---
+# Free → Master Budget → paywall → Test Store purchase → Budget Planner opens.
+# Mirrors settings-premium-purchase.yaml selectors. Requires free (Upgrade) state.
+# Run: maestro test .maestro/master-budget-purchase.yaml
+
+- setAirplaneMode: disabled
+
+- launchApp:
+    clearState: true
+    clearKeychain: true
+
+- runFlow: shared/debug-signin-intro.yaml
+
+- tapOn:
+    id: "shell_tab_settings"
+
+- extendedWaitUntil:
+    visible:
+      id: "settings_premium"
+    timeout: 15000
+
+- extendedWaitUntil:
+    visible:
+      text: ".*Upgrade.*"
+    timeout: 20000
+
+- tapOn:
+    id: "settings_budget"
+
+- extendedWaitUntil:
+    visible:
+      text: ".*(Monthly|Annual|R79|Subscribe|Continue).*"
+    timeout: 25000
+
+- runFlow:
+    when:
+      visible:
+        text: ".*Monthly.*"
+    commands:
+      - tapOn:
+          text: ".*Monthly.*"
+
+- runFlow:
+    when:
+      visible:
+        text: "Subscribe"
+    commands:
+      - tapOn:
+          text: "Subscribe"
+
+- runFlow:
+    when:
+      visible:
+        text: "Continue"
+    commands:
+      - tapOn:
+          text: "Continue"
+
+- extendedWaitUntil:
+    visible:
+      text: ".*(Buy|Purchase|Confirm|Test Store|OK|Subscribe).*"
+    timeout: 20000
+    optional: true
+
+- runFlow:
+    when:
+      visible:
+        text: ".*Buy.*"
+    commands:
+      - tapOn:
+          text: ".*Buy.*"
+
+- runFlow:
+    when:
+      visible:
+        text: ".*Purchase.*"
+    commands:
+      - tapOn:
+          text: ".*Purchase.*"
+
+- runFlow:
+    when:
+      visible:
+        text: ".*Confirm.*"
+    commands:
+      - tapOn:
+          text: ".*Confirm.*"
+
+- runFlow:
+    when:
+      visible:
+        text: ".*(Got it|OK|Close|Success|Thank|Unlocked).*"
+    commands:
+      - tapOn:
+          text: ".*(Got it|OK|Close|Success|Thank|Unlocked).*"
+
+- extendedWaitUntil:
+    visible:
+      text: "Master Budget"
+    timeout: 30000
+
+- assertVisible:
+    text: "Master Budget"
+
+- assertVisible:
+    id: "budget_sort"
