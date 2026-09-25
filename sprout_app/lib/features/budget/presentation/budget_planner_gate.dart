@@ -10,13 +10,28 @@ import 'budget_planner_screen.dart';
 ///
 /// When the user can access the feature (Premium active or kill switch off),
 /// shows [BudgetPlannerScreen]. Otherwise redirects to Settings.
-class BudgetPlannerGate extends StatelessWidget {
+class BudgetPlannerGate extends StatefulWidget {
   const BudgetPlannerGate({super.key});
+
+  @override
+  State<BudgetPlannerGate> createState() => _BudgetPlannerGateState();
+}
+
+class _BudgetPlannerGateState extends State<BudgetPlannerGate> {
+  late final Future<bool> _canUseFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _canUseFuture = sl<PremiumService>().canUsePremiumFeature(
+      isPremiumFeature: true,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<bool>(
-      future: sl<PremiumService>().canUsePremiumFeature(isPremiumFeature: true),
+      future: _canUseFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
           return const Scaffold(

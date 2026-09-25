@@ -19,7 +19,7 @@ class SettingsFinanceSection extends StatelessWidget {
 
     if (canUse) {
       if (context.mounted) {
-        context.push(AppRoute.budget.path);
+        await context.push(AppRoute.budget.path);
       }
       return;
     }
@@ -39,7 +39,7 @@ class SettingsFinanceSection extends StatelessWidget {
       messenger.showSnackBar(
         const SnackBar(content: Text(AppStrings.premiumUnlocked)),
       );
-      context.push(AppRoute.budget.path);
+      await context.push(AppRoute.budget.path);
     }
   }
 
