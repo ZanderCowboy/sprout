@@ -1,7 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sprout/features/purchases/application/premium_service.dart';
 import 'package:sprout/features/purchases/application/premium_service_impl.dart';
-import 'package:sprout/features/purchases/presentation/premium_paywall_helper.dart';
 
 import '../mocks/mocks.dart';
 
@@ -60,20 +59,9 @@ void main() {
       );
     });
 
-    group('hasPremium vs hasPremiumAfterRefresh', () {
-      test('hasPremium returns false when Purchases not configured', () async {
-        final result = await PremiumPaywall.hasPremium();
-        expect(result, false);
-      });
-
-      test(
-        'hasPremiumAfterRefresh returns false when Purchases not configured',
-        () async {
-          final result = await PremiumPaywall.hasPremiumAfterRefresh();
-          expect(result, false);
-        },
-      );
-    });
+    // PremiumPaywall.hasPremium / hasPremiumAfterRefresh call Purchases.isConfigured
+    // (platform channel). Cover those paths in device QA; unit tests inject fakes via
+    // PremiumServiceImpl instead.
 
     group('Customer Center presentation matrix', () {
       test(
