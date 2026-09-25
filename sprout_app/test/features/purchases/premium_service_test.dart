@@ -3,7 +3,7 @@ import 'package:sprout/core/flags/remote_feature_flag.dart';
 import 'package:sprout/features/purchases/application/premium_service.dart';
 import 'package:sprout/features/purchases/application/premium_service_impl.dart';
 
-import '../../../mocks/mocks.dart';
+import '../../mocks/mocks.dart';
 
 void main() {
   group('PremiumService', () {
