@@ -159,17 +159,3 @@ void main() {
     });
   });
 }
-
-class FakeRemoteConfigServiceWithFlag extends FakeRemoteConfigService {
-  FakeRemoteConfigServiceWithFlag({required this.revenueCatEnabled});
-
-  final bool revenueCatEnabled;
-
-  @override
-  bool isEnabled(RemoteFeatureFlag flag) {
-    if (flag == RemoteFeatureFlag.revenueCatEnabled) {
-      return revenueCatEnabled;
-    }
-    return flag.defaultValue;
-  }
-}
