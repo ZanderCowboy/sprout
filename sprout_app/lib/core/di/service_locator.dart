@@ -34,6 +34,8 @@ import 'package:sprout/features/goals/application/goals_service_impl.dart';
 import 'package:sprout/features/goals/data/goals_repository_impl.dart';
 import 'package:sprout/features/goals/data/local/models/goal_hive_model.dart';
 import 'package:sprout/features/goals/domain/goals_repository.dart';
+import 'package:sprout/features/purchases/application/premium_service.dart';
+import 'package:sprout/features/purchases/application/premium_service_impl.dart';
 import 'package:sprout/features/purchases/presentation/premium_paywall_helper.dart';
 import 'package:sprout/features/sync/application/sync_service.dart';
 import 'package:sprout/features/sync/application/sync_service_impl.dart';
@@ -162,6 +164,10 @@ Future<void> configureDependencies({
       userContext: sl(),
       analyticsService: sl(),
     ),
+  );
+
+  sl.registerLazySingleton<PremiumService>(
+    () => PremiumServiceImpl(remoteConfigService: sl()),
   );
 
   sl.registerLazySingleton<LocalSessionCleaner>(

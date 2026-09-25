@@ -7,7 +7,7 @@ import 'package:sprout/bootstrap.dart';
 import 'package:sprout/core/core.dart';
 import 'package:sprout/core/debug/sprout_debug_lens.dart';
 import 'package:sprout/features/auth/export.dart';
-import 'package:sprout/features/purchases/presentation/premium_paywall_helper.dart';
+import 'package:sprout/features/purchases/export.dart';
 import 'package:sprout/ui/export.dart';
 
 import 'widgets/settings_finance_section.dart';
@@ -24,7 +24,7 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  bool _purchasesReady = false;
+  bool _showPremiumCard = false;
   bool _loadingPremiumStatus = true;
   bool _hasPremium = false;
   String? _versionLabel;
@@ -71,28 +71,29 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Future<void> _loadPremiumStatus() async {
     try {
-      final ready = await PremiumPaywall.isPurchasesReady();
+      final premiumService = sl<PremiumService>();
+      final canShow = await premiumService.canShowPaywall();
       if (!mounted) return;
-      if (!ready) {
+      if (!canShow) {
         setState(() {
-          _purchasesReady = false;
+          _showPremiumCard = false;
           _loadingPremiumStatus = false;
           _hasPremium = false;
         });
         return;
       }
 
-      final hasPremium = await PremiumPaywall.hasPremium();
+      final hasPremium = await premiumService.hasPremiumEntitlement();
       if (!mounted) return;
       setState(() {
-        _purchasesReady = true;
+        _showPremiumCard = true;
         _loadingPremiumStatus = false;
         _hasPremium = hasPremium;
       });
     } on Object {
       if (!mounted) return;
       setState(() {
-        _purchasesReady = false;
+        _showPremiumCard = false;
         _loadingPremiumStatus = false;
         _hasPremium = false;
       });
@@ -103,7 +104,8 @@ class _SettingsPageState extends State<SettingsPage> {
     final result = await PremiumPaywall.presentPremiumPaywall();
     if (!mounted) return;
 
-    final hasPremium = await PremiumPaywall.hasPremium();
+    final premiumService = sl<PremiumService>();
+    final hasPremium = await premiumService.hasPremiumEntitlement();
     if (!mounted) return;
     setState(() => _hasPremium = hasPremium);
 
@@ -129,7 +131,8 @@ class _SettingsPageState extends State<SettingsPage> {
     final outcome = await PremiumPaywall.presentCustomerCenter();
     if (!mounted) return;
 
-    final hasPremium = await PremiumPaywall.hasPremium();
+    final premiumService = sl<PremiumService>();
+    final hasPremium = await premiumService.hasPremiumEntitlement();
     if (!mounted) return;
     setState(() => _hasPremium = hasPremium);
 
@@ -183,7 +186,7 @@ class _SettingsPageState extends State<SettingsPage> {
               const SproutShellHeader(),
               const SizedBox(height: 16),
               SettingsProfileHeader(user: user, onEditProfile: _openAccount),
-              if (_purchasesReady) ...[
+              if (_showPremiumCard) ...[
                 const SizedBox(height: 24),
                 SettingsPremiumCard(
                   loading: _loadingPremiumStatus,

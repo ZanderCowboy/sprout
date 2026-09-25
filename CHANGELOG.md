@@ -2,6 +2,17 @@
 
 Changes heading to `main`. Newest entries at the top.
 
+## 2026-09-25 — V1 Premium gate kill switch matrix
+
+- Implemented `PremiumService` with fail-open matrix for Premium feature gating (issue #58)
+- When `revenuecat_enabled` is false: Premium features accessible to everyone, paywall hidden, new purchases blocked
+- When `revenuecat_enabled` is true: Premium features gated by real RevenueCat entitlement checks
+- Non-Premium features always accessible regardless of flag state
+- Does not mint fake local subscribed state when flag is off
+- Updated Settings page to use `PremiumService` for paywall visibility
+- Added comprehensive unit tests covering all gate matrix scenarios
+- Documented kill switch behavior and production launch defaults in `docs/REVENUECAT.md`
+
 ## 2026-09-24 — Production RevenueCat Remote Config kill switch
 
 - Firebase Remote Config now works on production flavor (same fail-closed pattern as development)
