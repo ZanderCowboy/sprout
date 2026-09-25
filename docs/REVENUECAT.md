@@ -9,6 +9,56 @@ This pass wires:
 
 No premium feature gating is added yet (premium is opt-in via the paywall tile only).
 
+## V1 Premium Gate Matrix
+
+The `PremiumService` implements the V1 billing kill switch / Premium gate matrix:
+
+| Feature flagged Premium? | `revenuecat_enabled` (Remote Config) | Who can use it |
+|--------------------------|--------------------------------------|----------------|
+| No | on or off | Everyone |
+| Yes | false | Everyone (fail-open) |
+| Yes | true | Only if RevenueCat entitlement says subscribed |
+
+### Rules
+
+- When `revenuecat_enabled` is **false**:
+  - Premium features are **accessible** to everyone (fail-open)
+  - Paywalls are **hidden** (no new purchases)
+  - Purchase flows are **blocked**
+  - Does **NOT** mint fake local `subscribed=true` state for free users
+- When `revenuecat_enabled` is **true**:
+  - Premium features are **gated** using real RevenueCat entitlement checks
+  - Paywalls are **shown** when configured
+  - Purchases work normally
+
+### Usage
+
+Use `PremiumService.canUsePremiumFeature(isPremiumFeature: true)` to gate Premium features:
+
+```dart
+final premiumService = sl<PremiumService>();
+final canUse = await premiumService.canUsePremiumFeature(
+  isPremiumFeature: true,
+);
+if (!canUse) {
+  // Show upgrade prompt or block access
+}
+```
+
+Use `PremiumService.canShowPaywall()` to check if the paywall should be shown:
+
+```dart
+final premiumService = sl<PremiumService>();
+final canShow = await premiumService.canShowPaywall();
+if (canShow) {
+  // Show Premium tile / paywall entry point
+}
+```
+
+### Production launch default
+
+**Important:** The production Firebase Remote Config default for `revenuecat_enabled` should be set to **`true`** before launching real billing, unless explicitly changed. The in-app default is `false` (fail-closed for `Purchases.configure`), but the Remote Config parameter should be published as `true` once RevenueCat production setup and smoke testing are complete.
+
 ## Project
 
 | Item | Value |
@@ -200,6 +250,18 @@ For either flavor:
 3. **Cold-start** the app (full process kill). Hot restart may leave a previously configured native Purchases singleton alone.
 
 In-app defaults also set `revenuecat_enabled: false` before fetch, so an unpublished parameter stays off.
+
+## Identity sync
+
+When Purchases is configured (`revenuecat_enabled=true`), the app syncs RevenueCat identity with the authenticated user:
+
+- **Sign-in** (email OTP, Google, or debug): calls `Purchases.logIn(appUserId)` after binding the session, so the device App User ID matches the stable Supabase user id (or `maestro-test-user` for debug sign-in). This ensures promo grants applied in the RevenueCat dashboard to a specific App User ID are received on the device.
+- **Sign-out**: calls `Purchases.logOut()` to restore an anonymous RevenueCat identity.
+- **Account deletion**: also calls `Purchases.logOut()` (best-effort) after the remote user is deleted.
+
+This is a **best-effort** sync — failures are caught and logged but do not block auth flows. If Purchases is not configured or the kill switch is off, these calls are no-ops.
+
+For Maestro E2E flows that use `debugSignIn`, the App User ID becomes `maestro-test-user`, allowing promo grants on that identity to reach the test device.
 
 ## Verify
 

@@ -1,0 +1,62 @@
+appId: app.stackmint.sprout.dev
+tags:
+  - page
+  - premium
+  - purchases
+  - paywall
+---
+# Assert Settings Premium opens the RevenueCat paywall when unsubscribed.
+# clearState mint + configure UUID has no entitlement → Upgrade / Unlock premium.
+# Paywall is purchases_ui_flutter (no Sprout semantics) — match package/price text.
+# Dismiss with back — do NOT complete a purchase (see settings-premium-purchase.yaml).
+#
+# Merged SproutListTile semantics: match Upgrade via contains regex.
+# Run: maestro test .maestro/settings-premium-paywall.yaml
+
+- setAirplaneMode: disabled
+
+- launchApp:
+    clearState: true
+    clearKeychain: true
+
+- runFlow: shared/debug-signin-intro.yaml
+
+- tapOn:
+    id: "shell_tab_settings"
+
+- extendedWaitUntil:
+    visible:
+      id: "settings_premium"
+    timeout: 15000
+
+- assertVisible:
+    id: "settings_premium"
+
+- extendedWaitUntil:
+    visible:
+      text: ".*Upgrade.*"
+    timeout: 20000
+
+- assertVisible:
+    text: ".*Upgrade.*"
+
+- tapOn:
+    id: "settings_premium"
+
+- extendedWaitUntil:
+    visible:
+      text: ".*(Monthly|Annual|R79|Subscribe|Continue).*"
+    timeout: 25000
+
+- assertVisible:
+    text: ".*(Monthly|Annual|R79|Subscribe|Continue).*"
+
+- back
+
+- extendedWaitUntil:
+    visible:
+      id: "settings_premium"
+    timeout: 10000
+
+- assertVisible:
+    id: "settings_premium"

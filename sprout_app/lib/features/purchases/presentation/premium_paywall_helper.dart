@@ -22,6 +22,16 @@ abstract final class PremiumPaywall {
     await Purchases.logOut();
   }
 
+  /// Best-effort RevenueCat identity sync after successful sign-in.
+  ///
+  /// When Purchases is configured, logs in with the stable app user ID so that
+  /// RevenueCat entitlements (including promo grants for Maestro E2E) apply to
+  /// the expected identity.
+  static Future<void> logInIfConfigured(String appUserId) async {
+    if (!await Purchases.isConfigured) return;
+    await Purchases.logIn(appUserId);
+  }
+
   /// Returns whether the user has the premium entitlement active.
   static Future<bool> hasPremium() async {
     if (!await Purchases.isConfigured) return false;

@@ -334,6 +334,20 @@ class FakeRemoteConfigService implements RemoteConfigService {
   }
 }
 
+class FakeRemoteConfigServiceWithFlag extends FakeRemoteConfigService {
+  FakeRemoteConfigServiceWithFlag({required this.revenueCatEnabled});
+
+  final bool revenueCatEnabled;
+
+  @override
+  bool isEnabled(RemoteFeatureFlag flag) {
+    if (flag == RemoteFeatureFlag.revenueCatEnabled) {
+      return revenueCatEnabled;
+    }
+    return flag.defaultValue;
+  }
+}
+
 class FakeTransactionsRepository implements TransactionsRepository {
   FakeTransactionsRepository({List<Transaction>? initial}) {
     if (initial != null) _transactions.addAll(initial);
