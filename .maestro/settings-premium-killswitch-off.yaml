@@ -1,0 +1,39 @@
+appId: app.stackmint.sprout.dev
+tags:
+  - page
+  - premium
+  - killswitch
+---
+# Assert Settings Premium card is hidden when revenuecat_enabled is off.
+# Live sprout-app-development RC currently publishes revenuecat_enabled=true,
+# so this flow forces airplane mode before cold start so Firebase fetch fails
+# and in-app defaults apply (RemoteFeatureFlag.revenueCatEnabled defaultValue:
+# false). Debug sign-in is local-only and does not need network.
+# Run: maestro test .maestro/settings-premium-killswitch-off.yaml
+
+- setAirplaneMode: enabled
+
+- launchApp:
+    clearState: true
+    clearKeychain: true
+
+- runFlow: shared/debug-signin-intro.yaml
+
+- tapOn:
+    id: "shell_tab_settings"
+
+- extendedWaitUntil:
+    visible:
+      id: "settings_transactions"
+    timeout: 10000
+
+- assertVisible:
+    id: "settings_transactions"
+
+- assertVisible:
+    id: "settings_account"
+
+- assertNotVisible:
+    id: "settings_premium"
+
+- setAirplaneMode: disabled
