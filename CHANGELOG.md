@@ -2,6 +2,13 @@
 
 Changes heading to `main`. Newest entries at the top.
 
+## 2026-09-25 — Master Budget Premium gate
+
+- Master Budget now requires Premium subscription
+- Tapping Settings → Master Budget shows paywall for non-Premium users
+- After successful purchase or restore, Master Budget opens automatically
+- Uses PremiumService matrix for correct fail-open behavior
+
 ## 2026-09-25 — V1 Premium gate kill switch matrix
 
 - Implemented `PremiumService` with fail-open matrix for Premium feature gating (issue #58)
