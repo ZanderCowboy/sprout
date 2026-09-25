@@ -48,9 +48,9 @@ abstract final class PremiumPaywall {
   static Future<bool> hasPremiumAfterRefresh() async {
     if (!await Purchases.isConfigured) return false;
 
-    final customerInfo = await Purchases.getCustomerInfo(
-      fetchPolicy: CacheFetchPolicy.fetchCurrent,
-    );
+    // Invalidate cache to force a network refresh on the next getCustomerInfo.
+    await Purchases.invalidateCustomerInfoCache();
+    final customerInfo = await Purchases.getCustomerInfo();
     return customerInfo.entitlements.active.containsKey(kPremiumEntitlementId);
   }
 
