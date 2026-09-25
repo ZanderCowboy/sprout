@@ -294,15 +294,40 @@ For Maestro E2E flows that use `debugSignIn`, the App User ID becomes `maestro-t
 
 ## Customer Center verify (Settings → Manage)
 
-1. After a sandbox purchase, the tile should show **ACTIVE** and **Manage**.
-2. Tap **Manage**. The RevenueCat Customer Center should open and list the Test Store subscription (restore + cancel survey).
+### Implementation (Path A — #99)
+
+The app presents RevenueCat Customer Center for active subscribers:
+
+**Gating logic:**
+1. Check `PremiumService.canShowPaywall()` — respects kill switch (flag off / Purchases not configured → no-op)
+2. Refresh CustomerInfo via `PremiumPaywall.hasPremiumAfterRefresh()` to avoid identity/entitlement race
+3. Re-check entitlement after refresh — only present if still premium
+4. Try/catch presentation failures — clear snackbar, no crash
+
+**Customer Center dashboard setup (manual, not API):**
+- [RevenueCat](https://app.revenuecat.com/) → **Sprout** → **Customer Center**
+- **Management screen for active subscribers**: shows plan, price, status, renewal date when RC exposes it
+- **Restore**: handled by Customer Center (existing snackbar `Premium unlocked.` / `Subscription update failed.`)
+- **Manage subscription**: deep-links to Play Store (RC-owned; Test Store shows placeholder)
+- **Optional**: Support email (not yet configured), Appearance accent → Sprout teal `#0D9488`
+
+### Verification matrix (device QA)
+
+| Flavor | Store | Entitlement | Kill switch | Expected behavior |
+|--------|-------|-------------|-------------|-------------------|
+| DEV | Test Store | None | Off | Premium card hidden |
+| DEV | Test Store | None | On | Tile shows **Upgrade**, tapping opens paywall |
+| DEV | Test Store | Trial/Paid | On | Tile shows **ACTIVE** + **Manage**, tapping opens Customer Center with subscription details + Restore + cancel survey |
+| PROD | Play | Trial/Paid | On | Customer Center opens, **Manage subscription** deep-links to Play Store subscription page |
+
+**Steps (after sandbox purchase):**
+1. The tile should show **ACTIVE** and **Manage**.
+2. Tap **Manage**. The RevenueCat Customer Center should open and list the subscription (management screen for active subscribers).
 3. Dismiss the sheet. The tile should still show **ACTIVE** if the entitlement is unchanged.
 4. Tap **Restore purchases** inside Customer Center, dismiss, and confirm the app shows `Premium unlocked.`
 5. If the entitlement is gone after dismiss (cancelled / expired), the tile should switch back to **Upgrade** and show `Premium is no longer active.`
 
 On Test Store (development), store-native cancel/manage will not open Google Play. On production with a Play `goog_…` key installed from Play Internal Testing, native manage buttons will open the Play subscription management page.
-
-Dashboard: [RevenueCat](https://app.revenuecat.com/) → **Sprout** → **Customer Center**. Defaults are enough; optional later: support email, Sprout teal accent.
 
 ## Later (not done yet)
 

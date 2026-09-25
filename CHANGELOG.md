@@ -2,6 +2,15 @@
 
 Changes heading to `main`. Newest entries at the top.
 
+## 2026-09-25 — Customer Center for active Premium subscribers
+
+- Customer Center now requires active Premium entitlement and respects kill switch
+- Refresh CustomerInfo before presenting to avoid identity/entitlement race after purchase
+- Presentation failures are caught and handled gracefully (clear snackbar, no crash)
+- Customer Center dashboard configured for active subscriber management (plan, price, status, renewal, Restore, store Manage)
+- Added unit tests for Customer Center gating logic
+- Updated `docs/REVENUECAT.md` with Path A implementation details and device QA matrix
+
 ## 2026-09-25 — Master Budget Premium gate
 
 - Master Budget now requires Premium subscription

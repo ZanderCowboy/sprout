@@ -40,6 +40,20 @@ abstract final class PremiumPaywall {
     return customerInfo.entitlements.active.containsKey(kPremiumEntitlementId);
   }
 
+  /// Refreshes CustomerInfo from RevenueCat servers and returns whether the
+  /// user has the premium entitlement active.
+  ///
+  /// Use this before presenting Customer Center to avoid identity/entitlement
+  /// race conditions (e.g. stale entitlement after purchase on another device).
+  static Future<bool> hasPremiumAfterRefresh() async {
+    if (!await Purchases.isConfigured) return false;
+
+    // Invalidate cache to force a network refresh on the next getCustomerInfo.
+    await Purchases.invalidateCustomerInfoCache();
+    final customerInfo = await Purchases.getCustomerInfo();
+    return customerInfo.entitlements.active.containsKey(kPremiumEntitlementId);
+  }
+
   /// Presents the RevenueCat dashboard paywall (attached to the `premium`
   /// entitlement in the dashboard).
   ///

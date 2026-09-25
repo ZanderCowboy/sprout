@@ -1,0 +1,86 @@
+appId: app.stackmint.sprout.dev
+tags:
+  - page
+  - premium
+  - purchases
+  - customer-center
+  - issue-106
+  - path-a
+---
+# #106 / #99 Path A — Premium active + Manage opens RevenueCat Customer Center.
+# debugSignIn → Purchases.logIn(maestro-test-user); requires active `premium`
+# entitlement on that App User ID (promo grant or prior Test Store purchase).
+# CC is purchases_ui (no Sprout semantics) — match RC dashboard copy.
+# Run: maestro test .maestro/settings-premium-customer-center.yaml
+
+- setAirplaneMode: disabled
+
+- launchApp:
+    clearState: true
+    clearKeychain: true
+
+- runFlow: shared/debug-signin-intro.yaml
+
+- tapOn:
+    id: "shell_tab_settings"
+
+- extendedWaitUntil:
+    visible:
+      id: "settings_premium"
+    timeout: 15000
+
+- assertVisible:
+    id: "settings_premium"
+
+- extendedWaitUntil:
+    visible:
+      text: ".*Premium active.*"
+    timeout: 30000
+
+- assertVisible:
+    text: ".*Premium active.*"
+
+- assertVisible:
+    text: ".*Manage.*"
+
+- tapOn:
+    id: "settings_premium"
+
+# RevenueCat Customer Center (purchases_ui) — Path A management screen.
+- extendedWaitUntil:
+    visible:
+      text: ".*(How can we help|Manage subscription|Restore past purchases).*"
+    timeout: 25000
+
+- assertVisible:
+    text: ".*(How can we help|Manage subscription|Restore past purchases).*"
+
+# Optional: Restore row is present in CC UI (do not require completion).
+- runFlow:
+    when:
+      visible:
+        text: ".*Restore past purchases.*"
+    commands:
+      - assertVisible:
+          text: ".*Restore past purchases.*"
+
+- back
+
+- extendedWaitUntil:
+    visible:
+      id: "settings_premium"
+    timeout: 15000
+
+- assertVisible:
+    id: "settings_premium"
+
+- extendedWaitUntil:
+    visible:
+      text: ".*Premium active.*"
+    timeout: 20000
+
+- assertVisible:
+    text: ".*Premium active.*"
+
+- assertVisible:
+    text: ".*Manage.*"
