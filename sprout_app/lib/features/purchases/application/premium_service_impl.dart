@@ -1,7 +1,8 @@
 import 'package:sprout/core/flags/remote_config_service.dart';
 import 'package:sprout/core/flags/remote_feature_flag.dart';
-import 'package:sprout/features/purchases/application/premium_service.dart';
 import 'package:sprout/features/purchases/presentation/premium_paywall_helper.dart';
+
+import 'premium_service.dart';
 
 class PremiumServiceImpl implements PremiumService {
   PremiumServiceImpl({
