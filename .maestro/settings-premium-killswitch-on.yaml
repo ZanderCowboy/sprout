@@ -1,0 +1,36 @@
+appId: app.stackmint.sprout.dev
+tags:
+  - page
+  - premium
+  - killswitch
+---
+# Assert Settings Premium card is visible when revenuecat_enabled is on.
+# Online cold start so Firebase Remote Config can fetch and apply the live
+# sprout-app-development value revenuecat_enabled=true; assert settings_premium
+# is visible alongside transactions/account. Does not open Purchases/checkout.
+# Run: maestro test .maestro/settings-premium-killswitch-on.yaml
+
+- setAirplaneMode: disabled
+
+- launchApp:
+    clearState: true
+    clearKeychain: true
+
+- runFlow: shared/debug-signin-intro.yaml
+
+- tapOn:
+    id: "shell_tab_settings"
+
+- extendedWaitUntil:
+    visible:
+      id: "settings_transactions"
+    timeout: 10000
+
+- assertVisible:
+    id: "settings_transactions"
+
+- assertVisible:
+    id: "settings_account"
+
+- assertVisible:
+    id: "settings_premium"
