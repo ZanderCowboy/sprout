@@ -8,6 +8,7 @@ Changes heading to `main`. Newest entries at the top.
 - `revenuecat_enabled` flag must be set in **sprout-app-production** Firebase project for production Purchases to configure
 - Documented Play Store app linkage (`appcb952e263d` for `app.stackmint.sprout`) with live prices (R49.99/mo, R399/yr, 7-day trials)
 - Updated docs to clarify Play Internal Testing install requirement for real billing (not sideloaded)
+- Added comprehensive operational runbook for #53 Play Console / RevenueCat / GCP setup (service account `revenuecat-play@sprout-app-production.iam.gserviceaccount.com`, RTDN topic `Play-Store-Notifications`, license testing, smoke order)
 
 ## 2026-09-25 — OTP email links to sprout.app
 

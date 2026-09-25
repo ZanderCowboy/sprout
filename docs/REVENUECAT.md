@@ -26,6 +26,118 @@ No premium feature gating is added yet (premium is opt-in via the paywall tile o
 
 **Development** continues using the Test Store public key (`test_…`) for local testing.
 
+
+## Play Store production setup (#53)
+
+This section documents the one-time Play Console / RevenueCat / GCP setup completed for production subscriptions. Operational runbook for reference if changes are needed.
+
+### RevenueCat project `proj8bd5ebcf` (Sprout)
+
+**Apps:**
+- **Play Store app**: Sprout Android (Play) `appcb952e263d`, package `app.stackmint.sprout`
+- **Test Store app**: `app643c11c740` (remains for DEV / `test_…` keys only)
+
+**Play Store configuration:**
+- Products (Play store identifiers): `premium_monthly:monthly`, `premium_annual:yearly`
+- Entitlement: `premium`
+- Default offering: `$rc_monthly` + `$rc_annual` only
+  - Note: `$rc_weekly` removed from default offering (weekly may still exist in Test Store catalog)
+- Locked prices: **R49.99/mo**, **R399/yr** ZAR
+- Trial offers: 7-day free trial on both plans (configured as offers in Play Console)
+
+**SDK keys (never commit):**
+- Production Play key: `goog_…` → lives in gitignored `production.json` + GitHub secret `APP_CONFIG_PROD_BASE64`
+- Development Test Store key: `test_…` → local `development.json` only
+
+### Play Console (app Sprout / `app.stackmint.sprout`)
+
+**Subscriptions Active:**
+- Product IDs: `premium_monthly`, `premium_annual`
+- Base plans: `monthly`, `yearly`
+- Tax category: Digital app sales
+- Compliance: Service
+- Age rating: Everyone (or all-ages equivalent)
+- 7-day trial: configured as an **offer** on each base plan (eligibility: new customer / never had this subscription)
+
+**License testing for sandbox purchases:**
+- Account-level: **Settings → License testing**
+- Add tester Gmail (same account on device Play Store)
+- Also add email as **Internal track tester** to install from Internal Testing
+
+**Real billing smoke test requirements:**
+- Install from **Internal testing** (not sideloaded debug APK)
+- Build must include `goog_…` config (see Config section)
+- This Remote Config wiring (PR #96) merged and in the Internal AAB
+- License tester account on device
+
+### GCP `sprout-app-production` — dedicated SA
+
+**Service Account (RevenueCat-only, least privilege):**
+- Email: `revenuecat-play@sprout-app-production.iam.gserviceaccount.com`
+- Display name: RevenueCat PROD (or similar)
+- Why separate: Upload SA has release rights; RC-only SA is least privilege (view financial + manage orders/subscriptions only)
+
+**Play Console → Users and permissions (on Sprout app):**
+- View financial data ✓
+- Manage orders and subscriptions ✓
+- App access ✓
+- Note: Catalog checks can pass before purchase-validation; purchase-validation may stay red until propagation / Internal build / first sandbox purchase — not a blocker for SDK key
+
+**GCP IAM roles (on project `sprout-app-production`):**
+- **Pub/Sub Admin** (required; Editor alone failed topic create)
+- **Monitoring Viewer**
+
+**APIs enabled (GCP Console → APIs & Services):**
+- Google Play Android Developer API ✓
+- Cloud Pub/Sub ✓
+
+**Real-time developer notifications (RTDN):**
+- Topic created: `projects/sprout-app-production/topics/Play-Store-Notifications`
+- Wired in Play Console → Monetize → Monetization setup → Real-time developer notifications
+- "Send test notification" confirmed green in RevenueCat dashboard
+
+### App config / secrets (ops, not committed)
+
+**Local (gitignored):**
+- `sprout_app/assets/config/production.json`:
+  ```json
+  {
+    "revenueCatAndroidApiKey": "goog_..."
+  }
+  ```
+- Keep `config/APP_CONFIG_PROD_BASE64.md` gitignored mirror if that pattern exists
+
+**GitHub Secrets:**
+- `APP_CONFIG_PROD_BASE64`: base64 of `production.json` (refreshed after updating `goog_…` key)
+
+**Flavor isolation:**
+- **DEV**: Test Store `test_…` + `sprout-app-development` Remote Config
+- **PROD**: Play `goog_…` + `sprout-app-production` Remote Config
+
+### Firebase Remote Config (ops)
+
+**Development (`sprout-app-development`):**
+- Parameter: `revenuecat_enabled` (Boolean, default `false`)
+- Set to `true` for local Test Store testing
+
+**Production (`sprout-app-production`):**
+- Parameter: `revenuecat_enabled` (Boolean, default `false`)
+- Set to `true` **only after** this PR is in a Play Internal build for smoke testing
+- Keep `false` until ready for real billing smoke / beta testers
+
+### Smoke order (production Play billing)
+
+1. This PR (#96) merged to `main`
+2. Release Main workflow creates Internal AAB with updated `APP_CONFIG_PROD_BASE64`
+3. License tester + Internal tester: same Gmail account
+4. Install production flavor from Play Internal Testing link (not sideloaded)
+5. Flip `revenuecat_enabled` to `true` in `sprout-app-production` Remote Config; publish
+6. Cold-start the production app (full process kill)
+7. Navigate to **Settings → Sprout Premium**
+8. Verify offerings show R49.99/mo + R399/yr with 7-day trial
+9. Complete sandbox purchase
+10. Confirm Premium tile shows **ACTIVE** and **Manage** button works
+
 ## Config
 
 In `sprout_app/assets/config/development.json` and `production.json` (gitignored):
@@ -127,7 +239,7 @@ In-app defaults also set `revenuecat_enabled: false` before fetch, so an unpubli
 4. Tap **Restore purchases** inside Customer Center, dismiss, and confirm the app shows `Premium unlocked.`
 5. If the entitlement is gone after dismiss (cancelled / expired), the tile should switch back to **Upgrade** and show `Premium is no longer active.`
 
-On Test Store, store-native cancel/manage will not open Google Play. That needs a Play Store app and a `goog_…` key later. Customer Center should still open and show the Test Store entitlement.
+On Test Store (development), store-native cancel/manage will not open Google Play. On production with a Play `goog_…` key installed from Play Internal Testing, native manage buttons will open the Play subscription management page.
 
 Dashboard: [RevenueCat](https://app.revenuecat.com/) → **Sprout** → **Customer Center**. Defaults are enough; optional later: support email, Sprout teal accent.
 
