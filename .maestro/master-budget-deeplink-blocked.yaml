@@ -5,7 +5,7 @@ tags:
   - budget
   - deeplink
 env:
-  EMAIL: sprout.play.review@gmail.com
+  EMAIL: sprout.play.review+free@gmail.com
 ---
 # Requires OTP_CODE at runtime:
 #   OTP_CODE=xxxxxx maestro test .maestro/master-budget-deeplink-blocked.yaml
@@ -16,8 +16,8 @@ env:
 #   intent-filter. Docs (SUPABASE_AUTH_TODOS) mark OS deep links as deferred.
 # - `adb resolve-activity -d https://sprout.app/settings/budget` → Chrome,
 #   not Sprout. `sprout://settings/budget` → No activity found.
-# - Use a non-Premium OTP identity (do not grant promo on this review account
-#   when running this stub).
+# - The default free alias is a non-Premium OTP identity; do not grant
+#   Premium on it when running this stub.
 #
 # Keep this flow as a stub for when (1) a free-user identity is used AND (2) a
 # real deep-link / in-app navigation harness exists. Do not treat as E2E green.

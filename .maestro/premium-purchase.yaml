@@ -2,16 +2,21 @@ appId: app.stackmint.sprout.dev
 tags:
   - page
   - premium
-  - budget
+  - purchases
   - purchase
 env:
-  EMAIL: sprout.play.review@gmail.com
+  EMAIL: sprout.play.review+free@gmail.com
 ---
+# One purchase path from the free/unsubscribed identity (single clearState).
+# Default EMAIL is the free alias; it shares the Play Review inbox but remains
+# a separate app/RevenueCat identity from the subscribed account.
+# Coverage: former settings-premium-purchase (+ master-budget-purchase unlock).
+# Settings Premium → Test Store sandbox purchase → Premium active + Manage,
+# then open Master Budget planner (budget_sort) to confirm unlock.
 # Requires OTP_CODE at runtime:
-#   OTP_CODE=xxxxxx maestro test .maestro/master-budget-purchase.yaml
-# Free → Master Budget → paywall → Test Store purchase → Budget Planner opens.
-# Mirrors settings-premium-purchase.yaml selectors. Requires free (Upgrade) state.
-# Run: maestro test .maestro/master-budget-purchase.yaml
+#   OTP_CODE=xxxxxx maestro test .maestro/premium-purchase.yaml
+# Selectors adapt to Test Store UI (Monthly / Continue / Purchase observed).
+# Run: maestro test .maestro/premium-purchase.yaml
 
 - setAirplaneMode: disabled
 
@@ -39,7 +44,7 @@ env:
     timeout: 20000
 
 - tapOn:
-    id: "settings_budget"
+    id: "settings_premium"
 
 - extendedWaitUntil:
     visible:
@@ -107,6 +112,33 @@ env:
     commands:
       - tapOn:
           text: ".*(Got it|OK|Close|Success|Thank|Unlocked).*"
+
+- runFlow:
+    when:
+      notVisible:
+        id: "settings_premium"
+    commands:
+      - back
+
+- extendedWaitUntil:
+    visible:
+      id: "settings_premium"
+    timeout: 15000
+
+- extendedWaitUntil:
+    visible:
+      text: ".*Premium active.*"
+    timeout: 30000
+
+- assertVisible:
+    text: ".*Premium active.*"
+
+- assertVisible:
+    text: ".*Manage.*"
+
+# Confirm Master Budget unlock after purchase
+- tapOn:
+    id: "settings_budget"
 
 - extendedWaitUntil:
     visible:

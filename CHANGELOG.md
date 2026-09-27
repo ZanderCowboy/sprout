@@ -2,6 +2,14 @@
 
 Changes heading to `main`. Newest entries at the top.
 
+## 2026-09-27 — Maestro flow consolidation
+
+- Deduped Maestro roots: promote `full-app-tour` (absorbs overview/goals/deposit/transactions/settings/account-profile/core-loop)
+- Added `premium-subscribed`, `premium-free-paywalls`, `premium-purchase` (merged settings + master-budget positives)
+- Folded `intro` into `first-open-online`; merged `sign-in` + `sign-in-email` into `auth-surfaces`
+- clearState launches: 36 → 23; kept killswitch-off, failopen, deeplink, Google/auth edges, OTP helpers, wizards separate
+- Combined roots use OTP shared helpers from #101 / #107 (no debug sign-in)
+
 ## 2026-09-27 — Remove debug sign-in (#101)
 
 - Deleted debug sign-in UI, APIs, and semantics entirely (not behind `kDebugMode` / flavor)

@@ -182,50 +182,64 @@ With the app installed or running:
 maestro test .maestro/
 
 # Tag subsets
-maestro test .maestro/ --include-tags p1      # ordinary PRs: tour + OTP + free paywall (see .maestro/README.md)
-maestro test .maestro/ --include-tags page    # per-page journeys
-maestro test .maestro/ --include-tags smoke   # core-loop + full-app-tour
+maestro test .maestro/ --include-tags p1      # ordinary PRs: tour + OTP + free paywalls (see .maestro/README.md)
+maestro test .maestro/ --include-tags page    # focused journeys
+maestro test .maestro/ --include-tags smoke   # full-app-tour + first-open-online
 maestro test .maestro/ --include-tags edge    # no-accounts edge cases
+maestro test .maestro/ --include-tags premium # paywall / purchase / subscribed
 
 # Run a specific journey
-maestro test .maestro/overview.yaml
 maestro test .maestro/full-app-tour.yaml
+maestro test .maestro/premium-free-paywalls.yaml
 ```
 
 ### Flow layout
 
 - **Root journeys** (`.maestro/*.yaml`) — runnable end-to-end tests. `config.yaml` sets `flows: ["*"]` so only these are discovered.
 - **Shared helpers** (`.maestro/shared/*.yaml`) — `runFlow` subflows (seed, chapters, form fill). Not runnable alone; compose them from root journeys with `env` parameters.
-- **Tags**: `p1` (ordinary-PR smoke: `full-app-tour` + `otp-auto-submit` + `settings-premium-paywall` — see [`.maestro/README.md`](.maestro/README.md)), `page` (one surface), `smoke` (core-loop + full-app-tour), `edge` (no-accounts CTAs).
+- **Tags**: `p1` (ordinary-PR smoke: `full-app-tour` + `otp-auto-submit` + `premium-free-paywalls` — see [`.maestro/README.md`](.maestro/README.md)), `page` (focused), `smoke` (full-app-tour + first-open-online), `edge` (no-accounts CTAs), `premium` / `paywall` / `purchase` / `subscribed`.
+- **Deduped**: positives that share signed-in + preloaded setup live in one root; state-poison edges stay separate. Prefer session reuse over extra `clearState`.
 
 ### Available flows
 
-**Page** (`tags: [page]`):
-
-- `intro.yaml` — Intro slides, back from Sign in, OTP sign-in
-- `sign-in.yaml` — Legal links + fields (surface only; no OTP / Google complete)
-- `overview.yaml` — Empty CTAs then populated Overview
-- `goals.yaml` — Goals sort, unallocated, Everyday Fund detail
-- `deposit.yaml` — Deposit sheet modes (FAB + goal detail)
-- `settings.yaml` — Settings hub tiles
-- `account-profile.yaml` — Edit name, legal, delete cancel (no sign-out)
-- `transactions.yaml` — Transactions list + detail note
-
 **P1** (`tags: [p1]` — ordinary PRs):
 
-- `full-app-tour.yaml` — Signed-in core pages
+- `full-app-tour.yaml` — Signed-in core pages tour
 - `otp-auto-submit.yaml` — Real OTP auth
-- `settings-premium-paywall.yaml` — Free Premium paywall
+- `premium-free-paywalls.yaml` — Free Premium + Master Budget paywall dismiss
 
 **Smoke** (`tags: [smoke]`):
 
-- `core-loop.yaml` — Create account, goal, deposit, verify progress
-- `full-app-tour.yaml` — Orchestrator: every surface via shared chapters
+- `full-app-tour.yaml` — Orchestrator (absorbs overview / goals / deposit / transactions / settings / account-profile / core-loop)
+- `first-open-online.yaml` — Intro slides + back from Sign in + OTP sign-in → wizard → Overview
+
+**Auth / page**:
+
+- `auth-surfaces.yaml` — Create-account legal/fields + email Sign in field (no auth complete)
+- `otp-auto-submit.yaml` — OTP send → wrong stays → right navigates (`EMAIL` + `OTP_CODE`)
+- `otp-send-only.yaml` / `otp-verify-only.yaml` — OTP helper phases
+- `otp-offline-blocks.yaml` — Offline OTP edge
+- `auth-continue-disabled.yaml` / `auth-email-exists.yaml` / `auth-email-unknown.yaml` — auth edges
+- `google-sign-in.yaml` / `google-sign-in-dismiss.yaml` — Google auth edges
+- `sign-out-keeps-data.yaml` — Sign out keeps local data
+- `wizard-happy-path.yaml` / `wizard-skip.yaml` — Wizard paths
+
+**Premium** (`tags: [premium]`):
+
+- `premium-subscribed.yaml` — Premium active + Manage + Master Budget planner
+- `premium-free-paywalls.yaml` — Killswitch-on row + Settings + Master Budget paywall dismiss
+- `premium-purchase.yaml` — One purchase path (Settings → active → Master Budget unlock)
+- `settings-premium-killswitch-off.yaml` — Killswitch off (keep separate)
+- `master-budget-failopen.yaml` / `master-budget-deeplink-blocked.yaml` — state-poison edges
 
 **Edge** (`tags: [edge]`):
 
 - `deposit-no-accounts.yaml` — Deposit with 0 accounts shows CTA
 - `goal-no-accounts.yaml` — Creating goal with 0 accounts shows guidance
+
+**Other**:
+
+- `play-store-screenshots.yaml` — Store screenshot capture
 
 ### Shared helpers (not runnable alone)
 
@@ -255,7 +269,7 @@ Debug sign-in has been **removed entirely**. Maestro E2E standardizes on **real 
 | `OTP_CODE_REAUTH` | Second code for flows that sign out then sign in again | `sign-out-keeps-data.yaml` only |
 
 ```bash
-OTP_CODE=123456 maestro test .maestro/overview.yaml
+OTP_CODE=123456 maestro test .maestro/full-app-tour.yaml
 OTP_CODE=111111 OTP_CODE_REAUTH=222222 maestro test .maestro/sign-out-keeps-data.yaml
 ```
 

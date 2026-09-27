@@ -5,7 +5,9 @@ tags:
 env:
   EMAIL: sprout.play.review@gmail.com
 ---
-# First open online: carousel → Create account surface → OTP sign-in → wizard → Overview
+# First open online (single clearState).
+# Coverage: former intro.yaml (slides + back from Sign in) + create-account
+# → OTP sign-in → wizard skip → Overview. OTP wrong/right lives in otp-auto-submit.
 # Requires OTP_CODE at runtime:
 #   OTP_CODE=xxxxxx maestro test .maestro/first-open-online.yaml
 # Run: maestro test .maestro/first-open-online.yaml
@@ -34,6 +36,26 @@ env:
 
 - assertVisible:
     text: ".*Sign in so your data stays with you.*"
+
+# Intro coverage: open Sign in then back (former intro.yaml / chapter-intro)
+- tapOn:
+    id: "intro_sign_in"
+
+- extendedWaitUntil:
+    visible:
+      id: "sign_in_email_field"
+    timeout: 5000
+
+- tapOn:
+    id: "sign_in_back"
+
+- extendedWaitUntil:
+    visible:
+      id: "intro_create_account"
+    timeout: 5000
+
+- assertVisible:
+    id: "intro_sign_in"
 
 - tapOn:
     id: "intro_create_account"
