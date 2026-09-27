@@ -5,11 +5,11 @@ tags:
   - budget
   - failopen
 env:
-  EMAIL: sprout.play.review@gmail.com
+  EMAIL: sprout.play.review+free@gmail.com
 ---
 # Requires OTP_CODE at runtime:
 #   OTP_CODE=xxxxxx maestro test .maestro/master-budget-failopen.yaml
-# Fail-open: airplane before cold start → RC fetch fails → in-app default
+# Free/unsubscribed identity. Fail-open: airplane before cold start → RC fetch fails → in-app default
 # revenuecat_enabled=false → canUsePremiumFeature(true) → Master Budget opens
 # without paywall (same pattern as settings-premium-killswitch-off.yaml).
 # Run: maestro test .maestro/master-budget-failopen.yaml

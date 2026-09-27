@@ -7,9 +7,11 @@ tags:
   - paywall
   - killswitch
 env:
-  EMAIL: sprout.play.review@gmail.com
+  EMAIL: sprout.play.review+free@gmail.com
 ---
 # Free / unsubscribed paywalls (single clearState).
+# Default EMAIL is the free alias; it shares the Play Review inbox but remains
+# a separate app/RevenueCat identity from the subscribed account.
 # Coverage: former settings-premium-killswitch-on + settings-premium-paywall
 #   + master-budget-paywall.
 # Online cold start so Remote Config can apply revenuecat_enabled=true;

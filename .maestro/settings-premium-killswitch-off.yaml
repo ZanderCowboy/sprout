@@ -4,9 +4,9 @@ tags:
   - premium
   - killswitch
 env:
-  EMAIL: sprout.play.review@gmail.com
+  EMAIL: sprout.play.review+free@gmail.com
 ---
-# Assert Settings Premium card is hidden when revenuecat_enabled is off.
+# Free/unsubscribed identity: assert Settings Premium card is hidden when revenuecat_enabled is off.
 # Sign in with OTP online first (real auth), then airplane-mode cold start so
 # Firebase Remote Config fetch fails and in-app defaults apply
 # (RemoteFeatureFlag.revenueCatEnabled defaultValue: false).

@@ -17,7 +17,14 @@ Ordinary PRs run **`--include-tags p1` only** (three flows):
 OTP_CODE=xxxxxx maestro test .maestro/ --include-tags p1
 ```
 
-Device: prefer a single emulator (Pixel_10_Pro / `emulator-5554` on CT-MAC). Pass `EMAIL` if not using the flow default `sprout.play.review@gmail.com`.
+Device: prefer a single emulator (Pixel_10_Pro / `emulator-5554` on CT-MAC).
+
+## Maestro account split
+
+- Subscribed/Premium flows default to `sprout.play.review@gmail.com`.
+- Free/unsubscribed flows (paywalls, killswitch-on free, purchase-from-free, and the free full-app tour) default to `sprout.play.review+free@gmail.com`.
+- The `+free` alias shares the Play Review inbox; retrieve its OTP through the play.review Gmail connector. Keep it as a separate app/RevenueCat identity and never clear RevenueCat between free and subscribed runs.
+- Pass `EMAIL` to override a flow default when needed.
 
 ## Full matrix
 

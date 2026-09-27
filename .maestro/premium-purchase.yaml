@@ -5,9 +5,11 @@ tags:
   - purchases
   - purchase
 env:
-  EMAIL: sprout.play.review@gmail.com
+  EMAIL: sprout.play.review+free@gmail.com
 ---
-# One purchase path (single clearState).
+# One purchase path from the free/unsubscribed identity (single clearState).
+# Default EMAIL is the free alias; it shares the Play Review inbox but remains
+# a separate app/RevenueCat identity from the subscribed account.
 # Coverage: former settings-premium-purchase (+ master-budget-purchase unlock).
 # Settings Premium → Test Store sandbox purchase → Premium active + Manage,
 # then open Master Budget planner (budget_sort) to confirm unlock.

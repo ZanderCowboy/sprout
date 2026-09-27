@@ -3,9 +3,10 @@ tags:
   - p1
   - smoke
 env:
-  EMAIL: sprout.play.review@gmail.com
+  EMAIL: sprout.play.review+free@gmail.com
 ---
-# Full-app smoke tour (single clearState).
+# Free/unsubscribed full-app smoke tour (single clearState).
+# Default EMAIL is the free alias; the tour does not grant or require Premium.
 # Coverage (absorbed former page/smoke roots):
 #   overview, goals, deposit, transactions, settings, account-profile, core-loop
 # OTP sign-in → empty→seed→populated surfaces, shell FAB, goals/deposit,
