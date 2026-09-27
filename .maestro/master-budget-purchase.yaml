@@ -4,7 +4,11 @@ tags:
   - premium
   - budget
   - purchase
+env:
+  EMAIL: sprout.play.review@gmail.com
 ---
+# Requires OTP_CODE at runtime:
+#   OTP_CODE=xxxxxx maestro test .maestro/master-budget-purchase.yaml
 # Free → Master Budget → paywall → Test Store purchase → Budget Planner opens.
 # Mirrors settings-premium-purchase.yaml selectors. Requires free (Upgrade) state.
 # Run: maestro test .maestro/master-budget-purchase.yaml
@@ -15,7 +19,11 @@ tags:
     clearState: true
     clearKeychain: true
 
-- runFlow: shared/debug-signin-intro.yaml
+- runFlow:
+    file: shared/otp-signin-to-overview.yaml
+    env:
+      EMAIL: ${EMAIL}
+      OTP_CODE: ${OTP_CODE}
 
 - tapOn:
     id: "shell_tab_settings"

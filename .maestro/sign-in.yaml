@@ -2,7 +2,7 @@ appId: app.stackmint.sprout.dev
 tags:
   - page
 ---
-# Sign-in surface: legal links, fields, debug sign-in (no OTP / Google).
+# Sign-in surface: legal links + fields (no OTP / Google complete).
 # Run: maestro test .maestro/sign-in.yaml
 
 - launchApp:

@@ -1,7 +1,5 @@
 import 'package:sprout/core/analytics/analytics_catalog.dart';
 import 'package:sprout/core/analytics/analytics_service.dart';
-import 'package:sprout/core/config/app_config.dart';
-import 'package:sprout/core/config/app_environment.dart';
 import 'package:sprout/core/constants/app_strings.dart';
 import 'package:sprout/core/error/error.dart';
 import 'package:sprout/core/user/user_context.dart';
@@ -14,7 +12,6 @@ class AuthServiceImpl implements AuthService {
   AuthServiceImpl({
     required AuthRepository authRepository,
     required UserContext userContext,
-    required AppConfig appConfig,
     required LocalSessionCleaner localSessionCleaner,
     required AnalyticsService analyticsService,
     required Future<void> Function() flushPending,
@@ -23,7 +20,6 @@ class AuthServiceImpl implements AuthService {
     Future<void> Function()? logOutPurchases,
   }) : _authRepository = authRepository,
        _userContext = userContext,
-       _appConfig = appConfig,
        _localSessionCleaner = localSessionCleaner,
        _analyticsService = analyticsService,
        _flushPending = flushPending,
@@ -33,49 +29,18 @@ class AuthServiceImpl implements AuthService {
 
   final AuthRepository _authRepository;
   final UserContext _userContext;
-  final AppConfig _appConfig;
   final LocalSessionCleaner _localSessionCleaner;
   final AnalyticsService _analyticsService;
   final Future<void> Function() _flushPending;
   final Future<void> Function() _pullRemote;
   final Future<void> Function(String appUserId)? _logInPurchases;
   final Future<void> Function()? _logOutPurchases;
-  bool _debugSignedIn = false;
 
   @override
   AuthUser? get currentUser => _authRepository.currentUser;
 
   @override
   Stream<AuthUser?> authStateChanges() => _authRepository.authStateChanges();
-
-  @override
-  bool get debugSignInAvailable =>
-      _appConfig.environment == AppEnvironment.development;
-
-  @override
-  bool get isDebugSignedIn => _debugSignedIn;
-
-  @override
-  Future<void> debugSignIn() async {
-    if (!debugSignInAvailable) {
-      throw const AuthAppException(AppStrings.debugSignInDevOnly);
-    }
-
-    _debugSignedIn = true;
-    await _userContext.setActiveUserId(AuthService.maestroTestUserId);
-    await _userContext.markIntroCompleted();
-    // Do not mark verified — keep sync disabled for local-only test data.
-
-    // Sync RevenueCat identity for promo grants in E2E flows.
-    final logInPurchases = _logInPurchases;
-    if (logInPurchases != null) {
-      try {
-        await logInPurchases(AuthService.maestroTestUserId);
-      } on Object {
-        // Best-effort identity sync; debug sign-in continues either way.
-      }
-    }
-  }
 
   @override
   bool get canSync {
@@ -149,7 +114,6 @@ class AuthServiceImpl implements AuthService {
 
   @override
   Future<void> signOut() async {
-    _debugSignedIn = false;
     await _authRepository.signOut();
     await _analyticsService.logEvent(AnalyticsEvent.signOut);
 
@@ -166,7 +130,6 @@ class AuthServiceImpl implements AuthService {
 
   @override
   Future<void> deleteAccount() async {
-    _debugSignedIn = false;
     await _authRepository.deleteOwnAccount();
     await _localSessionCleaner.clearLocalEntityData();
     final logOutPurchases = _logOutPurchases;

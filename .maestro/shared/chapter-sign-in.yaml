@@ -1,8 +1,9 @@
 appId: app.stackmint.sprout.dev
 ---
 # Requires: intro screen visible (fresh launch).
-# Slides to Create account, opens terms/privacy, focuses fields, debug-signs in.
-# Does NOT send OTP or tap Google.
+# Slides to Create account, opens terms/privacy, focuses fields.
+# Does NOT complete OTP or Google (surface smoke only).
+
 - extendedWaitUntil:
     visible:
       id: "intro_next"
@@ -19,7 +20,7 @@ appId: app.stackmint.sprout.dev
 
 - extendedWaitUntil:
     visible:
-      id: "create_account_debug_sign_in"
+      id: "create_account_continue"
     timeout: 5000
 
 - tapOn:
@@ -54,9 +55,5 @@ appId: app.stackmint.sprout.dev
 
 - hideKeyboard
 
-- tapOn:
-    id: "create_account_debug_sign_in"
-
-- runFlow: skip-wizard.yaml
-
-- runFlow: wait-overview.yaml
+- assertVisible:
+    id: "create_account_continue"

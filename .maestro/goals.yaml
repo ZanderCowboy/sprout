@@ -1,7 +1,11 @@
 appId: app.stackmint.sprout.dev
 tags:
   - page
+env:
+  EMAIL: sprout.play.review@gmail.com
 ---
+# Requires OTP_CODE at runtime:
+#   OTP_CODE=xxxxxx maestro test .maestro/goals.yaml
 # Goals sort, unallocated card, Everyday Fund detail (delete cancel).
 # Seeds unallocated via to-account deposit, then a goal deposit.
 # Run: maestro test .maestro/goals.yaml
@@ -10,7 +14,11 @@ tags:
     clearState: true
     clearKeychain: true
 
-- runFlow: shared/debug-signin-intro.yaml
+- runFlow:
+    file: shared/otp-signin-to-overview.yaml
+    env:
+      EMAIL: ${EMAIL}
+      OTP_CODE: ${OTP_CODE}
 
 - runFlow:
     file: shared/seed-core.yaml

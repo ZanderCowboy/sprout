@@ -129,8 +129,6 @@ abstract final class AppStrings {
       'Could not delete your account. Try again.';
   static const String termsOfService = 'Terms of Service';
   static const String privacyPolicy = 'Privacy Policy';
-  static const String debugSignIn = 'Debug sign in';
-  static const String debugSignInDetails = 'Maestro Test · maestro@test.local';
   static const String byContinuingYouAgree = 'By continuing you agree to the';
   static const String and = 'and';
   static const String termsLoadFailed = 'Could not load Terms of Service.';
@@ -184,8 +182,6 @@ abstract final class AppStrings {
       'Google Sign-In is not configured. Add googleWebClientId to the flavor config.';
   static const String googleSignInNoIdToken =
       'Google Sign-In did not return an ID token.';
-  static const String debugSignInDevOnly =
-      'Debug sign-in is only available in the development flavor.';
   static const String offlineSignInBlocked =
       "You're offline — connect to sign in.";
   static const String introSlide1Title = 'Track your savings in one place';

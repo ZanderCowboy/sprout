@@ -4,28 +4,16 @@ tags:
   - premium
   - purchases
   - subscribed
+env:
+  EMAIL: sprout.play.review@gmail.com
 ---
+# Requires OTP_CODE at runtime:
+#   OTP_CODE=xxxxxx maestro test .maestro/settings-premium-subscribed.yaml
 # Assert Settings Premium card shows subscribed state (Premium active + Manage).
-#
-# IMPORTANT — Purchases appUserID vs debug sign-in:
-# - Cold start with clearState: resolveUserId() mints a random UUID and
-#   Purchases.configure uses that UUID BEFORE debugSignIn.
-# - debugSignIn sets UserContext/Hive to AuthService.maestroTestUserId
-#   (`maestro-test-user`) but does NOT call Purchases.logIn — so the promo
-#   grant on `maestro-test-user` is NOT seen after clearState alone.
-# - After process death / soft relaunch (no clearState), configure reads Hive
-#   and uses `maestro-test-user` — grant on that id then applies.
-# - Mid-session grant on the clearState UUID is a QA procedure and is NOT
-#   fully automatable in Maestro alone (clearState would mint a new UUID).
-#
-# This flow uses clearState:true so it is durable for CI once either:
-#   (A) product adds Purchases.logIn('maestro-test-user') after debugSignIn and
-#       RC grants premium on maestro-test-user, OR
-#   (B) a prior Test Store purchase on that same install left premium active
-#       (see settings-premium-purchase.yaml).
-# Until (A), expect FAIL after fresh clearState even when maestro-test-user
-# has a promotional grant.
-#
+# After OTP, Purchases.logIn uses the real Supabase user id.
+# QA: grant Premium on that App User ID in RevenueCat (or prior Test Store purchase).
+# Google account picker is unreliable in Maestro — OTP is the E2E standard.
+
 # Run: maestro test .maestro/settings-premium-subscribed.yaml
 
 - setAirplaneMode: disabled
@@ -34,7 +22,11 @@ tags:
     clearState: true
     clearKeychain: true
 
-- runFlow: shared/debug-signin-intro.yaml
+- runFlow:
+    file: shared/otp-signin-to-overview.yaml
+    env:
+      EMAIL: ${EMAIL}
+      OTP_CODE: ${OTP_CODE}
 
 - tapOn:
     id: "shell_tab_settings"

@@ -1,9 +1,13 @@
-﻿appId: app.stackmint.sprout.dev
+appId: app.stackmint.sprout.dev
 tags:
   - smoke
   - auth
+env:
+  EMAIL: sprout.play.review@gmail.com
 ---
-# First open online: carousel → Create account → wizard → Overview
+# First open online: carousel → Create account surface → OTP sign-in → wizard → Overview
+# Requires OTP_CODE at runtime:
+#   OTP_CODE=xxxxxx maestro test .maestro/first-open-online.yaml
 # Run: maestro test .maestro/first-open-online.yaml
 # Slide titles share an a11y node with body text — use regex, not exact title.
 
@@ -36,24 +40,32 @@ tags:
 
 - extendedWaitUntil:
     visible:
-      id: "create_account_debug_sign_in"
+      id: "create_account_continue"
     timeout: 5000
 
 - assertVisible:
     text: ".*Create account.*|.*display name.*"
 
 - tapOn:
-    id: "create_account_debug_sign_in"
+    id: "create_account_sign_in_link"
+
+- runFlow:
+    file: shared/otp-signin-from-sign-in.yaml
+    env:
+      EMAIL: ${EMAIL}
+      OTP_CODE: ${OTP_CODE}
 
 - extendedWaitUntil:
     visible:
       id: "wizard_skip"
-    timeout: 10000
+    timeout: 45000
+    optional: true
 
-- assertVisible:
-    text: "What are you growing?"
-
-- runFlow: shared/skip-wizard.yaml
+- runFlow:
+    when:
+      visible:
+        id: "wizard_skip"
+    file: shared/skip-wizard.yaml
 
 - extendedWaitUntil:
     visible:

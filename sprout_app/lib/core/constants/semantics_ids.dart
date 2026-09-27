@@ -4,7 +4,6 @@
 abstract final class SemanticsIds {
   // --- Intro ---
   static const introNext = 'intro_next';
-  static const introDebugSignIn = 'intro_debug_sign_in';
   static const introCreateAccount = 'intro_create_account';
   static const introSignIn = 'intro_sign_in';
 
@@ -18,7 +17,6 @@ abstract final class SemanticsIds {
   static const createAccountPrivacyLink = 'create_account_privacy_link';
   static const createAccountSignInLink = 'create_account_sign_in_link';
   static const createAccountExistingSignIn = 'create_account_existing_sign_in';
-  static const createAccountDebugSignIn = 'create_account_debug_sign_in';
 
   // --- Sign in ---
   static const signInBack = 'sign_in_back';
@@ -29,7 +27,6 @@ abstract final class SemanticsIds {
   static const signInPrivacyLink = 'sign_in_privacy_link';
   static const signInCreateAccountLink = 'sign_in_create_account_link';
   static const signInMissingCreateAccount = 'sign_in_missing_create_account';
-  static const signInDebugSignIn = 'sign_in_debug_sign_in';
 
   // --- Verify OTP ---
   static const verifyOtpBack = 'verify_otp_back';

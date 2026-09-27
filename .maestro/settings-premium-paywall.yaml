@@ -1,10 +1,15 @@
 appId: app.stackmint.sprout.dev
 tags:
+  - p1
   - page
   - premium
   - purchases
   - paywall
+env:
+  EMAIL: sprout.play.review@gmail.com
 ---
+# Requires OTP_CODE at runtime:
+#   OTP_CODE=xxxxxx maestro test .maestro/settings-premium-paywall.yaml
 # Assert Settings Premium opens the RevenueCat paywall when unsubscribed.
 # clearState mint + configure UUID has no entitlement → Upgrade / Unlock premium.
 # Paywall is purchases_ui_flutter (no Sprout semantics) — match package/price text.
@@ -19,7 +24,11 @@ tags:
     clearState: true
     clearKeychain: true
 
-- runFlow: shared/debug-signin-intro.yaml
+- runFlow:
+    file: shared/otp-signin-to-overview.yaml
+    env:
+      EMAIL: ${EMAIL}
+      OTP_CODE: ${OTP_CODE}
 
 - tapOn:
     id: "shell_tab_settings"

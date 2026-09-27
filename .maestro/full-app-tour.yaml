@@ -1,17 +1,25 @@
 appId: app.stackmint.sprout.dev
 tags:
+  - p1
   - smoke
+env:
+  EMAIL: sprout.play.review@gmail.com
 ---
-# Full-app smoke tour: composes shared chapters + seed.
-# Requires development flavor.
+# Full-app smoke tour: OTP sign-in + shared chapters + seed.
+# Requires development flavor + OTP_CODE at runtime:
+#   OTP_CODE=xxxxxx maestro test .maestro/full-app-tour.yaml
 # Run: maestro test .maestro/full-app-tour.yaml
 
 - launchApp:
     clearState: true
     clearKeychain: true
 
-# ===== 1. Sign in (legal links + debug) =====
-- runFlow: shared/chapter-sign-in.yaml
+# ===== 1. OTP sign-in → Overview =====
+- runFlow:
+    file: shared/otp-signin-to-overview.yaml
+    env:
+      EMAIL: ${EMAIL}
+      OTP_CODE: ${OTP_CODE}
 
 # ===== 2. Empty states =====
 - takeScreenshot: tour-01-overview-empty

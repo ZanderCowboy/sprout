@@ -4,13 +4,13 @@ tags:
 env:
   EMAIL: sprout.play.review@gmail.com
 ---
-# Phase 1: send OTP email only. Leave app on OTP field.
+# Phase 1: send OTP email via Sign in. Leave app on OTP field.
 
 - launchApp:
     clearState: true
     clearKeychain: true
 
 - runFlow:
-    file: shared/chapter-otp-send.yaml
+    file: shared/chapter-otp-send-signin.yaml
     env:
       EMAIL: ${EMAIL}

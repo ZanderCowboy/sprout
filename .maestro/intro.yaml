@@ -1,12 +1,20 @@
 appId: app.stackmint.sprout.dev
 tags:
   - page
+env:
+  EMAIL: sprout.play.review@gmail.com
 ---
-# Intro slides + back from sign-in + debug sign-in.
+# Intro slides + back from sign-in + OTP sign-in.
+# Requires OTP_CODE at runtime:
+#   OTP_CODE=xxxxxx maestro test .maestro/intro.yaml
 # Run: maestro test .maestro/intro.yaml
 
 - launchApp:
     clearState: true
     clearKeychain: true
 
-- runFlow: shared/chapter-intro.yaml
+- runFlow:
+    file: shared/chapter-intro.yaml
+    env:
+      EMAIL: ${EMAIL}
+      OTP_CODE: ${OTP_CODE}

@@ -4,7 +4,11 @@ tags:
   - premium
   - budget
   - failopen
+env:
+  EMAIL: sprout.play.review@gmail.com
 ---
+# Requires OTP_CODE at runtime:
+#   OTP_CODE=xxxxxx maestro test .maestro/master-budget-failopen.yaml
 # Fail-open: airplane before cold start → RC fetch fails → in-app default
 # revenuecat_enabled=false → canUsePremiumFeature(true) → Master Budget opens
 # without paywall (same pattern as settings-premium-killswitch-off.yaml).
@@ -16,7 +20,11 @@ tags:
     clearState: true
     clearKeychain: true
 
-- runFlow: shared/debug-signin-intro.yaml
+- runFlow:
+    file: shared/otp-signin-to-overview.yaml
+    env:
+      EMAIL: ${EMAIL}
+      OTP_CODE: ${OTP_CODE}
 
 - tapOn:
     id: "shell_tab_settings"

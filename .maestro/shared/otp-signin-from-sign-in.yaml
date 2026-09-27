@@ -1,0 +1,36 @@
+appId: app.stackmint.sprout.dev
+---
+# Requires: Sign in screen visible (e.g. after sign-out).
+# Needs EMAIL + OTP_CODE (fresh code after prior sign-out).
+
+- extendedWaitUntil:
+    visible:
+      id: "sign_in_email_field"
+    timeout: 20000
+
+- tapOn:
+    id: "sign_in_email_field"
+
+- eraseText
+
+- inputText: ${EMAIL}
+
+- hideKeyboard
+
+- tapOn:
+    id: "sign_in_continue"
+
+- extendedWaitUntil:
+    visible:
+      id: "verify_otp_code_field"
+    timeout: 30000
+
+- tapOn:
+    id: "verify_otp_code_field"
+
+- inputText: ${OTP_CODE}
+
+- extendedWaitUntil:
+    visible:
+      id: "shell_tab_overview"
+    timeout: 45000

@@ -1,8 +1,7 @@
 appId: app.stackmint.sprout.dev
 ---
-# Requires: intro visible (fresh). Goes to Sign in via "I already have an account".
-# Email field smoke only. Does NOT complete OTP/Google.
-
+# Intro → Sign in → email → Continue → verify OTP field.
+# Requires EMAIL. Leaves app on verify_otp_code_field.
 - extendedWaitUntil:
     visible:
       id: "intro_next"
@@ -20,14 +19,19 @@ appId: app.stackmint.sprout.dev
 - extendedWaitUntil:
     visible:
       id: "sign_in_email_field"
-    timeout: 5000
+    timeout: 10000
 
 - tapOn:
     id: "sign_in_email_field"
 
-- inputText: "tour@example.com"
+- inputText: ${EMAIL}
 
 - hideKeyboard
 
-- assertVisible:
+- tapOn:
     id: "sign_in_continue"
+
+- extendedWaitUntil:
+    visible:
+      id: "verify_otp_code_field"
+    timeout: 30000

@@ -59,7 +59,6 @@ void main() {
       authService: AuthServiceImpl(
         authRepository: fakeAuth,
         userContext: UserContext(settingsBox),
-        appConfig: config,
         localSessionCleaner: FakeLocalSessionCleaner(),
         analyticsService: FakeAnalyticsService(),
         flushPending: () async {},

@@ -3,7 +3,11 @@ tags:
   - page
   - premium
   - killswitch
+env:
+  EMAIL: sprout.play.review@gmail.com
 ---
+# Requires OTP_CODE at runtime:
+#   OTP_CODE=xxxxxx maestro test .maestro/settings-premium-killswitch-on.yaml
 # Assert Settings Premium card is visible when revenuecat_enabled is on.
 # Online cold start so Firebase Remote Config can fetch and apply the live
 # sprout-app-development value revenuecat_enabled=true; assert settings_premium
@@ -16,7 +20,11 @@ tags:
     clearState: true
     clearKeychain: true
 
-- runFlow: shared/debug-signin-intro.yaml
+- runFlow:
+    file: shared/otp-signin-to-overview.yaml
+    env:
+      EMAIL: ${EMAIL}
+      OTP_CODE: ${OTP_CODE}
 
 - tapOn:
     id: "shell_tab_settings"
