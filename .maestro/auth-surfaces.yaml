@@ -6,7 +6,7 @@ tags:
 # Auth surfaces smoke (single clearState).
 # Coverage: former sign-in.yaml (create-account legal/fields) +
 #   sign-in-email.yaml (email-only Sign in field). Does NOT complete
-#   debug / OTP / Google — surface checks only.
+#   OTP / Google — surface checks only.
 # Run: maestro test .maestro/auth-surfaces.yaml
 
 - launchApp:
@@ -29,7 +29,7 @@ tags:
 
 - extendedWaitUntil:
     visible:
-      id: "create_account_debug_sign_in"
+      id: "create_account_continue"
     timeout: 5000
 
 - tapOn:
@@ -67,9 +67,6 @@ tags:
 - assertVisible:
     id: "create_account_continue"
 
-- assertVisible:
-    id: "create_account_debug_sign_in"
-
 # Switch to email-only Sign in surface (former sign-in-email)
 - tapOn:
     id: "create_account_sign_in_link"
@@ -90,6 +87,3 @@ tags:
 
 - assertVisible:
     id: "sign_in_continue"
-
-- assertVisible:
-    id: "sign_in_debug_sign_in"

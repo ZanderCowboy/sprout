@@ -85,7 +85,6 @@ void main() {
     final service = AuthServiceImpl(
       authRepository: fake,
       userContext: UserContext(settingsBox),
-      appConfig: config(supabase: true),
       localSessionCleaner: FakeLocalSessionCleaner(),
       analyticsService: FakeAnalyticsService(),
       flushPending: () async {},

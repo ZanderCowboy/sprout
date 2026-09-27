@@ -1,23 +1,24 @@
 appId: app.stackmint.sprout.dev
 tags:
   - play-store
+env:
+  EMAIL: sprout.play.review@gmail.com
 ---
 # Play Store screenshot capture flow
-# Completes the first-run wizard (goal, account, deposit), then captures
-# Overview, Goals, and Accounts.
+# OTP sign-in, completes the first-run wizard, then captures Overview/Goals/Accounts.
+# Requires OTP_CODE at runtime:
+#   OTP_CODE=xxxxxx maestro test .maestro/play-store-screenshots.yaml
 # Output: ~/.maestro/tests/<timestamp>/play-*.png
 
 - launchApp:
     clearState: true
     clearKeychain: true
 
-- extendedWaitUntil:
-    visible:
-      id: "intro_debug_sign_in"
-    timeout: 45000
-
-- tapOn:
-    id: "intro_debug_sign_in"
+- runFlow:
+    file: shared/otp-signin-intro.yaml
+    env:
+      EMAIL: ${EMAIL}
+      OTP_CODE: ${OTP_CODE}
 
 - runFlow:
     file: shared/complete-wizard.yaml
@@ -32,7 +33,6 @@ tags:
       id: "overview_progress_header"
     timeout: 10000
 
-# Welcome toast covers the hero; dismiss it before capturing.
 - tapOn:
     text: "Done"
     optional: true

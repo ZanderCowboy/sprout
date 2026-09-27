@@ -8,6 +8,14 @@ Changes heading to `main`. Newest entries at the top.
 - Added `premium-subscribed`, `premium-free-paywalls`, `premium-purchase` (merged settings + master-budget positives)
 - Folded `intro` into `first-open-online`; merged `sign-in` + `sign-in-email` into `auth-surfaces`
 - clearState launches: 36 → 23; kept killswitch-off, failopen, deeplink, Google/auth edges, OTP helpers, wizards separate
+- Combined roots use OTP shared helpers from #101 / #107 (no debug sign-in)
+
+## 2026-09-27 — Remove debug sign-in (#101)
+
+- Deleted debug sign-in UI, APIs, and semantics entirely (not behind `kDebugMode` / flavor)
+- Maestro E2E now uses real email OTP (`EMAIL` + `OTP_CODE`); Google picker documented as unreliable
+- `Purchases.logIn` / `logOut` remain on real verified auth bind / sign-out (no regression from #58 / #100)
+- Updated REVENUECAT + Maestro docs for the OTP path
 
 ## 2026-09-25 — Master Budget Premium gate
 

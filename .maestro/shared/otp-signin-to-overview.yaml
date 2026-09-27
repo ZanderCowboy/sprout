@@ -1,0 +1,18 @@
+appId: app.stackmint.sprout.dev
+---
+# OTP sign-in then skip wizard (if shown) and wait for Overview.
+# Requires EMAIL + OTP_CODE.
+
+- runFlow:
+    file: otp-signin-intro.yaml
+    env:
+      EMAIL: ${EMAIL}
+      OTP_CODE: ${OTP_CODE}
+
+- runFlow:
+    when:
+      visible:
+        id: "wizard_skip"
+    file: skip-wizard.yaml
+
+- runFlow: wait-overview.yaml

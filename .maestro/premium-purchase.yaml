@@ -4,11 +4,15 @@ tags:
   - premium
   - purchases
   - purchase
+env:
+  EMAIL: sprout.play.review@gmail.com
 ---
 # One purchase path (single clearState).
 # Coverage: former settings-premium-purchase (+ master-budget-purchase unlock).
 # Settings Premium → Test Store sandbox purchase → Premium active + Manage,
 # then open Master Budget planner (budget_sort) to confirm unlock.
+# Requires OTP_CODE at runtime:
+#   OTP_CODE=xxxxxx maestro test .maestro/premium-purchase.yaml
 # Selectors adapt to Test Store UI (Monthly / Continue / Purchase observed).
 # Run: maestro test .maestro/premium-purchase.yaml
 
@@ -18,7 +22,11 @@ tags:
     clearState: true
     clearKeychain: true
 
-- runFlow: shared/debug-signin-intro.yaml
+- runFlow:
+    file: shared/otp-signin-to-overview.yaml
+    env:
+      EMAIL: ${EMAIL}
+      OTP_CODE: ${OTP_CODE}
 
 - tapOn:
     id: "shell_tab_settings"

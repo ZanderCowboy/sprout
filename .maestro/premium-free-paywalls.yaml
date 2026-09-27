@@ -1,10 +1,13 @@
 appId: app.stackmint.sprout.dev
 tags:
+  - p1
   - page
   - premium
   - purchases
   - paywall
   - killswitch
+env:
+  EMAIL: sprout.play.review@gmail.com
 ---
 # Free / unsubscribed paywalls (single clearState).
 # Coverage: former settings-premium-killswitch-on + settings-premium-paywall
@@ -12,6 +15,8 @@ tags:
 # Online cold start so Remote Config can apply revenuecat_enabled=true;
 # assert Premium row visible, open Settings + Master Budget paywalls, dismiss
 # with back (no purchase). Keep killswitch-off / failopen / deeplink separate.
+# Requires OTP_CODE at runtime:
+#   OTP_CODE=xxxxxx maestro test .maestro/premium-free-paywalls.yaml
 # Run: maestro test .maestro/premium-free-paywalls.yaml
 
 - setAirplaneMode: disabled
@@ -20,7 +25,11 @@ tags:
     clearState: true
     clearKeychain: true
 
-- runFlow: shared/debug-signin-intro.yaml
+- runFlow:
+    file: shared/otp-signin-to-overview.yaml
+    env:
+      EMAIL: ${EMAIL}
+      OTP_CODE: ${OTP_CODE}
 
 - tapOn:
     id: "shell_tab_settings"

@@ -53,7 +53,7 @@ Screenshots are captured automatically using Maestro flows on a connected device
    flutter install --debug --flavor development
    ```
    
-   ⚠️ **Important**: The development flavor is required for debug sign-in. Production builds will not work with the Maestro screenshot flows.
+   ⚠️ **Important**: Screenshot flows use the development flavor + real OTP (`EMAIL` + `OTP_CODE`).
 
 ### Running the Capture Script
 
@@ -88,7 +88,7 @@ Screenshots will be saved to `~/.maestro/tests/<timestamp>/play-*.png`. You'll n
 
 The screenshot capture flow (`.maestro/play-store-screenshots.yaml`):
 - Launches with clean state (no previous data)
-- Uses debug sign-in to bypass authentication
+- Uses real OTP sign-in (`shared/otp-signin-intro.yaml`)
 - Completes the first-run wizard: "Cape Town trip" goal (R12 000), "EasyEquities TFSA" account, R2 500 deposit
 - Captures three screenshots:
   - `play-overview.png` — Overview screen with progress summary
@@ -118,7 +118,7 @@ Per Google Play Console:
 
 ## Known Gaps
 
-**Banner-free builds**: Play Store listing screenshots should ideally use a banner-free build (production or debug with banner disabled) for a cleaner appearance. The current Maestro flow uses the development flavor with debug sign-in, which displays the "DEV" banner ribbon.
+**Banner-free builds**: Play Store listing screenshots should ideally use a banner-free build (production or debug with banner disabled) for a cleaner appearance. The current Maestro flow uses the development flavor with OTP sign-in, which displays the "DEV" banner ribbon.
 
 Issue [#70](https://github.com/ZanderCowboy/sprout/issues/70) tracks Maestro flows with real Google authentication and email OTP, which will enable screenshot capture on production builds without the development banner.
 
@@ -126,7 +126,7 @@ For now, screenshots captured with the current workflow will include the develop
 
 ## Notes
 
-- Screenshots show **development flavor** only (production hides debug sign-in)
+- Screenshots show **development flavor** only (DEV banner may appear)
 - Test data is consistent across captures for reproducible results
 - Rebuild and reinstall the APK if any UI changes are made before capturing screenshots
 - See `.cursor/rules/maestro.mdc` for more details on Maestro conventions

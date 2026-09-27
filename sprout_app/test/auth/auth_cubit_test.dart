@@ -7,7 +7,6 @@ import 'package:sprout/core/config/app_environment.dart';
 import 'package:sprout/core/constants/app_strings.dart';
 import 'package:sprout/core/error/error.dart';
 import 'package:sprout/core/user/user_context.dart';
-import 'package:sprout/features/auth/application/auth_service.dart';
 import 'package:sprout/features/auth/application/auth_service_impl.dart';
 import 'package:sprout/features/auth/domain/auth_user.dart';
 import 'package:sprout/features/auth/presentation/bloc/auth_cubit.dart';
@@ -55,7 +54,6 @@ void main() {
       authService: AuthServiceImpl(
         authRepository: fakeAuth,
         userContext: UserContext(settingsBox),
-        appConfig: config,
         localSessionCleaner: FakeLocalSessionCleaner(),
         analyticsService: FakeAnalyticsService(),
         flushPending: () async {},
@@ -76,26 +74,6 @@ void main() {
     if (tempDir.existsSync()) {
       tempDir.deleteSync(recursive: true);
     }
-  });
-
-  test('debug sign-in stays signed in when Supabase has no session', () async {
-    expect(cubit.debugSignInAvailable, isTrue);
-    await cubit.debugSignIn();
-
-    expect(cubit.state, isA<AuthViewSignedIn>());
-    expect(
-      (cubit.state as AuthViewSignedIn).user.id,
-      AuthService.maestroTestUserId,
-    );
-    expect((cubit.state as AuthViewSignedIn).user.email, 'maestro@test.local');
-
-    fakeAuth.setUser(null);
-    await Future<void>.delayed(Duration.zero);
-    expect(cubit.state, isA<AuthViewSignedIn>());
-    expect(
-      (cubit.state as AuthViewSignedIn).user.id,
-      AuthService.maestroTestUserId,
-    );
   });
 
   test('starts as guest when signed out', () {

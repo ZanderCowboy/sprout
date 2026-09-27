@@ -1,0 +1,60 @@
+appId: app.stackmint.sprout.dev
+---
+# Real OTP sign-in from intro → Sign in → authenticated UI (wizard or Overview).
+# Does NOT skip the first-run wizard — callers that need Overview should
+# run skip-wizard.yaml + wait-overview.yaml afterwards.
+# Requires OTP_CODE at runtime (do not commit secrets).
+# Optional EMAIL via parent env (convention: sprout.play.review@gmail.com).
+# Google account picker is unreliable in Maestro — OTP is the E2E standard.
+# Purchases.logIn runs in-app after verified OTP (RevenueCat identity = Supabase uid).
+
+- extendedWaitUntil:
+    visible:
+      id: "intro_next"
+    timeout: 45000
+
+- tapOn:
+    id: "intro_next"
+
+- tapOn:
+    id: "intro_next"
+
+- tapOn:
+    id: "intro_sign_in"
+
+- extendedWaitUntil:
+    visible:
+      id: "sign_in_email_field"
+    timeout: 10000
+
+- tapOn:
+    id: "sign_in_email_field"
+
+- inputText: ${EMAIL}
+
+- hideKeyboard
+
+- tapOn:
+    id: "sign_in_continue"
+
+- extendedWaitUntil:
+    visible:
+      id: "verify_otp_code_field"
+    timeout: 30000
+
+- tapOn:
+    id: "verify_otp_code_field"
+
+- inputText: ${OTP_CODE}
+
+- extendedWaitUntil:
+    visible:
+      id: "wizard_skip"
+    timeout: 45000
+    optional: true
+
+- extendedWaitUntil:
+    visible:
+      id: "shell_tab_overview"
+    timeout: 5000
+    optional: true

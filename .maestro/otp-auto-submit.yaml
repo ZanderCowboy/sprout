@@ -1,10 +1,13 @@
 appId: app.stackmint.sprout.dev
 tags:
+  - p1
   - page
 env:
   EMAIL: sprout.play.review@gmail.com
 ---
 # OTP auto-submit journey (send → wrong stays → right navigates).
+# Uses Sign in (play-review email already registered). Create-account path
+# surfaces "Account already exists" for this EMAIL — covered by auth-email-exists.
 # OTP_CODE must be provided at run time (do not commit secrets):
 #   OTP_CODE=xxxxxx maestro test .maestro/otp-auto-submit.yaml
 
@@ -13,7 +16,7 @@ env:
     clearKeychain: true
 
 - runFlow:
-    file: shared/chapter-otp-send.yaml
+    file: shared/chapter-otp-send-signin.yaml
     env:
       EMAIL: ${EMAIL}
 

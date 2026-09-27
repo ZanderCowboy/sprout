@@ -254,13 +254,13 @@ In-app defaults also set `revenuecat_enabled: false` before fetch, so an unpubli
 
 When Purchases is configured (`revenuecat_enabled=true`), the app syncs RevenueCat identity with the authenticated user:
 
-- **Sign-in** (email OTP, Google, or debug): calls `Purchases.logIn(appUserId)` after binding the session, so the device App User ID matches the stable Supabase user id (or `maestro-test-user` for debug sign-in). This ensures promo grants applied in the RevenueCat dashboard to a specific App User ID are received on the device.
+- **Sign-in** (email OTP or Google): calls `Purchases.logIn(appUserId)` after binding the session, so the device App User ID matches the stable Supabase user id. This ensures promo grants applied in the RevenueCat dashboard to a specific App User ID are received on the device.
 - **Sign-out**: calls `Purchases.logOut()` to restore an anonymous RevenueCat identity.
 - **Account deletion**: also calls `Purchases.logOut()` (best-effort) after the remote user is deleted.
 
 This is a **best-effort** sync — failures are caught and logged but do not block auth flows. If Purchases is not configured or the kill switch is off, these calls are no-ops.
 
-For Maestro E2E flows that use `debugSignIn`, the App User ID becomes `maestro-test-user`, allowing promo grants on that identity to reach the test device.
+For Maestro E2E flows, sign in with real OTP (`EMAIL` + `OTP_CODE`). The App User ID becomes the Supabase uid for that account — grant Premium promos (or use Test Store purchases) against that identity.
 
 ## Verify
 
