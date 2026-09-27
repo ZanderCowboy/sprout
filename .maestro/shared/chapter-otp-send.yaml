@@ -2,7 +2,8 @@ appId: app.stackmint.sprout.dev
 ---
 # Requires: intro screen visible (fresh launch).
 # Walks intro → create account (terms/privacy), fills Play Review + ${EMAIL},
-# taps Continue, waits for verify OTP field. Does NOT debug-sign-in or Google.
+# taps Continue. If email already exists, Sign in instead (refill EMAIL) and
+# send OTP. Leaves app on verify OTP field.
 - extendedWaitUntil:
     visible:
       id: "intro_next"
@@ -32,6 +33,11 @@ appId: app.stackmint.sprout.dev
 
 - back
 
+- extendedWaitUntil:
+    visible:
+      id: "create_account_privacy_link"
+    timeout: 10000
+
 - tapOn:
     id: "create_account_privacy_link"
 
@@ -41,6 +47,11 @@ appId: app.stackmint.sprout.dev
     timeout: 10000
 
 - back
+
+- extendedWaitUntil:
+    visible:
+      id: "create_account_display_name_field"
+    timeout: 10000
 
 - tapOn:
     id: "create_account_display_name_field"
@@ -56,6 +67,25 @@ appId: app.stackmint.sprout.dev
 
 - tapOn:
     id: "create_account_continue"
+
+- runFlow:
+    when:
+      visible:
+        text: "Account already exists"
+    commands:
+      - tapOn:
+          id: "create_account_existing_sign_in"
+      - extendedWaitUntil:
+          visible:
+            id: "sign_in_email_field"
+          timeout: 10000
+      - tapOn:
+          id: "sign_in_email_field"
+      - eraseText
+      - inputText: ${EMAIL}
+      - hideKeyboard
+      - tapOn:
+          id: "sign_in_continue"
 
 - extendedWaitUntil:
     visible:

@@ -182,6 +182,7 @@ With the app installed or running:
 maestro test .maestro/
 
 # Tag subsets
+maestro test .maestro/ --include-tags p1      # ordinary PRs: tour + OTP + free paywall (see .maestro/README.md)
 maestro test .maestro/ --include-tags page    # per-page journeys
 maestro test .maestro/ --include-tags smoke   # core-loop + full-app-tour
 maestro test .maestro/ --include-tags edge    # no-accounts edge cases
@@ -195,7 +196,7 @@ maestro test .maestro/full-app-tour.yaml
 
 - **Root journeys** (`.maestro/*.yaml`) — runnable end-to-end tests. `config.yaml` sets `flows: ["*"]` so only these are discovered.
 - **Shared helpers** (`.maestro/shared/*.yaml`) — `runFlow` subflows (seed, chapters, form fill). Not runnable alone; compose them from root journeys with `env` parameters.
-- **Tags**: `page` (one surface), `smoke` (core-loop + full-app-tour), `edge` (no-accounts CTAs).
+- **Tags**: `p1` (ordinary-PR smoke: `full-app-tour` + `otp-auto-submit` + `settings-premium-paywall` — see [`.maestro/README.md`](.maestro/README.md)), `page` (one surface), `smoke` (core-loop + full-app-tour), `edge` (no-accounts CTAs).
 
 ### Available flows
 
@@ -209,6 +210,12 @@ maestro test .maestro/full-app-tour.yaml
 - `settings.yaml` — Settings hub tiles
 - `account-profile.yaml` — Edit name, legal, delete cancel (no sign-out)
 - `transactions.yaml` — Transactions list + detail note
+
+**P1** (`tags: [p1]` — ordinary PRs):
+
+- `full-app-tour.yaml` — Signed-in core pages
+- `otp-auto-submit.yaml` — Real OTP auth
+- `settings-premium-paywall.yaml` — Free Premium paywall
 
 **Smoke** (`tags: [smoke]`):
 

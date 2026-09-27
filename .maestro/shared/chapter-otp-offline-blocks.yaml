@@ -3,6 +3,8 @@ appId: app.stackmint.sprout.dev
 # Requires: cold start. Walks intro to sign-in email field, enables
 # airplane mode, asserts offline banner, then restores connectivity.
 # Banner is exposed as accessibilityText on Flutter; match full copy.
+# Last intro slide shows Create account + I already have an account
+# (no intro_next) — same path as otp-signin-intro.
 
 - extendedWaitUntil:
     visible:
@@ -16,7 +18,7 @@ appId: app.stackmint.sprout.dev
     id: "intro_next"
 
 - tapOn:
-    id: "intro_next"
+    id: "intro_sign_in"
 
 - extendedWaitUntil:
     visible:
