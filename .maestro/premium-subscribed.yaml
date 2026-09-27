@@ -5,7 +5,9 @@ tags:
   - purchases
   - subscribed
 ---
-# Assert Settings Premium card shows subscribed state (Premium active + Manage).
+# Premium subscribed (single clearState).
+# Coverage: former settings-premium-subscribed + master-budget-premium.
+# Asserts Settings Premium active + Manage, then Master Budget planner opens.
 #
 # IMPORTANT — Purchases appUserID vs debug sign-in:
 # - Cold start with clearState: resolveUserId() mints a random UUID and
@@ -15,18 +17,9 @@ tags:
 #   grant on `maestro-test-user` is NOT seen after clearState alone.
 # - After process death / soft relaunch (no clearState), configure reads Hive
 #   and uses `maestro-test-user` — grant on that id then applies.
-# - Mid-session grant on the clearState UUID is a QA procedure and is NOT
-#   fully automatable in Maestro alone (clearState would mint a new UUID).
-#
-# This flow uses clearState:true so it is durable for CI once either:
-#   (A) product adds Purchases.logIn('maestro-test-user') after debugSignIn and
-#       RC grants premium on maestro-test-user, OR
-#   (B) a prior Test Store purchase on that same install left premium active
-#       (see settings-premium-purchase.yaml).
-# Until (A), expect FAIL after fresh clearState even when maestro-test-user
-# has a promotional grant.
-#
-# Run: maestro test .maestro/settings-premium-subscribed.yaml
+# Until product adds Purchases.logIn after debugSignIn, or a prior Test Store
+# purchase left premium active, expect FAIL after fresh clearState.
+# Run: maestro test .maestro/premium-subscribed.yaml
 
 - setAirplaneMode: disabled
 
@@ -58,3 +51,22 @@ tags:
 
 - assertVisible:
     text: ".*Manage.*"
+
+- extendedWaitUntil:
+    visible:
+      id: "settings_budget"
+    timeout: 10000
+
+- tapOn:
+    id: "settings_budget"
+
+- extendedWaitUntil:
+    visible:
+      text: "Master Budget"
+    timeout: 15000
+
+- assertVisible:
+    text: "Master Budget"
+
+- assertVisible:
+    id: "budget_sort"

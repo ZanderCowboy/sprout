@@ -1,0 +1,101 @@
+appId: app.stackmint.sprout.dev
+tags:
+  - page
+  - premium
+  - purchases
+  - paywall
+  - killswitch
+---
+# Free / unsubscribed paywalls (single clearState).
+# Coverage: former settings-premium-killswitch-on + settings-premium-paywall
+#   + master-budget-paywall.
+# Online cold start so Remote Config can apply revenuecat_enabled=true;
+# assert Premium row visible, open Settings + Master Budget paywalls, dismiss
+# with back (no purchase). Keep killswitch-off / failopen / deeplink separate.
+# Run: maestro test .maestro/premium-free-paywalls.yaml
+
+- setAirplaneMode: disabled
+
+- launchApp:
+    clearState: true
+    clearKeychain: true
+
+- runFlow: shared/debug-signin-intro.yaml
+
+- tapOn:
+    id: "shell_tab_settings"
+
+- extendedWaitUntil:
+    visible:
+      id: "settings_transactions"
+    timeout: 10000
+
+- assertVisible:
+    id: "settings_transactions"
+
+- assertVisible:
+    id: "settings_account"
+
+- assertVisible:
+    id: "settings_premium"
+
+- extendedWaitUntil:
+    visible:
+      text: ".*Upgrade.*"
+    timeout: 20000
+
+- assertVisible:
+    text: ".*Upgrade.*"
+
+# ===== Settings Premium paywall → dismiss =====
+- tapOn:
+    id: "settings_premium"
+
+- extendedWaitUntil:
+    visible:
+      text: ".*(Monthly|Annual|R79|Subscribe|Continue).*"
+    timeout: 25000
+
+- assertVisible:
+    text: ".*(Monthly|Annual|R79|Subscribe|Continue).*"
+
+- back
+
+- extendedWaitUntil:
+    visible:
+      id: "settings_premium"
+    timeout: 10000
+
+- assertVisible:
+    id: "settings_premium"
+
+# ===== Master Budget paywall → dismiss =====
+- extendedWaitUntil:
+    visible:
+      id: "settings_budget"
+    timeout: 10000
+
+- tapOn:
+    id: "settings_budget"
+
+- extendedWaitUntil:
+    visible:
+      text: ".*(Monthly|Annual|R79|Subscribe|Continue).*"
+    timeout: 25000
+
+- assertVisible:
+    text: ".*(Monthly|Annual|R79|Subscribe|Continue).*"
+
+- back
+
+- extendedWaitUntil:
+    visible:
+      id: "settings_budget"
+    timeout: 10000
+
+- assertVisible:
+    id: "settings_budget"
+
+# Master Budget text remains on Settings finance row — planner gated by budget_sort.
+- assertNotVisible:
+    id: "budget_sort"

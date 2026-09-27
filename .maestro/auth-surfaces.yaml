@@ -1,0 +1,95 @@
+appId: app.stackmint.sprout.dev
+tags:
+  - page
+  - auth
+---
+# Auth surfaces smoke (single clearState).
+# Coverage: former sign-in.yaml (create-account legal/fields) +
+#   sign-in-email.yaml (email-only Sign in field). Does NOT complete
+#   debug / OTP / Google — surface checks only.
+# Run: maestro test .maestro/auth-surfaces.yaml
+
+- launchApp:
+    clearState: true
+    clearKeychain: true
+
+- extendedWaitUntil:
+    visible:
+      id: "intro_next"
+    timeout: 45000
+
+- tapOn:
+    id: "intro_next"
+
+- tapOn:
+    id: "intro_next"
+
+- tapOn:
+    id: "intro_create_account"
+
+- extendedWaitUntil:
+    visible:
+      id: "create_account_debug_sign_in"
+    timeout: 5000
+
+- tapOn:
+    id: "create_account_terms_link"
+
+- extendedWaitUntil:
+    visible:
+      text: "Terms of Service"
+    timeout: 10000
+
+- back
+
+- tapOn:
+    id: "create_account_privacy_link"
+
+- extendedWaitUntil:
+    visible:
+      text: "Privacy Policy"
+    timeout: 10000
+
+- back
+
+- tapOn:
+    id: "create_account_display_name_field"
+
+- inputText: "Tour User"
+
+- tapOn:
+    id: "create_account_email_field"
+
+- inputText: "tour@example.com"
+
+- hideKeyboard
+
+- assertVisible:
+    id: "create_account_continue"
+
+- assertVisible:
+    id: "create_account_debug_sign_in"
+
+# Switch to email-only Sign in surface (former sign-in-email)
+- tapOn:
+    id: "create_account_sign_in_link"
+
+- extendedWaitUntil:
+    visible:
+      id: "sign_in_email_field"
+    timeout: 5000
+
+- tapOn:
+    id: "sign_in_email_field"
+
+- eraseText
+
+- inputText: "tour@example.com"
+
+- hideKeyboard
+
+- assertVisible:
+    id: "sign_in_continue"
+
+- assertVisible:
+    id: "sign_in_debug_sign_in"

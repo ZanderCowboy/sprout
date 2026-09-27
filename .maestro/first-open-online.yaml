@@ -1,9 +1,11 @@
-﻿appId: app.stackmint.sprout.dev
+appId: app.stackmint.sprout.dev
 tags:
   - smoke
   - auth
 ---
-# First open online: carousel → Create account → wizard → Overview
+# First open online (single clearState).
+# Coverage: former intro.yaml (slides + back from Sign in) + create-account
+# debug sign-in → wizard skip → Overview. OTP wrong/right lives in otp-auto-submit.
 # Run: maestro test .maestro/first-open-online.yaml
 # Slide titles share an a11y node with body text — use regex, not exact title.
 
@@ -30,6 +32,26 @@ tags:
 
 - assertVisible:
     text: ".*Sign in so your data stays with you.*"
+
+# Intro coverage: open Sign in then back (former intro.yaml / chapter-intro)
+- tapOn:
+    id: "intro_sign_in"
+
+- extendedWaitUntil:
+    visible:
+      id: "sign_in_debug_sign_in"
+    timeout: 5000
+
+- tapOn:
+    id: "sign_in_back"
+
+- extendedWaitUntil:
+    visible:
+      id: "intro_create_account"
+    timeout: 5000
+
+- assertVisible:
+    id: "intro_sign_in"
 
 - tapOn:
     id: "intro_create_account"

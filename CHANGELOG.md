@@ -2,6 +2,13 @@
 
 Changes heading to `main`. Newest entries at the top.
 
+## 2026-09-27 — Maestro flow consolidation
+
+- Deduped Maestro roots: promote `full-app-tour` (absorbs overview/goals/deposit/transactions/settings/account-profile/core-loop)
+- Added `premium-subscribed`, `premium-free-paywalls`, `premium-purchase` (merged settings + master-budget positives)
+- Folded `intro` into `first-open-online`; merged `sign-in` + `sign-in-email` into `auth-surfaces`
+- clearState launches: 36 → 23; kept killswitch-off, failopen, deeplink, Google/auth edges, OTP helpers, wizards separate
+
 ## 2026-09-25 — Master Budget Premium gate
 
 - Master Budget now requires Premium subscription

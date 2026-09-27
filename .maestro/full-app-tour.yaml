@@ -2,8 +2,11 @@ appId: app.stackmint.sprout.dev
 tags:
   - smoke
 ---
-# Full-app smoke tour: composes shared chapters + seed.
-# Requires development flavor.
+# Full-app smoke tour (single clearState).
+# Coverage (absorbed former page/smoke roots):
+#   overview, goals, deposit, transactions, settings, account-profile, core-loop
+# Debug sign-in → empty→seed→populated surfaces, shell FAB, goals/deposit,
+# settings subtree, sign-out.
 # Run: maestro test .maestro/full-app-tour.yaml
 
 - launchApp:
