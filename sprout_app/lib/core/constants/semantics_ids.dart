@@ -9,7 +9,8 @@ abstract final class SemanticsIds {
 
   // --- Create account ---
   static const createAccountBack = 'create_account_back';
-  static const createAccountDisplayNameField = 'create_account_display_name_field';
+  static const createAccountDisplayNameField =
+      'create_account_display_name_field';
   static const createAccountEmailField = 'create_account_email_field';
   static const createAccountContinue = 'create_account_continue';
   static const createAccountGoogle = 'create_account_google';
@@ -173,6 +174,12 @@ abstract final class SemanticsIds {
   static const budgetSortSave = 'budget_sort_save';
   static const budgetSortCancel = 'budget_sort_cancel';
 
+  // --- Play soft prompts ---
+  static const playUpdateCta = 'play_update_cta';
+  static const playUpdateLater = 'play_update_later';
+  static const playReviewRate = 'play_review_rate';
+  static const playReviewNotNow = 'play_review_not_now';
+
   // --- Dialogs (shared) ---
   static const dialogCancel = 'dialog_cancel';
   static const dialogDelete = 'dialog_delete';
@@ -183,6 +190,5 @@ abstract final class SemanticsIds {
       '${colorSwatch}_$oneBasedIndex';
 
   /// Goal icon picker id for palette index [1-based].
-  static String goalIconAt(int oneBasedIndex) =>
-      '${goalIcon}_$oneBasedIndex';
+  static String goalIconAt(int oneBasedIndex) => '${goalIcon}_$oneBasedIndex';
 }

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:get_it/get_it.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sprout/core/analytics/analytics_service.dart';
 import 'package:sprout/core/analytics/analytics_service_impl.dart';
 import 'package:sprout/core/config/app_config.dart';
@@ -34,6 +35,17 @@ import 'package:sprout/features/goals/application/goals_service_impl.dart';
 import 'package:sprout/features/goals/data/goals_repository_impl.dart';
 import 'package:sprout/features/goals/data/local/models/goal_hive_model.dart';
 import 'package:sprout/features/goals/domain/goals_repository.dart';
+import 'package:sprout/features/play_prompts/application/play_in_app_review_gateway.dart';
+import 'package:sprout/features/play_prompts/application/play_in_app_review_gateway_impl.dart';
+import 'package:sprout/features/play_prompts/application/play_prompt_preferences.dart';
+import 'package:sprout/features/play_prompts/application/play_review_prompt_service.dart';
+import 'package:sprout/features/play_prompts/application/play_review_prompt_service_impl.dart';
+import 'package:sprout/features/play_prompts/application/play_store_listing_launcher.dart';
+import 'package:sprout/features/play_prompts/application/play_store_listing_launcher_impl.dart';
+import 'package:sprout/features/play_prompts/application/play_update_availability_checker.dart';
+import 'package:sprout/features/play_prompts/application/play_update_availability_checker_impl.dart';
+import 'package:sprout/features/play_prompts/application/play_update_prompt_service.dart';
+import 'package:sprout/features/play_prompts/application/play_update_prompt_service_impl.dart';
 import 'package:sprout/features/purchases/application/premium_service.dart';
 import 'package:sprout/features/purchases/application/premium_service_impl.dart';
 import 'package:sprout/features/purchases/presentation/premium_paywall_helper.dart';
@@ -216,6 +228,36 @@ Future<void> configureDependencies({
     if (!canSync()) return;
     unawaited(sl<SyncService>().flushPending());
   };
+
+  final sharedPreferences = await SharedPreferences.getInstance();
+  sl.registerSingleton<SharedPreferences>(sharedPreferences);
+  sl.registerLazySingleton<PlayPromptPreferences>(
+    () => PlayPromptPreferences(sl()),
+  );
+  sl.registerLazySingleton<PlayUpdateAvailabilityChecker>(
+    PlayUpdateAvailabilityCheckerImpl.new,
+  );
+  sl.registerLazySingleton<PlayStoreListingLauncher>(
+    PlayStoreListingLauncherImpl.new,
+  );
+  sl.registerLazySingleton<PlayInAppReviewGateway>(
+    PlayInAppReviewGatewayImpl.new,
+  );
+  sl.registerLazySingleton<PlayUpdatePromptService>(
+    () => PlayUpdatePromptServiceImpl(
+      availabilityChecker: sl(),
+      listingLauncher: sl(),
+      preferences: sl(),
+      appConfig: sl(),
+    ),
+  );
+  sl.registerLazySingleton<PlayReviewPromptService>(
+    () => PlayReviewPromptServiceImpl(
+      preferences: sl(),
+      reviewGateway: sl(),
+      userContext: sl(),
+    ),
+  );
 
   if (supabaseClient != null) {
     sl.registerSingleton<SupabaseClient>(supabaseClient);
