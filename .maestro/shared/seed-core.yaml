@@ -1,6 +1,6 @@
 appId: app.stackmint.sprout.dev
 ---
-# Requires: empty Overview after debug sign-in.
+# Requires: empty Overview after OTP (or Google) sign-in.
 # Always creates Everyday account. Optional env flags (set to "true"):
 #   SEED_GOAL — Everyday Fund goal (target 10000)
 #   SEED_DEPOSIT — immediate deposit Everyday → Everyday Fund (2500)

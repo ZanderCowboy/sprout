@@ -25,34 +25,6 @@ class AuthCubit extends Cubit<AuthViewState> {
 
   bool get _googleAvailable => _appConfig.isGoogleSignInConfigured;
 
-  /// Development flavor only. Production never shows the debug sign-in button.
-  bool get debugSignInAvailable => _authService.debugSignInAvailable;
-
-  /// Development-only: skip OTP/Google and bind a stable local test user.
-  Future<void> debugSignIn() async {
-    final current = state;
-    if (current is AuthViewSignedOut && current.busy) return;
-    if (current is AuthViewSignedOut) {
-      emit(current.copyWith(busy: true, clearError: true, clearInfo: true));
-    }
-    try {
-      await _authService.debugSignIn();
-      if (isClosed) return;
-      emit(const AuthViewSignedIn(user: AuthService.maestroTestUser));
-    } on AppException catch (e) {
-      if (isClosed) return;
-      if (current is AuthViewSignedOut) {
-        emit(
-          current.copyWith(
-            busy: false,
-            errorMessage: e.toFailure().message,
-            clearInfo: true,
-          ),
-        );
-      }
-    }
-  }
-
   void emailChanged(String email) {
     final current = state;
     if (current is! AuthViewSignedOut || current.busy) return;
@@ -370,10 +342,6 @@ class AuthCubit extends Cubit<AuthViewState> {
     if (isClosed) return;
     if (user != null && user.isVerified) {
       emit(AuthViewSignedIn(user: user));
-      return;
-    }
-    if (_authService.isDebugSignedIn) {
-      emit(const AuthViewSignedIn(user: AuthService.maestroTestUser));
       return;
     }
     final previous = state;

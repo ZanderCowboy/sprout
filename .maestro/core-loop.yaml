@@ -1,7 +1,11 @@
 appId: app.stackmint.sprout.dev
 tags:
   - smoke
+env:
+  EMAIL: sprout.play.review@gmail.com
 ---
+# Requires OTP_CODE at runtime:
+#   OTP_CODE=xxxxxx maestro test .maestro/core-loop.yaml
 # Core savings loop: account → goal → deposit → verify progress
 # Run: maestro test .maestro/core-loop.yaml
 
@@ -9,7 +13,11 @@ tags:
     clearState: true
     clearKeychain: true
 
-- runFlow: shared/debug-signin-intro.yaml
+- runFlow:
+    file: shared/otp-signin-to-overview.yaml
+    env:
+      EMAIL: ${EMAIL}
+      OTP_CODE: ${OTP_CODE}
 
 - assertVisible:
     id: "overview_empty_new_account"

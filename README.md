@@ -201,8 +201,8 @@ maestro test .maestro/full-app-tour.yaml
 
 **Page** (`tags: [page]`):
 
-- `intro.yaml` — Intro slides, back from Sign in, debug sign-in
-- `sign-in.yaml` — Legal links, fields, debug sign-in (no OTP / Google)
+- `intro.yaml` — Intro slides, back from Sign in, OTP sign-in
+- `sign-in.yaml` — Legal links + fields (surface only; no OTP / Google complete)
 - `overview.yaml` — Empty CTAs then populated Overview
 - `goals.yaml` — Goals sort, unallocated, Everyday Fund detail
 - `deposit.yaml` — Deposit sheet modes (FAB + goal detail)
@@ -224,7 +224,9 @@ maestro test .maestro/full-app-tour.yaml
 
 | Helper | Purpose |
 |--------|---------|
-| `shared/debug-signin-intro.yaml` | Debug sign-in from intro |
+| `shared/otp-signin-intro.yaml` | Real OTP sign-in from intro (needs `EMAIL` + `OTP_CODE`) |
+| `shared/otp-signin-to-overview.yaml` | OTP sign-in + skip wizard → Overview |
+| `shared/otp-signin-from-sign-in.yaml` | OTP when already on Sign in screen |
 | `shared/wait-overview.yaml` | Wait for Overview after sign-in |
 | `shared/open-center-sheet.yaml` | Open shell FAB action sheet |
 | `shared/fill-account-form.yaml` | Fill account name + color + save (`ACCOUNT_NAME`, `COLOR_INDEX`) |
@@ -233,9 +235,24 @@ maestro test .maestro/full-app-tour.yaml
 | `shared/seed-core.yaml` | Empty Overview → Everyday account; optional `SEED_GOAL` / `SEED_DEPOSIT` / `SEED_RECURRING` |
 | `shared/chapter-*.yaml` | Per-surface steps (no `launchApp`); composed by page journeys and the tour |
 
-Development builds show a **Debug sign in** button on intro and Sign in (`Maestro Test · maestro@test.local`). Flows tap it with `id: intro_debug_sign_in` (intro) or `id: sign_in_debug_sign_in` (sign-in screen). It binds a local-only test user (`maestro-test-user`) and opens Overview. Sync stays off.
+### Auth for Maestro (OTP)
 
-**Production flavor never shows the button.**
+Debug sign-in has been **removed entirely**. Maestro E2E standardizes on **real email OTP** (Google account picker is unreliable in Maestro).
+
+**Required env vars (do not commit secrets):**
+
+| Var | Purpose | Example |
+|-----|---------|---------|
+| `EMAIL` | Existing test account | `sprout.play.review@gmail.com` (default in most flows) |
+| `OTP_CODE` | 6-digit code from the inbox after Continue | pass at run time |
+| `OTP_CODE_REAUTH` | Second code for flows that sign out then sign in again | `sign-out-keeps-data.yaml` only |
+
+```bash
+OTP_CODE=123456 maestro test .maestro/overview.yaml
+OTP_CODE=111111 OTP_CODE_REAUTH=222222 maestro test .maestro/sign-out-keeps-data.yaml
+```
+
+After verified OTP, the app calls `Purchases.logIn` with the Supabase user id (RevenueCat identity sync). For Premium-subscribed flows, grant a promo (or complete a Test Store purchase) on that App User ID in RevenueCat.
 
 ### Semantic IDs for taps
 

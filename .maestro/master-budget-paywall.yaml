@@ -4,9 +4,13 @@ tags:
   - premium
   - budget
   - paywall
+env:
+  EMAIL: sprout.play.review@gmail.com
 ---
+# Requires OTP_CODE at runtime:
+#   OTP_CODE=xxxxxx maestro test .maestro/master-budget-paywall.yaml
 # Free/unsubscribed: tap Master Budget → paywall → back stays on Settings.
-# Needs Upgrade visible (no active entitlement on maestro-test-user after logIn).
+# Needs Upgrade visible (no active entitlement on the OTP user after Purchases.logIn).
 # Planner absence after dismiss: budget_sort not visible (Master Budget text
 # remains as Settings finance row label).
 # Run: maestro test .maestro/master-budget-paywall.yaml
@@ -17,7 +21,11 @@ tags:
     clearState: true
     clearKeychain: true
 
-- runFlow: shared/debug-signin-intro.yaml
+- runFlow:
+    file: shared/otp-signin-to-overview.yaml
+    env:
+      EMAIL: ${EMAIL}
+      OTP_CODE: ${OTP_CODE}
 
 - tapOn:
     id: "shell_tab_settings"

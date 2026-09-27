@@ -1,21 +1,23 @@
 appId: app.stackmint.sprout.dev
 tags:
   - wizard
+env:
+  EMAIL: sprout.play.review@gmail.com
 ---
-# Wizard happy path: complete goal → account → deposit → verify Overview with progress
+# Wizard happy path: OTP sign-in → complete wizard → Overview with progress
+# Requires OTP_CODE at runtime:
+#   OTP_CODE=xxxxxx maestro test .maestro/wizard-happy-path.yaml
 # Run: maestro test .maestro/wizard-happy-path.yaml
 
 - launchApp:
     clearState: true
     clearKeychain: true
 
-- extendedWaitUntil:
-    visible:
-      id: "intro_debug_sign_in"
-    timeout: 45000
-
-- tapOn:
-    id: "intro_debug_sign_in"
+- runFlow:
+    file: shared/otp-signin-intro.yaml
+    env:
+      EMAIL: ${EMAIL}
+      OTP_CODE: ${OTP_CODE}
 
 - runFlow: shared/complete-wizard.yaml
 

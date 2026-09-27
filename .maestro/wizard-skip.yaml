@@ -1,23 +1,24 @@
 appId: app.stackmint.sprout.dev
 tags:
   - wizard
+env:
+  EMAIL: sprout.play.review@gmail.com
 ---
-# Wizard skip: tap Skip → land on empty Overview → verify first_run_completed persisted
+# Wizard skip: OTP → Skip → empty Overview → verify first_run_completed persisted
+# Requires OTP_CODE at runtime:
+#   OTP_CODE=xxxxxx maestro test .maestro/wizard-skip.yaml
 # Run: maestro test .maestro/wizard-skip.yaml
 
 - launchApp:
     clearState: true
     clearKeychain: true
 
-- extendedWaitUntil:
-    visible:
-      id: "intro_debug_sign_in"
-    timeout: 45000
+- runFlow:
+    file: shared/otp-signin-intro.yaml
+    env:
+      EMAIL: ${EMAIL}
+      OTP_CODE: ${OTP_CODE}
 
-- tapOn:
-    id: "intro_debug_sign_in"
-
-# Should redirect to wizard (first run not completed)
 - extendedWaitUntil:
     visible:
       id: "wizard_skip"
@@ -26,16 +27,13 @@ tags:
 - assertVisible:
     text: "Step 1 of 3"
 
-# Tap Skip immediately (do not advance to step 2)
 - runFlow: shared/skip-wizard.yaml
 
-# Should redirect to Overview
 - extendedWaitUntil:
     visible:
       id: "shell_tab_overview"
     timeout: 10000
 
-# Verify empty state guidance appears
 - assertVisible:
     text: "Welcome to Sprout"
 
@@ -48,7 +46,6 @@ tags:
 - assertVisible:
     text: "3. Make a deposit"
 
-# Verify empty state CTAs appear in correct order
 - assertVisible:
     id: "overview_empty_new_goal"
 
@@ -58,24 +55,15 @@ tags:
 - assertVisible:
     id: "overview_empty_deposit"
 
-# Verify wizard does NOT reappear on app restart (first_run_completed persisted)
+# Session persists — relaunch without clearState should land on Overview
 - stopApp
 
 - launchApp
 
 - extendedWaitUntil:
     visible:
-      id: "intro_debug_sign_in"
-    timeout: 45000
-
-- tapOn:
-    id: "intro_debug_sign_in"
-
-# Should go directly to Overview (wizard already skipped)
-- extendedWaitUntil:
-    visible:
       id: "shell_tab_overview"
-    timeout: 10000
+    timeout: 45000
 
 - assertVisible:
     text: "Welcome to Sprout"

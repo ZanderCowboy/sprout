@@ -1,9 +1,13 @@
-﻿appId: app.stackmint.sprout.dev
+appId: app.stackmint.sprout.dev
 tags:
   - edge
   - auth
+env:
+  EMAIL: sprout.play.review@gmail.com
 ---
 # #56: sign-out clears session but keeps local Hive data.
+# Requires two OTP codes (initial + re-auth after sign-out):
+#   OTP_CODE=xxxxxx OTP_CODE_REAUTH=yyyyyy maestro test .maestro/sign-out-keeps-data.yaml
 # Run: maestro test .maestro/sign-out-keeps-data.yaml
 # Overview may not show goal names — assert on Goals tab.
 
@@ -11,7 +15,11 @@ tags:
     clearState: true
     clearKeychain: true
 
-- runFlow: shared/debug-signin-intro.yaml
+- runFlow:
+    file: shared/otp-signin-to-overview.yaml
+    env:
+      EMAIL: ${EMAIL}
+      OTP_CODE: ${OTP_CODE}
 
 - runFlow:
     file: shared/seed-core.yaml
@@ -26,21 +34,17 @@ tags:
 
 - runFlow: shared/chapter-sign-out.yaml
 
-# After introCompleted, unsigned gate is Sign in (primary).
-- extendedWaitUntil:
-    visible:
-      id: "sign_in_debug_sign_in"
-    timeout: 10000
-
-- tapOn:
-    id: "sign_in_debug_sign_in"
+- runFlow:
+    file: shared/otp-signin-from-sign-in.yaml
+    env:
+      EMAIL: ${EMAIL}
+      OTP_CODE: ${OTP_CODE_REAUTH}
 
 - extendedWaitUntil:
     visible:
       id: "shell_tab_overview"
     timeout: 20000
 
-# Local goal should still be present (no wizard if first_run already done)
 - tapOn:
     id: "shell_tab_goals"
 

@@ -3,21 +3,39 @@ tags:
   - page
   - premium
   - killswitch
+env:
+  EMAIL: sprout.play.review@gmail.com
 ---
 # Assert Settings Premium card is hidden when revenuecat_enabled is off.
-# Live sprout-app-development RC currently publishes revenuecat_enabled=true,
-# so this flow forces airplane mode before cold start so Firebase fetch fails
-# and in-app defaults apply (RemoteFeatureFlag.revenueCatEnabled defaultValue:
-# false). Debug sign-in is local-only and does not need network.
+# Sign in with OTP online first (real auth), then airplane-mode cold start so
+# Firebase Remote Config fetch fails and in-app defaults apply
+# (RemoteFeatureFlag.revenueCatEnabled defaultValue: false).
+# Requires OTP_CODE at runtime:
+#   OTP_CODE=xxxxxx maestro test .maestro/settings-premium-killswitch-off.yaml
 # Run: maestro test .maestro/settings-premium-killswitch-off.yaml
 
-- setAirplaneMode: enabled
+- setAirplaneMode: disabled
 
 - launchApp:
     clearState: true
     clearKeychain: true
 
-- runFlow: shared/debug-signin-intro.yaml
+- runFlow:
+    file: shared/otp-signin-to-overview.yaml
+    env:
+      EMAIL: ${EMAIL}
+      OTP_CODE: ${OTP_CODE}
+
+- setAirplaneMode: enabled
+
+- stopApp
+
+- launchApp
+
+- extendedWaitUntil:
+    visible:
+      id: "shell_tab_settings"
+    timeout: 45000
 
 - tapOn:
     id: "shell_tab_settings"

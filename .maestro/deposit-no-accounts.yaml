@@ -1,7 +1,11 @@
 appId: app.stackmint.sprout.dev
 tags:
   - edge
+env:
+  EMAIL: sprout.play.review@gmail.com
 ---
+# Requires OTP_CODE at runtime:
+#   OTP_CODE=xxxxxx maestro test .maestro/deposit-no-accounts.yaml
 # Deposit with 0 accounts shows "create an account first" CTA
 # Run: maestro test .maestro/deposit-no-accounts.yaml
 
@@ -9,7 +13,11 @@ tags:
     clearState: true
     clearKeychain: true
 
-- runFlow: shared/debug-signin-intro.yaml
+- runFlow:
+    file: shared/otp-signin-to-overview.yaml
+    env:
+      EMAIL: ${EMAIL}
+      OTP_CODE: ${OTP_CODE}
 
 - assertVisible:
     id: "overview_empty_new_account"

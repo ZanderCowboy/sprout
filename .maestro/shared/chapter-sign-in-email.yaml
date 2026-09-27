@@ -1,7 +1,8 @@
 appId: app.stackmint.sprout.dev
 ---
 # Requires: intro visible (fresh). Goes to Sign in via "I already have an account".
-# Email-only; debug sign-in. Does NOT OTP/Google.
+# Email field smoke only. Does NOT complete OTP/Google.
+
 - extendedWaitUntil:
     visible:
       id: "intro_next"
@@ -18,7 +19,7 @@ appId: app.stackmint.sprout.dev
 
 - extendedWaitUntil:
     visible:
-      id: "sign_in_debug_sign_in"
+      id: "sign_in_email_field"
     timeout: 5000
 
 - tapOn:
@@ -28,9 +29,5 @@ appId: app.stackmint.sprout.dev
 
 - hideKeyboard
 
-- tapOn:
-    id: "sign_in_debug_sign_in"
-
-- runFlow: skip-wizard.yaml
-
-- runFlow: wait-overview.yaml
+- assertVisible:
+    id: "sign_in_continue"

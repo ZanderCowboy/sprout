@@ -1,7 +1,11 @@
 appId: app.stackmint.sprout.dev
 tags:
   - page
+env:
+  EMAIL: sprout.play.review@gmail.com
 ---
+# Requires OTP_CODE at runtime:
+#   OTP_CODE=xxxxxx maestro test .maestro/deposit.yaml
 # Deposit sheet modes from FAB and goal-detail quick deposit.
 # Seeds unallocated (to-account) then a goal deposit so all modes appear.
 # Run: maestro test .maestro/deposit.yaml
@@ -10,7 +14,11 @@ tags:
     clearState: true
     clearKeychain: true
 
-- runFlow: shared/debug-signin-intro.yaml
+- runFlow:
+    file: shared/otp-signin-to-overview.yaml
+    env:
+      EMAIL: ${EMAIL}
+      OTP_CODE: ${OTP_CODE}
 
 - runFlow:
     file: shared/seed-core.yaml

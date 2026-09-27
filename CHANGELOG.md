@@ -2,6 +2,13 @@
 
 Changes heading to `main`. Newest entries at the top.
 
+## 2026-09-27 — Remove debug sign-in (#101)
+
+- Deleted debug sign-in UI, APIs, and semantics entirely (not behind `kDebugMode` / flavor)
+- Maestro E2E now uses real email OTP (`EMAIL` + `OTP_CODE`); Google picker documented as unreliable
+- `Purchases.logIn` / `logOut` remain on real verified auth bind / sign-out (no regression from #58 / #100)
+- Updated REVENUECAT + Maestro docs for the OTP path
+
 ## 2026-09-25 — Master Budget Premium gate
 
 - Master Budget now requires Premium subscription

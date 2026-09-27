@@ -4,10 +4,15 @@ tags:
   - premium
   - budget
   - subscribed
+env:
+  EMAIL: sprout.play.review@gmail.com
 ---
-# Premium active: clearState + debugSignIn → Purchases.logIn(maestro-test-user)
-# with promo entitlement → Settings shows Premium active → Master Budget opens
-# with no paywall.
+# Requires OTP_CODE at runtime:
+#   OTP_CODE=xxxxxx maestro test .maestro/master-budget-premium.yaml
+# Premium active: OTP sign-in → Purchases.logIn(supabase uid).
+# QA: grant Premium promo on the review account Supabase App User ID in RevenueCat,
+# or complete a Test Store purchase for that identity first.
+
 # Run: maestro test .maestro/master-budget-premium.yaml
 
 - setAirplaneMode: disabled
@@ -16,7 +21,11 @@ tags:
     clearState: true
     clearKeychain: true
 
-- runFlow: shared/debug-signin-intro.yaml
+- runFlow:
+    file: shared/otp-signin-to-overview.yaml
+    env:
+      EMAIL: ${EMAIL}
+      OTP_CODE: ${OTP_CODE}
 
 - tapOn:
     id: "shell_tab_settings"
