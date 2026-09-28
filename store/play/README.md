@@ -28,7 +28,17 @@ To regenerate with different branding, modify `tool/generate_play_assets.py` or 
 
 ## Capturing Screenshots
 
-Screenshots are captured automatically using Maestro flows on a connected device or emulator.
+Screenshots are captured with Maestro on a **production release** build (banner-free) using real email OTP. Debug sign-in is gone (#101). Prefer the email OTP human-pause path; Google handoff is documented in `.maestro/shared/google-signin-handoff.yaml` for completeness.
+
+### Flavor + bubble requirement (future recaptures)
+
+| Requirement | Detail |
+|-------------|--------|
+| Flavor | **production** (`app.stackmint.sprout`) |
+| Build mode | **release** — EnvironmentBanner hides only when `production && kReleaseMode`. Production **debug** still shows a PROD ribbon. |
+| Install | `flutter build apk --release --flavor production -t lib/main_production.dart` then `flutter install --release --flavor production` |
+| Debug Lens bubble | Must be **off** in every shot. PROD Remote Config defaults `debug_lens_enabled=false`; bubble toggle lives on the **Environment** page (#114), not main Settings. Do not reintroduce Debug Lens on Settings. |
+| Auth | Real email OTP (`shared/email-otp-human-pause.yaml`). No debug / bypass auth. |
 
 ### Prerequisites
 
@@ -37,74 +47,83 @@ Screenshots are captured automatically using Maestro flows on a connected device
    curl -Ls "https://get.maestro.mobile.dev" | bash
    ```
 
-2. **Connect a device or start an emulator**:
+2. **Connect a device or start an emulator** (standing QA lock: CT-MAC-75 Pixel_10_Pro / `emulator-5554`):
    ```bash
-   # List connected devices
    adb devices
-   
-   # Or start an emulator
-   emulator -avd <your_avd_name>
+   # Leave the emulator up for the whole capture
+   emulator -avd Pixel_10_Pro
    ```
 
-3. **Build and install the development APK**:
+3. **Build and install the production release APK** (banner-free):
    ```bash
    cd sprout_app
-   flutter build apk --debug --flavor development -t lib/main_development.dart
-   flutter install --debug --flavor development
+   flutter build apk --release --flavor production -t lib/main_production.dart
+   flutter install --release --flavor production
    ```
-   
-   ⚠️ **Important**: Screenshot flows use the development flavor + real OTP (`EMAIL` + `OTP_CODE`).
+
+4. **OTP handoff**: be ready to enter the 6-digit code for `sprout.play.review@gmail.com` when Maestro reaches the verify screen (or pass `OTP_CODE=xxxxxx` for the optional fast-path).
 
 ### Running the Capture Script
 
 From the workspace root:
 
 ```bash
-# Capture phone screenshots (default)
-./tool/capture_play_screenshots.sh
+# Phone screenshots on CT-MAC-75 standing emulator (human OTP pause)
+./tool/capture_play_screenshots.sh phone --device emulator-5554
 
-# Or specify device class explicitly
-./tool/capture_play_screenshots.sh phone
-./tool/capture_play_screenshots.sh sevenInch
-./tool/capture_play_screenshots.sh tenInch
+# Optional OTP fast-path
+OTP_CODE=xxxxxx ./tool/capture_play_screenshots.sh phone --device emulator-5554
+
+# Other device classes
+./tool/capture_play_screenshots.sh sevenInch --device emulator-5554
+./tool/capture_play_screenshots.sh tenInch --device emulator-5554
 ```
 
 The script will:
-1. Run the Maestro flow `.maestro/play-store-screenshots.yaml`
-2. Capture screenshots of Overview, Goals, and Accounts screens with seeded data
-3. Copy the screenshots to `store/play/screenshots/<device_class>/`
+1. Run `.maestro/play-store-screenshots.yaml` against `app.stackmint.sprout`
+2. Pause for human OTP (unless `OTP_CODE` is set)
+3. Complete the wizard and capture Overview, Goals, and Accounts
+4. Copy `play-*.png` into `store/play/screenshots/<device_class>/`
 
 ### Manual Maestro Run
 
-You can also run the Maestro flow directly:
-
 ```bash
-maestro test .maestro/play-store-screenshots.yaml
+maestro test --device emulator-5554 .maestro/play-store-screenshots.yaml
+# or
+OTP_CODE=xxxxxx maestro test --device emulator-5554 .maestro/play-store-screenshots.yaml
 ```
 
-Screenshots will be saved to `~/.maestro/tests/<timestamp>/play-*.png`. You'll need to manually copy them to the appropriate `screenshots/<device_class>/` directory.
+Screenshots land in `~/.maestro/tests/<timestamp>/play-*.png`. Copy them into `screenshots/<device_class>/` (or use the capture script).
 
 ## Maestro Flow Details
 
-The screenshot capture flow (`.maestro/play-store-screenshots.yaml`):
-- Launches with clean state (no previous data)
-- Uses real OTP sign-in (`shared/otp-signin-intro.yaml`)
-- Completes the first-run wizard: "Cape Town trip" goal (R12 000), "EasyEquities TFSA" account, R2 500 deposit
-- Captures three screenshots:
-  - `play-overview.png` — Overview screen with progress summary
-  - `play-goals.png` — Goals screen showing the wizard goal
-  - `play-accounts.png` — Accounts screen showing the wizard account
-- Tagged `[play-store]` to exclude from default smoke test runs
+`.maestro/play-store-screenshots.yaml`:
+- Launches production app with clean state
+- Real email OTP via `shared/email-otp-human-pause.yaml` (human pause by default; optional `OTP_CODE`)
+- Completes the first-run wizard: "Cape Town trip" goal (R12 000), "EasyEquities TFSA" account, R2 500 deposit (`shared/complete-wizard-play.yaml`)
+- Captures:
+  - `play-overview.png`
+  - `play-goals.png`
+  - `play-accounts.png`
+- Tagged `[play-store]` (excluded from default smoke / p1 runs)
+
+Related shared subflows (#70):
+- `shared/email-otp-human-pause.yaml` — email → request code → human OTP pause (or `OTP_CODE` fast-path)
+- `shared/google-signin-handoff.yaml` — Google path with documented account-picker / consent handoffs Maestro cannot automate
+
+DEV E2E flows stay on `app.stackmint.sprout.dev` + `shared/otp-signin-intro.yaml` (still require `OTP_CODE`).
 
 ## Uploading to Play Console
+
+**Zander only** (PM / agents do not drive Play Console).
 
 1. Navigate to [Google Play Console](https://play.google.com/console)
 2. Select the Sprout app
 3. Go to **Store presence** → **Main store listing**
-4. Upload the generated assets:
+4. Upload:
    - **App icon**: `icon-512.png`
    - **Feature graphic**: `feature-graphic-1024x500.png`
-   - **Screenshots**: Files from `screenshots/phone/` (required), `screenshots/sevenInch/`, `screenshots/tenInch/` (optional)
+   - **Screenshots**: `screenshots/phone/` (required); `sevenInch/` / `tenInch/` optional
 
 ## Screenshot Requirements
 
@@ -116,17 +135,10 @@ Per Google Play Console:
 - **Phone screenshots**: Required
 - **Tablet screenshots**: Optional but recommended
 
-## Known Gaps
-
-**Banner-free builds**: Play Store listing screenshots should ideally use a banner-free build (production or debug with banner disabled) for a cleaner appearance. The current Maestro flow uses the development flavor with OTP sign-in, which displays the "DEV" banner ribbon.
-
-Issue [#70](https://github.com/ZanderCowboy/sprout/issues/70) tracks Maestro flows with real Google authentication and email OTP, which will enable screenshot capture on production builds without the development banner.
-
-For now, screenshots captured with the current workflow will include the development banner. This is acceptable for initial Play Store setup, but should be replaced with banner-free screenshots before public launch.
-
 ## Notes
 
-- Screenshots show **development flavor** only (DEV banner may appear)
+- Existing PNGs under `screenshots/` may still be from an older DEV capture — replace after a production OTP handoff run on CT-MAC-75
+- No DEV/PROD ribbon and no debug_lens bubble in listing shots
 - Test data is consistent across captures for reproducible results
-- Rebuild and reinstall the APK if any UI changes are made before capturing screenshots
-- See `.cursor/rules/maestro.mdc` for more details on Maestro conventions
+- Rebuild and reinstall the production **release** APK if UI changes before recapturing
+- See `.cursor/rules/maestro.mdc` and `.maestro/README.md` for Maestro conventions

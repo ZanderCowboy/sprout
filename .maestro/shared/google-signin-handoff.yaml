@@ -1,0 +1,71 @@
+appId: app.stackmint.sprout
+---
+# Google sign-in shared subflow with documented human / device handoffs.
+# Production appId (banner-free release). Prefer email-otp-human-pause.yaml for
+# Play screenshot runs; this subflow exists for AC completeness and reuse.
+#
+# Handoff points Maestro cannot reliably automate (human or pre-seeded device):
+# 1. System account picker ("Choose an account") — account list varies by device;
+#    tap target text is not stable across AVDs / physical devices.
+# 2. Google consent / "Sign in to continue" / reauth challenges.
+# 3. 2FA / Device affirmations on the Google account.
+# Pre-seed the review account on the emulator (Settings → Passwords & accounts)
+# before running. After the Google button tap, either select the account manually
+# or rely on a single pre-selected device account that auto-continues.
+#
+# Requires: intro (or create-account) path reachable; fresh launch recommended
+# by the parent root flow.
+# Leaves app on wizard_skip and/or Overview after successful Google bind.
+
+- extendedWaitUntil:
+    visible:
+      id: "intro_next"
+    timeout: 45000
+
+- tapOn:
+    id: "intro_next"
+
+- tapOn:
+    id: "intro_next"
+
+- tapOn:
+    id: "intro_create_account"
+
+- extendedWaitUntil:
+    visible:
+      id: "create_account_google"
+    timeout: 10000
+
+- tapOn:
+    id: "create_account_google"
+
+# Account picker / consent: human handoff window (up to 5 minutes).
+# Optional: if a known account row is visible, tap it; otherwise wait for human.
+- runFlow:
+    when:
+      visible:
+        text: ".*Choose an account.*"
+    commands:
+      - tapOn:
+          text: ".*sprout\\.play\\.review@gmail\\.com.*|.*Test User Review.*"
+          optional: true
+
+- extendedWaitUntil:
+    visible:
+      id: "wizard_skip"
+    timeout: 300000
+    optional: true
+
+- runFlow:
+    when:
+      visible:
+        id: "wizard_skip"
+    commands:
+      - tapOn:
+          id: "wizard_skip"
+
+- extendedWaitUntil:
+    visible:
+      id: "shell_tab_overview"
+    timeout: 60000
+    optional: true

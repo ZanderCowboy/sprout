@@ -1,47 +1,73 @@
 #!/usr/bin/env bash
 #
-# Capture Play Store screenshots using Maestro
+# Capture Play Store screenshots using Maestro on the production flavor.
 #
 # Usage:
-#   ./tool/capture_play_screenshots.sh [device_class]
+#   ./tool/capture_play_screenshots.sh [device_class] [--device <adb_serial>]
 #
 # Arguments:
 #   device_class - Optional. One of: phone (default), sevenInch, tenInch
+#   --device      - Optional. ADB serial / Maestro device id (e.g. emulator-5554)
 #
 # Prerequisites:
-#   - Development APK must be built and installed (see below)
-#   - Device/emulator must be connected and running
-#   - Maestro must be installed and available in PATH
+#   - Production RELEASE APK installed (banner-free; see below)
+#   - Device/emulator connected and running (CT-MAC-75: Pixel_10_Pro / emulator-5554)
+#   - Maestro installed and available in PATH
+#   - Human ready to enter email OTP when the flow pauses (or pass OTP_CODE)
 #
-# Before running:
+# Before running (banner-free production release — required):
 #   cd sprout_app
-#   flutter build apk --debug --flavor development -t lib/main_development.dart
-#   flutter install --debug --flavor development
+#   flutter build apk --release --flavor production -t lib/main_production.dart
+#   flutter install --release --flavor production
+#
+# debug_lens bubble must stay off (PROD Remote Config default; toggle lives on
+# the Environment page, not main Settings). Do not capture with the bubble visible.
+#
+# OTP:
+#   Default = human pause on the verify screen (enter code on-device).
+#   Optional fast-path: OTP_CODE=xxxxxx ./tool/capture_play_screenshots.sh
 #
 
 set -euo pipefail
 
 # Configuration
-DEVICE_CLASS="${1:-phone}"
+DEVICE_CLASS="phone"
+MAESTRO_DEVICE=""
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 WORKSPACE_ROOT="$(dirname "$SCRIPT_DIR")"
 MAESTRO_DIR="$WORKSPACE_ROOT/.maestro"
-OUTPUT_DIR="$WORKSPACE_ROOT/store/play/screenshots/$DEVICE_CLASS"
 FLOW_FILE="$MAESTRO_DIR/play-store-screenshots.yaml"
 
-# Validate device class
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    phone|sevenInch|tenInch)
+      DEVICE_CLASS="$1"
+      shift
+      ;;
+    --device)
+      MAESTRO_DEVICE="${2:-}"
+      if [[ -z "$MAESTRO_DEVICE" ]]; then
+        echo "❌ ERROR: --device requires an ADB serial (e.g. emulator-5554)" >&2
+        exit 1
+      fi
+      shift 2
+      ;;
+    *)
+      echo "❌ ERROR: Unknown argument '$1'" >&2
+      echo "   Usage: $0 [phone|sevenInch|tenInch] [--device <adb_serial>]" >&2
+      exit 1
+      ;;
+  esac
+done
+
+OUTPUT_DIR="$WORKSPACE_ROOT/store/play/screenshots/$DEVICE_CLASS"
+
 case "$DEVICE_CLASS" in
   phone|sevenInch|tenInch)
     echo "📱 Capturing screenshots for device class: $DEVICE_CLASS"
     ;;
-  *)
-    echo "❌ ERROR: Invalid device class '$DEVICE_CLASS'" >&2
-    echo "   Valid options: phone, sevenInch, tenInch" >&2
-    exit 1
-    ;;
 esac
 
-# Check prerequisites
 if ! command -v maestro &> /dev/null; then
   echo "❌ ERROR: Maestro not found in PATH" >&2
   echo "   Install from: https://maestro.mobile.dev/getting-started/installing-maestro" >&2
@@ -53,33 +79,41 @@ if [[ ! -f "$FLOW_FILE" ]]; then
   exit 1
 fi
 
-# Ensure output directory exists
 mkdir -p "$OUTPUT_DIR"
 
 echo ""
 echo "🔧 Running Maestro flow: play-store-screenshots.yaml"
+echo "   App id: app.stackmint.sprout (production)"
 echo "   Output directory: $OUTPUT_DIR"
+if [[ -n "$MAESTRO_DEVICE" ]]; then
+  echo "   Device: $MAESTRO_DEVICE"
+fi
+if [[ -n "${OTP_CODE:-}" ]]; then
+  echo "   OTP: OTP_CODE fast-path"
+else
+  echo "   OTP: human pause — enter the 6-digit code on-device when verify appears"
+fi
 echo ""
 
-# Run the Maestro flow
-# Screenshots will be saved to ~/.maestro/tests/<timestamp>/
 cd "$WORKSPACE_ROOT"
 
-# Capture the test run timestamp by running maestro and capturing output
 MAESTRO_OUTPUT=$(mktemp)
 trap "rm -f $MAESTRO_OUTPUT" EXIT
 
-if maestro test "$FLOW_FILE" 2>&1 | tee "$MAESTRO_OUTPUT"; then
+MAESTRO_ARGS=(test "$FLOW_FILE")
+if [[ -n "$MAESTRO_DEVICE" ]]; then
+  MAESTRO_ARGS=(test --device "$MAESTRO_DEVICE" "$FLOW_FILE")
+fi
+
+if maestro "${MAESTRO_ARGS[@]}" 2>&1 | tee "$MAESTRO_OUTPUT"; then
   echo ""
   echo "✅ Maestro flow completed successfully"
-  
-  # Find the most recent test output directory
+
   MAESTRO_OUTPUT_DIR="$HOME/.maestro/tests"
-  
+
   if [[ -d "$MAESTRO_OUTPUT_DIR" ]]; then
-    # Get the most recent test directory
     LATEST_TEST_DIR=$(ls -td "$MAESTRO_OUTPUT_DIR"/*/ 2>/dev/null | head -1)
-    
+
     if [[ -n "$LATEST_TEST_DIR" ]]; then
       echo ""
       echo "📸 Copying screenshots from $LATEST_TEST_DIR"
@@ -98,8 +132,8 @@ if maestro test "$FLOW_FILE" 2>&1 | tee "$MAESTRO_OUTPUT"; then
         echo "   $OUTPUT_DIR"
         echo ""
         echo "📋 Next steps:"
-        echo "   1. Review screenshots in $OUTPUT_DIR"
-        echo "   2. Upload to Play Console: https://play.google.com/console"
+        echo "   1. Review screenshots in $OUTPUT_DIR (no DEV/PROD ribbon, no debug bubble)"
+        echo "   2. Upload to Play Console: https://play.google.com/console (Zander only)"
         echo "   3. Repeat for other device classes if needed (sevenInch, tenInch)"
       else
         echo ""

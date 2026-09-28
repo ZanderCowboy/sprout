@@ -1,27 +1,40 @@
-appId: app.stackmint.sprout.dev
+appId: app.stackmint.sprout
 tags:
   - play-store
 env:
   EMAIL: sprout.play.review@gmail.com
+  # Leave empty for human OTP handoff (default). Optional fast-path: OTP_CODE=xxxxxx
+  OTP_CODE: ""
 ---
-# Play Store screenshot capture flow
-# OTP sign-in, completes the first-run wizard, then captures Overview/Goals/Accounts.
-# Requires OTP_CODE at runtime:
-#   OTP_CODE=xxxxxx maestro test .maestro/play-store-screenshots.yaml
+# Play Store screenshot capture on production (banner-free release).
+# Uses real email OTP with human pause — no debug sign-in.
+# Alternate auth: shared/google-signin-handoff.yaml (documented device handoffs).
+#
+# Prerequisites:
+#   cd sprout_app
+#   flutter build apk --release --flavor production -t lib/main_production.dart
+#   flutter install --release --flavor production
+# Ensure debug_lens bubble is off (PROD RC default; Environment page owns the toggle).
+#
+# Run (CT-MAC-75 Pixel_10_Pro / emulator-5554):
+#   maestro test --device emulator-5554 .maestro/play-store-screenshots.yaml
+#   OTP_CODE=xxxxxx maestro test --device emulator-5554 .maestro/play-store-screenshots.yaml
+#
 # Output: ~/.maestro/tests/<timestamp>/play-*.png
+# Copy via ./tool/capture_play_screenshots.sh (or manually into store/play/screenshots/).
 
 - launchApp:
     clearState: true
     clearKeychain: true
 
 - runFlow:
-    file: shared/otp-signin-intro.yaml
+    file: shared/email-otp-human-pause.yaml
     env:
       EMAIL: ${EMAIL}
       OTP_CODE: ${OTP_CODE}
 
 - runFlow:
-    file: shared/complete-wizard.yaml
+    file: shared/complete-wizard-play.yaml
     env:
       GOAL_NAME: "Cape Town trip"
       TARGET: "12000"
