@@ -1,0 +1,73 @@
+appId: app.stackmint.sprout
+env:
+  EMAIL: sprout.play.review@gmail.com
+  # Optional fast-path: set OTP_CODE=xxxxxx to auto-enter. Default empty = human pause.
+  OTP_CODE: ""
+---
+# Email OTP sign-in with human OTP handoff (Play screenshots / production).
+# Intro → Sign in → email → Continue → verify field, then either:
+#   - OTP_CODE set: auto-enter the code (fast-path for scripted runs)
+#   - OTP_CODE empty (default): wait up to 5 minutes for a human to type the
+#     6-digit code on-device (or in Maestro Studio). OTP auto-submit is out of
+#     scope — the app navigates once the code verifies.
+# Does NOT skip the first-run wizard — callers that need Overview should run
+# complete-wizard / skip-wizard afterwards.
+# Google account picker is unreliable; prefer this path for Play screenshots.
+# Purchases.logIn runs in-app after verified OTP.
+
+- extendedWaitUntil:
+    visible:
+      id: "intro_next"
+    timeout: 45000
+
+- tapOn:
+    id: "intro_next"
+
+- tapOn:
+    id: "intro_next"
+
+- tapOn:
+    id: "intro_sign_in"
+
+- extendedWaitUntil:
+    visible:
+      id: "sign_in_email_field"
+    timeout: 10000
+
+- tapOn:
+    id: "sign_in_email_field"
+
+- inputText: ${EMAIL}
+
+- hideKeyboard
+
+- tapOn:
+    id: "sign_in_continue"
+
+- extendedWaitUntil:
+    visible:
+      id: "verify_otp_code_field"
+    timeout: 30000
+
+# Optional OTP_CODE fast-path (does not break callers that leave it empty).
+- runFlow:
+    when:
+      true: ${OTP_CODE != ""}
+    commands:
+      - tapOn:
+          id: "verify_otp_code_field"
+      - inputText: ${OTP_CODE}
+
+# Human OTP handoff: enter the code on the device while this wait runs.
+# Resumes when wizard or Overview appears after verified OTP.
+- extendedWaitUntil:
+    visible:
+      id: "wizard_skip"
+    timeout: 300000
+    optional: true
+
+- extendedWaitUntil:
+    visible:
+      id: "shell_tab_overview"
+    timeout: 10000
+    optional: true

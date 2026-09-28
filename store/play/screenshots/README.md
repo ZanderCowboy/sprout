@@ -28,3 +28,7 @@ Per [Play Console requirements](https://support.google.com/googleplay/android-de
 - Feature the most important functionality
 - Use consistent branding and visual style
 - Avoid text overlays (add descriptions in Play Console instead)
+
+## Flavor note
+
+Recapture on a **production release** install with debug_lens bubble off. See [../README.md](../README.md) for the runbook (email OTP human pause, CT-MAC-75 Pixel_10_Pro / `emulator-5554`). Existing PNGs may predate that requirement until the next handoff capture.

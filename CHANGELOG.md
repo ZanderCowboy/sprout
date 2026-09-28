@@ -2,6 +2,12 @@
 
 Changes heading to `main`. Newest entries at the top.
 
+## 2026-09-28 — Play screenshots Maestro real-auth (#70, #87)
+
+- Play screenshot Maestro flow targets production (`app.stackmint.sprout`) with email OTP human pause (optional `OTP_CODE` fast-path); Google handoff subflow documents device account / consent points Maestro cannot automate
+- Capture script + `store/play/README.md` retargeted to banner-free production **release** install; debug_lens bubble must stay off (Environment page owns the toggle)
+- PNG recapture + Play Console upload still pending OTP handoff on CT-MAC-75
+
 ## 2026-09-28 — Environment page + RC subscriber attributes (#114, #102)
 
 - **#114:** New **Environment** page hosts Debug Lens, bubble toggle, and soft-prompt previews (relocated off main Settings); App version long-press **or** double-tap opens it when `environment_page_enabled` allows (PROD default false; silent no-op when off)

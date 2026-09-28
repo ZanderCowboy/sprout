@@ -239,13 +239,16 @@ maestro test .maestro/premium-free-paywalls.yaml
 
 **Other**:
 
-- `play-store-screenshots.yaml` — Store screenshot capture
+- `play-store-screenshots.yaml` — Store screenshot capture (**production** app id; human OTP pause — see `store/play/README.md`)
 
 ### Shared helpers (not runnable alone)
 
 | Helper | Purpose |
 |--------|---------|
-| `shared/otp-signin-intro.yaml` | Real OTP sign-in from intro (needs `EMAIL` + `OTP_CODE`) |
+| `shared/otp-signin-intro.yaml` | Real OTP sign-in from intro (DEV; needs `EMAIL` + `OTP_CODE`) |
+| `shared/email-otp-human-pause.yaml` | Production email OTP with human pause (Play screenshots; optional `OTP_CODE`) |
+| `shared/google-signin-handoff.yaml` | Production Google sign-in with documented device/human handoffs |
+| `shared/complete-wizard-play.yaml` | Wizard fill for production Play screenshot flow |
 | `shared/otp-signin-to-overview.yaml` | OTP sign-in + skip wizard → Overview |
 | `shared/otp-signin-from-sign-in.yaml` | OTP when already on Sign in screen |
 | `shared/wait-overview.yaml` | Wait for Overview after sign-in |
