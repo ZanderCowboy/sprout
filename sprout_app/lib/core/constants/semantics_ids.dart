@@ -153,6 +153,11 @@ abstract final class SemanticsIds {
   static const settingsDebugShowReviewPrompt =
       'settings_debug_show_review_prompt';
 
+  // --- Manage Subscription ---
+  static const manageSubscriptionGooglePlay = 'manage_subscription_google_play';
+  static const manageSubscriptionRestore = 'manage_subscription_restore';
+  static const manageSubscriptionNeedHelp = 'manage_subscription_need_help';
+
   // --- Transactions ---
   static const transactionRow = 'transaction_row';
   static const transactionNoteField = 'transaction_note_field';

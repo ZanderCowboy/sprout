@@ -5,7 +5,8 @@ Sprout uses [RevenueCat](https://www.revenuecat.com/) for subscriptions.
 This pass wires:
 - **SDK configure + identity** (after `revenuecat_enabled` kill switch)
 - **Paywall UI** via `purchases_ui_flutter` launched from **Settings → Sprout Premium** when the user is not subscribed
-- **Customer Center** via `RevenueCatUI.presentCustomerCenter` when the tile shows **Manage** (active `premium`)
+- **Manage Subscription (Path B / #99)**: custom full-screen route from **Settings → Manage** (active `premium`) with plan details, Play manage, restore, and tertiary Customer Center help — **not** Customer Center as the primary Manage surface
+- **Customer Center** via `RevenueCatUI.presentCustomerCenter` only from Manage → **Need help with your subscription?**
 - **Premium feature gating**: Master Budget requires the `premium` entitlement (tapping Settings → Master Budget shows the paywall when not subscribed)
 
 ## V1 Premium Gate Matrix
