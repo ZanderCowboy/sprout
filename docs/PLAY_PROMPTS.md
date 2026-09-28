@@ -25,3 +25,9 @@ Android-only soft prompts. iOS is out of scope.
 - `url_launcher` — open listing
 - `in_app_review` — native review API
 - `shared_preferences` — cooldown / decline / completed flags
+
+
+## Soft-prompt polish (#112)
+
+- Review CTA leading icon: official colourful Play prism SVG at `sprout_app/assets/images/google_play_icon.svg` (~22 lp). Do not recolour.
+- Update **Later** matches Review **Not now**: `SproutTextButton`, ~8 lp gap above secondary, no icon / outlined pill.

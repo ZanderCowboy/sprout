@@ -220,6 +220,29 @@ class AuthRepositoryImpl implements AuthRepository {
     }
   }
 
+
+  @override
+  Future<AuthUser> updateAvatarPath(String? avatarPath) async {
+    final trimmed = avatarPath?.trim();
+    final path = (trimmed == null || trimmed.isEmpty) ? null : trimmed;
+    try {
+      final response = await _client.auth.updateUser(
+        UserAttributes(data: {'avatar_path': path}),
+      );
+      final user = _mapUser(response.user ?? _client.auth.currentUser);
+      if (user == null || !user.isVerified) {
+        throw const AuthAppException(AppStrings.avatarUploadFailed);
+      }
+      return user;
+    } on AuthException catch (e) {
+      throw AuthAppException(e.message);
+    } on AuthAppException {
+      rethrow;
+    } on Object catch (e) {
+      throw AuthAppException(e.toString());
+    }
+  }
+
   @override
   Future<void> deleteOwnAccount() async {
     try {
@@ -339,6 +362,7 @@ class AuthRepositoryImpl implements AuthRepository {
       id: user.id,
       email: user.email,
       displayName: displayNameFromMetadata(user.userMetadata),
+      avatarPath: avatarPathFromMetadata(user.userMetadata),
       isAnonymous: user.isAnonymous,
       signedInWithGoogle: signedInWithGoogleFromAuth(
         identityProviders:

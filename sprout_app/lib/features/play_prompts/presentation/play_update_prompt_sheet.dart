@@ -66,22 +66,12 @@ Future<PlayUpdatePromptResult> showPlayUpdatePromptSheet(
                     Navigator.pop(sheetContext, PlayUpdatePromptResult.update),
               ),
             ),
-            const SizedBox(height: 12),
-            SizedBox(
-              width: double.infinity,
-              child: SproutOutlinedButton.icon(
-                identifier: SemanticsIds.playUpdateLater,
-                label: AppStrings.playUpdateLater,
-                icon: const Icon(Icons.close_rounded),
-                labelWidget: const Text(AppStrings.playUpdateLater),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: scheme.onSurface,
-                  shape: pillShape,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                ),
-                onPressed: () =>
-                    Navigator.pop(sheetContext, PlayUpdatePromptResult.later),
-              ),
+            const SizedBox(height: 8),
+            SproutTextButton(
+              identifier: SemanticsIds.playUpdateLater,
+              label: AppStrings.playUpdateLater,
+              onPressed: () =>
+                  Navigator.pop(sheetContext, PlayUpdatePromptResult.later),
             ),
             const SizedBox(height: 16),
             Row(

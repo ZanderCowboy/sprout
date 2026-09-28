@@ -2,6 +2,13 @@
 
 Changes heading to `main`. Newest entries at the top.
 
+## 2026-09-28 — Soft-prompt polish + delete Confirm + profile picture (#112, #115, #117)
+
+- Review soft-prompt **Rate on Play** uses the official colourful Google Play prism mark (`assets/images/google_play_icon.svg`), not Material `play_arrow`
+- Update soft-prompt **Later** matches Review **Not now** (quiet centered text button, ~8 lp gap, no icon / outlined pill)
+- Delete-account sheet requires typing exact `Confirm` before Delete enables (case-sensitive); Cancel unchanged
+- Settings profile avatar: choose/take/crop/upload/remove via **Supabase Storage** bucket `avatars` (`{uid}/avatar.jpg`, owner-only RLS); circular crop; max 512px / ~2 MB; prior avatar kept on failure
+
 ## 2026-09-28 — Manage Subscription Path B (#99)
 
 - Settings → Sprout Premium → **Manage** opens a custom dark Manage Subscription route (Stitch SoT), not RevenueCat Customer Center

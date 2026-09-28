@@ -127,6 +127,27 @@ abstract final class AppStrings {
       'billing. Manage or cancel Premium separately.';
   static const String deleteAccountFailed =
       'Could not delete your account. Try again.';
+  static const String deleteAccountConfirmHelper = 'Type Confirm to delete';
+  static const String deleteAccountConfirmToken = 'Confirm';
+  static const String deleteAccountConfirmHint = 'Confirm';
+
+  // --- Profile avatar (#117) ---
+  static const String choosePhoto = 'Choose photo';
+  static const String takePhoto = 'Take photo';
+  static const String removePhoto = 'Remove photo';
+  static const String removePhotoConfirmTitle = 'Remove profile photo?';
+  static const String removePhotoConfirmBody =
+      'Your profile will show your initial instead.';
+  static const String cropPhoto = 'Crop photo';
+  static const String usePhoto = 'Use photo';
+  static const String avatarUploadFailed =
+      'Could not update your profile photo. Try again.';
+  static const String avatarTooLarge =
+      'That photo is too large. Choose one under 2 MB.';
+  static const String avatarInvalid =
+      'Could not read that photo. Try a different image.';
+  static const String avatarPermissionDenied =
+      'Photo permission was denied. Enable it in Settings to continue.';
   static const String termsOfService = 'Terms of Service';
   static const String privacyPolicy = 'Privacy Policy';
   static const String byContinuingYouAgree = 'By continuing you agree to the';

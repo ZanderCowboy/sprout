@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:sprout/core/core.dart';
 import 'package:sprout/features/auth/export.dart';
+import 'package:sprout/features/settings/presentation/widgets/profile_avatar.dart';
 import 'package:sprout/ui/export.dart';
 
 class SettingsProfileHeader extends StatelessWidget {
@@ -9,10 +10,16 @@ class SettingsProfileHeader extends StatelessWidget {
     super.key,
     required this.user,
     required this.onEditProfile,
+    this.avatarUrl,
+    this.avatarLoading = false,
+    this.onAvatarTap,
   });
 
   final AuthUser? user;
   final VoidCallback onEditProfile;
+  final String? avatarUrl;
+  final bool avatarLoading;
+  final VoidCallback? onAvatarTap;
 
   @override
   Widget build(BuildContext context) {
@@ -20,56 +27,16 @@ class SettingsProfileHeader extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     final title = user == null ? AppStrings.account : accountTileTitle(user!);
     final subtitle = user == null ? null : accountTileSubtitle(user!);
-    final initial = user == null ? 'A' : accountAvatarInitial(user!);
 
     return Column(
       children: [
-        SizedBox(
-          width: 112,
-          height: 112,
-          child: Stack(
-            clipBehavior: Clip.none,
-            children: [
-              Align(
-                alignment: Alignment.center,
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.seed.withValues(alpha: 0.35),
-                        blurRadius: 24,
-                        spreadRadius: 2,
-                      ),
-                    ],
-                  ),
-                  child: CircleAvatar(
-                    radius: 48,
-                    backgroundColor: scheme.surfaceContainerHighest,
-                    child: Text(initial, style: textTheme.headlineMedium),
-                  ),
-                ),
-              ),
-              Positioned(
-                right: 4,
-                bottom: 4,
-                child: Material(
-                  color: scheme.surfaceContainerHighest,
-                  shape: const CircleBorder(),
-                  child: SproutIconButton(
-                    identifier: SemanticsIds.settingsAccountAvatar,
-                    label: AppStrings.accountSectionProfile,
-                    onPressed: onEditProfile,
-                    icon: Icon(
-                      Icons.edit_rounded,
-                      size: 18,
-                      color: scheme.onSurface,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
+        ProfileAvatar(
+          user: user,
+          imageUrl: avatarUrl,
+          radius: 48,
+          loading: avatarLoading,
+          showEditBadge: user != null && user!.isVerified,
+          onTap: user != null && user!.isVerified ? onAvatarTap : null,
         ),
         const SizedBox(height: 16),
         Text(title, textAlign: TextAlign.center, style: textTheme.titleLarge),

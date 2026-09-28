@@ -42,6 +42,32 @@ void main() {
     expect(result, PlayUpdatePromptResult.update);
   });
 
+  testWidgets('update sheet Later is quiet text button without icon', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      harness(
+        home: Builder(
+          builder: (context) {
+            return Scaffold(
+              body: TextButton(
+                onPressed: () async {
+                  await showPlayUpdatePromptSheet(context);
+                },
+                child: const Text('open'),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('open'));
+    await tester.pumpAndSettle();
+    expect(find.byIcon(Icons.close_rounded), findsNothing);
+    expect(find.text(AppStrings.playUpdateLater), findsOneWidget);
+  });
+
   testWidgets('update sheet Later dismisses', (tester) async {
     late PlayUpdatePromptResult result;
     await tester.pumpWidget(
@@ -91,6 +117,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text(AppStrings.playReviewTitle), findsOneWidget);
     expect(find.byIcon(Icons.star), findsNothing);
+    expect(find.byIcon(Icons.play_arrow_rounded), findsNothing);
 
     await tester.tap(find.text(AppStrings.playReviewRateCta));
     await tester.pumpAndSettle();
