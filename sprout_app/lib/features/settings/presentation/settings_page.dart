@@ -204,7 +204,24 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: BlocBuilder<AuthCubit, AuthViewState>(
+      body: BlocConsumer<AuthCubit, AuthViewState>(
+        listenWhen: (previous, current) {
+          if (current is! AuthViewSignedIn) return false;
+          final message = current.errorMessage;
+          if (message == null || message.isEmpty) return false;
+          if (previous is AuthViewSignedIn &&
+              previous.errorMessage == message) {
+            return false;
+          }
+          return true;
+        },
+        listener: (context, state) {
+          final message = (state as AuthViewSignedIn).errorMessage;
+          if (message == null || message.isEmpty) return;
+          final messenger = ScaffoldMessenger.of(context);
+          messenger.clearSnackBars();
+          messenger.showSnackBar(SnackBar(content: Text(message)));
+        },
         builder: (context, state) {
           final signedIn = state is AuthViewSignedIn ? state : null;
           final user = signedIn?.user;

@@ -2,6 +2,12 @@
 
 Changes heading to `main`. Newest entries at the top.
 
+## 2026-09-28 — Update soft-prompt fix + sign-out loading (#113, #116)
+
+- **#113:** Play update sheet cooldown is recorded only after the sheet is presented and closed; host skips `/loading` and retries until the navigator is ready (fixes accidental same-day suppress when auth redirect raced the prompt)
+- Documented once-per-calendar-day suppress + Internal manual repro in `docs/PLAY_PROMPTS.md`
+- **#116:** Settings **Sign Out** shows an in-button circular progress while `busy`, keeps outlined error styling, disables footer actions; sign-out failure snackbar on Settings
+
 ## 2026-09-28 — Manage Subscription Path B (#99)
 
 - Settings → Sprout Premium → **Manage** opens a custom dark Manage Subscription route (Stitch SoT), not RevenueCat Customer Center

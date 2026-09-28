@@ -38,7 +38,16 @@ class SettingsFooter extends StatelessWidget {
           identifier: SemanticsIds.accountSignOut,
           label: AppStrings.signOut,
           onPressed: busy ? null : onSignOut,
-          icon: Icon(Icons.logout_rounded, color: scheme.error),
+          icon: busy
+              ? SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: scheme.error,
+                  ),
+                )
+              : Icon(Icons.logout_rounded, color: scheme.error),
           labelWidget: Text(
             AppStrings.signOut,
             style: textTheme.labelLarge?.copyWith(color: scheme.error),
