@@ -26,11 +26,31 @@ Config: [`.github/config/version-labels.json`](../.github/config/version-labels.
 
 1. **Compute** the next `x.y.z+N` (no commit yet)
 2. **Ship in parallel** — development APK → Firebase App Distribution; production AAB → Play **internal**, both with `--build-name` / `--build-number`
-3. **Commit** `Bump version to x.y.z+N [skip ci]` via Version Bot only after both uploads succeed
+3. **Commit** `Bump version to x.y.z+N [skip ci]` via Version Bot when **Play upload succeeds** (approach A / #94)
+
+Play is the hard uniqueness store for Android `versionCode`. Commit Version therefore treats **Play success** as the commit trigger of record:
+
+| Play job | Firebase job | Commit version? |
+|----------|--------------|-----------------|
+| success | success / failure / skipped | **Yes** — record the code Play accepted |
+| skipped (`skip_play`) | success | **Yes** — existing skip_play path |
+| failure | any | **No** — do not leave git ahead of Play |
+| skipped | skipped / failure | **No** |
+
+Firebase failure after a successful Play upload still **fails the overall workflow** (Firebase is not `continue-on-error`) so the APK issue surfaces, but the version commit proceeds so the next Release Main does not reuse a burned `versionCode`.
 
 `[skip ci]` stops CI Dev Checks from re-running on the bot commit. The release workflow triggers on `pull_request` closed, not on the bot push.
 
 Manual retries and one-offs use the same workflow’s **Run workflow** form (`bump_type`, `play_track`, `skip_firebase` / `skip_play`, `commit_version`). Prefer promoting the existing Play internal release in Play Console over rebuilding for production.
+
+## Manual recovery: realign git with Play after a burned `versionCode`
+
+If Play already accepted build `N` but `main` still shows a lower `+` build number (e.g. Commit Version was skipped on an older workflow, or a manual Play upload):
+
+1. In Play Console → **App bundle explorer** (or the Internal track release), note the highest `versionCode` Play has accepted.
+2. On `main`, set `sprout_app/pubspec.yaml` `version:` so the `+N` build number is **strictly greater** than that Play code (e.g. Play has 15 → commit at least `x.y.z+16`), or dispatch **Release Main** with `bump_type: patch` (or higher) and `commit_version: true` so Version Bot advances past Play.
+3. If you only need to record the already-shipped code without another Play upload: commit the bumped `pubspec` on `main` (`Bump version to x.y.z+N [skip ci]`), or dispatch with `skip_play: true` only after git is already past Play’s max (otherwise a later Play upload can still collide).
+4. Re-run Release Main only after git’s build number is ahead of Play’s highest accepted code.
 
 ## GitHub App secrets (required)
 
