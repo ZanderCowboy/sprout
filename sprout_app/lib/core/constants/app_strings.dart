@@ -382,6 +382,12 @@ abstract final class AppStrings {
   static const String debugBubbleVisible = 'Show debug bubble';
   static const String debugBubbleSubtitle =
       'Floating bubble to open Debug Lens';
+  static const String debugShowUpdatePrompt = 'Show update prompt';
+  static const String debugShowUpdatePromptSubtitle =
+      'Preview the Play update bottom sheet';
+  static const String debugShowReviewPrompt = 'Show review prompt';
+  static const String debugShowReviewPromptSubtitle =
+      'Preview the Play review bottom sheet';
 
   static String appVersionLabel(String version, String buildNumber) =>
       'Version $version (Build $buildNumber)';

@@ -2,24 +2,32 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
+import 'package:sprout/core/config/app_config.dart';
 import 'package:sprout/core/user/user_context.dart';
 
 import 'play_in_app_review_gateway.dart';
 import 'play_prompt_preferences.dart';
 import 'play_review_prompt_service.dart';
+import 'play_store_listing_launcher.dart';
 
 class PlayReviewPromptServiceImpl implements PlayReviewPromptService {
   PlayReviewPromptServiceImpl({
     required PlayPromptPreferences preferences,
     required PlayInAppReviewGateway reviewGateway,
+    required PlayStoreListingLauncher listingLauncher,
     required UserContext userContext,
+    required AppConfig appConfig,
   }) : _preferences = preferences,
        _reviewGateway = reviewGateway,
-       _userContext = userContext;
+       _listingLauncher = listingLauncher,
+       _userContext = userContext,
+       _appConfig = appConfig;
 
   final PlayPromptPreferences _preferences;
   final PlayInAppReviewGateway _reviewGateway;
+  final PlayStoreListingLauncher _listingLauncher;
   final UserContext _userContext;
+  final AppConfig _appConfig;
   final StreamController<void> _requests = StreamController<void>.broadcast();
 
   bool get _isAndroid =>
@@ -52,14 +60,23 @@ class PlayReviewPromptServiceImpl implements PlayReviewPromptService {
   Future<void> markDeclined() => _preferences.markReviewDeclined();
 
   @override
-  Future<void> requestReviewAndMarkCompleted() async {
-    try {
-      if (await _reviewGateway.isAvailable()) {
-        await _reviewGateway.requestReview();
+  Future<void> requestReview({bool forceStoreListing = false}) async {
+    if (!forceStoreListing) {
+      try {
+        if (await _reviewGateway.isAvailable()) {
+          await _reviewGateway.requestReview();
+          return;
+        }
+      } on Object {
+        // Play may throw; fall through to the listing.
       }
-    } on Object {
-      // Play may no-op or throw; still mark completed so we do not nag.
     }
+    await _listingLauncher.openListing(_appConfig.androidApplicationId);
+  }
+
+  @override
+  Future<void> requestReviewAndMarkCompleted() async {
+    await requestReview();
     await _preferences.markReviewCompleted();
   }
 

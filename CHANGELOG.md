@@ -2,6 +2,17 @@
 
 Changes heading to `main`. Newest entries at the top.
 
+## 2026-09-28 — Play prompt CTAs open the store listing
+
+- Debug **Update** / **Rate on Play** now launch Play (`market://details?id=` then HTTPS)
+- Production **Rate on Play** falls back to the same listing when in-app review is unavailable
+- Debug Rate skips the in-app API so a sideloaded build still opens Play, without persisting completed/declined flags
+
+## 2026-09-28 — Debug preview for Play prompt sheets
+
+- Settings → Debug tools adds **Show update prompt** and **Show review prompt**
+- Both skip eligibility and do not persist cooldown / declined / completed flags
+
 ## 2026-09-28 — Play update + review soft prompts (#104, #105)
 
 - Soft Play Store **update** bottom sheet on cold start/resume when Play reports a newer build; **Update** opens the listing (no flexible/immediate in-app update flow); **Later** dismisses; once-per-calendar-day cooldown

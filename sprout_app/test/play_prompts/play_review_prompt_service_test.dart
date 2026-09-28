@@ -1,9 +1,12 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sprout/core/config/app_config.dart';
+import 'package:sprout/core/config/app_environment.dart';
 import 'package:sprout/features/play_prompts/application/play_in_app_review_gateway.dart';
 import 'package:sprout/features/play_prompts/application/play_prompt_preferences.dart';
 import 'package:sprout/features/play_prompts/application/play_review_prompt_service_impl.dart';
+import 'package:sprout/features/play_prompts/application/play_store_listing_launcher.dart';
 
 import '../mocks/mocks.dart';
 
@@ -20,11 +23,35 @@ class _FakeReviewGateway implements PlayInAppReviewGateway {
   }
 }
 
+class _FakeLauncher implements PlayStoreListingLauncher {
+  String? openedId;
+
+  @override
+  Future<void> openListing(String androidApplicationId) async {
+    openedId = androidApplicationId;
+  }
+}
+
+AppConfig _config() => const AppConfig(
+  environment: AppEnvironment.development,
+  supabaseUrl: '',
+  supabaseAnonKey: '',
+  googleWebClientId: '',
+  androidApplicationId: 'app.stackmint.sprout.dev',
+  revenueCatAndroidApiKey: '',
+  firebaseApiKey: '',
+  firebaseAppId: '',
+  firebaseMessagingSenderId: '',
+  firebaseProjectId: '',
+  firebaseStorageBucket: '',
+);
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   late PlayPromptPreferences preferences;
   late _FakeReviewGateway gateway;
+  late _FakeLauncher launcher;
   late FakeUserContext userContext;
   late PlayReviewPromptServiceImpl service;
 
@@ -32,11 +59,14 @@ void main() {
     SharedPreferences.setMockInitialValues({});
     preferences = PlayPromptPreferences(await SharedPreferences.getInstance());
     gateway = _FakeReviewGateway();
+    launcher = _FakeLauncher();
     userContext = FakeUserContext()..firstDepositLoggedValue = true;
     service = PlayReviewPromptServiceImpl(
       preferences: preferences,
       reviewGateway: gateway,
+      listingLauncher: launcher,
       userContext: userContext,
+      appConfig: _config(),
     );
   });
 
@@ -88,14 +118,22 @@ void main() {
 
     await service.requestReviewAndMarkCompleted();
     expect(gateway.requestCount, 1);
+    expect(launcher.openedId, isNull);
     expect(await service.shouldShowPrompt(), isFalse);
     expect(preferences.hasCompletedReview, isTrue);
   });
 
-  test('requestReview still completes when gateway unavailable', () async {
+  test('requestReview opens listing when gateway unavailable', () async {
     gateway.available = false;
-    await service.requestReviewAndMarkCompleted();
+    await service.requestReview();
     expect(gateway.requestCount, 0);
-    expect(preferences.hasCompletedReview, isTrue);
+    expect(launcher.openedId, 'app.stackmint.sprout.dev');
+    expect(preferences.hasCompletedReview, isFalse);
+  });
+
+  test('forceStoreListing skips in-app review', () async {
+    await service.requestReview(forceStoreListing: true);
+    expect(gateway.requestCount, 0);
+    expect(launcher.openedId, 'app.stackmint.sprout.dev');
   });
 }

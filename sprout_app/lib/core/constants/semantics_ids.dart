@@ -148,6 +148,10 @@ abstract final class SemanticsIds {
   static const settingsBudget = 'settings_budget';
   static const settingsDebugLens = 'settings_debug_lens';
   static const settingsDebugBubbleToggle = 'settings_debug_bubble_toggle';
+  static const settingsDebugShowUpdatePrompt =
+      'settings_debug_show_update_prompt';
+  static const settingsDebugShowReviewPrompt =
+      'settings_debug_show_review_prompt';
 
   // --- Transactions ---
   static const transactionRow = 'transaction_row';

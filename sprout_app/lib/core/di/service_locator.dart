@@ -255,7 +255,9 @@ Future<void> configureDependencies({
     () => PlayReviewPromptServiceImpl(
       preferences: sl(),
       reviewGateway: sl(),
+      listingLauncher: sl(),
       userContext: sl(),
+      appConfig: sl(),
     ),
   );
 

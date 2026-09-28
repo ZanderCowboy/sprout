@@ -19,6 +19,12 @@ abstract class PlayReviewPromptService {
   /// User chose Not now / dismissed — do not ask again.
   Future<void> markDeclined();
 
-  /// User chose Rate on Play — request native review and mark completed.
+  /// Native in-app review when Play can show it; otherwise opens the listing.
+  ///
+  /// Does not change declined / completed prefs. Debug preview uses this so
+  /// tapping Rate still opens Play without locking out the real prompt.
+  Future<void> requestReview({bool forceStoreListing = false});
+
+  /// User chose Rate on Play — [requestReview] then mark completed.
   Future<void> requestReviewAndMarkCompleted();
 }
