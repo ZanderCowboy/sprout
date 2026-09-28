@@ -12,6 +12,12 @@ abstract final class AppAssets {
   static const googleGLogo = AppAssetImage.svg(
     'assets/images/google_g_logo.svg',
   );
+
+  /// Official colourful Google Play prism mark (brand guidelines).
+  /// Do not recolour to monochrome — keep brand gradients.
+  static const googlePlayIcon = AppAssetImage.svg(
+    'assets/images/google_play_icon.svg',
+  );
 }
 
 /// Raster or SVG asset so call sites never pass a raw path string.

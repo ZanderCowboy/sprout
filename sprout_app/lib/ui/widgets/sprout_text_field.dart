@@ -22,6 +22,8 @@ class SproutTextField extends StatelessWidget {
     this.minLines,
     this.maxLines = 1,
     this.style,
+    this.autocorrect = true,
+    this.enableSuggestions = true,
   });
 
   final String identifier;
@@ -40,6 +42,8 @@ class SproutTextField extends StatelessWidget {
   final int? minLines;
   final int? maxLines;
   final TextStyle? style;
+  final bool autocorrect;
+  final bool enableSuggestions;
 
   @override
   Widget build(BuildContext context) {
@@ -61,6 +65,8 @@ class SproutTextField extends StatelessWidget {
         minLines: minLines,
         maxLines: maxLines,
         style: style,
+        autocorrect: autocorrect,
+        enableSuggestions: enableSuggestions,
       ),
     );
   }

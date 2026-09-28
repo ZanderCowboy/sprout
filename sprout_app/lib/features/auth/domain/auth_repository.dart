@@ -24,6 +24,9 @@ abstract class AuthRepository {
 
   Future<AuthUser> updateDisplayName(String displayName);
 
+  /// Sets or clears `user_metadata.avatar_path` for the signed-in user.
+  Future<AuthUser> updateAvatarPath(String? avatarPath);
+
   Future<void> deleteOwnAccount();
 
   Future<void> signOut();

@@ -10,6 +10,7 @@ environment:
 dependencies:
   bloc_concurrency: ^0.3.0
   connectivity_plus: ^7.3.1
+  crop_your_image: ^2.0.1
   cupertino_icons: ^1.0.8
   debug_lens: ^0.0.2
   equatable: ^2.0.7
@@ -27,6 +28,8 @@ dependencies:
   google_sign_in: ^7.2.0
   hive: ^2.2.3
   hive_flutter: ^1.1.0
+  image: ^4.10.1
+  image_picker: ^1.2.3
   in_app_review: ^2.0.12
   in_app_update: ^5.0.0
   intl: ^0.20.2
@@ -53,3 +56,4 @@ flutter:
     - assets/legal/privacy.md
     - assets/images/sprout-icon.png
     - assets/images/google_g_logo.svg
+    - assets/images/google_play_icon.svg
