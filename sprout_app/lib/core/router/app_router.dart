@@ -10,6 +10,7 @@ import 'package:sprout/features/auth/export.dart';
 import 'package:sprout/features/budget/export.dart';
 import 'package:sprout/features/goals/export.dart';
 import 'package:sprout/features/home/export.dart';
+import 'package:sprout/features/purchases/export.dart';
 import 'package:sprout/features/settings/export.dart';
 import 'package:sprout/features/shell/export.dart';
 import 'package:sprout/features/transactions/export.dart';
@@ -153,6 +154,12 @@ GoRouter createAppRouter({
                 path: AppRoute.settings.path,
                 builder: (context, state) => const SettingsPage(),
                 routes: [
+                  GoRoute(
+                    path: 'manage-subscription',
+                    parentNavigatorKey: rootKey,
+                    builder: (context, state) =>
+                        const ManageSubscriptionPage(),
+                  ),
                   GoRoute(
                     path: 'account',
                     parentNavigatorKey: rootKey,

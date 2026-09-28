@@ -13,6 +13,7 @@ enum AppRoute {
   goals('/goals'),
   goalDetail('/goals/:id'),
   settings('/settings'),
+  manageSubscription('/settings/manage-subscription'),
   account('/settings/account'),
   transactions('/settings/transactions'),
   transactionDetail('/settings/transactions/:id'),

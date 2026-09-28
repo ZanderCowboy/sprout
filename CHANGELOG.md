@@ -2,6 +2,13 @@
 
 Changes heading to `main`. Newest entries at the top.
 
+## 2026-09-28 — Manage Subscription Path B (#99)
+
+- Settings → Sprout Premium → **Manage** opens a custom dark Manage Subscription route (Stitch SoT), not RevenueCat Customer Center
+- Plan card shows Annual/Monthly name, localized price when available, Active/Trial status, and trial-end / renews / expires date line
+- Subscription Settings: Manage on Google Play, Restore past purchases; Support: Need help opens Customer Center as tertiary help
+- Respects #58 kill switch; present/load failures show a snackbar without crashing
+
 ## 2026-09-27 — Maestro flow consolidation
 
 - Deduped Maestro roots: promote `full-app-tour` (absorbs overview/goals/deposit/transactions/settings/account-profile/core-loop)

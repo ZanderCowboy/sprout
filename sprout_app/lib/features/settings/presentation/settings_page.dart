@@ -127,32 +127,42 @@ class _SettingsPageState extends State<SettingsPage> {
     }
   }
 
-  Future<void> _presentCustomerCenter() async {
-    final hadPremium = _hasPremium;
-    final outcome = await PremiumPaywall.presentCustomerCenter();
-    if (!mounted) return;
-
+  Future<void> _openManageSubscription() async {
     final premiumService = sl<PremiumService>();
-    final hasPremium = await premiumService.hasPremiumEntitlement();
-    if (!mounted) return;
-    setState(() => _hasPremium = hasPremium);
 
-    final messenger = ScaffoldMessenger.of(context);
-    switch (outcome) {
-      case CustomerCenterOutcome.restored:
-        messenger.showSnackBar(
-          const SnackBar(content: Text(AppStrings.premiumUnlocked)),
-        );
-      case CustomerCenterOutcome.restoreFailed:
-        messenger.showSnackBar(
-          const SnackBar(content: Text(AppStrings.subscriptionUpdateFailed)),
-        );
-      case CustomerCenterOutcome.dismissed:
-        if (hadPremium && !hasPremium) {
-          messenger.showSnackBar(
-            const SnackBar(content: Text(AppStrings.premiumNoLongerActive)),
-          );
-        }
+    // Gate: respect the kill switch (Purchases not ready or flag off).
+    final canShow = await premiumService.canShowPaywall();
+    if (!mounted) return;
+    if (!canShow) return;
+
+    // Refresh CustomerInfo to avoid identity/entitlement race after purchase.
+    try {
+      final hasPremiumNow = await PremiumPaywall.hasPremiumAfterRefresh();
+      if (!mounted) return;
+      if (!hasPremiumNow) {
+        setState(() => _hasPremium = false);
+        return;
+      }
+    } on Object {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AppStrings.subscriptionUpdateFailed)),
+      );
+      return;
+    }
+
+    await context.push(AppRoute.manageSubscription.path);
+    if (!mounted) return;
+
+    // After dismiss, refresh tile (Upgrade if entitlement gone).
+    try {
+      final hasPremium = await premiumService.hasPremiumEntitlement();
+      if (!mounted) return;
+      setState(() => _hasPremium = hasPremium);
+    } on Object {
+      if (!mounted) return;
+      setState(() => _hasPremium = false);
     }
   }
 
@@ -192,7 +202,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 SettingsPremiumCard(
                   loading: _loadingPremiumStatus,
                   hasPremium: _hasPremium,
-                  onTap: _hasPremium ? _presentCustomerCenter : _presentPaywall,
+                  onTap: _hasPremium ? _openManageSubscription : _presentPaywall,
                 ),
               ],
               const SizedBox(height: 28),

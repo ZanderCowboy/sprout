@@ -374,6 +374,38 @@ abstract final class AppStrings {
   static const String sproutPremium = 'Sprout Premium';
   static const String manage = 'Manage';
   static const String upgrade = 'Upgrade';
+
+  // --- Manage Subscription (Path B / #99) ---
+  static const String manageSubscriptionTitle = 'Manage Subscription';
+  static const String manageSubscriptionMembershipActive =
+      'Your membership is active and managed via Google Play.';
+  static const String manageSubscriptionSproutTier = 'Sprout Tier';
+  static const String manageSubscriptionStatusActive = 'Active';
+  static const String manageSubscriptionStatusTrial = 'Trial';
+  static const String manageSubscriptionPerYear = '/ year';
+  static const String manageSubscriptionPerMonth = '/ month';
+  static const String manageSubscriptionPlayBillingNote =
+      'Payment billed via your Google Play account.';
+  static const String manageSubscriptionRenewsYearly =
+      'Automatically renews yearly until cancelled.';
+  static const String manageSubscriptionRenewsMonthly =
+      'Automatically renews monthly until cancelled.';
+  static const String manageSubscriptionSettingsSection =
+      'Subscription Settings';
+  static const String manageSubscriptionOnGooglePlay =
+      'Manage on Google Play';
+  static const String manageSubscriptionOnGooglePlaySubtitle =
+      'Cancel, pause, or update payment method';
+  static const String manageSubscriptionRestore = 'Restore past purchases';
+  static const String manageSubscriptionRestoreSubtitle =
+      'Sync purchases made on this Google account';
+  static const String manageSubscriptionSupportSection = 'Support';
+  static const String manageSubscriptionNeedHelp =
+      'Need help with your subscription?';
+  static const String manageSubscriptionNeedHelpSubtitle =
+      'Billing questions, family sharing, and receipts';
+  static const String manageSubscriptionFooter =
+      'Sprout Premium is billed securely through Google Play. Subscriptions renew automatically unless cancelled at least 24 hours before the end of the current period.';
   static const String finance = 'Finance';
   static const String debugTools = 'Debug tools';
   static const String debugLens = 'Debug Lens';
