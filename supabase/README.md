@@ -61,3 +61,8 @@ Encode each config for GitHub Actions:
 base64 -i sprout_app/assets/config/development.json | tr -d '\n'  # APP_CONFIG_DEV_BASE64
 base64 -i sprout_app/assets/config/production.json | tr -d '\n'   # APP_CONFIG_PROD_BASE64
 ```
+
+
+## Profile avatars (#117)
+
+Private Storage bucket **`avatars`** with path `{auth.uid()}/avatar.jpg` and owner-only policies (`auth.uid()`). See [docs/PROFILE_AVATAR.md](../docs/PROFILE_AVATAR.md) and migration `20260928164500_profile_avatars_storage.sql`. Apply to both Dev and Prod.

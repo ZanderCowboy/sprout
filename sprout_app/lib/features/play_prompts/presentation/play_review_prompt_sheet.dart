@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:sprout/core/constants/app_assets.dart';
 import 'package:sprout/core/constants/app_colors.dart';
 import 'package:sprout/core/constants/app_strings.dart';
 import 'package:sprout/core/constants/semantics_ids.dart';
@@ -54,7 +55,7 @@ Future<PlayReviewPromptResult> showPlayReviewPromptSheet(
               child: SproutFilledButton.icon(
                 identifier: SemanticsIds.playReviewRate,
                 label: AppStrings.playReviewRateCta,
-                icon: const Icon(Icons.play_arrow_rounded),
+                icon: AppAssets.googlePlayIcon.image(width: 22, height: 22),
                 labelWidget: const Text(AppStrings.playReviewRateCta),
                 style: FilledButton.styleFrom(
                   backgroundColor: AppColors.seed,

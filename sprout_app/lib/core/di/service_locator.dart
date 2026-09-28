@@ -49,6 +49,8 @@ import 'package:sprout/features/play_prompts/application/play_update_prompt_serv
 import 'package:sprout/features/purchases/application/premium_service.dart';
 import 'package:sprout/features/purchases/application/premium_service_impl.dart';
 import 'package:sprout/features/purchases/presentation/premium_paywall_helper.dart';
+import 'package:sprout/features/settings/application/profile_avatar_service.dart';
+import 'package:sprout/features/settings/application/profile_avatar_service_impl.dart';
 import 'package:sprout/features/sync/application/sync_service.dart';
 import 'package:sprout/features/sync/application/sync_service_impl.dart';
 import 'package:sprout/features/sync/data/pending_sync_queue.dart';
@@ -208,6 +210,13 @@ Future<void> configureDependencies({
       logInPurchases: PremiumPaywall.logInIfConfigured,
       setPurchasesAttributes: PremiumPaywall.setSubscriberAttributesIfConfigured,
       logOutPurchases: PremiumPaywall.logOutIfConfigured,
+    ),
+  );
+
+  sl.registerLazySingleton<ProfileAvatarService>(
+    () => ProfileAvatarServiceImpl(
+      authRepository: sl(),
+      supabase: supabaseClient,
     ),
   );
 

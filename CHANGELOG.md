@@ -9,6 +9,18 @@ Changes heading to `main`. Newest entries at the top.
 - **#102:** Set RevenueCat `$email` + `$displayName` from auth on sign-in and display-name change; clear both before `logOut` so the next identity does not keep prior attributes
 - Documented reserved vs custom attributes and privacy notes in `docs/REVENUECAT.md`
 
+## 2026-09-28 — Edit profile avatar matches settings size
+
+- Edit Profile avatar uses the same 96px circle as Settings (radius 48)
+- Avatar shows a small in-circle spinner while the photo URL resolves and while the image loads
+
+## 2026-09-28 — Soft-prompt polish + delete Confirm + profile picture (#112, #115, #117)
+
+- Review soft-prompt **Rate on Play** uses the official colourful Google Play prism mark (`assets/images/google_play_icon.svg`), not Material `play_arrow`
+- Update soft-prompt **Later** matches Review **Not now** (quiet centered text button, ~8 lp gap, no icon / outlined pill)
+- Delete-account sheet requires typing exact `Confirm` before Delete enables (case-sensitive); Cancel unchanged
+- Settings profile avatar: choose/take/crop/upload/remove via **Supabase Storage** bucket `avatars` (`{uid}/avatar.jpg`, owner-only RLS); circular crop; max 512px / ~2 MB; prior avatar kept on failure
+
 ## 2026-09-28 — Update soft-prompt fix + sign-out loading (#113, #116)
 
 - **#113:** Play update sheet cooldown is recorded only after the sheet is presented and closed; host skips `/loading` and retries until the navigator is ready (fixes accidental same-day suppress when auth redirect raced the prompt)

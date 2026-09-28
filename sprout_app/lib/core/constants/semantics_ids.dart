@@ -65,6 +65,7 @@ abstract final class SemanticsIds {
   static const accountEditNameCancel = 'account_edit_name_cancel';
   static const accountDeleteConfirm = 'account_delete_confirm';
   static const accountDeleteCancel = 'account_delete_cancel';
+  static const accountDeleteConfirmField = 'account_delete_confirm_field';
 
   // --- Shell ---
   static const shellHeader = 'shell_header';
@@ -142,6 +143,14 @@ abstract final class SemanticsIds {
   // --- Settings ---
   static const settingsAccount = 'settings_account';
   static const settingsAccountAvatar = 'settings_account_avatar';
+  static const settingsAvatarChoosePhoto = 'settings_avatar_choose_photo';
+  static const settingsAvatarTakePhoto = 'settings_avatar_take_photo';
+  static const settingsAvatarRemovePhoto = 'settings_avatar_remove_photo';
+  static const settingsAvatarCancel = 'settings_avatar_cancel';
+  static const settingsAvatarCropUse = 'settings_avatar_crop_use';
+  static const settingsAvatarCropCancel = 'settings_avatar_crop_cancel';
+  static const settingsAvatarRemoveConfirm = 'settings_avatar_remove_confirm';
+  static const settingsAvatarRemoveDismiss = 'settings_avatar_remove_dismiss';
   static const settingsPremium = 'settings_premium';
   static const settingsTransactions = 'settings_transactions';
   static const settingsRecurring = 'settings_recurring';

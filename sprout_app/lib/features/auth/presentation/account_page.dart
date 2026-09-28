@@ -3,12 +3,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:sprout/core/constants/app_strings.dart';
 import 'package:sprout/core/constants/semantics_ids.dart';
+import 'package:sprout/core/di/service_locator.dart';
 import 'package:sprout/features/auth/domain/auth_user.dart';
 import 'package:sprout/features/auth/presentation/bloc/auth_cubit.dart';
 import 'package:sprout/features/auth/presentation/utils/account_identity_labels.dart';
 import 'package:sprout/features/auth/presentation/widgets/account_section_card.dart';
 import 'package:sprout/features/auth/presentation/widgets/delete_account_sheet.dart';
 import 'package:sprout/features/auth/presentation/widgets/edit_display_name_dialog.dart';
+import 'package:sprout/features/settings/application/profile_avatar_service.dart';
+import 'package:sprout/features/settings/presentation/widgets/profile_avatar.dart';
 import 'package:sprout/ui/export.dart';
 
 class AccountPage extends StatelessWidget {
@@ -49,12 +52,23 @@ class AccountPage extends StatelessWidget {
                     const SizedBox(height: 16),
                   ],
                   Center(
-                    child: CircleAvatar(
-                      radius: 40,
-                      child: Text(
-                        accountAvatarInitial(user),
-                        style: Theme.of(context).textTheme.headlineMedium,
-                      ),
+                    child: FutureBuilder<String?>(
+                      future: user.hasCustomAvatar
+                          ? sl<ProfileAvatarService>().resolveDisplayUrl(
+                              user.avatarPath,
+                            )
+                          : Future<String?>.value(null),
+                      builder: (context, snapshot) {
+                        final resolving =
+                            user.hasCustomAvatar &&
+                            snapshot.connectionState != ConnectionState.done;
+                        return ProfileAvatar(
+                          user: user,
+                          imageUrl: snapshot.data,
+                          loading: resolving,
+                          showEditBadge: false,
+                        );
+                      },
                     ),
                   ),
                   const SizedBox(height: 16),

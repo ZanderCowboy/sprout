@@ -276,6 +276,17 @@ class AuthCubit extends Cubit<AuthViewState> {
     }
   }
 
+  /// Applies a freshly updated [AuthUser] (e.g. after avatar upload) without
+  /// toggling busy when the caller already managed loading UI.
+  void applyUser(AuthUser user) {
+    if (isClosed) return;
+    if (!user.isVerified) {
+      _emitFromUser(user);
+      return;
+    }
+    emit(AuthViewSignedIn(user: user));
+  }
+
   Future<void> updateDisplayName(String displayName) async {
     final current = state;
     if (current is! AuthViewSignedIn || current.busy) return;

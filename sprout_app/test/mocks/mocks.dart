@@ -126,6 +126,7 @@ class FakeAuthRepository implements AuthRepository {
   int verifyOtpCalls = 0;
   int googleCalls = 0;
   int updateDisplayNameCalls = 0;
+  int updateAvatarPathCalls = 0;
   int deleteOwnAccountCalls = 0;
   int signOutCalls = 0;
 
@@ -140,6 +141,8 @@ class FakeAuthRepository implements AuthRepository {
   Object? verifyOtpError;
   Object? googleError;
   Object? updateDisplayNameError;
+  Object? updateAvatarPathError;
+  String? lastAvatarPath;
   Object? deleteOwnAccountError;
   Object? signOutError;
 
@@ -238,6 +241,29 @@ class FakeAuthRepository implements AuthRepository {
       id: current.id,
       email: current.email,
       displayName: displayName,
+      avatarPath: current.avatarPath,
+      isAnonymous: current.isAnonymous,
+      signedInWithGoogle: current.signedInWithGoogle,
+    );
+    setUser(user);
+    return user;
+  }
+
+  @override
+  Future<AuthUser> updateAvatarPath(String? avatarPath) async {
+    updateAvatarPathCalls++;
+    lastAvatarPath = avatarPath;
+    final error = updateAvatarPathError;
+    if (error != null) throw error;
+    final current = _currentUser;
+    if (current == null) {
+      throw StateError('No signed-in user to update.');
+    }
+    final user = AuthUser(
+      id: current.id,
+      email: current.email,
+      displayName: current.displayName,
+      avatarPath: avatarPath,
       isAnonymous: current.isAnonymous,
       signedInWithGoogle: current.signedInWithGoogle,
     );

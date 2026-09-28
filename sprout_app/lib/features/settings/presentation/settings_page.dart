@@ -10,8 +10,10 @@ import 'package:sprout/core/di/service_locator.dart';
 import 'package:sprout/features/auth/export.dart';
 import 'package:sprout/features/play_prompts/export.dart';
 import 'package:sprout/features/purchases/export.dart';
+import 'package:sprout/features/settings/application/profile_avatar_service.dart';
 import 'package:sprout/ui/export.dart';
 
+import 'widgets/profile_avatar_actions.dart';
 import 'widgets/settings_finance_section.dart';
 import 'widgets/settings_footer.dart';
 import 'widgets/settings_nav_row.dart';
@@ -31,6 +33,9 @@ class _SettingsPageState extends State<SettingsPage> {
   bool _hasPremium = false;
   String? _versionLabel;
   bool _debugBubbleVisible = true;
+  String? _avatarUrl;
+  String? _avatarPathResolved;
+  bool _avatarLoading = false;
 
   @override
   void initState() {
@@ -167,6 +172,53 @@ class _SettingsPageState extends State<SettingsPage> {
     }
   }
 
+
+  Future<void> _resolveAvatar(AuthUser? user) async {
+    final path = user?.avatarPath;
+    if (path == null || path.isEmpty) {
+      if (_avatarUrl != null || _avatarPathResolved != null) {
+        setState(() {
+          _avatarUrl = null;
+          _avatarPathResolved = null;
+        });
+      }
+      return;
+    }
+    if (path == _avatarPathResolved) return;
+    try {
+      final url = await sl<ProfileAvatarService>().resolveDisplayUrl(path);
+      if (!mounted) return;
+      setState(() {
+        _avatarUrl = url;
+        _avatarPathResolved = path;
+      });
+    } on Object {
+      if (!mounted) return;
+      setState(() {
+        _avatarPathResolved = path;
+        // Keep prior _avatarUrl on resolve failure.
+      });
+    }
+  }
+
+  Future<void> _onAvatarTap(AuthUser user) async {
+    if (_avatarLoading) return;
+    await showProfileAvatarActions(
+      context,
+      user: user,
+      onBusyChanged: (busy) {
+        if (!mounted) return;
+        setState(() => _avatarLoading = busy);
+      },
+    );
+    if (!mounted) return;
+    final state = context.read<AuthCubit>().state;
+    if (state is AuthViewSignedIn) {
+      _avatarPathResolved = null; // force re-resolve after change
+      await _resolveAvatar(state.user);
+    }
+  }
+
   void _openAccount() {
     context.push(AppRoute.account.path);
   }
@@ -232,13 +284,25 @@ class _SettingsPageState extends State<SettingsPage> {
           final signedIn = state is AuthViewSignedIn ? state : null;
           final user = signedIn?.user;
           final busy = signedIn?.busy ?? false;
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (!mounted) return;
+            _resolveAvatar(user);
+          });
 
           return ListView(
             padding: const EdgeInsets.fromLTRB(16, 4, 16, 32),
             children: [
               const SproutShellHeader(),
               const SizedBox(height: 16),
-              SettingsProfileHeader(user: user, onEditProfile: _openAccount),
+              SettingsProfileHeader(
+                user: user,
+                onEditProfile: _openAccount,
+                avatarUrl: _avatarUrl,
+                avatarLoading: _avatarLoading,
+                onAvatarTap: user != null && user.isVerified
+                    ? () => _onAvatarTap(user)
+                    : null,
+              ),
               if (_showPremiumCard) ...[
                 const SizedBox(height: 24),
                 SettingsPremiumCard(
