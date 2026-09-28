@@ -443,9 +443,9 @@ abstract final class AppStrings {
       'Preview the Play review bottom sheet';
   static const String environmentPageTitle = 'Environment';
   static const String environmentPageSubtitle =
-      'QA and break-glass tools. Not shown on production Settings.';
+      'QA and break-glass tools (Debug Lens, soft-prompt previews). Not shown on production Settings.';
   static const String environmentPageNavSubtitle =
-      'Soft-prompt previews and other test-only tools';
+      'Debug Lens, soft-prompt previews, and other test-only tools';
   static const String environmentPlayPromptsSection = 'Play prompts';
 
   static String appVersionLabel(String version, String buildNumber) =>

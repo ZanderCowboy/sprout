@@ -7,16 +7,14 @@ Debug Lens is an on-device debugging panel that provides visibility into network
 ### Development flavor
 Debug Lens is **always enabled** in development builds:
 - No Remote Config flag required
-- Entry visible in Settings → Debug tools → Debug Lens
-- Debug bubble toggle available in Settings → Debug tools
+- Entry + bubble toggle live on **Settings → Environment** (DEV always has that page)
 
 ### Production flavor
 Debug Lens is **gated by Remote Config**:
 - Default: **disabled** (`debug_lens_enabled = false`)
-- Enable for break-glass debugging by setting `debug_lens_enabled = true` in Firebase Remote Config
-- Only visible in Settings when the flag is enabled
-- Debug bubble toggle available when enabled
-- Soft-prompt preview buttons (**Show update / review prompt**) live on the separate **Environment** page (`environment_page_enabled`) — see [`ENVIRONMENT_PAGE.md`](ENVIRONMENT_PAGE.md). They are not gated by `debug_lens_enabled`.
+- Enable for break-glass by setting `debug_lens_enabled = true` in Firebase Remote Config (optionally with an app-version condition)
+- Lens entry + bubble toggle appear on the **Environment** page when that flag is on — not on main Settings
+- Opening Environment itself requires `environment_page_enabled` (see [`ENVIRONMENT_PAGE.md`](ENVIRONMENT_PAGE.md)). Soft-prompt previews on Environment are not gated by `debug_lens_enabled`.
 
 ## Remote Config setup
 
@@ -40,7 +38,7 @@ false
    - **Default value**: `false` (boolean) — keep the PROD default off
    - **Value**: `true` only for break-glass (optionally scoped with a **condition**, e.g. App version `==` / `>=` a build you control)
 5. Click **Publish changes**
-6. After the next Remote Config fetch (typically within minutes for active sessions; cold-start is safest), Settings shows **Debug tools** (Debug Lens + bubble) again
+6. After the next Remote Config fetch (typically within minutes for active sessions; cold-start is safest), **Environment** shows Debug Lens + bubble when that page is reachable (`environment_page_enabled` or DEV)
 
 ## Features
 
@@ -56,9 +54,9 @@ Debug Lens provides:
 
 The floating debug bubble provides quick access to Debug Lens:
 - Tap the bubble to open the Debug Lens panel
-- Show/hide the bubble via Settings → Debug tools → Show debug bubble
+- Show/hide the bubble via Environment → Show debug bubble
 - Bubble visibility preference persists across app relaunches
-- When hidden, Debug Lens remains accessible through Settings → Debug tools → Debug Lens
+- When hidden, Debug Lens remains accessible through Environment → Debug Lens
 
 ## Current integration
 
@@ -71,7 +69,7 @@ The Sprout integration:
 - In-panel routes use that same opaque surface so previous screens do not show through and the canvas color does not jump
 - Registers `SproutDebugLens.navigatorObserver` on the root GoRouter
 - Feeds Firebase Remote Config values via `DebugLens.instance.setRemoteConfigData()`
-- Settings entry and the Debug Lens bubble call `SproutDebugLens.show(context)` (gated by visibility logic)
+- Environment page entry and the Debug Lens bubble call `SproutDebugLens.show(context)` (gated by visibility logic)
 
 ## Security
 
@@ -89,5 +87,5 @@ Production use should still be limited to break-glass debugging scenarios, not c
 - GitHub issue: [#60 MVP debug_lens](https://github.com/ZanderCowboy/sprout/issues/60)
 - Remote Config service: `lib/core/flags/remote_config_service.dart`
 - Feature flag enum: `lib/core/flags/remote_feature_flag.dart` (`debugLensEnabled`)
-- Settings entry: `lib/features/settings/presentation/settings_page.dart`
+- Environment entry: `lib/features/settings/presentation/environment_page.dart`
 - Related (Environment page / version gesture): [`ENVIRONMENT_PAGE.md`](ENVIRONMENT_PAGE.md), [#114](https://github.com/ZanderCowboy/sprout/issues/114)

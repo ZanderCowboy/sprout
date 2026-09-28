@@ -5,7 +5,6 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:purchases_ui_flutter/purchases_ui_flutter.dart';
 import 'package:sprout/bootstrap.dart';
 import 'package:sprout/core/core.dart';
-import 'package:sprout/core/debug/sprout_debug_lens.dart';
 import 'package:sprout/core/di/service_locator.dart';
 import 'package:sprout/features/auth/export.dart';
 import 'package:sprout/features/purchases/export.dart';
@@ -31,7 +30,6 @@ class _SettingsPageState extends State<SettingsPage> {
   bool _loadingPremiumStatus = true;
   bool _hasPremium = false;
   String? _versionLabel;
-  bool _debugBubbleVisible = true;
   String? _avatarUrl;
   String? _avatarPathResolved;
   bool _avatarLoading = false;
@@ -41,9 +39,6 @@ class _SettingsPageState extends State<SettingsPage> {
     super.initState();
     _loadPremiumStatus();
     _loadVersion();
-    if (shouldEnableDebugLens()) {
-      _loadDebugBubbleVisibility();
-    }
   }
 
   Future<void> _loadVersion() async {
@@ -59,20 +54,6 @@ class _SettingsPageState extends State<SettingsPage> {
     } on Object {
       // Leave the version line hidden when the plugin is unavailable.
     }
-  }
-
-  void _loadDebugBubbleVisibility() {
-    setState(() {
-      _debugBubbleVisible = SproutDebugLens.isBubbleVisible;
-    });
-  }
-
-  Future<void> _toggleDebugBubble(bool visible) async {
-    await SproutDebugLens.setBubbleVisible(visible);
-    if (!mounted) return;
-    setState(() {
-      _debugBubbleVisible = visible;
-    });
   }
 
   Future<void> _loadPremiumStatus() async {
@@ -230,10 +211,6 @@ class _SettingsPageState extends State<SettingsPage> {
     context.push(AppRoute.privacy.path);
   }
 
-  void _openDebugLens() {
-    SproutDebugLens.show(context);
-  }
-
   void _openEnvironment() {
     context.push(AppRoute.environment.path);
   }
@@ -298,32 +275,6 @@ class _SettingsPageState extends State<SettingsPage> {
               ],
               const SizedBox(height: 28),
               const SettingsFinanceSection(),
-              if (shouldEnableDebugLens()) ...[
-                const SizedBox(height: 28),
-                Text(
-                  AppStrings.debugTools,
-                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                SettingsNavRow(
-                  identifier: SemanticsIds.settingsDebugLens,
-                  label: AppStrings.debugLens,
-                  subtitle: AppStrings.debugLensSubtitle,
-                  icon: Icons.bug_report_outlined,
-                  onTap: _openDebugLens,
-                ),
-                const SizedBox(height: 8),
-                SproutSwitchTile(
-                  identifier: SemanticsIds.settingsDebugBubbleToggle,
-                  label: AppStrings.debugBubbleVisible,
-                  value: _debugBubbleVisible,
-                  onChanged: _toggleDebugBubble,
-                  title: const Text(AppStrings.debugBubbleVisible),
-                  subtitle: const Text(AppStrings.debugBubbleSubtitle),
-                ),
-              ],
               // DEV-only Settings row so day-to-day testing does not rely on
               // the App version gesture or PROD break-glass RC.
               if (sl<AppConfig>().environment == AppEnvironment.development) ...[

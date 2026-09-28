@@ -1,13 +1,22 @@
 # Environment page
 
-Hidden QA / break-glass screen for **test-only** Settings controls (soft-prompt previews and similar). Normal product Settings stay clean on PROD.
+Hidden QA / break-glass screen for **test-only** Settings controls. Normal product Settings stay clean on PROD.
 
 ## What lives here
 
-- **Show update prompt** — preview the Play update bottom sheet (relocated from Settings → Debug tools)
-- **Show review prompt** — preview the Play review bottom sheet (relocated from Settings → Debug tools)
+- **Debug Lens** — open the existing Debug Lens panel (relocated from Settings → Debug tools)
+- **Show debug bubble** — toggle the floating Debug Lens bubble (relocated from Settings)
+- **Show update prompt** — preview the Play update bottom sheet
+- **Show review prompt** — preview the Play review bottom sheet
 
-Debug Lens and the debug bubble stay under Settings → Debug tools, gated by **`debug_lens_enabled`** (see [`DEBUG_LENS.md`](DEBUG_LENS.md)). They are **not** controlled by this flag.
+### Flag split
+
+| Concern | Flag | Notes |
+|---------|------|--------|
+| Environment page entry (gesture / DEV row) | `environment_page_enabled` | PROD default false; DEV always on |
+| Debug Lens runtime + bubble + Lens rows on Environment | `debug_lens_enabled` | Unchanged; DEV always on. When false, Environment still shows soft-prompt previews |
+
+See [`DEBUG_LENS.md`](DEBUG_LENS.md) for Lens/bubble RC setup. Soft-prompt previews are **not** gated by `debug_lens_enabled`.
 
 ## Entry
 
@@ -24,13 +33,15 @@ Either gesture opens Environment. Incomplete / gate-off gestures are a **silent 
 
 - Development flavor: `shouldEnableEnvironmentPage()` is always **true** (no RC dependency).
 - Settings also shows an **Environment** nav row in DEV only so you do not need the version gesture for daily QA.
+- DEV also has `shouldEnableDebugLens()` always true, so Lens + bubble appear on Environment without PROD RC.
 
 ### PROD
 
-- No permanent Settings section for Environment.
+- No permanent Settings section for Environment, Debug Lens, or bubble.
 - Entry is gesture-only when `environment_page_enabled` is true (default false; enable via Firebase condition for break-glass).
+- Lens/bubble rows on Environment additionally require `debug_lens_enabled` (or they stay hidden while soft prompts remain).
 
-## Remote Config flag
+## Remote Config flag (page entry)
 
 ### Parameter
 
@@ -60,6 +71,8 @@ Type: Boolean. **Do not** reuse `debug_lens_enabled`.
 4. **Publish changes**
 5. Cold-start the production app (or wait for the next RC fetch). Long-press or double-tap **App version** on Settings to open Environment.
 
+To also use Debug Lens / bubble on that page in PROD, enable `debug_lens_enabled` the same way (see [`DEBUG_LENS.md`](DEBUG_LENS.md)).
+
 Disable by setting the conditional / default back to `false` and publishing — no new build required.
 
 ## Code
@@ -69,8 +82,9 @@ Disable by setting the conditional / default back to `false` and publishing — 
 - Page: `lib/features/settings/presentation/environment_page.dart`
 - Route: `AppRoute.environment` (`/settings/environment`)
 - Gesture: `SettingsFooter.onVersionEnvironmentEntry`
+- Lens rows gated by `shouldEnableDebugLens()` inside Environment
 
 ## References
 
 - Issue: [#114 Environment page](https://github.com/ZanderCowboy/sprout/issues/114)
-- Debug Lens (separate): [`DEBUG_LENS.md`](DEBUG_LENS.md)
+- Debug Lens: [`DEBUG_LENS.md`](DEBUG_LENS.md)
