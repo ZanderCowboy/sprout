@@ -7,7 +7,11 @@ enum RemoteFeatureFlag {
   showStartupChecks('show_startup_checks', defaultValue: false),
 
   /// When true, enable DebugLens in production builds. Always enabled in DEV.
-  debugLensEnabled('debug_lens_enabled', defaultValue: false);
+  debugLensEnabled('debug_lens_enabled', defaultValue: false),
+
+  /// When true, allow the Settings App version gesture to open Environment.
+  /// Always enabled in DEV. PROD default false; break-glass via RC conditions.
+  environmentPageEnabled('environment_page_enabled', defaultValue: false);
 
   const RemoteFeatureFlag(this.key, {required this.defaultValue});
 

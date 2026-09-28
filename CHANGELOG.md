@@ -2,6 +2,14 @@
 
 Changes heading to `main`. Newest entries at the top.
 
+## 2026-09-28 — Environment page + RC subscriber attributes (#114, #102)
+
+- **#114:** New **Environment** page hosts Debug Lens, bubble toggle, and soft-prompt previews (relocated off main Settings); App version long-press **or** double-tap opens it when `environment_page_enabled` allows (PROD default false; silent no-op when off)
+- Page entry uses `environment_page_enabled`; Lens/bubble rows still respect `debug_lens_enabled`; DEV always has Environment (Settings row + gesture) without PROD break-glass
+- Documented in `docs/ENVIRONMENT_PAGE.md` / `docs/DEBUG_LENS.md`
+- **#102:** Set RevenueCat `$email` + `$displayName` from auth on sign-in and display-name change; clear both before `logOut` so the next identity does not keep prior attributes
+- Documented reserved vs custom attributes and privacy notes in `docs/REVENUECAT.md`
+
 ## 2026-09-28 — Edit profile avatar matches settings size
 
 - Edit Profile avatar uses the same 96px circle as Settings (radius 48)

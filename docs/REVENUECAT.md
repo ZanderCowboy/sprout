@@ -263,6 +263,32 @@ This is a **best-effort** sync — failures are caught and logged but do not blo
 
 For Maestro E2E flows, sign in with real OTP (`EMAIL` + `OTP_CODE`). The App User ID becomes the Supabase uid for that account — grant Premium promos (or use Test Store purchases) against that identity.
 
+## Subscriber attributes (#102)
+
+### Reserved vs custom (research note)
+
+RevenueCat supports **reserved** attributes (keys prefixed with `$`) plus arbitrary **custom** keys:
+
+| Kind | Examples | V1 Sprout |
+|------|----------|-----------|
+| Reserved | `$email`, `$displayName`, `$phoneNumber`, `$apnsTokens`, … | **`$email`** + **`$displayName` only** |
+| Custom | any non-`$` key | **None** for V1 (prefer reserved) |
+
+We use the Flutter helpers `Purchases.setEmail` / `Purchases.setDisplayName` (equivalent to setting `$email` / `$displayName`). No `$phoneNumber`. No custom keys unless a later issue documents a trivial need.
+
+### When we set / clear
+
+- **Sign-in / bind** (`Purchases.logIn` path): after identity sync, set `$email` and `$displayName` from the auth session (skip empty values).
+- **Profile name change** (`AuthService.updateDisplayName`): refresh `$email` + `$displayName` from the updated `AuthUser`. Email change UI is still “coming soon” — when it lands, refresh on that path the same way.
+- **Not** on every app resume.
+- **Sign-out / account deletion**: clear `$email` and `$displayName` with empty strings (RC deletes the attribute), then `Purchases.logOut()`, so the next anonymous identity does not keep prior-user attributes.
+
+Helpers live on `PremiumPaywall` (`setSubscriberAttributesIfConfigured`, `clearSubscriberAttributesIfConfigured`) and are wired through `AuthServiceImpl` the same way as identity `logIn` / `logOut`. Failures are best-effort and do not block auth. When `revenuecat_enabled` is off / Purchases is not configured, attribute calls are no-ops — they do **not** change the #58 kill-switch / entitlement matrix.
+
+### Privacy
+
+Only PII already present on the auth session (email + display name from Google / OTP). No new collection. Documented for support/dashboard lookup and Customer Center context.
+
 ## Verify
 
 1. Run the development flavor with the flag **false** (or unset):

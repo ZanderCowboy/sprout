@@ -5,10 +5,8 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:purchases_ui_flutter/purchases_ui_flutter.dart';
 import 'package:sprout/bootstrap.dart';
 import 'package:sprout/core/core.dart';
-import 'package:sprout/core/debug/sprout_debug_lens.dart';
 import 'package:sprout/core/di/service_locator.dart';
 import 'package:sprout/features/auth/export.dart';
-import 'package:sprout/features/play_prompts/export.dart';
 import 'package:sprout/features/purchases/export.dart';
 import 'package:sprout/features/settings/application/profile_avatar_service.dart';
 import 'package:sprout/ui/export.dart';
@@ -32,7 +30,6 @@ class _SettingsPageState extends State<SettingsPage> {
   bool _loadingPremiumStatus = true;
   bool _hasPremium = false;
   String? _versionLabel;
-  bool _debugBubbleVisible = true;
   String? _avatarUrl;
   String? _avatarPathResolved;
   bool _avatarLoading = false;
@@ -42,9 +39,6 @@ class _SettingsPageState extends State<SettingsPage> {
     super.initState();
     _loadPremiumStatus();
     _loadVersion();
-    if (shouldEnableDebugLens()) {
-      _loadDebugBubbleVisibility();
-    }
   }
 
   Future<void> _loadVersion() async {
@@ -60,20 +54,6 @@ class _SettingsPageState extends State<SettingsPage> {
     } on Object {
       // Leave the version line hidden when the plugin is unavailable.
     }
-  }
-
-  void _loadDebugBubbleVisibility() {
-    setState(() {
-      _debugBubbleVisible = SproutDebugLens.isBubbleVisible;
-    });
-  }
-
-  Future<void> _toggleDebugBubble(bool visible) async {
-    await SproutDebugLens.setBubbleVisible(visible);
-    if (!mounted) return;
-    setState(() {
-      _debugBubbleVisible = visible;
-    });
   }
 
   Future<void> _loadPremiumStatus() async {
@@ -231,26 +211,14 @@ class _SettingsPageState extends State<SettingsPage> {
     context.push(AppRoute.privacy.path);
   }
 
-  void _openDebugLens() {
-    SproutDebugLens.show(context);
+  void _openEnvironment() {
+    context.push(AppRoute.environment.path);
   }
 
-  Future<void> _showDebugUpdatePrompt() async {
-    final result = await showPlayUpdatePromptSheet(context);
-    if (!mounted) return;
-    if (result == PlayUpdatePromptResult.update) {
-      await sl<PlayUpdatePromptService>().openStoreListing();
-    }
-  }
-
-  Future<void> _showDebugReviewPrompt() async {
-    final result = await showPlayReviewPromptSheet(context);
-    if (!mounted) return;
-    if (result == PlayReviewPromptResult.rate) {
-      await sl<PlayReviewPromptService>().requestReview(
-        forceStoreListing: true,
-      );
-    }
+  /// Hidden App version gesture (#114). Silent no-op when gate is off.
+  void _onVersionEnvironmentEntry() {
+    if (!shouldEnableEnvironmentPage()) return;
+    _openEnvironment();
   }
 
   @override
@@ -307,46 +275,23 @@ class _SettingsPageState extends State<SettingsPage> {
               ],
               const SizedBox(height: 28),
               const SettingsFinanceSection(),
-              if (shouldEnableDebugLens()) ...[
+              // DEV-only Settings row so day-to-day testing does not rely on
+              // the App version gesture or PROD break-glass RC.
+              if (sl<AppConfig>().environment == AppEnvironment.development) ...[
                 const SizedBox(height: 28),
                 Text(
-                  AppStrings.debugTools,
+                  AppStrings.environmentPageTitle,
                   style: Theme.of(context).textTheme.labelLarge?.copyWith(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                 ),
                 const SizedBox(height: 8),
                 SettingsNavRow(
-                  identifier: SemanticsIds.settingsDebugLens,
-                  label: AppStrings.debugLens,
-                  subtitle: AppStrings.debugLensSubtitle,
-                  icon: Icons.bug_report_outlined,
-                  onTap: _openDebugLens,
-                ),
-                const SizedBox(height: 8),
-                SproutSwitchTile(
-                  identifier: SemanticsIds.settingsDebugBubbleToggle,
-                  label: AppStrings.debugBubbleVisible,
-                  value: _debugBubbleVisible,
-                  onChanged: _toggleDebugBubble,
-                  title: const Text(AppStrings.debugBubbleVisible),
-                  subtitle: const Text(AppStrings.debugBubbleSubtitle),
-                ),
-                const SizedBox(height: 8),
-                SettingsNavRow(
-                  identifier: SemanticsIds.settingsDebugShowUpdatePrompt,
-                  label: AppStrings.debugShowUpdatePrompt,
-                  subtitle: AppStrings.debugShowUpdatePromptSubtitle,
-                  icon: Icons.system_update_alt_outlined,
-                  onTap: _showDebugUpdatePrompt,
-                ),
-                const SizedBox(height: 8),
-                SettingsNavRow(
-                  identifier: SemanticsIds.settingsDebugShowReviewPrompt,
-                  label: AppStrings.debugShowReviewPrompt,
-                  subtitle: AppStrings.debugShowReviewPromptSubtitle,
-                  icon: Icons.star_outline_rounded,
-                  onTap: _showDebugReviewPrompt,
+                  identifier: SemanticsIds.settingsEnvironment,
+                  label: AppStrings.environmentPageTitle,
+                  subtitle: AppStrings.environmentPageNavSubtitle,
+                  icon: Icons.science_outlined,
+                  onTap: _openEnvironment,
                 ),
               ],
               const SizedBox(height: 32),
@@ -356,6 +301,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 onSignOut: () => context.read<AuthCubit>().signOut(),
                 onPrivacy: _openPrivacy,
                 onTerms: _openTerms,
+                onVersionEnvironmentEntry: _onVersionEnvironmentEntry,
               ),
               const SizedBox(height: 96),
             ],

@@ -18,7 +18,8 @@ enum AppRoute {
   transactions('/settings/transactions'),
   transactionDetail('/settings/transactions/:id'),
   recurring('/settings/recurring'),
-  budget('/settings/budget');
+  budget('/settings/budget'),
+  environment('/settings/environment');
 
   const AppRoute(this.path);
   final String path;

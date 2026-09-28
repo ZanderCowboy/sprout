@@ -22,9 +22,17 @@ abstract final class PremiumPaywall {
     return Purchases.isConfigured;
   }
 
-  /// Best-effort RevenueCat logout after in-app account deletion.
+  /// Best-effort RevenueCat logout after sign-out / account deletion.
+  ///
+  /// Clears `$email` / `$displayName` first so the next anonymous identity
+  /// does not keep prior-user attributes (#102), then calls `Purchases.logOut`.
   static Future<void> logOutIfConfigured() async {
     if (!await Purchases.isConfigured) return;
+    try {
+      await clearSubscriberAttributesIfConfigured();
+    } on Object {
+      // Still attempt logOut even if attribute clear fails.
+    }
     await Purchases.logOut();
   }
 
@@ -32,10 +40,45 @@ abstract final class PremiumPaywall {
   ///
   /// When Purchases is configured, logs in with the stable app user ID so that
   /// RevenueCat entitlements (including promo grants for Maestro E2E) apply to
-  /// the expected identity.
-  static Future<void> logInIfConfigured(String appUserId) async {
+  /// the expected identity, then sets reserved subscriber attributes from auth.
+  static Future<void> logInIfConfigured(
+    String appUserId, {
+    String? email,
+    String? displayName,
+  }) async {
     if (!await Purchases.isConfigured) return;
     await Purchases.logIn(appUserId);
+    await setSubscriberAttributesIfConfigured(
+      email: email,
+      displayName: displayName,
+    );
+  }
+
+  /// Sets reserved `$email` / `$displayName` from auth (V1 — no `$phone`, no
+  /// custom keys). Empty / null values are skipped on set; use
+  /// [clearSubscriberAttributesIfConfigured] to delete.
+  static Future<void> setSubscriberAttributesIfConfigured({
+    String? email,
+    String? displayName,
+  }) async {
+    if (!await Purchases.isConfigured) return;
+
+    final trimmedEmail = email?.trim();
+    if (trimmedEmail != null && trimmedEmail.isNotEmpty) {
+      await Purchases.setEmail(trimmedEmail);
+    }
+
+    final trimmedName = displayName?.trim();
+    if (trimmedName != null && trimmedName.isNotEmpty) {
+      await Purchases.setDisplayName(trimmedName);
+    }
+  }
+
+  /// Clears reserved `$email` / `$displayName` (empty string deletes per RC SDK).
+  static Future<void> clearSubscriberAttributesIfConfigured() async {
+    if (!await Purchases.isConfigured) return;
+    await Purchases.setEmail('');
+    await Purchases.setDisplayName('');
   }
 
   /// Returns whether the user has the premium entitlement active.

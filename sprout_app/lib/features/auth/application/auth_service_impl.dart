@@ -16,7 +16,15 @@ class AuthServiceImpl implements AuthService {
     required AnalyticsService analyticsService,
     required Future<void> Function() flushPending,
     required Future<void> Function() pullRemote,
-    Future<void> Function(String appUserId)? logInPurchases,
+    Future<void> Function(
+      String appUserId, {
+      String? email,
+      String? displayName,
+    })? logInPurchases,
+    Future<void> Function({
+      String? email,
+      String? displayName,
+    })? setPurchasesAttributes,
     Future<void> Function()? logOutPurchases,
   }) : _authRepository = authRepository,
        _userContext = userContext,
@@ -25,6 +33,7 @@ class AuthServiceImpl implements AuthService {
        _flushPending = flushPending,
        _pullRemote = pullRemote,
        _logInPurchases = logInPurchases,
+       _setPurchasesAttributes = setPurchasesAttributes,
        _logOutPurchases = logOutPurchases;
 
   final AuthRepository _authRepository;
@@ -33,7 +42,15 @@ class AuthServiceImpl implements AuthService {
   final AnalyticsService _analyticsService;
   final Future<void> Function() _flushPending;
   final Future<void> Function() _pullRemote;
-  final Future<void> Function(String appUserId)? _logInPurchases;
+  final Future<void> Function(
+    String appUserId, {
+    String? email,
+    String? displayName,
+  })? _logInPurchases;
+  final Future<void> Function({
+    String? email,
+    String? displayName,
+  })? _setPurchasesAttributes;
   final Future<void> Function()? _logOutPurchases;
 
   @override
@@ -78,7 +95,7 @@ class AuthServiceImpl implements AuthService {
       user = await _authRepository.updateDisplayName(trimmedName);
     }
     await bindAfterVerifiedSignIn(user);
-    
+
     // Log analytics event determined by caller
     final eventName = isSignUp
         ? AnalyticsEvent.signUpSuccess
@@ -95,7 +112,7 @@ class AuthServiceImpl implements AuthService {
     final previousUserId = _userContext.lastVerifiedUserId;
     final user = await _authRepository.signInWithGoogle();
     await bindAfterVerifiedSignIn(user);
-    
+
     // Sign-up if this is a different user than previously verified
     final isSignUp = previousUserId == null || previousUserId != user.id;
     final eventName = isSignUp
@@ -109,8 +126,18 @@ class AuthServiceImpl implements AuthService {
   }
 
   @override
-  Future<AuthUser> updateDisplayName(String displayName) =>
-      _authRepository.updateDisplayName(displayName);
+  Future<AuthUser> updateDisplayName(String displayName) async {
+    final user = await _authRepository.updateDisplayName(displayName);
+    final setAttributes = _setPurchasesAttributes;
+    if (setAttributes != null) {
+      try {
+        await setAttributes(email: user.email, displayName: user.displayName);
+      } on Object {
+        // Best-effort attribute refresh; profile update already succeeded.
+      }
+    }
+    return user;
+  }
 
   @override
   Future<void> signOut() async {
@@ -162,7 +189,11 @@ class AuthServiceImpl implements AuthService {
       final logInPurchases = _logInPurchases;
       if (logInPurchases != null) {
         try {
-          await logInPurchases(newUid);
+          await logInPurchases(
+            newUid,
+            email: user.email,
+            displayName: user.displayName,
+          );
         } on Object {
           // Best-effort identity sync; continue bind.
         }
@@ -179,7 +210,11 @@ class AuthServiceImpl implements AuthService {
     final logInPurchases = _logInPurchases;
     if (logInPurchases != null) {
       try {
-        await logInPurchases(newUid);
+        await logInPurchases(
+          newUid,
+          email: user.email,
+          displayName: user.displayName,
+        );
       } on Object {
         // Best-effort identity sync; continue bind.
       }

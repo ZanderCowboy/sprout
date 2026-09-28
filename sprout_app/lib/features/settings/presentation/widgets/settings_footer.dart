@@ -11,6 +11,7 @@ class SettingsFooter extends StatelessWidget {
     required this.onSignOut,
     required this.onPrivacy,
     required this.onTerms,
+    this.onVersionEnvironmentEntry,
   });
 
   final String? versionLabel;
@@ -18,6 +19,12 @@ class SettingsFooter extends StatelessWidget {
   final VoidCallback onSignOut;
   final VoidCallback onPrivacy;
   final VoidCallback onTerms;
+
+  /// Hidden Environment entry (#114): long-press **or** double-tap on version.
+  ///
+  /// Caller must gate (silent no-op when `environment_page_enabled` is off).
+  /// The version label stays plain metadata with no affordance chrome.
+  final VoidCallback? onVersionEnvironmentEntry;
 
   static final ButtonStyle _linkStyle = TextButton.styleFrom(
     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -30,6 +37,7 @@ class SettingsFooter extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final onEntry = onVersionEnvironmentEntry;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -66,10 +74,19 @@ class SettingsFooter extends StatelessWidget {
         ),
         if (versionLabel != null) ...[
           const SizedBox(height: 2),
-          Text(
-            versionLabel!,
-            style: textTheme.bodySmall?.copyWith(
-              color: scheme.onSurfaceVariant,
+          GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onDoubleTap: onEntry,
+            onLongPress: onEntry,
+            child: Semantics(
+              identifier: SemanticsIds.settingsAppVersion,
+              container: true,
+              child: Text(
+                versionLabel!,
+                style: textTheme.bodySmall?.copyWith(
+                  color: scheme.onSurfaceVariant,
+                ),
+              ),
             ),
           ),
         ],
