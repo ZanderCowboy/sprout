@@ -206,6 +206,7 @@ Future<void> configureDependencies({
         await sl<TransactionsRepository>().pullRemote();
       },
       logInPurchases: PremiumPaywall.logInIfConfigured,
+      setPurchasesAttributes: PremiumPaywall.setSubscriberAttributesIfConfigured,
       logOutPurchases: PremiumPaywall.logOutIfConfigured,
     ),
   );

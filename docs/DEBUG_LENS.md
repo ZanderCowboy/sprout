@@ -16,6 +16,8 @@ Debug Lens is **gated by Remote Config**:
 - Enable for break-glass debugging by setting `debug_lens_enabled = true` in Firebase Remote Config
 - Only visible in Settings when the flag is enabled
 - Debug bubble toggle available when enabled
+- **Hidden entry (#114):** when the gate is **on**, double-tap **then** long-press the Settings footer **App version** label opens Debug Lens (same panel as Settings → Debug tools). When the gate is **off**, that gesture is a **silent no-op** (no toast, snackbar, haptic, or copy). The version label stays plain metadata with no affordance chrome.
+- One flag (`debug_lens_enabled`) gates Settings Debug tools, the floating bubble, and the App version gesture. No separate RC key.
 
 ## Remote Config setup
 
@@ -36,9 +38,12 @@ false
 3. Navigate to **Remote Config**
 4. Add or edit parameter:
    - **Parameter key**: `debug_lens_enabled`
-   - **Value**: `true` (boolean)
+   - **Default value**: `false` (boolean) — keep the PROD default off
+   - **Value**: `true` only for break-glass (optionally scoped with a **condition**, e.g. App version `==` / `>=` a build you control)
 5. Click **Publish changes**
-6. Users will see Debug Lens after the next Remote Config fetch (typically within minutes for active sessions)
+6. After the next Remote Config fetch (typically within minutes for active sessions; cold-start is safest):
+   - Settings shows **Debug tools** again
+   - Double-tap → long-press on **App version** opens Debug Lens
 
 ## Features
 
@@ -70,6 +75,7 @@ The Sprout integration:
 - Registers `SproutDebugLens.navigatorObserver` on the root GoRouter
 - Feeds Firebase Remote Config values via `DebugLens.instance.setRemoteConfigData()`
 - Settings entry and the Debug Lens bubble call `SproutDebugLens.show(context)` (gated by visibility logic)
+- Settings footer App version gesture uses `DebugEntryGestureSequence` (double-tap → long-press) and only opens Debug Lens when `shouldEnableDebugLens()` is true
 
 ## Security
 
@@ -84,7 +90,8 @@ Production use should still be limited to break-glass debugging scenarios, not c
 
 ## References
 
-- GitHub issue: [#60 MVP debug_lens](https://github.com/ZanderCowboy/sprout/issues/60)
+- GitHub issues: [#60 MVP debug_lens](https://github.com/ZanderCowboy/sprout/issues/60), [#114 PROD-safe debug entry](https://github.com/ZanderCowboy/sprout/issues/114)
 - Remote Config service: `lib/core/flags/remote_config_service.dart`
 - Feature flag enum: `lib/core/flags/remote_feature_flag.dart` (`debugLensEnabled`)
-- Settings entry: `lib/features/settings/presentation/settings_page.dart`
+- Settings entry + gesture: `lib/features/settings/presentation/settings_page.dart`, `settings_footer.dart`
+- Gesture sequence: `lib/core/debug/debug_entry_gesture_sequence.dart`

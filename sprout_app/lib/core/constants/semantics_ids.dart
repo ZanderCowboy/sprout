@@ -152,6 +152,7 @@ abstract final class SemanticsIds {
       'settings_debug_show_update_prompt';
   static const settingsDebugShowReviewPrompt =
       'settings_debug_show_review_prompt';
+  static const settingsAppVersion = 'settings_app_version';
 
   // --- Manage Subscription ---
   static const manageSubscriptionGooglePlay = 'manage_subscription_google_play';

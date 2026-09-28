@@ -2,6 +2,13 @@
 
 Changes heading to `main`. Newest entries at the top.
 
+## 2026-09-28 — PROD-safe debug entry + RC subscriber attributes (#114, #102)
+
+- **#114:** PROD Debug Lens stays behind `debug_lens_enabled` (default false); App version double-tap → long-press opens Debug Lens when the gate is on, silent no-op when off; DEV Settings Debug tools unchanged
+- Reused one RC flag for Settings debug tools, bubble, and hidden gesture; Firebase version/condition break-glass documented in `docs/DEBUG_LENS.md`
+- **#102:** Set RevenueCat `$email` + `$displayName` from auth on sign-in and display-name change; clear both before `logOut` so the next identity does not keep prior attributes
+- Documented reserved vs custom attributes and privacy notes in `docs/REVENUECAT.md`
+
 ## 2026-09-28 — Update soft-prompt fix + sign-out loading (#113, #116)
 
 - **#113:** Play update sheet cooldown is recorded only after the sheet is presented and closed; host skips `/loading` and retries until the navigator is ready (fixes accidental same-day suppress when auth redirect raced the prompt)

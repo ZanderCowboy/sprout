@@ -183,6 +183,12 @@ class _SettingsPageState extends State<SettingsPage> {
     SproutDebugLens.show(context);
   }
 
+  /// Hidden App version gesture (#114). Silent no-op when the RC gate is off.
+  void _onVersionDebugEntry() {
+    if (!shouldEnableDebugLens()) return;
+    SproutDebugLens.show(context);
+  }
+
   Future<void> _showDebugUpdatePrompt() async {
     final result = await showPlayUpdatePromptSheet(context);
     if (!mounted) return;
@@ -292,6 +298,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 onSignOut: () => context.read<AuthCubit>().signOut(),
                 onPrivacy: _openPrivacy,
                 onTerms: _openTerms,
+                onVersionDebugEntry: _onVersionDebugEntry,
               ),
               const SizedBox(height: 96),
             ],

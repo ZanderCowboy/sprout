@@ -36,7 +36,15 @@ void main() {
   var pullCalls = 0;
 
   AuthServiceImpl buildAuthService({
-    Future<void> Function(String)? logInPurchases,
+    Future<void> Function(
+      String, {
+      String? email,
+      String? displayName,
+    })? logInPurchases,
+    Future<void> Function({
+      String? email,
+      String? displayName,
+    })? setPurchasesAttributes,
     Future<void> Function()? logOutPurchases,
   }) {
     return AuthServiceImpl(
@@ -51,6 +59,7 @@ void main() {
         pullCalls++;
       },
       logInPurchases: logInPurchases,
+      setPurchasesAttributes: setPurchasesAttributes,
       logOutPurchases: logOutPurchases,
     );
   }
@@ -139,10 +148,14 @@ void main() {
     var logInCalls = 0;
     String? lastLogInUserId;
 
+    String? lastEmail;
+    String? lastDisplayName;
     final service = buildAuthService(
-      logInPurchases: (userId) async {
+      logInPurchases: (userId, {email, displayName}) async {
         logInCalls++;
         lastLogInUserId = userId;
+        lastEmail = email;
+        lastDisplayName = displayName;
       },
     );
 
@@ -153,6 +166,40 @@ void main() {
 
     expect(logInCalls, 1);
     expect(lastLogInUserId, 'verified-uid');
+    expect(lastEmail, 'guest@example.com');
+    // FakeAuthRepository verify default has no display name.
+    expect(lastDisplayName, isNull);
+  });
+
+  test('updateDisplayName syncs RevenueCat attributes when callback provided',
+      () async {
+    var setCalls = 0;
+    String? lastEmail;
+    String? lastDisplayName;
+
+    fakeAuth.setUser(
+      const AuthUser(
+        id: 'verified-uid',
+        email: 'a@b.com',
+        displayName: 'Old',
+        isAnonymous: false,
+      ),
+    );
+
+    final service = buildAuthService(
+      setPurchasesAttributes: ({email, displayName}) async {
+        setCalls++;
+        lastEmail = email;
+        lastDisplayName = displayName;
+      },
+    );
+
+    final user = await service.updateDisplayName('Ada');
+
+    expect(user.displayName, 'Ada');
+    expect(setCalls, 1);
+    expect(lastEmail, 'a@b.com');
+    expect(lastDisplayName, 'Ada');
   });
 
   test('verifyEmailOtp with display name updates metadata', () async {
