@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -5,6 +6,7 @@ import 'package:sprout/core/core.dart';
 import 'package:sprout/core/di/service_locator.dart';
 import 'package:sprout/features/accounts/export.dart';
 import 'package:sprout/features/goals/export.dart';
+import 'package:sprout/features/play_prompts/export.dart';
 import 'package:sprout/features/transactions/export.dart';
 import 'package:sprout/ui/export.dart';
 
@@ -58,6 +60,9 @@ class DepositBottomSheet extends StatelessWidget {
         listener: (context, state) {
           if (state is DepositSubmitSuccess) {
             Navigator.of(context).pop();
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              unawaited(sl<PlayReviewPromptService>().onDepositLoggedSuccess());
+            });
           }
         },
         child: _DepositBottomSheetBody(

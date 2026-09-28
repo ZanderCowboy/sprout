@@ -382,6 +382,12 @@ abstract final class AppStrings {
   static const String debugBubbleVisible = 'Show debug bubble';
   static const String debugBubbleSubtitle =
       'Floating bubble to open Debug Lens';
+  static const String debugShowUpdatePrompt = 'Show update prompt';
+  static const String debugShowUpdatePromptSubtitle =
+      'Preview the Play update bottom sheet';
+  static const String debugShowReviewPrompt = 'Show review prompt';
+  static const String debugShowReviewPromptSubtitle =
+      'Preview the Play review bottom sheet';
 
   static String appVersionLabel(String version, String buildNumber) =>
       'Version $version (Build $buildNumber)';
@@ -410,6 +416,25 @@ abstract final class AppStrings {
   static const String startupConfigurePurchases = 'Configuring purchases';
   static const String startupFlushPending = 'Flushing pending sync';
   static const String startupPullRemote = 'Pulling remote data';
+
+  // --- Play soft prompts (#104 / #105) ---
+  static const String playUpdateTitle = 'A new version of Sprout is ready';
+  static const String playUpdateBody =
+      "Updates improve stability and features. You'll be redirected to the "
+      'Google Play Store to update.';
+  static const String playUpdateCta = 'Update';
+  static const String playUpdateLater = 'Later';
+  static const String playUpdateCaption =
+      'Quick and secure update via Google Play';
+
+  static const String playReviewTitle = 'Enjoying Sprout?';
+  static const String playReviewBody =
+      "If Sprout's helping you grow your savings, a quick review on Google Play "
+      'means the world to our team.';
+  static const String playReviewRateCta = 'Rate on Play';
+  static const String playReviewNotNow = 'Not now';
+  static const String playReviewCaption =
+      'Takes under a minute · opens Google Play directly';
 
   // --- Shared UI / env ---
   static const String environmentDev = 'DEV';
