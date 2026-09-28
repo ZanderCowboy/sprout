@@ -1,0 +1,112 @@
+appId: app.stackmint.sprout.dev
+tags:
+  - p1
+  - page
+  - premium
+  - purchases
+  - paywall
+  - killswitch
+env:
+  EMAIL: sprout.play.review+free@gmail.com
+---
+# Free / unsubscribed paywalls (single clearState).
+# Default EMAIL is the free alias; it shares the Play Review inbox but remains
+# a separate app/RevenueCat identity from the subscribed account.
+# Coverage: former settings-premium-killswitch-on + settings-premium-paywall
+#   + master-budget-paywall.
+# Online cold start so Remote Config can apply revenuecat_enabled=true;
+# assert Premium row visible, open Settings + Master Budget paywalls, dismiss
+# with back (no purchase). Keep killswitch-off / failopen / deeplink separate.
+# Requires OTP_CODE at runtime:
+#   OTP_CODE=xxxxxx maestro test .maestro/premium-free-paywalls.yaml
+# Run: maestro test .maestro/premium-free-paywalls.yaml
+
+- setAirplaneMode: disabled
+
+- launchApp:
+    clearState: true
+    clearKeychain: true
+
+- runFlow:
+    file: shared/otp-signin-to-overview.yaml
+    env:
+      EMAIL: ${EMAIL}
+      OTP_CODE: ${OTP_CODE}
+
+- tapOn:
+    id: "shell_tab_settings"
+
+- extendedWaitUntil:
+    visible:
+      id: "settings_transactions"
+    timeout: 10000
+
+- assertVisible:
+    id: "settings_transactions"
+
+- assertVisible:
+    id: "settings_account"
+
+- assertVisible:
+    id: "settings_premium"
+
+- extendedWaitUntil:
+    visible:
+      text: ".*Upgrade.*"
+    timeout: 20000
+
+- assertVisible:
+    text: ".*Upgrade.*"
+
+# ===== Settings Premium paywall → dismiss =====
+- tapOn:
+    id: "settings_premium"
+
+- extendedWaitUntil:
+    visible:
+      text: ".*(Monthly|Annual|R79|Subscribe|Continue).*"
+    timeout: 25000
+
+- assertVisible:
+    text: ".*(Monthly|Annual|R79|Subscribe|Continue).*"
+
+- back
+
+- extendedWaitUntil:
+    visible:
+      id: "settings_premium"
+    timeout: 10000
+
+- assertVisible:
+    id: "settings_premium"
+
+# ===== Master Budget paywall → dismiss =====
+- extendedWaitUntil:
+    visible:
+      id: "settings_budget"
+    timeout: 10000
+
+- tapOn:
+    id: "settings_budget"
+
+- extendedWaitUntil:
+    visible:
+      text: ".*(Monthly|Annual|R79|Subscribe|Continue).*"
+    timeout: 25000
+
+- assertVisible:
+    text: ".*(Monthly|Annual|R79|Subscribe|Continue).*"
+
+- back
+
+- extendedWaitUntil:
+    visible:
+      id: "settings_budget"
+    timeout: 10000
+
+- assertVisible:
+    id: "settings_budget"
+
+# Master Budget text remains on Settings finance row — planner gated by budget_sort.
+- assertNotVisible:
+    id: "budget_sort"

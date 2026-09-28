@@ -1,6 +1,13 @@
 ---
 # Merge-to-main release: compute version from PR labels, ship Firebase (dev APK)
-# + Play internal (prod AAB) in parallel, then commit the version on success.
+# + Play internal (prod AAB) in parallel, then commit the version on Play success.
+#
+# versionCode uniqueness is enforced by Play. Commit Version runs when Play upload
+# succeeds (even if Firebase fails), so a burned Play code is recorded on main and
+# the next Release Main does not reuse it. Firebase failure still fails the overall
+# workflow (job not continue-on-error) so the APK issue surfaces after Play+commit.
+# When skip_play=true, commit still requires Firebase success (existing skip_play path).
+# Play failure → do not commit (Play success is the commit trigger of record).
 #
 # Manual dispatch supports retries and one-off rebuilds (see inputs).
 # Config: .github/config/version-labels.json
@@ -382,15 +389,18 @@ jobs:
   commit-version:
     name: Commit Version
     needs: [resolve, firebase, play]
-    # Run when resolve succeeded, commit is requested, and every non-skipped deploy job succeeded.
-    # Skipped firebase/play (via skip_* inputs) must not block the commit.
+    # Play owns versionCode uniqueness. Commit when Play succeeded (Firebase must not
+    # block that), or when Play was intentionally skipped and Firebase succeeded
+    # (skip_play rebuild path). Never commit after a Play failure — that would leave
+    # git ahead of Play. Both skipped → no commit. See docs/BUILD_NUMBER.md (#94).
     if: >-
       always() &&
       needs.resolve.result == 'success' &&
       needs.resolve.outputs.commit_version == 'true' &&
-      (needs.firebase.result == 'success' || needs.firebase.result == 'skipped') &&
-      (needs.play.result == 'success' || needs.play.result == 'skipped') &&
-      !(needs.firebase.result == 'skipped' && needs.play.result == 'skipped')
+      (
+        needs.play.result == 'success' ||
+        (needs.play.result == 'skipped' && needs.firebase.result == 'success')
+      )
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout (for local actions)

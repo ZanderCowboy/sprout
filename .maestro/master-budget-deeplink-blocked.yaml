@@ -4,23 +4,28 @@ tags:
   - premium
   - budget
   - deeplink
+env:
+  EMAIL: sprout.play.review+free@gmail.com
 ---
+# Requires OTP_CODE at runtime:
+#   OTP_CODE=xxxxxx maestro test .maestro/master-budget-deeplink-blocked.yaml
 # Deep-link / route-guard block for /settings/budget when not Premium.
 #
-# AUTOMATION STATUS (2026-09-26 QA on emulator-5554):
+# AUTOMATION STATUS (2026-09-26 QA on emulator-5554; updated 2026-09-27 for OTP):
 # - AndroidManifest has LAUNCHER only — no VIEW / App Links / custom-scheme
 #   intent-filter. Docs (SUPABASE_AUTH_TODOS) mark OS deep links as deferred.
 # - `adb resolve-activity -d https://sprout.app/settings/budget` → Chrome,
 #   not Sprout. `sprout://settings/budget` → No activity found.
-# - While maestro-test-user promo premium is active, clearState+debugSignIn
-#   logs in as Premium, so a free-user redirect assert cannot run anyway.
+# - The default free alias is a non-Premium OTP identity; do not grant
+#   Premium on it when running this stub.
 #
-# Keep this flow as a stub for when (1) promo is revoked AND (2) a real
-# deep-link / in-app navigation harness exists. Do not treat as E2E green.
+# Keep this flow as a stub for when (1) a free-user identity is used AND (2) a
+# real deep-link / in-app navigation harness exists. Do not treat as E2E green.
 #
 # Intended steps once unblocked:
 # - free user on Settings → open /settings/budget → assert settings_budget
 #   visible and budget_sort / Master Budget NOT visible (BudgetPlannerGate).
+
 
 - setAirplaneMode: disabled
 
@@ -28,7 +33,11 @@ tags:
     clearState: true
     clearKeychain: true
 
-- runFlow: shared/debug-signin-intro.yaml
+- runFlow:
+    file: shared/otp-signin-to-overview.yaml
+    env:
+      EMAIL: ${EMAIL}
+      OTP_CODE: ${OTP_CODE}
 
 - tapOn:
     id: "shell_tab_settings"

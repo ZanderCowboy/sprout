@@ -23,7 +23,7 @@ Manual trigger: **Actions** → **CI Android Verify** → **Run workflow** (sele
 `.github/workflows/release-main.yml` runs on labeled merges to `main`:
 
 - **Builds AND uploads** to Firebase App Distribution (dev APK) and Play Store internal track (prod AAB)
-- Commits the bumped version after successful uploads
+- Commits the bumped version when **Play upload succeeds** (Firebase failure does not block the commit; see [BUILD_NUMBER.md](BUILD_NUMBER.md) / #94)
 - See [FIREBASE_DEV_DISTRIBUTION.md](FIREBASE_DEV_DISTRIBUTION.md) and [BUILD_NUMBER.md](BUILD_NUMBER.md)
 
 ## CI policy: testing tracks only (until Production go-ahead)

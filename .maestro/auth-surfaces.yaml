@@ -1,8 +1,17 @@
 appId: app.stackmint.sprout.dev
+tags:
+  - page
+  - auth
 ---
-# Requires: intro screen visible (fresh launch).
-# Slides to Create account, opens terms/privacy, focuses fields.
-# Does NOT complete OTP or Google (surface smoke only).
+# Auth surfaces smoke (single clearState).
+# Coverage: former sign-in.yaml (create-account legal/fields) +
+#   sign-in-email.yaml (email-only Sign in field). Does NOT complete
+#   OTP / Google — surface checks only.
+# Run: maestro test .maestro/auth-surfaces.yaml
+
+- launchApp:
+    clearState: true
+    clearKeychain: true
 
 - extendedWaitUntil:
     visible:
@@ -57,3 +66,24 @@ appId: app.stackmint.sprout.dev
 
 - assertVisible:
     id: "create_account_continue"
+
+# Switch to email-only Sign in surface (former sign-in-email)
+- tapOn:
+    id: "create_account_sign_in_link"
+
+- extendedWaitUntil:
+    visible:
+      id: "sign_in_email_field"
+    timeout: 5000
+
+- tapOn:
+    id: "sign_in_email_field"
+
+- eraseText
+
+- inputText: "tour@example.com"
+
+- hideKeyboard
+
+- assertVisible:
+    id: "sign_in_continue"

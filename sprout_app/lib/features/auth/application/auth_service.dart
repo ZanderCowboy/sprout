@@ -2,32 +2,11 @@ import '../domain/auth_user.dart';
 
 /// Auth use-cases: sign-in, session binding, sync gating, and account lifecycle.
 abstract class AuthService {
-  /// Stable user id for Maestro / development debug sign-in.
-  static const maestroTestUserId = 'maestro-test-user';
-
-  /// Stable [AuthUser] for Maestro / development debug sign-in.
-  static const maestroTestUser = AuthUser(
-    id: maestroTestUserId,
-    email: 'maestro@test.local',
-    displayName: 'Maestro Test',
-    isAnonymous: false,
-    signedInWithGoogle: false,
-  );
-
   /// Current Supabase auth user, if any.
   AuthUser? get currentUser;
 
   /// Emits auth user changes from the repository.
   Stream<AuthUser?> authStateChanges();
-
-  /// Development flavor only. Production never shows or accepts debug sign-in.
-  bool get debugSignInAvailable;
-
-  /// True after [debugSignIn] until [signOut] or [deleteAccount].
-  bool get isDebugSignedIn;
-
-  /// Development-only: skip OTP/Google and bind a stable local test user.
-  Future<void> debugSignIn();
 
   /// Sync is allowed only with a verified (non-anonymous) Supabase session.
   bool get canSync;

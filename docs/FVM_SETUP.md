@@ -86,6 +86,20 @@ If you need to manually configure it:
 2. Run **"Dart: Change SDK"**
 3. Select the `.fvm/flutter_sdk` path
 
+### Work Mac isolation checklist (AGP / Gradle — Sprout-only)
+
+Sprout’s Android toolchain lives **only** under `sprout_app/android/**` (AGP, Gradle wrapper, `gradle.properties`). Upgrading it must never become a global Android Studio “upgrade AGP for all projects” accept.
+
+Checklist before/after merging an AGP bump on a Mac that also hosts work Flutter/Android repos:
+
+1. **Stay in Personal paths** — change only this repo’s `sprout_app/android/**` (and Sprout docs/CI pins). Do not open or modify work project trees from the same agent/session.
+2. **FVM per repo** — Sprout uses the pin in `.fvmrc` (`fvm flutter …`). Work projects keep their own `.fvmrc` / Flutter (e.g. 3.38.x). Never `flutter upgrade` the shared/global SDK for Sprout.
+3. **Per-repo AGP/Gradle** — each Android tree has its own `settings.gradle(.kts)` + `gradle/wrapper`. Sprout on AGP 9.x does not require work repos to move.
+4. **JDK** — prefer Android Studio JBR for Sprout if system Temurin is too new for Kotlin DSL; do not change a shared JDK in a way work builds require. Optional Sprout-only: `org.gradle.java.home` in `sprout_app/android/gradle.properties` (commented example points at `~/.local/jdk/android-studio-jbr`).
+5. **After merge (Zander)** — smoke a work project configure/build yourself (`./gradlew` or the usual work command). Agents must not touch work trees to verify this.
+
+Current Sprout pins (see `sprout_app/android/`): AGP **9.0.1**, Gradle **9.1.0**, Kotlin plugin **2.2.20**, with `android.builtInKotlin=false` and `android.newDsl=false` until plugins migrate (Flutter AGP 9 guidance).
+
 ### Important: Work Projects Isolation
 
 **Do NOT run `flutter upgrade` in your global Flutter installation** or in the Grosvenor work project directory. Sprout's FVM setup is completely isolated:

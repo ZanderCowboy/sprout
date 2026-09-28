@@ -6,7 +6,6 @@ import 'package:sprout/core/constants/app_strings.dart';
 import 'package:sprout/core/constants/semantics_ids.dart';
 import 'package:sprout/core/router/app_route.dart';
 import 'package:sprout/ui/export.dart';
-import 'widgets/debug_sign_in_button.dart';
 import 'widgets/intro_dot.dart';
 import 'widgets/intro_slide.dart';
 
@@ -146,8 +145,6 @@ class _IntroPageState extends State<IntroPage> {
                   ),
                 ),
               ],
-              const SizedBox(height: 12),
-              const DebugSignInButton(),
             ],
           ),
         ),

@@ -7,7 +7,6 @@ import 'package:sprout/core/constants/app_strings.dart';
 import 'package:sprout/core/constants/semantics_ids.dart';
 import 'package:sprout/core/router/app_route.dart';
 import 'package:sprout/features/auth/presentation/bloc/auth_cubit.dart';
-import 'package:sprout/features/auth/presentation/widgets/debug_sign_in_button.dart';
 import 'package:sprout/features/connectivity/presentation/connectivity_cubit.dart';
 import 'package:sprout/ui/export.dart';
 
@@ -337,11 +336,6 @@ class _SignInPageState extends State<SignInPage> {
                           ),
                         ),
                       ],
-                      const SizedBox(height: 24),
-                      DebugSignInButton(
-                        enabled: isOnline && !busy,
-                        identifier: SemanticsIds.signInDebugSignIn,
-                      ),
                       if (busy) ...[
                         const SizedBox(height: 24),
                         const Center(child: CircularProgressIndicator()),

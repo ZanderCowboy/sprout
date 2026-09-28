@@ -184,7 +184,6 @@ Future<void> configureDependencies({
     () => AuthServiceImpl(
       authRepository: sl(),
       userContext: sl(),
-      appConfig: sl(),
       localSessionCleaner: sl(),
       analyticsService: sl(),
       flushPending: () => sl<SyncService>().flushPending(),

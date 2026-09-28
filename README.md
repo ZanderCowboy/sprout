@@ -182,49 +182,72 @@ With the app installed or running:
 maestro test .maestro/
 
 # Tag subsets
-maestro test .maestro/ --include-tags page    # per-page journeys
-maestro test .maestro/ --include-tags smoke   # core-loop + full-app-tour
+maestro test .maestro/ --include-tags p1      # ordinary PRs: tour + OTP + free paywalls (see .maestro/README.md)
+maestro test .maestro/ --include-tags page    # focused journeys
+maestro test .maestro/ --include-tags smoke   # full-app-tour + first-open-online
 maestro test .maestro/ --include-tags edge    # no-accounts edge cases
+maestro test .maestro/ --include-tags premium # paywall / purchase / subscribed
 
 # Run a specific journey
-maestro test .maestro/overview.yaml
 maestro test .maestro/full-app-tour.yaml
+maestro test .maestro/premium-free-paywalls.yaml
 ```
 
 ### Flow layout
 
 - **Root journeys** (`.maestro/*.yaml`) — runnable end-to-end tests. `config.yaml` sets `flows: ["*"]` so only these are discovered.
 - **Shared helpers** (`.maestro/shared/*.yaml`) — `runFlow` subflows (seed, chapters, form fill). Not runnable alone; compose them from root journeys with `env` parameters.
-- **Tags**: `page` (one surface), `smoke` (core-loop + full-app-tour), `edge` (no-accounts CTAs).
+- **Tags**: `p1` (ordinary-PR smoke: `full-app-tour` + `otp-auto-submit` + `premium-free-paywalls` — see [`.maestro/README.md`](.maestro/README.md)), `page` (focused), `smoke` (full-app-tour + first-open-online), `edge` (no-accounts CTAs), `premium` / `paywall` / `purchase` / `subscribed`.
+- **Deduped**: positives that share signed-in + preloaded setup live in one root; state-poison edges stay separate. Prefer session reuse over extra `clearState`.
 
 ### Available flows
 
-**Page** (`tags: [page]`):
+**P1** (`tags: [p1]` — ordinary PRs):
 
-- `intro.yaml` — Intro slides, back from Sign in, debug sign-in
-- `sign-in.yaml` — Legal links, fields, debug sign-in (no OTP / Google)
-- `overview.yaml` — Empty CTAs then populated Overview
-- `goals.yaml` — Goals sort, unallocated, Everyday Fund detail
-- `deposit.yaml` — Deposit sheet modes (FAB + goal detail)
-- `settings.yaml` — Settings hub tiles
-- `account-profile.yaml` — Edit name, legal, delete cancel (no sign-out)
-- `transactions.yaml` — Transactions list + detail note
+- `full-app-tour.yaml` — Signed-in core pages tour
+- `otp-auto-submit.yaml` — Real OTP auth
+- `premium-free-paywalls.yaml` — Free Premium + Master Budget paywall dismiss
 
 **Smoke** (`tags: [smoke]`):
 
-- `core-loop.yaml` — Create account, goal, deposit, verify progress
-- `full-app-tour.yaml` — Orchestrator: every surface via shared chapters
+- `full-app-tour.yaml` — Orchestrator (absorbs overview / goals / deposit / transactions / settings / account-profile / core-loop)
+- `first-open-online.yaml` — Intro slides + back from Sign in + OTP sign-in → wizard → Overview
+
+**Auth / page**:
+
+- `auth-surfaces.yaml` — Create-account legal/fields + email Sign in field (no auth complete)
+- `otp-auto-submit.yaml` — OTP send → wrong stays → right navigates (`EMAIL` + `OTP_CODE`)
+- `otp-send-only.yaml` / `otp-verify-only.yaml` — OTP helper phases
+- `otp-offline-blocks.yaml` — Offline OTP edge
+- `auth-continue-disabled.yaml` / `auth-email-exists.yaml` / `auth-email-unknown.yaml` — auth edges
+- `google-sign-in.yaml` / `google-sign-in-dismiss.yaml` — Google auth edges
+- `sign-out-keeps-data.yaml` — Sign out keeps local data
+- `wizard-happy-path.yaml` / `wizard-skip.yaml` — Wizard paths
+
+**Premium** (`tags: [premium]`):
+
+- `premium-subscribed.yaml` — Premium active + Manage + Master Budget planner
+- `premium-free-paywalls.yaml` — Killswitch-on row + Settings + Master Budget paywall dismiss
+- `premium-purchase.yaml` — One purchase path (Settings → active → Master Budget unlock)
+- `settings-premium-killswitch-off.yaml` — Killswitch off (keep separate)
+- `master-budget-failopen.yaml` / `master-budget-deeplink-blocked.yaml` — state-poison edges
 
 **Edge** (`tags: [edge]`):
 
 - `deposit-no-accounts.yaml` — Deposit with 0 accounts shows CTA
 - `goal-no-accounts.yaml` — Creating goal with 0 accounts shows guidance
 
+**Other**:
+
+- `play-store-screenshots.yaml` — Store screenshot capture
+
 ### Shared helpers (not runnable alone)
 
 | Helper | Purpose |
 |--------|---------|
-| `shared/debug-signin-intro.yaml` | Debug sign-in from intro |
+| `shared/otp-signin-intro.yaml` | Real OTP sign-in from intro (needs `EMAIL` + `OTP_CODE`) |
+| `shared/otp-signin-to-overview.yaml` | OTP sign-in + skip wizard → Overview |
+| `shared/otp-signin-from-sign-in.yaml` | OTP when already on Sign in screen |
 | `shared/wait-overview.yaml` | Wait for Overview after sign-in |
 | `shared/open-center-sheet.yaml` | Open shell FAB action sheet |
 | `shared/fill-account-form.yaml` | Fill account name + color + save (`ACCOUNT_NAME`, `COLOR_INDEX`) |
@@ -233,9 +256,24 @@ maestro test .maestro/full-app-tour.yaml
 | `shared/seed-core.yaml` | Empty Overview → Everyday account; optional `SEED_GOAL` / `SEED_DEPOSIT` / `SEED_RECURRING` |
 | `shared/chapter-*.yaml` | Per-surface steps (no `launchApp`); composed by page journeys and the tour |
 
-Development builds show a **Debug sign in** button on intro and Sign in (`Maestro Test · maestro@test.local`). Flows tap it with `id: intro_debug_sign_in` (intro) or `id: sign_in_debug_sign_in` (sign-in screen). It binds a local-only test user (`maestro-test-user`) and opens Overview. Sync stays off.
+### Auth for Maestro (OTP)
 
-**Production flavor never shows the button.**
+Debug sign-in has been **removed entirely**. Maestro E2E standardizes on **real email OTP** (Google account picker is unreliable in Maestro).
+
+**Required env vars (do not commit secrets):**
+
+| Var | Purpose | Example |
+|-----|---------|---------|
+| `EMAIL` | Existing test account | `sprout.play.review@gmail.com` (default in most flows) |
+| `OTP_CODE` | 6-digit code from the inbox after Continue | pass at run time |
+| `OTP_CODE_REAUTH` | Second code for flows that sign out then sign in again | `sign-out-keeps-data.yaml` only |
+
+```bash
+OTP_CODE=123456 maestro test .maestro/full-app-tour.yaml
+OTP_CODE=111111 OTP_CODE_REAUTH=222222 maestro test .maestro/sign-out-keeps-data.yaml
+```
+
+After verified OTP, the app calls `Purchases.logIn` with the Supabase user id (RevenueCat identity sync). For Premium-subscribed flows, grant a promo (or complete a Test Store purchase) on that App User ID in RevenueCat.
 
 ### Semantic IDs for taps
 

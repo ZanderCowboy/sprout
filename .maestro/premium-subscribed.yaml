@@ -1,0 +1,72 @@
+appId: app.stackmint.sprout.dev
+tags:
+  - page
+  - premium
+  - purchases
+  - subscribed
+env:
+  EMAIL: sprout.play.review@gmail.com
+---
+# Premium subscribed (single clearState).
+# Coverage: former settings-premium-subscribed + master-budget-premium.
+# Asserts Settings Premium active + Manage, then Master Budget planner opens.
+# Requires OTP_CODE at runtime:
+#   OTP_CODE=xxxxxx maestro test .maestro/premium-subscribed.yaml
+# After OTP, Purchases.logIn uses the real Supabase user id.
+# QA: grant Premium on that App User ID in RevenueCat (or prior Test Store purchase).
+# Google account picker is unreliable in Maestro — OTP is the E2E standard.
+# Run: maestro test .maestro/premium-subscribed.yaml
+
+- setAirplaneMode: disabled
+
+- launchApp:
+    clearState: true
+    clearKeychain: true
+
+- runFlow:
+    file: shared/otp-signin-to-overview.yaml
+    env:
+      EMAIL: ${EMAIL}
+      OTP_CODE: ${OTP_CODE}
+
+- tapOn:
+    id: "shell_tab_settings"
+
+- extendedWaitUntil:
+    visible:
+      id: "settings_premium"
+    timeout: 15000
+
+- assertVisible:
+    id: "settings_premium"
+
+# Wait out "Checking subscription...". Merged SproutListTile semantics need regex.
+- extendedWaitUntil:
+    visible:
+      text: ".*Premium active.*"
+    timeout: 30000
+
+- assertVisible:
+    text: ".*Premium active.*"
+
+- assertVisible:
+    text: ".*Manage.*"
+
+- extendedWaitUntil:
+    visible:
+      id: "settings_budget"
+    timeout: 10000
+
+- tapOn:
+    id: "settings_budget"
+
+- extendedWaitUntil:
+    visible:
+      text: "Master Budget"
+    timeout: 15000
+
+- assertVisible:
+    text: "Master Budget"
+
+- assertVisible:
+    id: "budget_sort"
