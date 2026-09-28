@@ -2,7 +2,7 @@ name: sprout
 description: "Watch your money grow and for those who want to reach their goals quickly."
 publish_to: 'none'
 
-version: 1.5.0+25
+version: 1.6.0+26
 
 environment:
   sdk: ^3.11.1
