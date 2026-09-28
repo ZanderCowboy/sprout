@@ -2,10 +2,11 @@
 
 Changes heading to `main`. Newest entries at the top.
 
-## 2026-09-28 — PROD-safe debug entry + RC subscriber attributes (#114, #102)
+## 2026-09-28 — Environment page + RC subscriber attributes (#114, #102)
 
-- **#114:** PROD Debug Lens stays behind `debug_lens_enabled` (default false); App version double-tap → long-press opens Debug Lens when the gate is on, silent no-op when off; DEV Settings Debug tools unchanged
-- Reused one RC flag for Settings debug tools, bubble, and hidden gesture; Firebase version/condition break-glass documented in `docs/DEBUG_LENS.md`
+- **#114:** New **Environment** page hosts relocated soft-prompt previews; Settings App version long-press **or** double-tap opens it when `environment_page_enabled` allows (PROD default false; silent no-op when off)
+- Separate from Debug Lens — `debug_lens_enabled` unchanged for Lens/bubble only; DEV always has Environment (Settings row + gesture) without PROD break-glass
+- Documented Firebase setup in `docs/ENVIRONMENT_PAGE.md`
 - **#102:** Set RevenueCat `$email` + `$displayName` from auth on sign-in and display-name change; clear both before `logOut` so the next identity does not keep prior attributes
 - Documented reserved vs custom attributes and privacy notes in `docs/REVENUECAT.md`
 

@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 
 import 'package:sprout/core/core.dart';
-import 'package:sprout/core/debug/debug_entry_gesture_sequence.dart';
 import 'package:sprout/ui/export.dart';
 
-class SettingsFooter extends StatefulWidget {
+class SettingsFooter extends StatelessWidget {
   const SettingsFooter({
     super.key,
     required this.versionLabel,
@@ -12,7 +11,7 @@ class SettingsFooter extends StatefulWidget {
     required this.onSignOut,
     required this.onPrivacy,
     required this.onTerms,
-    this.onVersionDebugEntry,
+    this.onVersionEnvironmentEntry,
   });
 
   final String? versionLabel;
@@ -21,19 +20,11 @@ class SettingsFooter extends StatefulWidget {
   final VoidCallback onPrivacy;
   final VoidCallback onTerms;
 
-  /// Hidden PROD debug entry (#114): double-tap then long-press on version.
+  /// Hidden Environment entry (#114): long-press **or** double-tap on version.
   ///
-  /// Caller must gate (silent no-op when `debug_lens_enabled` is off). The
-  /// version label stays plain metadata with no affordance chrome.
-  final VoidCallback? onVersionDebugEntry;
-
-  @override
-  State<SettingsFooter> createState() => _SettingsFooterState();
-}
-
-class _SettingsFooterState extends State<SettingsFooter> {
-  final DebugEntryGestureSequence _debugEntrySequence =
-      DebugEntryGestureSequence();
+  /// Caller must gate (silent no-op when `environment_page_enabled` is off).
+  /// The version label stays plain metadata with no affordance chrome.
+  final VoidCallback? onVersionEnvironmentEntry;
 
   static final ButtonStyle _linkStyle = TextButton.styleFrom(
     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -42,22 +33,11 @@ class _SettingsFooterState extends State<SettingsFooter> {
     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
   );
 
-  void _onVersionDoubleTap() {
-    if (widget.onVersionDebugEntry == null) return;
-    _debugEntrySequence.onDoubleTap();
-  }
-
-  void _onVersionLongPress() {
-    final onEntry = widget.onVersionDebugEntry;
-    if (onEntry == null) return;
-    if (!_debugEntrySequence.onLongPress()) return;
-    onEntry();
-  }
-
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final onEntry = onVersionEnvironmentEntry;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -65,8 +45,8 @@ class _SettingsFooterState extends State<SettingsFooter> {
         SproutOutlinedButton.icon(
           identifier: SemanticsIds.accountSignOut,
           label: AppStrings.signOut,
-          onPressed: widget.busy ? null : widget.onSignOut,
-          icon: widget.busy
+          onPressed: busy ? null : onSignOut,
+          icon: busy
               ? SizedBox(
                   width: 18,
                   height: 18,
@@ -92,21 +72,17 @@ class _SettingsFooterState extends State<SettingsFooter> {
           AppStrings.appTitle,
           style: textTheme.titleMedium?.copyWith(color: AppColors.seed),
         ),
-        if (widget.versionLabel != null) ...[
+        if (versionLabel != null) ...[
           const SizedBox(height: 2),
           GestureDetector(
             behavior: HitTestBehavior.opaque,
-            onDoubleTap: widget.onVersionDebugEntry == null
-                ? null
-                : _onVersionDoubleTap,
-            onLongPress: widget.onVersionDebugEntry == null
-                ? null
-                : _onVersionLongPress,
+            onDoubleTap: onEntry,
+            onLongPress: onEntry,
             child: Semantics(
               identifier: SemanticsIds.settingsAppVersion,
               container: true,
               child: Text(
-                widget.versionLabel!,
+                versionLabel!,
                 style: textTheme.bodySmall?.copyWith(
                   color: scheme.onSurfaceVariant,
                 ),
@@ -121,7 +97,7 @@ class _SettingsFooterState extends State<SettingsFooter> {
             SproutTextButton(
               identifier: SemanticsIds.accountPrivacy,
               label: AppStrings.privacyPolicy,
-              onPressed: widget.busy ? null : widget.onPrivacy,
+              onPressed: busy ? null : onPrivacy,
               style: _linkStyle,
               child: Text(
                 AppStrings.privacyPolicy,
@@ -137,7 +113,7 @@ class _SettingsFooterState extends State<SettingsFooter> {
             SproutTextButton(
               identifier: SemanticsIds.accountTerms,
               label: AppStrings.termsOfService,
-              onPressed: widget.busy ? null : widget.onTerms,
+              onPressed: busy ? null : onTerms,
               style: _linkStyle,
               child: Text(
                 AppStrings.termsOfService,

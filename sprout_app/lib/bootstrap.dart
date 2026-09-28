@@ -34,3 +34,16 @@ bool shouldEnableDebugLens() {
   final remoteConfig = sl<RemoteConfigService>();
   return remoteConfig.isEnabled(RemoteFeatureFlag.debugLensEnabled);
 }
+
+/// Returns true when the Environment page entry is allowed.
+///
+/// Enabled when development OR production with `environment_page_enabled`.
+/// Separate from [shouldEnableDebugLens] / `debug_lens_enabled`.
+bool shouldEnableEnvironmentPage() {
+  final config = sl<AppConfig>();
+  if (config.environment == AppEnvironment.development) {
+    return true;
+  }
+  final remoteConfig = sl<RemoteConfigService>();
+  return remoteConfig.isEnabled(RemoteFeatureFlag.environmentPageEnabled);
+}

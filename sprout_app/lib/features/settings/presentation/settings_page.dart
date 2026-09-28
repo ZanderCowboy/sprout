@@ -8,7 +8,6 @@ import 'package:sprout/core/core.dart';
 import 'package:sprout/core/debug/sprout_debug_lens.dart';
 import 'package:sprout/core/di/service_locator.dart';
 import 'package:sprout/features/auth/export.dart';
-import 'package:sprout/features/play_prompts/export.dart';
 import 'package:sprout/features/purchases/export.dart';
 import 'package:sprout/features/settings/application/profile_avatar_service.dart';
 import 'package:sprout/ui/export.dart';
@@ -235,28 +234,14 @@ class _SettingsPageState extends State<SettingsPage> {
     SproutDebugLens.show(context);
   }
 
-  /// Hidden App version gesture (#114). Silent no-op when the RC gate is off.
-  void _onVersionDebugEntry() {
-    if (!shouldEnableDebugLens()) return;
-    SproutDebugLens.show(context);
+  void _openEnvironment() {
+    context.push(AppRoute.environment.path);
   }
 
-  Future<void> _showDebugUpdatePrompt() async {
-    final result = await showPlayUpdatePromptSheet(context);
-    if (!mounted) return;
-    if (result == PlayUpdatePromptResult.update) {
-      await sl<PlayUpdatePromptService>().openStoreListing();
-    }
-  }
-
-  Future<void> _showDebugReviewPrompt() async {
-    final result = await showPlayReviewPromptSheet(context);
-    if (!mounted) return;
-    if (result == PlayReviewPromptResult.rate) {
-      await sl<PlayReviewPromptService>().requestReview(
-        forceStoreListing: true,
-      );
-    }
+  /// Hidden App version gesture (#114). Silent no-op when gate is off.
+  void _onVersionEnvironmentEntry() {
+    if (!shouldEnableEnvironmentPage()) return;
+    _openEnvironment();
   }
 
   @override
@@ -338,21 +323,24 @@ class _SettingsPageState extends State<SettingsPage> {
                   title: const Text(AppStrings.debugBubbleVisible),
                   subtitle: const Text(AppStrings.debugBubbleSubtitle),
                 ),
-                const SizedBox(height: 8),
-                SettingsNavRow(
-                  identifier: SemanticsIds.settingsDebugShowUpdatePrompt,
-                  label: AppStrings.debugShowUpdatePrompt,
-                  subtitle: AppStrings.debugShowUpdatePromptSubtitle,
-                  icon: Icons.system_update_alt_outlined,
-                  onTap: _showDebugUpdatePrompt,
+              ],
+              // DEV-only Settings row so day-to-day testing does not rely on
+              // the App version gesture or PROD break-glass RC.
+              if (sl<AppConfig>().environment == AppEnvironment.development) ...[
+                const SizedBox(height: 28),
+                Text(
+                  AppStrings.environmentPageTitle,
+                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 SettingsNavRow(
-                  identifier: SemanticsIds.settingsDebugShowReviewPrompt,
-                  label: AppStrings.debugShowReviewPrompt,
-                  subtitle: AppStrings.debugShowReviewPromptSubtitle,
-                  icon: Icons.star_outline_rounded,
-                  onTap: _showDebugReviewPrompt,
+                  identifier: SemanticsIds.settingsEnvironment,
+                  label: AppStrings.environmentPageTitle,
+                  subtitle: AppStrings.environmentPageNavSubtitle,
+                  icon: Icons.science_outlined,
+                  onTap: _openEnvironment,
                 ),
               ],
               const SizedBox(height: 32),
@@ -362,7 +350,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 onSignOut: () => context.read<AuthCubit>().signOut(),
                 onPrivacy: _openPrivacy,
                 onTerms: _openTerms,
-                onVersionDebugEntry: _onVersionDebugEntry,
+                onVersionEnvironmentEntry: _onVersionEnvironmentEntry,
               ),
               const SizedBox(height: 96),
             ],
