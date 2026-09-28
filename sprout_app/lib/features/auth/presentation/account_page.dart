@@ -59,10 +59,13 @@ class AccountPage extends StatelessWidget {
                             )
                           : Future<String?>.value(null),
                       builder: (context, snapshot) {
+                        final resolving =
+                            user.hasCustomAvatar &&
+                            snapshot.connectionState != ConnectionState.done;
                         return ProfileAvatar(
                           user: user,
                           imageUrl: snapshot.data,
-                          radius: 40,
+                          loading: resolving,
                           showEditBadge: false,
                         );
                       },

@@ -35,6 +35,17 @@ class ProfileAvatar extends StatelessWidget {
     final diameter = radius * 2;
     final hasPhoto = imageUrl != null && imageUrl!.isNotEmpty;
 
+    final spinnerSize = (radius * 0.46).clamp(16.0, 28.0);
+    final initialText = Text(initial, style: textTheme.headlineMedium);
+
+    Widget smallSpinner() {
+      return SizedBox(
+        width: spinnerSize,
+        height: spinnerSize,
+        child: const CircularProgressIndicator(strokeWidth: 2.5),
+      );
+    }
+
     final avatarCore = DecoratedBox(
       decoration: BoxDecoration(
         shape: BoxShape.circle,
@@ -49,13 +60,25 @@ class ProfileAvatar extends StatelessWidget {
       child: CircleAvatar(
         radius: radius,
         backgroundColor: scheme.surfaceContainerHighest,
-        backgroundImage: hasPhoto ? NetworkImage(imageUrl!) : null,
-        onBackgroundImageError: hasPhoto
-            ? (Object error, StackTrace? stackTrace) {}
-            : null,
         child: hasPhoto
-            ? null
-            : Text(initial, style: textTheme.headlineMedium),
+            ? ClipOval(
+                child: SizedBox(
+                  width: diameter,
+                  height: diameter,
+                  child: Image.network(
+                    imageUrl!,
+                    fit: BoxFit.cover,
+                    width: diameter,
+                    height: diameter,
+                    loadingBuilder: (context, child, progress) {
+                      if (progress == null) return child;
+                      return Center(child: smallSpinner());
+                    },
+                    errorBuilder: (_, _, _) => Center(child: initialText),
+                  ),
+                ),
+              )
+            : initialText,
       ),
     );
 
@@ -76,13 +99,7 @@ class ProfileAvatar extends StatelessWidget {
                   shape: BoxShape.circle,
                   color: Colors.black.withValues(alpha: 0.35),
                 ),
-                child: const Center(
-                  child: SizedBox(
-                    width: 28,
-                    height: 28,
-                    child: CircularProgressIndicator(strokeWidth: 2.5),
-                  ),
-                ),
+                child: Center(child: smallSpinner()),
               ),
             ),
           if (showEditBadge)

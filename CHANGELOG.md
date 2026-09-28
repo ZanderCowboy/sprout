@@ -2,6 +2,11 @@
 
 Changes heading to `main`. Newest entries at the top.
 
+## 2026-09-28 — Edit profile avatar matches settings size
+
+- Edit Profile avatar uses the same 96px circle as Settings (radius 48)
+- Avatar shows a small in-circle spinner while the photo URL resolves and while the image loads
+
 ## 2026-09-28 — Soft-prompt polish + delete Confirm + profile picture (#112, #115, #117)
 
 - Review soft-prompt **Rate on Play** uses the official colourful Google Play prism mark (`assets/images/google_play_icon.svg`), not Material `play_arrow`
