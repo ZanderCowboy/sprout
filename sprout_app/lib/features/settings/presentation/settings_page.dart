@@ -8,6 +8,7 @@ import 'package:sprout/core/core.dart';
 import 'package:sprout/core/debug/sprout_debug_lens.dart';
 import 'package:sprout/core/di/service_locator.dart';
 import 'package:sprout/features/auth/export.dart';
+import 'package:sprout/features/play_prompts/export.dart';
 import 'package:sprout/features/purchases/export.dart';
 import 'package:sprout/ui/export.dart';
 
@@ -182,6 +183,24 @@ class _SettingsPageState extends State<SettingsPage> {
     SproutDebugLens.show(context);
   }
 
+  Future<void> _showDebugUpdatePrompt() async {
+    final result = await showPlayUpdatePromptSheet(context);
+    if (!mounted) return;
+    if (result == PlayUpdatePromptResult.update) {
+      await sl<PlayUpdatePromptService>().openStoreListing();
+    }
+  }
+
+  Future<void> _showDebugReviewPrompt() async {
+    final result = await showPlayReviewPromptSheet(context);
+    if (!mounted) return;
+    if (result == PlayReviewPromptResult.rate) {
+      await sl<PlayReviewPromptService>().requestReview(
+        forceStoreListing: true,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -231,6 +250,22 @@ class _SettingsPageState extends State<SettingsPage> {
                   onChanged: _toggleDebugBubble,
                   title: const Text(AppStrings.debugBubbleVisible),
                   subtitle: const Text(AppStrings.debugBubbleSubtitle),
+                ),
+                const SizedBox(height: 8),
+                SettingsNavRow(
+                  identifier: SemanticsIds.settingsDebugShowUpdatePrompt,
+                  label: AppStrings.debugShowUpdatePrompt,
+                  subtitle: AppStrings.debugShowUpdatePromptSubtitle,
+                  icon: Icons.system_update_alt_outlined,
+                  onTap: _showDebugUpdatePrompt,
+                ),
+                const SizedBox(height: 8),
+                SettingsNavRow(
+                  identifier: SemanticsIds.settingsDebugShowReviewPrompt,
+                  label: AppStrings.debugShowReviewPrompt,
+                  subtitle: AppStrings.debugShowReviewPromptSubtitle,
+                  icon: Icons.star_outline_rounded,
+                  onTap: _showDebugReviewPrompt,
                 ),
               ],
               const SizedBox(height: 32),

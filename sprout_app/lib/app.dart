@@ -18,6 +18,7 @@ import 'package:sprout/features/accounts/export.dart';
 import 'package:sprout/features/auth/export.dart';
 import 'package:sprout/features/connectivity/export.dart';
 import 'package:sprout/features/goals/export.dart';
+import 'package:sprout/features/play_prompts/export.dart';
 import 'package:sprout/ui/export.dart';
 
 class SproutApp extends StatefulWidget {
@@ -31,6 +32,9 @@ class _SproutAppState extends State<SproutApp> {
   late final AuthCubit _authCubit;
   late final GoRouterRefreshStream _refresh;
   late final GoRouter _router;
+  final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(
+    debugLabel: 'root',
+  );
 
   @override
   void initState() {
@@ -41,6 +45,7 @@ class _SproutAppState extends State<SproutApp> {
       authCubit: _authCubit,
       userContext: sl<UserContext>(),
       refreshListenable: _refresh,
+      navigatorKey: _rootNavigatorKey,
       hasExistingSetup: _hasExistingSetup,
       observers: [
         AnalyticsNavigatorObserver(sl<AnalyticsService>()),
@@ -120,6 +125,10 @@ class _SproutAppState extends State<SproutApp> {
             Widget result = EnvironmentBanner(
               environment: sl<AppConfig>().environment,
               child: child ?? const SizedBox.shrink(),
+            );
+            result = PlayPromptsHost(
+              navigatorKey: _rootNavigatorKey,
+              child: result,
             );
             if (shouldEnableDebugLens()) {
               result = SproutDebugLens.wrap(result);

@@ -1,0 +1,1 @@
+enum PlayPromptBadgeKind { update, review }
